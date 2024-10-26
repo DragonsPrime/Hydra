@@ -24,4 +24,6 @@ public interface FSNodeAllotment extends Pinenut {
      Symbolic            newSymbolic();
      SymbolicMeta        newSymbolicMeta();
      ChannelReceiverEntity newChannelReceiverEntity();
+
+     Strip  newStrip();
 }

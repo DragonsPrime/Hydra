@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.file.transmit.receiver.channel;
 
+import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.transmit.receiver.ArchReceiveEntity;
@@ -40,5 +41,10 @@ public class GenericChannelReceiveEntity extends ArchReceiveEntity implements Ch
     @Override
     public void receive(long offset, long endSize) throws IOException {
         this.channelReceiver.receive( this, offset, endSize );
+    }
+
+    @Override
+    public void receive(GUID frameGuid, int threadId, int threadNum) throws IOException {
+        this.channelReceiver.receive( this,frameGuid,threadId,threadNum );
     }
 }

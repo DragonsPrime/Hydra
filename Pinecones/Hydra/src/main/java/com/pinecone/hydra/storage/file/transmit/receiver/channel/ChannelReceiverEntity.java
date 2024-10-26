@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.file.transmit.receiver.channel;
 
+import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.file.transmit.receiver.ReceiveEntity;
 
 import java.io.IOException;
@@ -12,4 +13,5 @@ public interface ChannelReceiverEntity extends ReceiveEntity {
 
     void receive( )throws IOException;
     void receive( long offset, long endSize )throws IOException;
+    void receive(GUID frameGuid, int threadId, int threadNum) throws IOException;
 }

@@ -8,6 +8,7 @@ import com.pinecone.hydra.file.ibatis.FolderMapper;
 import com.pinecone.hydra.file.ibatis.FolderMetaMapper;
 import com.pinecone.hydra.file.ibatis.LocalFrameMapper;
 import com.pinecone.hydra.file.ibatis.RemoteFrameMapper;
+import com.pinecone.hydra.file.ibatis.StripMapper;
 import com.pinecone.hydra.file.ibatis.SymbolicMapper;
 import com.pinecone.hydra.file.ibatis.SymbolicMetaMapper;
 
@@ -19,6 +20,7 @@ import com.pinecone.hydra.storage.file.source.FolderManipulator;
 import com.pinecone.hydra.storage.file.source.FolderMetaManipulator;
 import com.pinecone.hydra.storage.file.source.LocalFrameManipulator;
 import com.pinecone.hydra.storage.file.source.RemoteFrameManipulator;
+import com.pinecone.hydra.storage.file.source.StripManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicMetaManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
@@ -68,6 +70,9 @@ public class FileMasterManipulatorImpl implements FileMasterManipulator {
 
     @Resource( type = FileMasterTreeManipulatorImpl.class )
     KOISkeletonMasterManipulator skeletonMasterManipulator;
+
+    @Structure( type = StripMapper.class )
+    StripManipulator            stripManipulator;
 
     public FileMasterManipulatorImpl() {
 
@@ -121,6 +126,11 @@ public class FileMasterManipulatorImpl implements FileMasterManipulator {
     @Override
     public SymbolicMetaManipulator getSymbolicMetaManipulator() {
         return this.symbolicMetaManipulator;
+    }
+
+    @Override
+    public StripManipulator getStripManipulator() {
+        return this.stripManipulator;
     }
 
     @Override

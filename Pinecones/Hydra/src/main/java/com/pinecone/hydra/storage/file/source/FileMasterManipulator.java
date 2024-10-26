@@ -12,4 +12,5 @@ public interface FileMasterManipulator extends KOIMasterManipulator {
     RemoteFrameManipulator      getRemoteFrameManipulator();
     SymbolicManipulator         getSymbolicManipulator();
     SymbolicMetaManipulator     getSymbolicMetaManipulator();
+    StripManipulator            getStripManipulator();
 }

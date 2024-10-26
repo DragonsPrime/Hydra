@@ -144,5 +144,11 @@ public class GenericFSNodeAllotment implements FSNodeAllotment {
         return new GenericChannelReceiveEntity(fileSystem,null,null,null);
     }
 
+    @Override
+    public Strip newStrip() {
 
+        GenericStrip strip = new GenericStrip(this.fileMasterManipulator.getStripManipulator());
+        strip.setStripGuid( this.guidAllocator.nextGUID72() );
+        return strip;
+    }
 }

@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity;
 
+import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 
@@ -16,5 +17,6 @@ public interface PhysicalVolume extends Volume{
     void streamExport( KOMFileSystem fileSystem, FileNode file ) throws IOException;
     void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel) throws IOException;
     void channelReceive( KOMFileSystem fileSystem, FileNode file, FileChannel channel, long offset, long endSize ) throws IOException;
+    void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, GUID frameGuid, int threadNum, int threadId) throws IOException;
     void streamReceive(KOMFileSystem fileSystem, FileNode file, InputStream inputStream) throws IOException;
 }

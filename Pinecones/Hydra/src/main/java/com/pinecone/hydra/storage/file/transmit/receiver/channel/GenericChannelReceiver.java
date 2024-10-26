@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.file.transmit.receiver.channel;
 
 import com.pinecone.framework.util.Bytes;
+import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.file.FileSystemConfig;
 import com.pinecone.hydra.storage.file.FrameSegmentNaming;
 import com.pinecone.hydra.storage.file.KOFSFrameSegmentNaming;
@@ -9,8 +10,10 @@ import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.LocalFrame;
 import com.pinecone.hydra.storage.file.entity.RemoteFrame;
+import com.pinecone.hydra.storage.file.entity.Strip;
 import com.pinecone.hydra.storage.file.transmit.receiver.ArchReceiver;
 import com.pinecone.hydra.storage.file.transmit.receiver.ReceiveEntity;
+import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
@@ -47,8 +50,10 @@ public class GenericChannelReceiver extends ArchReceiver implements ChannelRecei
         FSNodeAllotment allotment = fileSystem.getFSNodeAllotment();
         GuidAllocator guidAllocator = fileSystem.getGuidAllocator();
         long bytesRead = 0;
-        long segId = 0;
-        long totalBytesToRead = endSize;  // 需要读取的总字节数
+        long segId = offset / FileSystemConfig.defaultChunkSize;
+        if( offset % FileSystemConfig.defaultChunkSize != 0 ){
+            segId++;
+        }
         long remainingBytes = endSize;    // 剩余需要读取的字节数
 
         // 将文件指针移动到 offset 位置
@@ -100,13 +105,6 @@ public class GenericChannelReceiver extends ArchReceiver implements ChannelRecei
             localFrame.save();
             remoteFrame.save();
         }
-
-        file.setPhysicalSize(bytesRead);
-        file.setLogicSize(bytesRead);
-        file.setChecksum(checksum);
-        file.setParityCheck(parityCheck);
-        file.setCrc32Xor(Long.toHexString(crc32Xor));
-        fileSystem.put(file);
     }
 
     @Override
@@ -172,6 +170,53 @@ public class GenericChannelReceiver extends ArchReceiver implements ChannelRecei
         file.setParityCheck( parityCheck );
         file.setCrc32Xor( Long.toHexString(crc32Xor) );
         fileSystem.put( file );
+    }
+
+    @Override
+    public void receive(ReceiveEntity entity, GUID frameGuid, int threadId, int threadNum) throws IOException {
+        ChannelReceiverEntity channelReceiverEntity = entity.evinceChannelReceiverEntity();
+        FileChannel fileChannel = channelReceiverEntity.getChannel();
+        String destDirPath = channelReceiverEntity.getDestDirPath();
+        FileNode file = channelReceiverEntity.getFile();
+        KOMFileSystem fileSystem = channelReceiverEntity.getFileSystem();
+
+        long stripSize = FileSystemConfig.stripSize1;
+        long offset = FileSystemConfig.stripSize1 * threadId;
+        long stripId = threadId;
+        ByteBuffer buffer = ByteBuffer.allocate((int) stripSize);
+        FSNodeAllotment allotment = fileSystem.getFSNodeAllotment();
+        long bytesRead = 0;
+
+        String sourceName = this.mFrameSegmentNaming.naming( file.getName(),frameGuid, threadId );
+        Path stripFile = Paths.get(destDirPath, sourceName);
+        while( true ){
+            buffer.clear();
+            int read = 0;
+            fileChannel.position( offset );
+            read = fileChannel.read( buffer );
+            if( read == -1 ){
+                break;
+            }
+
+            buffer.flip();
+            Strip strip = allotment.newStrip();
+            strip.setSegGuid( frameGuid );
+            strip.setSize( read );
+            strip.setDefinitionSize( read );
+            strip.setSourceName( stripFile.toString() );
+            strip.setStripId( stripId );
+
+            try ( FileChannel chunkChannel = FileChannel.open(stripFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE) ) {
+                buffer.rewind();
+                chunkChannel.position(chunkChannel.size());
+                chunkChannel.write(buffer);
+            }
+            strip.setFileStartOffset( offset );
+            offset += stripSize * threadNum;
+            stripId += threadNum;
+            strip.save();
+        }
+
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local;
 
+import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
@@ -71,6 +72,12 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, long offset, long endSize) throws IOException {
         ChannelReceiverEntity receiveEntity = new GenericChannelReceiveEntity(fileSystem, this.mountPoint.getMountPoint(), file, channel);
         receiveEntity.receive( offset,endSize );
+    }
+
+    @Override
+    public void channelReceive(KOMFileSystem fileSystem, FileNode file,FileChannel channel, GUID frameGuid, int threadNum, int threadId) throws IOException {
+        ChannelReceiverEntity receiveEntity = new GenericChannelReceiveEntity(fileSystem, this.mountPoint.getMountPoint(), file, channel);
+        receiveEntity.receive( frameGuid,threadId,threadNum );
     }
 
     @Override

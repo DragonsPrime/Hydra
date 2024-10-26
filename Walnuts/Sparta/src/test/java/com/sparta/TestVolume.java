@@ -2,12 +2,14 @@ package com.sparta;
 
 import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
+import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.volume.UniformVolumeTree;
+import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
@@ -20,12 +22,14 @@ import com.pinecone.hydra.volume.ibatis.hydranium.VolumeMappingDriver;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.sauron.radium.Radium;
+import lombok.Data;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.List;
 
 
 class Alice extends Radium {
@@ -52,7 +56,8 @@ class Alice extends Radium {
 
         //this.testInsert( volumeTree );
         //this.testChannelReceive( fileSystem,volumeTree );
-        this.testRaid0Insert( fileSystem,volumeTree );
+        //this.testRaid0Insert( fileSystem,volumeTree );
+        this.TestRaid0Receive( fileSystem, volumeTree );
     }
     private void testBaseInsert(UniformVolumeTree volumeTree ){
         VolumeAllotment volumeAllotment = volumeTree.getVolumeAllotment();
@@ -101,9 +106,9 @@ class Alice extends Radium {
     private void testRaid0Insert( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ){
         VolumeAllotment volumeAllotment = volumeTree.getVolumeAllotment();
         VolumeCapacity volumeCapacity1 = volumeAllotment.newVolumeCapacity();
-        volumeCapacity1.setDefinitionCapacity( 1000 );
+        volumeCapacity1.setDefinitionCapacity( 100*1024*1024 );
         VolumeCapacity volumeCapacity2 = volumeAllotment.newVolumeCapacity();
-        volumeCapacity2.setDefinitionCapacity( 2000 );
+        volumeCapacity2.setDefinitionCapacity( 200*1024*1024 );
 
         LocalPhysicalVolume physicalVolume1 = volumeAllotment.newLocalPhysicalVolume();
         physicalVolume1.setType("PhysicalVolume");
@@ -122,11 +127,11 @@ class Alice extends Radium {
         physicalVolume2.setMountPoint( mountPoint2 );
 
         VolumeCapacity logicVolumeCapacity1 = volumeAllotment.newVolumeCapacity();
-        logicVolumeCapacity1.setDefinitionCapacity( 1000 );
+        logicVolumeCapacity1.setDefinitionCapacity( 100*1024*1024 );
         VolumeCapacity logicVolumeCapacity2 = volumeAllotment.newVolumeCapacity();
-        logicVolumeCapacity2.setDefinitionCapacity( 2000 );
+        logicVolumeCapacity2.setDefinitionCapacity( 200*1024*1024 );
         VolumeCapacity logicVolumeCapacity3 = volumeAllotment.newVolumeCapacity();
-        logicVolumeCapacity3.setDefinitionCapacity( 3000 );
+        logicVolumeCapacity3.setDefinitionCapacity( 300*1024*1024 );
 
         LocalSimpleVolume simpleVolume1 = volumeAllotment.newLocalSimpleVolume();
         simpleVolume1.setName( "逻辑卷一" );
@@ -148,6 +153,22 @@ class Alice extends Radium {
         volumeTree.put( simpleVolume1 );
         volumeTree.put( simpleVolume2 );
         volumeTree.put( spannedVolume );
+    }
+
+    private void TestRaid0Receive( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ) throws IOException {
+//        LogicVolume volume1 = volumeTree.get(GUIDs.GUID72("0414fd8-00011e-0004-78"));
+//        volume1.extendLogicalVolume( GUIDs.GUID72("0414fd8-00011e-0000-9c") );
+//        LogicVolume volume2 = volumeTree.get(GUIDs.GUID72("0414fd8-00011e-0005-78"));
+//        volume2.extendLogicalVolume(GUIDs.GUID72("0414fd8-00011e-0002-78"));
+
+        LogicVolume volume3 = volumeTree.get(GUIDs.GUID72("0414fd8-00011e-0006-78"));
+        File sourceFile = new File("D:\\井盖视频块\\4月13日 (2).mp4");
+        Path path = sourceFile.toPath();
+        FileNode fileNode = fileSystem.getFSNodeAllotment().newFileNode();
+        fileNode.setName(sourceFile.getName());
+        fileNode.setGuid( fileSystem.getGuidAllocator().nextGUID72() );
+        fileNode.setDefinitionSize(200*1024*1024);
+        volume3.channelReceive( fileSystem,fileNode,FileChannel.open(path, StandardOpenOption.READ) );
     }
 
 }

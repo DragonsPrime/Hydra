@@ -99,6 +99,11 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     }
 
     @Override
+    public void channelReceive(KOMFileSystem fileSystem, FileNode file, GUID frameGuid, int threadNum, int threadId) throws IOException {
+
+    }
+
+    @Override
     public void setVolumeTree(VolumeTree volumeTree) {
         this.volumeTree = volumeTree;
     }
