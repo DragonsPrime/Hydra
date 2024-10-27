@@ -271,26 +271,6 @@ public class GenericFileNode extends ArchElementNode implements FileNode{
         this.disableCluster = disableCluster;
     }
 
-    public void fragmentation(long size ){
-//        long segNum = (this.size + size - 1) / size;
-//        for( int i = 0 ; i<segNum ;i++ ){
-//            GuidAllocator guidAllocator = this.fileSystem.getGuidAllocator();
-//            LocalFrame localFrame = this.fileSystem.getFileSystemCreator().dummyLocalFrame();
-//            GUID segGuid = guidAllocator.nextGUID72();
-//            localFrame.setSegGuid(segGuid);
-//            localFrame.setFileGuid(this.guid);
-//            localFrame.setSegId(i);
-//
-//            long segmentSize = (i == segNum - 1) ? this.size % size : size;
-//            if (segmentSize == 0) {
-//                segmentSize = size;
-//            }
-//            localFrame.setSize(segmentSize);
-//            localFrame.setSourceName(this.name+i);
-//            localFrame.save();
-//        }
-    }
-
     public String toString() {
         return "GenericFileNode{enumId = " + enumId + ", guid = " + guid + ", createTime = " + createTime + ", updateTime = " + updateTime + ", name = " + name + ", deletedTime = " + deletedTime + ", checksum = " + checksum + ", parityCheck = " + parityCheck + ", "  + ", fileMeta = " + fileMeta + ", attribute = " + fileSystemAttributes + "}";
     }

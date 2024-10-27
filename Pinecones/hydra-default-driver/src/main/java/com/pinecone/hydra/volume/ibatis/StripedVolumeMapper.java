@@ -2,7 +2,7 @@ package com.pinecone.hydra.volume.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
-import com.pinecone.hydra.storage.volume.entity.local.TitanLocalStripedVolume;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TitanLocalStripedVolume;
 import com.pinecone.hydra.storage.volume.source.StripedVolumeManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 import org.apache.ibatis.annotations.Delete;

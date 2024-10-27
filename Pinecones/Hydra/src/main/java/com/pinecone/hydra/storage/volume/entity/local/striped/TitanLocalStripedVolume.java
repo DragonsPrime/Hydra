@@ -1,4 +1,4 @@
-package com.pinecone.hydra.storage.volume.entity.local;
+package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
@@ -7,6 +7,7 @@ import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
+import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
 import com.pinecone.hydra.storage.volume.source.StripedVolumeManipulator;
 
 import java.io.IOException;

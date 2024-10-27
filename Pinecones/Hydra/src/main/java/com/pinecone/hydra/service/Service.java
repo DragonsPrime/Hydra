@@ -2,7 +2,7 @@ package com.pinecone.hydra.service;
 
 import com.pinecone.framework.util.name.Namespace;
 
-public interface Service extends ServiceFamilyObject {
+public interface Service extends ServiceFamilyMeta {
     String getName();        // Service Name, e.g. WpnService
 
     String getDisplayName(); // Service Long Name, e.g. Windows Push Notification System Service

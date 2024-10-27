@@ -15,7 +15,6 @@ import com.pinecone.hydra.storage.file.transmit.receiver.stream.StreamReceiverEn
 import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.entity.ArchVolume;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
-import com.pinecone.hydra.storage.volume.entity.VolumeCapacity;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
 
 import java.io.File;
@@ -47,7 +46,7 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     }
 
     @Override
-    public void channelExport(KOMFileSystem fileSystem, FileNode file) throws IOException {
+    public void channelExport( KOMFileSystem fileSystem, FileNode file ) throws IOException {
         File temporaryFile = new File(this.mountPoint.getMountPoint());
         FileChannel channel = FileChannel.open(temporaryFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         ChannelExporterEntity exporterEntity = new GenericChannelExporterEntity(fileSystem, file, channel);
@@ -55,7 +54,7 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     }
 
     @Override
-    public void streamExport(KOMFileSystem fileSystem, FileNode file) throws IOException {
+    public void streamExport( KOMFileSystem fileSystem, FileNode file ) throws IOException {
         File temporaryFile = new File(this.mountPoint.getMountPoint());
         FileOutputStream fileOutputStream = new FileOutputStream(temporaryFile);
         StreamExporterEntity exporterEntity = new GenericStreamExporterEntity(fileSystem, file, fileOutputStream);
@@ -63,25 +62,25 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     }
 
     @Override
-    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel) throws IOException {
+    public void channelReceive( KOMFileSystem fileSystem, FileNode file, FileChannel channel ) throws IOException {
         ChannelReceiverEntity receiveEntity = new GenericChannelReceiveEntity(fileSystem, this.mountPoint.getMountPoint(), file, channel);
         receiveEntity.receive();
     }
 
     @Override
-    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number offset, Number endSize) throws IOException {
+    public void channelReceive( KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number offset, Number endSize ) throws IOException {
         ChannelReceiverEntity receiveEntity = new GenericChannelReceiveEntity(fileSystem, this.mountPoint.getMountPoint(), file, channel);
         receiveEntity.receive( offset,endSize );
     }
 
     @Override
-    public void channelReceive(KOMFileSystem fileSystem, FileNode file,FileChannel channel, GUID frameGuid, int threadNum, int threadId) throws IOException {
+    public void channelReceive( KOMFileSystem fileSystem, FileNode file,FileChannel channel, GUID frameGuid, int threadNum, int threadId ) throws IOException {
         ChannelReceiverEntity receiveEntity = new GenericChannelReceiveEntity(fileSystem, this.mountPoint.getMountPoint(), file, channel);
         receiveEntity.receive( frameGuid,threadId,threadNum );
     }
 
     @Override
-    public void streamReceive(KOMFileSystem fileSystem, FileNode file, InputStream inputStream) throws IOException {
+    public void streamReceive( KOMFileSystem fileSystem, FileNode file, InputStream inputStream ) throws IOException {
         StreamReceiverEntity receiverEntity = new GenericStreamReceiverEntity(fileSystem, this.mountPoint.getMountPoint(), file, inputStream);
         receiverEntity.receive();
     }

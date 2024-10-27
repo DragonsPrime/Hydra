@@ -2,7 +2,6 @@ package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
 import java.time.LocalDateTime;
 
@@ -27,6 +26,6 @@ public interface Volume extends Pinenut {
     String getExtConfig();
     void setExtConfig( String extConfig );
 
-    VolumeCapacity getVolumeCapacity();
-    void setVolumeCapacity( VolumeCapacity volumeCapacity );
+    VolumeCapacity64 getVolumeCapacity();
+    void setVolumeCapacity( VolumeCapacity64 volumeCapacity );
 }

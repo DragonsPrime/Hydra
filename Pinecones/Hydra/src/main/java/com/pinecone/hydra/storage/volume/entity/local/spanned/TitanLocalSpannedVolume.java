@@ -1,17 +1,16 @@
-package com.pinecone.hydra.storage.volume.entity.local;
+package com.pinecone.hydra.storage.volume.entity.local.spanned;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
-import com.pinecone.hydra.storage.file.FileSystemConfig;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.RemoteFrame;
-import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
-import com.pinecone.hydra.storage.volume.entity.VolumeCapacity;
+import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
+import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
 
 import java.io.IOException;
@@ -140,7 +139,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
         return this.toJSONString();
     }
 
-    private boolean checkCapacity(long fileSize, VolumeCapacity capacity){
+    private boolean checkCapacity(long fileSize, VolumeCapacity64 capacity){
         long remainingCapacity = capacity.getDefinitionCapacity() - capacity.getUsedSize();
         return remainingCapacity > fileSize;
     }

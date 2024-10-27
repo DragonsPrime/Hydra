@@ -20,7 +20,9 @@ public class GenericFileSystemOperatorFactory implements FileSystemOperatorFacto
     protected Map<String, String >             metaTypeMap = new TreeMap<>();
 
     protected void registerDefaultMetaType( Class<?> genericType ) {
-        this.metaTypeMap.put( genericType.getName(), genericType.getSimpleName().replace(FileSystemConfig.filePrefix,"") );
+        this.metaTypeMap.put( genericType.getName(), genericType.getSimpleName().replace(
+                this.fileSystem.getConfig().getVersionSignature(),""
+        ));
     }
 
     protected void registerDefaultMetaTypes() {
@@ -44,6 +46,12 @@ public class GenericFileSystemOperatorFactory implements FileSystemOperatorFacto
 
         this.registerDefaultMetaTypes();
     }
+
+
+
+
+
+
     @Override
     public void register( String typeName, TreeNodeOperator functionalNodeOperation ) {
         this.registerer.put( typeName, functionalNodeOperation );

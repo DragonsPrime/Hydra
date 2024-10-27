@@ -3,10 +3,8 @@ package com.pinecone.hydra.storage.volume.operator;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
-import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
-import com.pinecone.hydra.storage.volume.entity.VolumeCapacity;
-import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
+import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
 import com.pinecone.hydra.storage.volume.source.StripedVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
@@ -37,7 +35,7 @@ public class StripedVolumeOperator extends ArchVolumeOperator  implements Volume
         LocalStripedVolume stripedVolume = ( LocalStripedVolume ) treeNode;
         DistributedTreeNode distributedTreeNode = this.affirmPreinsertionInitialize(stripedVolume);
         GUID guid = stripedVolume.getGuid();
-        VolumeCapacity volumeCapacity = stripedVolume.getVolumeCapacity();
+        VolumeCapacity64 volumeCapacity = stripedVolume.getVolumeCapacity();
         if ( volumeCapacity.getVolumeGuid() == null ){
             volumeCapacity.setVolumeGuid( guid );
         }
@@ -62,7 +60,7 @@ public class StripedVolumeOperator extends ArchVolumeOperator  implements Volume
     @Override
     public TreeNode get(GUID guid) {
         StripedVolume stripedVolume = this.stripedVolumeManipulator.getStripedVolume(guid);
-        VolumeCapacity volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
+        VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
         stripedVolume.setVolumeCapacity( volumeCapacity );
         stripedVolume.setVolumeTree( this.volumeTree );
         return stripedVolume;

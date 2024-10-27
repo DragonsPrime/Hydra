@@ -7,9 +7,8 @@ import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.TitanVolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
-import com.pinecone.hydra.storage.volume.entity.VolumeCapacity;
+import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.operator.TitanVolumeOperatorFactory;
-import com.pinecone.hydra.storage.volume.operator.VolumeOperatorFactory;
 import com.pinecone.hydra.storage.volume.source.MirroredVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.MountPointManipulator;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
@@ -49,7 +48,7 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
 
 
     public UniformVolumeTree(Hydrarum hydrarum, KOIMasterManipulator masterManipulator) {
-        super(hydrarum, masterManipulator, VolumeTree.KernelVolumeConfig);
+        super( hydrarum, masterManipulator, VolumeTree.KernelVolumeConfig );
 
         this.volumeMasterManipulator    =   ( VolumeMasterManipulator ) masterManipulator;
         this.pathResolver               =   new KOPathResolver( this.kernelObjectConfig );
@@ -81,8 +80,8 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
     }
 
     @Override
-    public KernelObjectConfig getConfig() {
-        return this.kernelObjectConfig;
+    public VolumeConfig getConfig() {
+        return (VolumeConfig) this.kernelObjectConfig;
     }
 
     public VolumeAllotment getVolumeAllotment(){
@@ -181,7 +180,7 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
     public PhysicalVolume getPhysicalVolume(GUID guid) {
         PhysicalVolume physicalVolume = this.physicalVolumeManipulator.getPhysicalVolume(guid);
         MountPoint mountPoint = this.mountPointManipulator.getMountPointByVolumeGuid(guid);
-        VolumeCapacity volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
+        VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
         physicalVolume.setMountPoint( mountPoint );
         physicalVolume.setVolumeCapacity( volumeCapacity );
         return physicalVolume;
@@ -218,7 +217,7 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
     @Override
     public GUID insertPhysicalVolume(PhysicalVolume physicalVolume) {
         GUID guid = physicalVolume.getGuid();
-        VolumeCapacity volumeCapacity = physicalVolume.getVolumeCapacity();
+        VolumeCapacity64 volumeCapacity = physicalVolume.getVolumeCapacity();
         if( volumeCapacity.getVolumeGuid() == null ){
             volumeCapacity.setVolumeGuid( guid );
         }

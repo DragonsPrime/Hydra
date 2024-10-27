@@ -43,13 +43,13 @@ public class GenericServiceElement extends ArchElementNode implements ServiceEle
         this.createTime = LocalDateTime.now();
     }
 
-    public GenericServiceElement(ServicesInstrument servicesInstrument) {
+    public GenericServiceElement( ServicesInstrument servicesInstrument ) {
         this.servicesInstrument = servicesInstrument;
         GuidAllocator guidAllocator = this.servicesInstrument.getGuidAllocator();
         this.setGuid( guidAllocator.nextGUID72() );
     }
 
-    public GenericServiceElement(ServicesInstrument servicesInstrument, ServiceNodeManipulator serviceNodeManipulator ) {
+    public GenericServiceElement( ServicesInstrument servicesInstrument, ServiceNodeManipulator serviceNodeManipulator ) {
         this(servicesInstrument);
         this.serviceNodeManipulator = serviceNodeManipulator;
     }

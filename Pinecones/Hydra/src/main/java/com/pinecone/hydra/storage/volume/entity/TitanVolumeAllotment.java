@@ -6,14 +6,9 @@ import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.TitanLocalPhysicalVolume;
-import com.pinecone.hydra.storage.volume.entity.local.TitanLocalSimpleVolume;
-import com.pinecone.hydra.storage.volume.entity.local.TitanLocalSpannedVolume;
-import com.pinecone.hydra.storage.volume.entity.local.TitanLocalStripedVolume;
-import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
-import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
-import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
-import com.pinecone.hydra.storage.volume.source.StripedVolumeManipulator;
-import com.pinecone.hydra.storage.volume.source.VolumeCapacityManipulator;
+import com.pinecone.hydra.storage.volume.entity.local.simple.TitanLocalSimpleVolume;
+import com.pinecone.hydra.storage.volume.entity.local.spanned.TitanLocalSpannedVolume;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TitanLocalStripedVolume;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
 
 public class TitanVolumeAllotment implements VolumeAllotment{
@@ -25,8 +20,8 @@ public class TitanVolumeAllotment implements VolumeAllotment{
         this.masterManipulator= volumeMasterManipulator;
     }
     @Override
-    public VolumeCapacity newVolumeCapacity() {
-        return new TitanVolumeCapacity( this.volumeTree,this.masterManipulator.getVolumeCapacityManipulator() );
+    public VolumeCapacity64 newVolumeCapacity() {
+        return new TitanVolumeCapacity64( this.volumeTree,this.masterManipulator.getVolumeCapacityManipulator() );
     }
 
     @Override

@@ -25,33 +25,34 @@ import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.zip.CRC32;
 
-public class GenericChannelReceiver extends ArchReceiver implements ChannelReceiver{
+public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
     protected KOMFileSystem           mKOMFileSystem;
     protected FrameSegmentNaming mFrameSegmentNaming;
 
-    public GenericChannelReceiver( KOMFileSystem komFileSystem ) {
+    public ChannelReceiver64(KOMFileSystem komFileSystem ) {
         this.mKOMFileSystem      = komFileSystem;
         this.mFrameSegmentNaming = new KOFSFrameSegmentNaming();
     }
 
 
     @Override
-    public void receive(ReceiveEntity entity, Number offset, Number endSize) throws IOException {
+    public void receive( ReceiveEntity entity, Number offset, Number endSize ) throws IOException {
         ChannelReceiverEntity channelReceiverEntity = entity.evinceChannelReceiverEntity();
         FileChannel fileChannel = channelReceiverEntity.getChannel();
         String destDirPath = channelReceiverEntity.getDestDirPath();
         FileNode file = channelReceiverEntity.getFile();
         KOMFileSystem fileSystem = channelReceiverEntity.getFileSystem();
-        long chunkSize = FileSystemConfig.defaultChunkSize;
+
+        long frameSize = this.mKOMFileSystem.getConfig().getFrameSize().longValue();
         int parityCheck = 0;
         long checksum = 0;
         long crc32Xor = 0;
-        ByteBuffer buffer = ByteBuffer.allocate((int) chunkSize);
+        ByteBuffer buffer = ByteBuffer.allocate((int) frameSize);
         FSNodeAllotment allotment = fileSystem.getFSNodeAllotment();
         GuidAllocator guidAllocator = fileSystem.getGuidAllocator();
         long bytesRead = 0;
-        long segId = offset.longValue() / FileSystemConfig.defaultChunkSize;
-        if( offset.longValue() % FileSystemConfig.defaultChunkSize != 0 ){
+        long segId = offset.longValue() / frameSize;
+        if( offset.longValue() % frameSize != 0 ){
             segId++;
         }
         long remainingBytes = endSize.longValue();    // 剩余需要读取的字节数
@@ -61,7 +62,7 @@ public class GenericChannelReceiver extends ArchReceiver implements ChannelRecei
 
         while (remainingBytes > 0) {
             buffer.clear();
-            int bytesToRead = (int) Math.min(chunkSize, remainingBytes);  // 计算本次读取的字节数
+            int bytesToRead = (int) Math.min(frameSize, remainingBytes);  // 计算本次读取的字节数
             buffer.limit(bytesToRead);
 
             int read = fileChannel.read(buffer);
@@ -89,7 +90,7 @@ public class GenericChannelReceiver extends ArchReceiver implements ChannelRecei
             Path chunkFile = Paths.get(destDirPath, sourceName);
             LocalFrame localFrame = allotment.newLocalFrame(file.getGuid(), (int) segId, chunkFile.toString(), Long.toHexString(crc.getValue()), read, 0);
             RemoteFrame remoteFrame = allotment.newRemoteFrame(file.getGuid(), (int) segId, Long.toHexString(crc.getValue()), read);
-            remoteFrame.setDeviceGuid(FileSystemConfig.localhostGUID);
+            remoteFrame.setDeviceGuid( this.mKOMFileSystem.getConfig().getLocalhostGUID() );
             remoteFrame.setSegGuid(localFrame.getSegGuid());
 
             try (FileChannel chunkChannel = FileChannel.open(chunkFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
@@ -114,11 +115,11 @@ public class GenericChannelReceiver extends ArchReceiver implements ChannelRecei
         String destDirPath = channelReceiverEntity.getDestDirPath();
         FileNode file = channelReceiverEntity.getFile();
         KOMFileSystem fileSystem = channelReceiverEntity.getFileSystem();
-        long chunkSize = FileSystemConfig.defaultChunkSize;
+        long frameSize = this.mKOMFileSystem.getConfig().getFrameSize().longValue();;
         int parityCheck = 0;
         long checksum = 0;
         long crc32Xor = 0;
-        ByteBuffer buffer = ByteBuffer.allocate((int) chunkSize);
+        ByteBuffer buffer = ByteBuffer.allocate((int) frameSize);
         FSNodeAllotment allotment = fileSystem.getFSNodeAllotment();
         GuidAllocator guidAllocator = fileSystem.getGuidAllocator();
         long bytesRead = 0;
@@ -151,7 +152,7 @@ public class GenericChannelReceiver extends ArchReceiver implements ChannelRecei
                 Path chunkFile = Paths.get(destDirPath, sourceName);
                 LocalFrame localFrame = allotment.newLocalFrame( file.getGuid(),(int) segId,chunkFile.toString(),Long.toHexString(crc.getValue()),read,0 );
                 RemoteFrame remoteFrame = allotment.newRemoteFrame( file.getGuid(),(int)segId,Long.toHexString(crc.getValue()), read);
-                remoteFrame.setDeviceGuid(FileSystemConfig.localhostGUID);
+                remoteFrame.setDeviceGuid(this.mKOMFileSystem.getConfig().getLocalhostGUID());
                 remoteFrame.setSegGuid( localFrame.getSegGuid() );
                 try ( FileChannel chunkChannel = FileChannel.open(chunkFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE) ) {
                     buffer.rewind();
@@ -173,7 +174,7 @@ public class GenericChannelReceiver extends ArchReceiver implements ChannelRecei
     }
 
     @Override
-    public void receive(ReceiveEntity entity, GUID frameGuid, int threadId, int threadNum) throws IOException {
+    public void receive( ReceiveEntity entity, GUID frameGuid, int threadId, int threadNum ) throws IOException {
         ChannelReceiverEntity channelReceiverEntity = entity.evinceChannelReceiverEntity();
         FileChannel fileChannel = channelReceiverEntity.getChannel();
         String destDirPath = channelReceiverEntity.getDestDirPath();

@@ -15,7 +15,7 @@ public class GenericChannelReceiveEntity extends ArchReceiveEntity implements Ch
     public GenericChannelReceiveEntity(KOMFileSystem fileSystem, String destDirPath, FileNode file, FileChannel channel ) {
         super(fileSystem, destDirPath, file);
         this.channel = channel;
-        this.channelReceiver = new GenericChannelReceiver( this.getFileSystem() );
+        this.channelReceiver = new ChannelReceiver64( this.getFileSystem() );
     }
 
     @Override

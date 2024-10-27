@@ -3,7 +3,7 @@ package com.pinecone.hydra.service;
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.util.id.Identification;
 
-public interface ServiceFamilyObject extends Pinenut  {
+public interface ServiceFamilyMeta extends Pinenut  {
     //long getEnumId();
 
     //GUID getGuid();

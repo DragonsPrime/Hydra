@@ -20,9 +20,9 @@ public interface LogicVolume extends Volume, TreeNode {
 
     void setChildren( List<LogicVolume> children );
 
-    VolumeCapacity getVolumeCapacity();
+    VolumeCapacity64 getVolumeCapacity();
 
-    void setVolumeCapacity( VolumeCapacity volumeCapacity );
+    void setVolumeCapacity( VolumeCapacity64 volumeCapacity );
 
     void extendLogicalVolume( GUID physicalGuid );
     List< GUID > listPhysicalVolume();

@@ -22,14 +22,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.zip.CRC32;
 
-public class GenericStreamReceiver extends ArchReceiver implements StreamReceiver {
+public class StreamReceiver64 extends ArchReceiver implements StreamReceiver {
     protected KOMFileSystem mKOMFileSystem;
     protected FrameSegmentNaming mFrameSegmentNaming;
 
-    public GenericStreamReceiver( KOMFileSystem komFileSystem ) {
+    public StreamReceiver64(KOMFileSystem komFileSystem ) {
         this.mKOMFileSystem      = komFileSystem;
         this.mFrameSegmentNaming = new KOFSFrameSegmentNaming();
     }
+
     @Override
     public void receive(ReceiveEntity entity) throws IOException {
         StreamReceiverEntity streamReceiverEntity = entity.evinceStreamReceiverEntity();
@@ -37,7 +38,7 @@ public class GenericStreamReceiver extends ArchReceiver implements StreamReceive
         FileNode file = streamReceiverEntity.getFile();
         KOMFileSystem fileSystem = streamReceiverEntity.getFileSystem();
 
-        long chunkSize = FileSystemConfig.defaultChunkSize; // 每片10MB
+        long chunkSize = this.mKOMFileSystem.getConfig().getFrameSize().longValue(); // 每片10MB
         int parityCheck = 0;
         long checksum = 0;
         long crc32Xor = 0;
@@ -59,7 +60,8 @@ public class GenericStreamReceiver extends ArchReceiver implements StreamReceive
                 }
                 if (segId == 0) {
                     crc32Xor = crc.getValue();
-                } else {
+                }
+                else {
                     crc32Xor ^= crc.getValue();
                 }
 
@@ -70,7 +72,7 @@ public class GenericStreamReceiver extends ArchReceiver implements StreamReceive
                 // 创建本地和远程分片信息
                 LocalFrame localFrame = allotment.newLocalFrame(file.getGuid(), (int) segId, chunkFile.toString(), Long.toHexString(crc.getValue()), read, 0);
                 RemoteFrame remoteFrame = allotment.newRemoteFrame(file.getGuid(), (int) segId, Long.toHexString(crc.getValue()), read);
-                remoteFrame.setDeviceGuid(FileSystemConfig.localhostGUID);
+                remoteFrame.setDeviceGuid( this.mKOMFileSystem.getConfig().getLocalhostGUID() );
                 remoteFrame.setSegGuid(localFrame.getSegGuid());
 
                 // 使用 OutputStream 将数据写入文件片段

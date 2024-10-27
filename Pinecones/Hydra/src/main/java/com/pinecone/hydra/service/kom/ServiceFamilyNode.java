@@ -2,9 +2,9 @@ package com.pinecone.hydra.service.kom;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.id.Identification;
-import com.pinecone.hydra.service.ServiceFamilyObject;
+import com.pinecone.hydra.service.ServiceFamilyMeta;
 
-public interface ServiceFamilyNode extends ServiceFamilyObject {
+public interface ServiceFamilyNode extends ServiceFamilyMeta {
     long getEnumId();
 
     void setEnumId( long id );

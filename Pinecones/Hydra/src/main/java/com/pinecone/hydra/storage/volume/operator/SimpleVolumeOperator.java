@@ -3,19 +3,14 @@ package com.pinecone.hydra.storage.volume.operator;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
-import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
-import com.pinecone.hydra.storage.volume.entity.Volume;
-import com.pinecone.hydra.storage.volume.entity.VolumeCapacity;
+import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
-import com.pinecone.hydra.storage.volume.source.MountPointManipulator;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
-import com.pinecone.hydra.storage.volume.source.VolumeCapacityManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
 import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
 import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.util.HashMap;
 import java.util.List;
@@ -40,7 +35,7 @@ public class SimpleVolumeOperator extends ArchVolumeOperator  implements VolumeO
         LocalSimpleVolume simpleVolume = ( LocalSimpleVolume ) treeNode;
         DistributedTreeNode distributedTreeNode = this.affirmPreinsertionInitialize(simpleVolume);
         GUID guid = simpleVolume.getGuid();
-        VolumeCapacity volumeCapacity = simpleVolume.getVolumeCapacity();
+        VolumeCapacity64 volumeCapacity = simpleVolume.getVolumeCapacity();
         if ( volumeCapacity.getVolumeGuid() == null ){
             volumeCapacity.setVolumeGuid( guid );
         }
@@ -65,7 +60,7 @@ public class SimpleVolumeOperator extends ArchVolumeOperator  implements VolumeO
     @Override
     public SimpleVolume get(GUID guid) {
         SimpleVolume simpleVolume = this.simpleVolumeManipulator.getSimpleVolume(guid);
-        VolumeCapacity volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
+        VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
         simpleVolume.setVolumeCapacity( volumeCapacity );
         simpleVolume.setVolumeTree( this.volumeTree );
         return simpleVolume;

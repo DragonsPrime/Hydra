@@ -2,10 +2,10 @@ package com.pinecone.hydra.service.kom.entity;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
-import com.pinecone.hydra.service.ArchServiceFamilyObject;
+import com.pinecone.hydra.service.ArchServiceFamilyMeta;
 import com.pinecone.hydra.service.kom.ServiceFamilyNode;
 
-public abstract class ArchElementNode extends ArchServiceFamilyObject implements ServiceFamilyNode {
+public abstract class ArchElementNode extends ArchServiceFamilyMeta implements ServiceFamilyNode {
     protected long enumId;
 
     public ArchElementNode() {

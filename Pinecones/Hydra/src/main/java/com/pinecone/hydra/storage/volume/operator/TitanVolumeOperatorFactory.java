@@ -1,14 +1,7 @@
 package com.pinecone.hydra.storage.volume.operator;
 
-import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.GenericFileNode;
 import com.pinecone.hydra.storage.file.entity.GenericFolder;
-import com.pinecone.hydra.storage.file.operator.FileSystemOperator;
-import com.pinecone.hydra.storage.file.operator.GenericFileOperator;
-import com.pinecone.hydra.storage.file.operator.GenericFolderOperator;
-import com.pinecone.hydra.storage.file.source.FileMasterManipulator;
-import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
 import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
@@ -20,11 +13,13 @@ import java.util.TreeMap;
 public class TitanVolumeOperatorFactory implements VolumeOperatorFactory{
     protected  VolumeMasterManipulator          volumeMasterManipulator;
     protected  VolumeTree                       volumeTree;
-    protected Map<String, TreeNodeOperator> registerer = new HashMap<>();
-    protected Map<String, String >             metaTypeMap = new TreeMap<>();
+    protected Map<String, TreeNodeOperator>     registerer = new HashMap<>();
+    protected Map<String, String >              metaTypeMap = new TreeMap<>();
 
     protected void registerDefaultMetaType( Class<?> genericType ) {
-        this.metaTypeMap.put( genericType.getName(), genericType.getSimpleName().replace(VolumeConfig.filePrefix,"") );
+        this.metaTypeMap.put( genericType.getName(), genericType.getSimpleName().replace(
+                this.volumeTree.getConfig().getVersionSignature(), ""
+        ));
     }
 
     protected void registerDefaultMetaTypes() {
@@ -32,7 +27,7 @@ public class TitanVolumeOperatorFactory implements VolumeOperatorFactory{
         this.registerDefaultMetaType( GenericFileNode.class );
     }
 
-    public TitanVolumeOperatorFactory(VolumeTree volumeTree, VolumeMasterManipulator volumeMasterManipulator ){
+    public TitanVolumeOperatorFactory( VolumeTree volumeTree, VolumeMasterManipulator volumeMasterManipulator ){
         this.volumeTree = volumeTree;
         this.volumeMasterManipulator = volumeMasterManipulator;
 
@@ -52,6 +47,8 @@ public class TitanVolumeOperatorFactory implements VolumeOperatorFactory{
         );
         this.registerDefaultMetaTypes();
     }
+
+
     @Override
     public void register( String typeName, TreeNodeOperator functionalNodeOperation ) {
         this.registerer.put( typeName, functionalNodeOperation );

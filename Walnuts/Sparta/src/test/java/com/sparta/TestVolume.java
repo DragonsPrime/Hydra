@@ -2,6 +2,7 @@ package com.sparta;
 
 import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
@@ -14,22 +15,23 @@ import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
-import com.pinecone.hydra.storage.volume.entity.VolumeCapacity;
+import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
+import com.pinecone.hydra.storage.volume.runtime.ArchStripedTaskThread;
+import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
+import com.pinecone.hydra.storage.volume.runtime.VolumeJob;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.volume.ibatis.hydranium.VolumeMappingDriver;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.sauron.radium.Radium;
-import lombok.Data;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.List;
 
 
 class Alice extends Radium {
@@ -57,12 +59,17 @@ class Alice extends Radium {
         //this.testInsert( volumeTree );
         //this.testChannelReceive( fileSystem,volumeTree );
         //this.testRaid0Insert( fileSystem,volumeTree );
-        this.TestRaid0Receive( fileSystem, volumeTree );
+        //this.TestRaid0Receive( fileSystem, volumeTree );
+
+
+        this.testSimpleThread();
     }
+
+
     private void testBaseInsert(UniformVolumeTree volumeTree ){
         VolumeAllotment volumeAllotment = volumeTree.getVolumeAllotment();
-        VolumeCapacity physicalVolumeCapacity = volumeAllotment.newVolumeCapacity();
-        VolumeCapacity logicVolumeCapacity = volumeAllotment.newVolumeCapacity();
+        VolumeCapacity64 physicalVolumeCapacity = volumeAllotment.newVolumeCapacity();
+        VolumeCapacity64 logicVolumeCapacity = volumeAllotment.newVolumeCapacity();
         physicalVolumeCapacity.setDefinitionCapacity(1000);
         logicVolumeCapacity.setDefinitionCapacity( 1000 );
 
@@ -105,9 +112,9 @@ class Alice extends Radium {
 
     private void testRaid0Insert( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ){
         VolumeAllotment volumeAllotment = volumeTree.getVolumeAllotment();
-        VolumeCapacity volumeCapacity1 = volumeAllotment.newVolumeCapacity();
+        VolumeCapacity64 volumeCapacity1 = volumeAllotment.newVolumeCapacity();
         volumeCapacity1.setDefinitionCapacity( 100*1024*1024 );
-        VolumeCapacity volumeCapacity2 = volumeAllotment.newVolumeCapacity();
+        VolumeCapacity64 volumeCapacity2 = volumeAllotment.newVolumeCapacity();
         volumeCapacity2.setDefinitionCapacity( 200*1024*1024 );
 
         LocalPhysicalVolume physicalVolume1 = volumeAllotment.newLocalPhysicalVolume();
@@ -126,11 +133,11 @@ class Alice extends Radium {
         mountPoint2.setMountPoint( "D:\\文件系统\\簇2" );
         physicalVolume2.setMountPoint( mountPoint2 );
 
-        VolumeCapacity logicVolumeCapacity1 = volumeAllotment.newVolumeCapacity();
+        VolumeCapacity64 logicVolumeCapacity1 = volumeAllotment.newVolumeCapacity();
         logicVolumeCapacity1.setDefinitionCapacity( 100*1024*1024 );
-        VolumeCapacity logicVolumeCapacity2 = volumeAllotment.newVolumeCapacity();
+        VolumeCapacity64 logicVolumeCapacity2 = volumeAllotment.newVolumeCapacity();
         logicVolumeCapacity2.setDefinitionCapacity( 200*1024*1024 );
-        VolumeCapacity logicVolumeCapacity3 = volumeAllotment.newVolumeCapacity();
+        VolumeCapacity64 logicVolumeCapacity3 = volumeAllotment.newVolumeCapacity();
         logicVolumeCapacity3.setDefinitionCapacity( 300*1024*1024 );
 
         LocalSimpleVolume simpleVolume1 = volumeAllotment.newLocalSimpleVolume();
@@ -171,6 +178,27 @@ class Alice extends Radium {
         volume3.channelReceive( fileSystem,fileNode,FileChannel.open(path, StandardOpenOption.READ) );
     }
 
+    private void testSimpleThread() throws Exception {
+        MasterVolumeGram gram = new MasterVolumeGram( "volume_master", this );
+        this.getTaskManager().add( gram );
+
+        PoopyButtholeThread poopyButthole = new PoopyButtholeThread( gram, new PoopJob( 1234 ) );
+        gram.getTaskManager().add( poopyButthole );
+
+
+        PoopyButtholeThread poopy1 = new PoopyButtholeThread( gram, new EatJob( "shit" ) );
+        gram.getTaskManager().add( poopy1 );
+
+
+        poopy1.start();
+        poopyButthole.start();
+
+
+        gram.getTaskManager().syncWaitingTerminated();
+        Debug.trace( "done~" );
+
+    }
+
 }
 public class TestVolume {
     public static void main( String[] args ) throws Exception {
@@ -181,3 +209,44 @@ public class TestVolume {
         }, (Object[]) args );
     }
 }
+
+
+class PoopJob implements VolumeJob {
+    int id ;
+    public PoopJob( int id ) {
+        this.id = id;
+    }
+
+    @Override
+    public void execute() {
+        Debug.trace( "I am pooping." + this.id );
+        Debug.sleep( 5000 );
+        Debug.trace( "done" );
+    }
+}
+
+class EatJob implements VolumeJob {
+    String name ;
+    public EatJob( String name ) {
+        this.name = name;
+    }
+
+    @Override
+    public void execute() {
+        Debug.trace( "I am eating." + this.name );
+        Debug.sleep( 5000 );
+        Debug.trace( "done" );
+    }
+}
+
+class PoopyButtholeThread extends ArchStripedTaskThread {
+    public PoopyButtholeThread ( Processum parent, VolumeJob job ) {
+        super( "PoopyButthole", parent, job );
+    }
+
+    @Override
+    protected void executeSingleJob() {
+        super.executeSingleJob();
+    }
+}
+

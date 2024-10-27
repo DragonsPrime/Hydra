@@ -1,11 +1,12 @@
 package com.pinecone.hydra.storage.file.entity;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.storage.UniformFile;
 
 import java.time.LocalDateTime;
 import java.util.TreeMap;
 
-public interface FileNode extends ElementNode{
+public interface FileNode extends ElementNode, UniformFile {
     LocalDateTime getDeletedTime();
     void setDeletedTime(LocalDateTime deletedTime);
 
@@ -31,7 +32,7 @@ public interface FileNode extends ElementNode{
     default FileNode evinceFileNode() {
         return this;
     }
-    void fragmentation( long size );
+
     void removeFrame();
 
     long getPhysicalSize();

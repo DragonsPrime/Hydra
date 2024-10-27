@@ -4,7 +4,7 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.id.Identification;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
 
-public abstract class ArchServiceFamilyObject implements ServiceFamilyObject {
+public abstract class ArchServiceFamilyMeta implements ServiceFamilyMeta {
     protected GUID   guid;
 
     protected String name;
@@ -20,7 +20,7 @@ public abstract class ArchServiceFamilyObject implements ServiceFamilyObject {
     protected String description;
 
 
-    public ArchServiceFamilyObject() {
+    public ArchServiceFamilyMeta() {
     }
 
     public GUID getGuid() {

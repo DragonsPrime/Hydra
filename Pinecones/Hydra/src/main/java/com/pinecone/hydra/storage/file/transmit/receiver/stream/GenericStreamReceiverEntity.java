@@ -13,7 +13,7 @@ public class GenericStreamReceiverEntity extends ArchReceiveEntity implements St
     public GenericStreamReceiverEntity(KOMFileSystem fileSystem, String destDirPath, FileNode file, InputStream inputStream) {
         super(fileSystem, destDirPath, file);
         this.inputStream = inputStream;
-        this.streamReceiver = new GenericStreamReceiver( fileSystem );
+        this.streamReceiver = new StreamReceiver64( fileSystem );
     }
 
     @Override
