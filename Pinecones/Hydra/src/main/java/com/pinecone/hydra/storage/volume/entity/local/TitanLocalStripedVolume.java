@@ -45,7 +45,7 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
     }
 
     @Override
-    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, long offset, long endSize) {
+    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number offset, Number endSize) {
 
     }
 
@@ -55,7 +55,7 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
     }
 
     @Override
-    public List<GUID> lsblk() {
+    public List<GUID> listPhysicalVolume() {
         return null;
     }
 

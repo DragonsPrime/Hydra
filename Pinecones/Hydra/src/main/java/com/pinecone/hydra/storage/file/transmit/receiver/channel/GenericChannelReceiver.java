@@ -36,7 +36,7 @@ public class GenericChannelReceiver extends ArchReceiver implements ChannelRecei
 
 
     @Override
-    public void receive(ReceiveEntity entity, long offset, long endSize) throws IOException {
+    public void receive(ReceiveEntity entity, Number offset, Number endSize) throws IOException {
         ChannelReceiverEntity channelReceiverEntity = entity.evinceChannelReceiverEntity();
         FileChannel fileChannel = channelReceiverEntity.getChannel();
         String destDirPath = channelReceiverEntity.getDestDirPath();
@@ -50,14 +50,14 @@ public class GenericChannelReceiver extends ArchReceiver implements ChannelRecei
         FSNodeAllotment allotment = fileSystem.getFSNodeAllotment();
         GuidAllocator guidAllocator = fileSystem.getGuidAllocator();
         long bytesRead = 0;
-        long segId = offset / FileSystemConfig.defaultChunkSize;
-        if( offset % FileSystemConfig.defaultChunkSize != 0 ){
+        long segId = offset.longValue() / FileSystemConfig.defaultChunkSize;
+        if( offset.longValue() % FileSystemConfig.defaultChunkSize != 0 ){
             segId++;
         }
-        long remainingBytes = endSize;    // 剩余需要读取的字节数
+        long remainingBytes = endSize.longValue();    // 剩余需要读取的字节数
 
         // 将文件指针移动到 offset 位置
-        fileChannel.position(offset);
+        fileChannel.position(offset.longValue());
 
         while (remainingBytes > 0) {
             buffer.clear();

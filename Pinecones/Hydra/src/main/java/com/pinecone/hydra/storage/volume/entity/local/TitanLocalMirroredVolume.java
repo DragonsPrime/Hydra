@@ -47,7 +47,7 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
     }
 
     @Override
-    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, long offset, long endSize) {
+    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number offset, Number endSize) {
 
     }
 
@@ -57,7 +57,7 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
     }
 
     @Override
-    public List<GUID> lsblk() {
+    public List<GUID> listPhysicalVolume() {
         return null;
     }
 

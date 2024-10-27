@@ -25,12 +25,12 @@ public interface LogicVolume extends Volume, TreeNode {
     void setVolumeCapacity( VolumeCapacity volumeCapacity );
 
     void extendLogicalVolume( GUID physicalGuid );
-    List< GUID > lsblk();
+    List< GUID > listPhysicalVolume();
 
     void channelExport( KOMFileSystem fileSystem, FileNode file ) throws IOException;
     void streamExport( KOMFileSystem fileSystem, FileNode file ) throws IOException;
     void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel) throws IOException;
-    void channelReceive( KOMFileSystem fileSystem, FileNode file, FileChannel channel, long offset, long endSize ) throws IOException;
+    void channelReceive( KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number offset, Number endSize ) throws IOException;
     void streamReceive(KOMFileSystem fileSystem, FileNode file, InputStream inputStream) throws IOException;
 
     default MirroredVolume evinceMirroredVolume(){

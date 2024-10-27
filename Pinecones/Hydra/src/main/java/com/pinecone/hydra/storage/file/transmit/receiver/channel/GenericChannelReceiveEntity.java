@@ -39,7 +39,7 @@ public class GenericChannelReceiveEntity extends ArchReceiveEntity implements Ch
     }
 
     @Override
-    public void receive(long offset, long endSize) throws IOException {
+    public void receive(Number offset, Number endSize) throws IOException {
         this.channelReceiver.receive( this, offset, endSize );
     }
 

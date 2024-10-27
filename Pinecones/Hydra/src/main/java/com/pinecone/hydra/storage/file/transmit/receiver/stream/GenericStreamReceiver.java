@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.file.transmit.receiver.stream;
 
 import com.pinecone.framework.util.Bytes;
+import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.file.FileSystemConfig;
 import com.pinecone.hydra.storage.file.FrameSegmentNaming;
 import com.pinecone.hydra.storage.file.KOFSFrameSegmentNaming;
@@ -95,7 +96,12 @@ public class GenericStreamReceiver extends ArchReceiver implements StreamReceive
     }
 
     @Override
-    public void receive(ReceiveEntity entity, long offset, long endSize) throws IOException {
+    public void receive(ReceiveEntity entity, Number offset, Number endSize) throws IOException {
+
+    }
+
+    @Override
+    public void receive(ReceiveEntity entity, GUID frameGuid, int threadId, int threadNum) throws IOException {
 
     }
 

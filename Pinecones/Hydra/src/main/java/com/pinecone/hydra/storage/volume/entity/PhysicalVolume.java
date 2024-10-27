@@ -16,7 +16,7 @@ public interface PhysicalVolume extends Volume{
     void channelExport(KOMFileSystem fileSystem, FileNode file ) throws IOException;
     void streamExport( KOMFileSystem fileSystem, FileNode file ) throws IOException;
     void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel) throws IOException;
-    void channelReceive( KOMFileSystem fileSystem, FileNode file, FileChannel channel, long offset, long endSize ) throws IOException;
+    void channelReceive( KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number offset, Number endSize ) throws IOException;
     void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, GUID frameGuid, int threadNum, int threadId) throws IOException;
     void streamReceive(KOMFileSystem fileSystem, FileNode file, InputStream inputStream) throws IOException;
 }

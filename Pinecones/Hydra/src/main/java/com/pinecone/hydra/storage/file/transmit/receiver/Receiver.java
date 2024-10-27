@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public interface Receiver extends Pinenut {
     void receive( ReceiveEntity entity ) throws IOException;
-    void receive( ReceiveEntity entity, long offset,long endSize ) throws IOException;
+    void receive( ReceiveEntity entity, Number offset,Number endSize ) throws IOException;
     void receive(ReceiveEntity entity, GUID frameGuid, int threadId , int threadNum) throws IOException;
     void resumableReceive(ReceiveEntity entity ) throws IOException;
 }

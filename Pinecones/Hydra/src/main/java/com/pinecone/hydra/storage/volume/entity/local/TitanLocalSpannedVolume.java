@@ -61,7 +61,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
     }
 
     @Override
-    public List<GUID> lsblk() {
+    public List<GUID> listPhysicalVolume() {
         return null;
     }
 
@@ -112,7 +112,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
     }
 
     @Override
-    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, long start, long offset) throws IOException {
+    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number start, Number offset) throws IOException {
 
     }
 
