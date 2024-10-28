@@ -148,7 +148,7 @@ public interface KOMFileSystem extends ReparseKOMTree {
     void copy(String sourcePath, String destinationPath);
 
     @Override
-    List<FileTreeNode> listRoot();
+    List<FileTreeNode> fetchRoot();
 
     Object querySelectorJ(String szSelector);
 

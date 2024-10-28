@@ -45,7 +45,7 @@ public interface Namespace extends ElementNode {
 
     Map<String, RegistryTreeNode > getChildren();
 
-    List<GUID > getChildrenGuids();
+    List<GUID > fetchChildrenGuids();
 
     void setChildrenGuids( List<GUID> contentGuids, int depth );
 

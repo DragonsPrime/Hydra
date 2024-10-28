@@ -1,8 +1,11 @@
 package com.pinecone.hydra.service.kom;
 
+import java.util.Map;
+
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.id.Identification;
 import com.pinecone.hydra.service.ServiceFamilyMeta;
+import com.pinecone.hydra.service.kom.entity.ArchElementNode;
 
 public interface ServiceFamilyNode extends ServiceFamilyMeta {
     long getEnumId();
@@ -13,7 +16,7 @@ public interface ServiceFamilyNode extends ServiceFamilyMeta {
 
     GUID getGuid();
 
-    void setGuid(GUID guid);
+    void setGuid( GUID guid );
 
     @Override
     default Identification getId() {
@@ -22,21 +25,23 @@ public interface ServiceFamilyNode extends ServiceFamilyMeta {
 
     String getScenario();
 
-    void setScenario(String scenario);
+    void setScenario( String scenario );
 
     String getPrimaryImplLang();
 
-    void setPrimaryImplLang(String primaryImplLang);
+    void setPrimaryImplLang( String primaryImplLang );
 
     String getExtraInformation();
 
-    void setExtraInformation(String extraInformation);
+    void setExtraInformation( String extraInformation );
 
     String getLevel();
 
-    void setLevel(String level);
+    void setLevel( String level );
 
     String getDescription();
 
-    void setDescription(String description);
+    void setDescription( String description );
+
+    ServiceFamilyNode apply( Map<String, Object > joEntity ) ;
 }

@@ -1,4 +1,22 @@
 package com.pinecone.hydra.service.kom.entity;
 
-public interface ElementNode extends ServiceTreeNode {
+import com.pinecone.hydra.service.kom.ServiceFamilyNode;
+import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
+
+public interface ElementNode extends ServiceTreeNode, ServiceFamilyNode {
+    default Namespace evinceNamespace() {
+        return null;
+    }
+
+    default ApplicationElement evinceApplicationElement() {
+        return null;
+    }
+
+    default ServiceElement evinceServiceElement() {
+        return null;
+    }
+
+    GUIDDistributedTrieNode getDistributedTreeNode();
+
+    void setDistributedTreeNode( GUIDDistributedTrieNode distributedTreeNode );
 }

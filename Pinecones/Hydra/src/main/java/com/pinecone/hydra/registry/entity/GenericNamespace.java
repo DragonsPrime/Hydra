@@ -67,7 +67,7 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
     }
 
     @Override
-    public List<GUID > getChildrenGuids() {
+    public List<GUID > fetchChildrenGuids() {
         return this.childrenGuids;
     }
 

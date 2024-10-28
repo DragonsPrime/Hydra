@@ -1,4 +1,4 @@
-package com.pinecone.framework.system.hometype;
+package com.pinecone.framework.system.homotype;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 

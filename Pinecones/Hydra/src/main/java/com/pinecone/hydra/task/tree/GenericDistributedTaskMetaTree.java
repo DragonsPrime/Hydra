@@ -144,7 +144,7 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
         }
         else {
             for(GUIDDistributedTrieNode childNode : childNodes){
-                List<GUID> parentNodes = this.distributedTrieTree.getParentGuids(childNode.getGuid());
+                List<GUID> parentNodes = this.distributedTrieTree.fetchParentGuids(childNode.getGuid());
                 if (parentNodes.size() > 1){
                     this.distributedTrieTree.removeInheritance(childNode.getGuid(),guid);
                 }else {

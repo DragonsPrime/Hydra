@@ -16,7 +16,7 @@ public interface RegistryTreeManipulator extends Pinenut {
 
     void removeInheritance(GUID childGuid, GUID parentGuid);
 
-    List<GUID> getParentGuids(GUID guid);
+    List<GUID> fetchParentGuids(GUID guid);
 
     List<GUIDDistributedTrieNode> getChild(GUID guid);
 }

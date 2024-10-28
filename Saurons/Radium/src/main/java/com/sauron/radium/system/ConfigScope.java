@@ -2,7 +2,7 @@ package com.sauron.radium.system;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.system.construction.UnifyStructureInjector;
-import com.pinecone.framework.system.hometype.StereotypicInjector;
+import com.pinecone.framework.system.homotype.StereotypicInjector;
 import com.pinecone.framework.unit.MultiScopeMap;
 import com.pinecone.framework.unit.MultiScopeMaptron;
 import com.pinecone.framework.util.config.JSONConfig;
@@ -15,7 +15,6 @@ import com.pinecone.hydra.system.ArchSystemCascadeComponent;
 import com.pinecone.hydra.system.HyComponent;
 import com.pinecone.hydra.system.Hydrarum;
 
-import java.nio.file.Path;
 import java.util.Map;
 
 public class ConfigScope extends ArchSystemCascadeComponent implements Saunut, HyComponent {

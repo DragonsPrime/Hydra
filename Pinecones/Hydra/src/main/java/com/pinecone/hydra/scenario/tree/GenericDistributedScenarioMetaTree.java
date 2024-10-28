@@ -144,7 +144,7 @@ public class GenericDistributedScenarioMetaTree implements DistributedScenarioMe
         }
         else {
             for(GUIDDistributedTrieNode childNode : childNodes){
-                List<GUID> parentNodes = this.distributedScenarioTree.getParentGuids(childNode.getGuid());
+                List<GUID> parentNodes = this.distributedScenarioTree.fetchParentGuids(childNode.getGuid());
                 if (parentNodes.size() > 1){
                     this.distributedScenarioTree.removeInheritance(childNode.getGuid(),guid);
                 }else {

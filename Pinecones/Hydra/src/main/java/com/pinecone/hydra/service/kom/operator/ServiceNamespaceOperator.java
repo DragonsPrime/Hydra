@@ -85,7 +85,7 @@ public class ServiceNamespaceOperator extends ArchServiceOperator implements Ser
     }
 
     @Override
-    public void purge(GUID guid) {
+    public void purge( GUID guid ) {
         //namespace节点需要递归删除其拥有节点若其引用节点，没有其他引用则进行清理
         List<GUIDDistributedTrieNode> childNodes = this.distributedTrieTree.getChildren(guid);
         GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
@@ -98,7 +98,7 @@ public class ServiceNamespaceOperator extends ArchServiceOperator implements Ser
             }
             childNodes = this.distributedTrieTree.getChildren( guid );
             for( GUIDDistributedTrieNode childNode : childNodes ){
-                List<GUID > parentNodes = this.distributedTrieTree.getParentGuids(childNode.getGuid());
+                List<GUID > parentNodes = this.distributedTrieTree.fetchParentGuids(childNode.getGuid());
                 if ( parentNodes.size() > 1 ){
                     this.distributedTrieTree.removeInheritance(childNode.getGuid(),guid);
                 }
@@ -125,22 +125,22 @@ public class ServiceNamespaceOperator extends ArchServiceOperator implements Ser
     }
 
     @Override
-    public ServiceTreeNode get(GUID guid ) {
+    public ServiceTreeNode get( GUID guid ) {
         GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
-        GenericNamespace genericClassificationNode = new GenericNamespace();
-        GenericNamespaceRules namespaceRules = this.namespaceRulesManipulator.getNamespaceRules(node.getAttributesGUID());
+        GenericNamespace namespace = new GenericNamespace( this.servicesInstrument );
+        GenericNamespaceRules namespaceRules = this.namespaceRulesManipulator.getNamespaceRules( node.getAttributesGUID() );
         GUIDDistributedTrieNode guidDistributedTrieNode = this.distributedTrieTree.getNode(node.getGuid());
 
         if ( namespaceRules!=null ){
-            genericClassificationNode.setRulesGUID(namespaceRules.getGuid());
-            genericClassificationNode.setClassificationRules(namespaceRules);
+            namespace.setRulesGUID( namespaceRules.getGuid() );
+            namespace.setClassificationRules(namespaceRules);
         }
-        genericClassificationNode.setDistributedTreeNode(guidDistributedTrieNode);
-        genericClassificationNode.setName(this.namespaceManipulator.getNamespace(guid).getName());
-        genericClassificationNode.setGuid(guid);
+        namespace.setDistributedTreeNode( guidDistributedTrieNode );
+        namespace.setName( this.namespaceManipulator.getNamespace(guid).getName() );
+        namespace.setGuid( guid );
 
 
-        return genericClassificationNode;
+        return namespace;
     }
 
     @Override

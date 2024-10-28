@@ -15,7 +15,7 @@ public interface Folder extends ElementNode{
 
     Map<String, FileTreeNode> getChildren();
 
-    List<GUID > getChildrenGuids();
+    List<GUID > fetchChildrenGuids();
 
     void setChildrenGuids( List<GUID> contentGuids, int depth );
 

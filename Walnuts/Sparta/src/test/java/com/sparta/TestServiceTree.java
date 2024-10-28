@@ -3,6 +3,7 @@ package com.sparta;
 import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.Debug;
+import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.hydra.service.ibatis.hydranium.ServiceMappingDriver;
 import com.pinecone.hydra.service.kom.UniformServicesInstrument;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
@@ -37,50 +38,40 @@ class Jesse extends Radium {
     }
 
     private void testInsert( ServicesInstrument servicesInstrument){
+//        GenericNamespace namespace = new GenericNamespace();
+//        namespace.setName( "Test1" );
+//        servicesInstrument.put( namespace );
 
-        GenericNamespace namespace = new GenericNamespace();
-        namespace.setName( "Test1" );
-        servicesInstrument.put( namespace );
-
-        //Debug.trace( servicesInstrument.get( GUIDs.GUID72("03c2f90-000133-0000-44") ) );
+        //Debug.trace( servicesInstrument.get( GUIDs.GUID72("03c2f90-000133-000 0-44") ) );
 
 
-        GenericApplicationElement applicationNode = new GenericApplicationElement();
-        applicationNode.setName( "很好的服务" );
-        applicationNode.setAlias("我是别名");
-        applicationNode.setDeploymentMethod("我是部署方式");
-        applicationNode.setPath("我是路径");
-        applicationNode.setResourceType("我是资源类型");
-        applicationNode.setType("我是类型");
-        applicationNode.setDescription("我是描述");
-        applicationNode.setExtraInformation("我是额外信息");
-        applicationNode.setLevel("我是等级");
-        applicationNode.setPrimaryImplLang("JAVA");
-        applicationNode.setScenario("我是场景");
-        servicesInstrument.put( applicationNode );
+//        GenericApplicationElement applicationNode = new GenericApplicationElement(
+//                new JSONMaptron( "{ name:specialApp, alias:jesus, deploymentMethod:Container, path:'/xxx/xxx/ggg', resourceType:human," +
+//                        "type:Social, description: 'This is jesus', extraInformation: 'more', level:'L1', primaryImplLang: java, scenario:'/scenario/dragon/king'  }" )
+//        );
 //
-        GenericServiceElement serviceNode = new GenericServiceElement();
-        serviceNode.setGuid( servicesInstrument.getGuidAllocator().nextGUID72() );
-        serviceNode.setName("我的世界");
-        serviceNode.setAlias("我是别名");
-        serviceNode.setDescription("我是描述");
-        serviceNode.setLevel("我是等级");
-        serviceNode.setScenario("我是场景");
-        serviceNode.setResourceType("我是资源类型");
-        serviceNode.setServiceType("我是服务类型");
-        serviceNode.setExtraInformation("我是额外信息");
-        serviceNode.setPrimaryImplLang("JAVA");
+//        applicationNode.apply( new JSONMaptron( "{ name:specialApp2, deploymentMethod:VM }" ) );
+//        servicesInstrument.put( applicationNode );
+
+        GenericServiceElement serviceNode = new GenericServiceElement(
+                new JSONMaptron( "{ name:'特殊服务', alias:jesus, serviceType:System, path:'/xxx/xxx/ggg', resourceType:human," +
+                        "type:Social, description: 'This is special', extraInformation: 'more', level:'L1', primaryImplLang: java, scenario:'/scenario/dragon/king'  }" )
+        );
         servicesInstrument.put( serviceNode );
     }
 
-    private void testGet( ServicesInstrument servicesInstrument){
+    private void testGet( ServicesInstrument servicesInstrument ){
         //Debug.trace( servicesInstrument.queryGUIDByPath( "规则1/很好的服务/我的世界" ) );
         //Debug.trace( servicesInstrument.getPath(GUIDs.GUID72( "03c4a36-000381-0000-48" ) ) );
         //Debug.trace( servicesInstrument.get( GUIDs.GUID72("03e60e8-0000ae-0000-20") ) );
         //Debug.trace( servicesInstrument.get( GUIDs.GUID72("03e60e8-0000c5-0000-48") ) );
         //Debug.trace( servicesInstrument.get( GUIDs.GUID72("03e60e8-000117-0000-18") ) );
 //        Debug.trace( servicesTree.get( GUIDs.GUID72( "02be396-0001e9-0000-e4" ) ) );
-        Debug.trace( servicesInstrument.affirmApplication( "Test1/特殊服务" ) );
+        //Debug.trace( servicesInstrument.affirmApplication( "Test1/App1" ) );
+        Debug.trace( servicesInstrument.affirmService( "Test1/特殊服务" ) );
+
+        Debug.trace( servicesInstrument.affirmNamespace( "Test1" ).fetchChildren() );
+
     }
 
     private void testDelete( ServicesInstrument servicesInstrument){

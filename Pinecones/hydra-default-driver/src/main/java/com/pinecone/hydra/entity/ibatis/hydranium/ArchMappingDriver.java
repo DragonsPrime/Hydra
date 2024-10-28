@@ -7,7 +7,7 @@ import org.apache.ibatis.session.SqlSession;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.system.construction.UnifyStructureInjector;
-import com.pinecone.framework.system.hometype.StereotypicInjector;
+import com.pinecone.framework.system.homotype.StereotypicInjector;
 import com.pinecone.hydra.entity.ibatis.GUID72TypeHandler;
 import com.pinecone.hydra.entity.ibatis.GUIDTypeHandler;
 import com.pinecone.hydra.entity.ibatis.UOITypeHandler;

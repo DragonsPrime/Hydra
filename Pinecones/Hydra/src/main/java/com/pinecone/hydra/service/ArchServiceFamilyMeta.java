@@ -1,8 +1,12 @@
 package com.pinecone.hydra.service;
 
+import java.util.Map;
+
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.id.Identification;
+import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.ulf.util.id.GUIDs;
 
 public abstract class ArchServiceFamilyMeta implements ServiceFamilyMeta {
     protected GUID   guid;
@@ -19,8 +23,21 @@ public abstract class ArchServiceFamilyMeta implements ServiceFamilyMeta {
 
     protected String description;
 
-
     public ArchServiceFamilyMeta() {
+    }
+
+    public ArchServiceFamilyMeta( Map<String, Object > joEntity ) {
+        this.apply( joEntity );
+    }
+
+    protected ArchServiceFamilyMeta apply( Map<String, Object > joEntity ) {
+        String szGuid = (String) joEntity.get( "guid" );
+        if( szGuid != null ) {
+            this.guid = GUIDs.GUID72( (String) joEntity.get( "guid" ) );
+        }
+        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+
+        return this;
     }
 
     public GUID getGuid() {

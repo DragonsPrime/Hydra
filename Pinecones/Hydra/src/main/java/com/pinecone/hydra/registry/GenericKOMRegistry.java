@@ -467,8 +467,8 @@ public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistr
     }
 
     @SuppressWarnings( "unchecked" )
-    public List<RegistryTreeNode > listRoot() {
-        return (List) super.listRoot();
+    public List<RegistryTreeNode > fetchRoot() {
+        return (List) super.fetchRoot();
     }
 
     // TODO, Unchecked type affirmed.

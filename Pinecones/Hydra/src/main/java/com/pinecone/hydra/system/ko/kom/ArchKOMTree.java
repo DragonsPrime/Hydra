@@ -152,7 +152,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
     }
 
     @Override
-    public GUID queryGUIDByPath(String path) {
+    public GUID queryGUIDByPath( String path ) {
         return this.queryGUIDByNS( path, null, null );
     }
 
@@ -190,7 +190,12 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
         return nodes;
     }
 
-    public EntityNode queryNodeByNS( String path, String szBadSep, String szTargetSep ) {
+    @Override
+    public List<GUID > fetchChildrenGuids( GUID guid ) {
+        return this.distributedTrieTree.fetchChildrenGuids( guid );
+    }
+
+    public EntityNode queryNodeByNS(String path, String szBadSep, String szTargetSep ) {
         Object ret = this.queryEntityHandleByNS( path, szBadSep, szTargetSep );
         if( ret instanceof EntityNode ) {
             return (EntityNode) ret;
@@ -203,8 +208,8 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
     }
 
     @Override
-    public List<? extends TreeNode > listRoot() {
-        List<GUID> guids = this.distributedTrieTree.listRoot();
+    public List<? extends TreeNode > fetchRoot() {
+        List<GUID> guids = this.distributedTrieTree.fetchRoot();
         ArrayList<TreeNode> treeNodes = new ArrayList<>();
         for( GUID guid : guids ){
             TreeNode treeNode = this.get(guid);

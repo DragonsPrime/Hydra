@@ -35,7 +35,7 @@ class StanMarsh extends Radium {
 
         KOMRegistry registry = new GenericKOMRegistry( koiMappingDriver );
 
-        //this.testBasicInsert( registry );
+        this.testBasicInsert( registry );
         //this.testDeletion( registry );
         //this.testDataExtends( registry );
         //this.testHardLink( registry );
@@ -116,7 +116,7 @@ class StanMarsh extends Radium {
     }
 
     private void testDataExtends( KOMRegistry registry ) {
-//          Debug.trace(registry.listRoot());
+//          Debug.trace(registry.fetchRoot());
 //        registry.setAffinity(new GUID72("1f7c33d6-000309-0000-f8"),new GUID72("1f7c33d6-0003c1-0000-b0"));
 
 //        registry.setInheritance();
@@ -180,7 +180,7 @@ class StanMarsh extends Radium {
 
 //
 //        registry.putProperties( "movie/terraria/mob1", new JSONMaptron( "{ name:lural, age:666, species:cthulhu, job:mob }" ) );
-//        Debug.trace(registry.listRoot());
+//        Debug.trace(registry.fetchRoot());
 
 
     }

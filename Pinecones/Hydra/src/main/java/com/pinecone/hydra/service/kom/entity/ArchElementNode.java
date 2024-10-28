@@ -1,15 +1,48 @@
 package com.pinecone.hydra.service.kom.entity;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
 import com.pinecone.hydra.service.ArchServiceFamilyMeta;
-import com.pinecone.hydra.service.kom.ServiceFamilyNode;
+import com.pinecone.hydra.service.kom.ServicesInstrument;
+import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
+import com.pinecone.ulf.util.id.GuidAllocator;
 
-public abstract class ArchElementNode extends ArchServiceFamilyMeta implements ServiceFamilyNode {
-    protected long enumId;
+public abstract class ArchElementNode extends ArchServiceFamilyMeta implements ElementNode {
+    protected long                       enumId;
+
+    protected GUIDDistributedTrieNode    distributedTreeNode;
+    protected ServicesInstrument         servicesInstrument;
 
     public ArchElementNode() {
         super();
+    }
+
+    public ArchElementNode( Map<String, Object > joEntity ) {
+        super( joEntity );
+        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+    }
+
+    public ArchElementNode( ServicesInstrument servicesInstrument ) {
+        this.apply( servicesInstrument );
+    }
+
+    public void apply( ServicesInstrument servicesInstrument ) {
+        this.servicesInstrument = servicesInstrument;
+        GuidAllocator guidAllocator = this.servicesInstrument.getGuidAllocator();
+        this.setGuid( guidAllocator.nextGUID72() );
+    }
+
+    @Override
+    public ArchElementNode apply( Map<String, Object > joEntity ) {
+        super.apply( joEntity );
+        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+
+        return this;
     }
 
     @Override
@@ -63,6 +96,16 @@ public abstract class ArchElementNode extends ArchServiceFamilyMeta implements S
     }
 
     @Override
+    public GUIDDistributedTrieNode getDistributedTreeNode() {
+        return this.distributedTreeNode;
+    }
+
+    @Override
+    public void setDistributedTreeNode( GUIDDistributedTrieNode distributedTreeNode ) {
+        this.distributedTreeNode = distributedTreeNode;
+    }
+
+    @Override
     public String toString() {
         return this.toJSONString();
     }
@@ -70,5 +113,20 @@ public abstract class ArchElementNode extends ArchServiceFamilyMeta implements S
     @Override
     public String toJSONString() {
         return BeanJSONEncoder.BasicEncoder.encode( this );
+    }
+
+
+    protected List<ElementNode > fetchChildren() {
+        List<GUID > guids = this.fetchChildrenGuids();
+        List<ElementNode > elementNodes = new ArrayList<>();
+        for( GUID guid : guids ){
+            ElementNode elementNode = (ElementNode) this.servicesInstrument.get( guid );
+            elementNodes.add( elementNode );
+        }
+        return elementNodes;
+    }
+
+    protected List<GUID > fetchChildrenGuids() {
+        return this.servicesInstrument.fetchChildrenGuids( this.getGuid() );
     }
 }

@@ -92,7 +92,7 @@ public class StandardPathSelector implements PathSelector {
             }
             else {
                 // Case3: For middle and last parts, retrieve children GUIDs using distributedTrieTree
-                guids = this.distributedTrieTree.getChildrenGuids( parentGuid );
+                guids = this.distributedTrieTree.fetchChildrenGuids( parentGuid );
             }
 
             if ( guids == null || guids.isEmpty() ) {
@@ -131,7 +131,7 @@ public class StandardPathSelector implements PathSelector {
         }
         else {
             // Case3: For middle and last parts, retrieve children GUIDs using distributedTrieTree
-            guids = this.distributedTrieTree.getChildrenGuids( parentGuid );
+            guids = this.distributedTrieTree.fetchChildrenGuids( parentGuid );
         }
 
         if ( guids == null || guids.isEmpty() ) {

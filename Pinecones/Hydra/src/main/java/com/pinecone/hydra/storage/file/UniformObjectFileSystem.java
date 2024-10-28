@@ -132,8 +132,8 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
 
     @Override
     @SuppressWarnings( "unchecked" )
-    public List<FileTreeNode > listRoot() {
-        return (List) super.listRoot();
+    public List<FileTreeNode > fetchRoot() {
+        return (List) super.fetchRoot();
     }
 
 

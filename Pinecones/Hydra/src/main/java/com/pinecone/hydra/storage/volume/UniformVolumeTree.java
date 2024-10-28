@@ -202,7 +202,7 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
     }
 
     @Override
-    public List<? extends TreeNode> listRoot() {
+    public List<? extends TreeNode> fetchRoot() {
         return null;
     }
 

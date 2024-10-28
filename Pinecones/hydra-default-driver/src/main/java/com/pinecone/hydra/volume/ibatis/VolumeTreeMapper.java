@@ -36,7 +36,7 @@ public interface VolumeTreeMapper extends VolumeTreeManipulator {
         if( node == null ){
             return node;
         }
-        List<GUID > parent = this.getParentGuids( guid );
+        List<GUID > parent = this.fetchParentGuids( guid );
         node.setParentGUID( parent );
         return node;
     }
@@ -74,16 +74,16 @@ public interface VolumeTreeMapper extends VolumeTreeManipulator {
     List<GUIDDistributedTrieNode > getChildren( GUID guid );
 
     @Select("SELECT `guid` FROM `hydra_uofs_volumes_tree` WHERE `parent_guid` = #{parentGuid}")
-    List<GUID > getChildrenGuids( @Param("parentGuid") GUID parentGuid );
+    List<GUID > fetchChildrenGuids( @Param("parentGuid") GUID parentGuid );
 
     @Select("SELECT `parent_guid` FROM `hydra_uofs_volumes_tree` WHERE `guid`=#{guid}")
-    List<GUID > getParentGuids( GUID guid );
+    List<GUID > fetchParentGuids( GUID guid );
 
     @Update("UPDATE `hydra_volume_nodes` SET `type` = #{type} WHERE guid=#{guid}")
     void updateType( UOI type , GUID guid );
 
     @Select( "SELECT guid FROM hydra_uofs_volumes_tree WHERE parent_guid IS NULL " )
-    List<GUID > listRoot();
+    List<GUID > fetchRoot();
 
     @Override
     @Select( "SELECT COUNT( `guid` ) FROM hydra_uofs_volumes_tree WHERE `parent_guid` IS NULL AND guid = #{guid}" )

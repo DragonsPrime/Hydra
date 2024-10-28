@@ -41,7 +41,7 @@ public interface ServiceTrieTreeMapper extends TrieTreeManipulator {
         if( node == null ) {
             return null;
         }
-        List<GUID > parent = this.getParentGuids( guid );
+        List<GUID > parent = this.fetchParentGuids( guid );
         node.setParentGUID( parent );
         return node;
     }
@@ -86,16 +86,16 @@ public interface ServiceTrieTreeMapper extends TrieTreeManipulator {
     List<GUIDDistributedTrieNode > getChildren( GUID guid );
 
     @Select("SELECT `guid` FROM `hydra_service_node_tree` WHERE `parent_guid` = #{parentGuid}")
-    List<GUID > getChildrenGuids( @Param("parentGuid") GUID parentGuid );
+    List<GUID > fetchChildrenGuids( @Param("parentGuid") GUID parentGuid );
 
     @Select("SELECT `parent_guid` FROM `hydra_service_node_tree` WHERE `guid`=#{guid}")
-    List<GUID > getParentGuids( GUID guid );
+    List<GUID > fetchParentGuids( GUID guid );
 
     @Update("UPDATE `hydra_service_meta_map` SET `type` = #{type} WHERE guid=#{guid}")
     void updateType( UOI type , GUID guid );
 
     @Select( "SELECT guid FROM hydra_service_node_tree WHERE parent_guid IS NULL " )
-    List<GUID > listRoot();
+    List<GUID > fetchRoot();
 
     @Override
     @Select( "SELECT COUNT( `guid` ) FROM hydra_service_node_tree WHERE `parent_guid` IS NULL AND guid = #{guid}" )

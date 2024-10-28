@@ -4,32 +4,38 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.service.kom.GenericNamespaceRules;
 import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
 
-public interface Namespace extends ServiceTreeNode {
+public interface Namespace extends FolderElement {
     long getEnumId();
 
-    @Override
-    default Namespace evinceTreeNode() {
-        return this;
-    }
-
-    void setEnumId(long id);
+    void setEnumId( long id );
 
     GUID getGuid();
-    void setGuid(GUID guid);
+
+    void setGuid( GUID guid );
 
     String getName();
-    void setName(String name);
+
+    void setName( String name );
 
     GUID getRulesGUID();
-    void setRulesGUID(GUID rulesGUID);
+
+    void setRulesGUID( GUID rulesGUID );
 
     GenericNamespaceRules getClassificationRules();
-    void setClassificationRules(GenericNamespaceRules classificationRules);
+
+    void setClassificationRules( GenericNamespaceRules classificationRules );
 
     GUIDDistributedTrieNode getDistributedTreeNode();
-    void setDistributedTreeNode(GUIDDistributedTrieNode distributedTreeNode);
+
+    void setDistributedTreeNode( GUIDDistributedTrieNode distributedTreeNode );
 
     ArchElementNode getAttributes();
-    void setNodeCommonData(ArchElementNode nodeAttributes);
+
+    void setNodeCommonData( ArchElementNode nodeAttributes );
+
+    @Override
+    default Namespace evinceNamespace() {
+        return this;
+    }
 
 }

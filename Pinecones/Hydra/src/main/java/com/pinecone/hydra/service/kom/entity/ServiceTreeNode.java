@@ -8,7 +8,8 @@ public interface ServiceTreeNode extends TreeNode {
     default String getMetaType() {
         return this.className().replace("Generic","");
     }
+
     default ServiceTreeNode evinceTreeNode(){
-        return null;
+        return this;
     }
 }

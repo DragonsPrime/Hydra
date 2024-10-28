@@ -63,7 +63,7 @@ public class GenericFolder extends ArchElementNode implements Folder{
     }
 
     @Override
-    public List<GUID> getChildrenGuids() {
+    public List<GUID> fetchChildrenGuids() {
         return null;
     }
 

@@ -111,13 +111,13 @@ public class GenericDistributedTrieTree implements UniDistributedTrieTree {
     }
 
     @Override
-    public List<GUID > getChildrenGuids( GUID parentGuid ) {
-        return this.trieTreeManipulator.getChildrenGuids( parentGuid );
+    public List<GUID > fetchChildrenGuids( GUID parentGuid ) {
+        return this.trieTreeManipulator.fetchChildrenGuids( parentGuid );
     }
 
     @Override
-    public List<GUID > getParentGuids( GUID guid ) {
-        return this.trieTreeManipulator.getParentGuids(guid);
+    public List<GUID > fetchParentGuids( GUID guid ) {
+        return this.trieTreeManipulator.fetchParentGuids(guid);
     }
 
     @Override
@@ -185,8 +185,8 @@ public class GenericDistributedTrieTree implements UniDistributedTrieTree {
 
 
     @Override
-    public List<GUID > listRoot() {
-        return this.trieTreeManipulator.listRoot();
+    public List<GUID > fetchRoot() {
+        return this.trieTreeManipulator.fetchRoot();
     }
 
 

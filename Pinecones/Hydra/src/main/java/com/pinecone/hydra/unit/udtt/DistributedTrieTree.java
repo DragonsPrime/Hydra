@@ -27,9 +27,9 @@ public interface DistributedTrieTree extends PineUnit {
 
     List<GUIDDistributedTrieNode> getChildren( GUID guid );
 
-    List<GUID> getChildrenGuids( GUID parentGuid );
+    List<GUID > fetchChildrenGuids( GUID parentGuid );
 
-    List<GUID> getParentGuids( GUID guid );
+    List<GUID > fetchParentGuids( GUID guid );
 
     void removeInheritance( GUID childGuid,GUID parentGuid );
 
@@ -49,7 +49,7 @@ public interface DistributedTrieTree extends PineUnit {
     void insertCachePath( GUID guid,String path );
 
 
-    List<GUID > listRoot();
+    List<GUID > fetchRoot();
 
     boolean isRoot( GUID guid );
 

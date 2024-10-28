@@ -5,8 +5,11 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.service.kom.entity.ApplicationElement;
 import com.pinecone.hydra.service.kom.entity.GenericApplicationElement;
 import com.pinecone.hydra.service.kom.entity.GenericNamespace;
+import com.pinecone.hydra.service.kom.entity.GenericServiceElement;
 import com.pinecone.hydra.service.kom.entity.Namespace;
+import com.pinecone.hydra.service.kom.entity.ServiceElement;
 import com.pinecone.hydra.service.kom.entity.ServiceTreeNode;
+import com.pinecone.hydra.service.kom.entity.ServoElement;
 import com.pinecone.hydra.service.kom.operator.GenericServiceOperatorFactory;
 import com.pinecone.hydra.service.kom.source.ApplicationNodeManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
@@ -79,11 +82,11 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
             node = this.queryElement( currentPath );
             if ( node == null){
                 if ( i == parts.length - 1 && cnSup != null ){
-                    ApplicationElement applicationElement = (ApplicationElement) this.dynamicFactory.optNewInstance( cnSup, new Object[]{ this } );
-                    applicationElement.setName( parts[i] );
-                    GUID guid = this.put(applicationElement);
+                    ServoElement servoElement = (ServoElement) this.dynamicFactory.optNewInstance( cnSup, new Object[]{ this } );
+                    servoElement.setName( parts[i] );
+                    GUID guid = this.put( servoElement );
                     this.affirmOwnedNode( parentGuid, guid );
-                    return applicationElement;
+                    return servoElement;
                 }
                 else {
                     Namespace namespace = (Namespace) this.dynamicFactory.optNewInstance( nsSup, new Object[]{ this } );
@@ -109,8 +112,13 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
     }
 
     @Override
-    public ApplicationElement affirmApplication(String path ) {
+    public ApplicationElement affirmApplication( String path ) {
         return (ApplicationElement) this.affirmTreeNodeByPath( path, GenericApplicationElement.class, GenericNamespace.class );
+    }
+
+    @Override
+    public ServiceElement affirmService( String path ) {
+        return (ServiceElement) this.affirmTreeNodeByPath( path, GenericServiceElement.class, GenericNamespace.class );
     }
 
     @Override
@@ -148,7 +156,7 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
     }
 
     @Override
-    public ServiceTreeNode get(GUID guid ){
+    public ServiceTreeNode get( GUID guid ){
         return (ServiceTreeNode) super.get( guid );
     }
 

@@ -1,5 +1,6 @@
 package com.pinecone.hydra.service.kom.entity;
 
+import java.util.List;
 
 import com.pinecone.framework.unit.KeyValue;
 import com.pinecone.framework.util.id.GUID;
@@ -8,19 +9,15 @@ import com.pinecone.hydra.service.kom.GenericNamespaceRules;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
 import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
 import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
 
 public class GenericNamespace extends ArchElementNode implements Namespace {
-    protected GUID rulesGUID;
+    protected GUID                        rulesGUID;
 
     protected GUIDDistributedTrieNode     distributedTreeNode;
 
     protected GenericNamespaceRules       classificationRules;
 
-    protected ArchElementNode nodeAttributes;
-
-
-    protected ServicesInstrument          servicesInstrument;
+    protected ArchElementNode             nodeAttributes;
 
     protected ServiceNamespaceManipulator namespaceManipulator;
 
@@ -29,23 +26,21 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
     }
 
     public GenericNamespace( ServicesInstrument servicesInstrument ) {
-        this.servicesInstrument = servicesInstrument;
-        GuidAllocator guidAllocator = this.servicesInstrument.getGuidAllocator();
-        this.setGuid( guidAllocator.nextGUID72() );
+        super( servicesInstrument );
     }
 
     public GenericNamespace( ServicesInstrument servicesInstrument, ServiceNamespaceManipulator namespaceManipulator ) {
-        this(servicesInstrument);
+        this( servicesInstrument );
         this.namespaceManipulator = namespaceManipulator;
     }
 
     @Override
     public GUIDDistributedTrieNode getDistributedTreeNode() {
-        return distributedTreeNode;
+        return this.distributedTreeNode;
     }
 
     @Override
-    public void setDistributedTreeNode(GUIDDistributedTrieNode distributedTreeNode) {
+    public void setDistributedTreeNode( GUIDDistributedTrieNode distributedTreeNode ) {
         this.distributedTreeNode = distributedTreeNode;
     }
 
@@ -90,5 +85,15 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
     @Override
     public String toString() {
         return this.name;
+    }
+
+    @Override
+    public List<ElementNode > fetchChildren() {
+        return super.fetchChildren();
+    }
+
+    @Override
+    public List<GUID > fetchChildrenGuids() {
+        return super.fetchChildrenGuids();
     }
 }

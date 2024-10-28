@@ -28,7 +28,7 @@ public class ApplicationNodeOperator extends ArchServiceOperator implements Serv
         this.factory = factory;
     }
 
-    public ApplicationNodeOperator(ServiceMasterManipulator masterManipulator, ServicesInstrument servicesInstrument){
+    public ApplicationNodeOperator( ServiceMasterManipulator masterManipulator, ServicesInstrument servicesInstrument ){
         super( masterManipulator, servicesInstrument);
         this.applicationNodeManipulator = masterManipulator.getApplicationNodeManipulator();
         this.applicationMetaManipulator = masterManipulator.getApplicationElementManipulator();
@@ -67,7 +67,7 @@ public class ApplicationNodeOperator extends ArchServiceOperator implements Serv
 
 
     @Override
-    public void purge(GUID guid) {
+    public void purge( GUID guid ) {
         //namespace节点需要递归删除其拥有节点若其引用节点，没有其他引用则进行清理
         List<GUIDDistributedTrieNode> childNodes = this.distributedTrieTree.getChildren(guid);
         GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
@@ -80,7 +80,7 @@ public class ApplicationNodeOperator extends ArchServiceOperator implements Serv
             }
             childNodes = this.distributedTrieTree.getChildren( guid );
             for( GUIDDistributedTrieNode childNode : childNodes ){
-                List<GUID > parentNodes = this.distributedTrieTree.getParentGuids(childNode.getGuid());
+                List<GUID > parentNodes = this.distributedTrieTree.fetchParentGuids(childNode.getGuid());
                 if ( parentNodes.size() > 1 ){
                     this.distributedTrieTree.removeInheritance(childNode.getGuid(),guid);
                 }
@@ -109,23 +109,23 @@ public class ApplicationNodeOperator extends ArchServiceOperator implements Serv
     @Override
     public ServiceTreeNode get( GUID guid ) {
         GUIDDistributedTrieNode node = this.distributedTrieTree.getNode( guid );
-        ApplicationElement applicationElement = new GenericApplicationElement();
+        ApplicationElement applicationElement;
         if( node.getNodeMetadataGUID() != null ){
-            applicationElement = this.applicationMetaManipulator.getApplicationElement( node.getNodeMetadataGUID() );
+            applicationElement = this.applicationMetaManipulator.getApplicationElement( node.getNodeMetadataGUID(), this.servicesInstrument );
+        }
+        else {
+            applicationElement = new GenericApplicationElement();
         }
 
         this.applyApplicationNode( applicationElement, this.commonDataManipulator.getNodeCommonData(guid) );
 
-
-        applicationElement.setDistributedTreeNode(node);
-
-        applicationElement.setName(this.applicationNodeManipulator.getApplicationNode(guid).getName());
+        applicationElement.setName( this.applicationNodeManipulator.getApplicationNode(guid).getName() );
         applicationElement.setGuid(applicationElement.getGuid());
         return applicationElement;
     }
 
     @Override
-    public TreeNode get(GUID guid, int depth) {
+    public TreeNode get( GUID guid, int depth ) {
         return null;
     }
 
@@ -135,12 +135,12 @@ public class ApplicationNodeOperator extends ArchServiceOperator implements Serv
     }
 
     @Override
-    public void update(TreeNode treeNode) {
+    public void update( TreeNode treeNode ) {
 
     }
 
     @Override
-    public void updateName(GUID guid, String name) {
+    public void updateName( GUID guid, String name ) {
 
     }
 

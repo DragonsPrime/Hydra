@@ -45,11 +45,13 @@ public interface KOMInstrument extends KernelObjectInstrument {
 
     List<TreeNode > getChildren( GUID guid );
 
+    List<GUID > fetchChildrenGuids( GUID guid );
+
     Object queryEntityHandleByNS( String path, String szBadSep, String szTargetSep );
 
     EntityNode queryNode( String path );
 
-    List<? extends TreeNode> listRoot();
+    List<? extends TreeNode> fetchRoot();
 
     void rename( GUID guid, String name );
 
