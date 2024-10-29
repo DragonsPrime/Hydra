@@ -3,7 +3,7 @@ package com.pinecone.hydra.volume.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
-import com.pinecone.hydra.storage.volume.entity.local.TitanLocalPhysicalVolume;
+import com.pinecone.hydra.storage.volume.entity.local.physical.TitanLocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 import org.apache.ibatis.annotations.Delete;

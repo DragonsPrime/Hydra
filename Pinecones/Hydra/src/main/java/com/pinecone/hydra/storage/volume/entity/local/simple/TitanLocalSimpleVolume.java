@@ -2,13 +2,16 @@ package com.pinecone.hydra.storage.volume.entity.local.simple;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
+import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
+import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleChannelReceiverEntity64;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 
 import java.io.IOException;
@@ -89,6 +92,15 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     @Override
     public void channelReceive(KOMFileSystem fileSystem, FileNode file, GUID frameGuid, int threadNum, int threadId) throws IOException {
 
+    }
+
+
+    @Override
+    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject,String destDirPath, FileChannel channel) throws IOException {
+        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64(this.volumeTree, receiveStorageObject, destDirPath, channel, this);
+        MiddleStorageObject middleStorageObject = titanSimpleChannelReceiverEntity64.receive();
+        middleStorageObject.setBottomGuid( this.guid );
+        return middleStorageObject;
     }
 
     @Override

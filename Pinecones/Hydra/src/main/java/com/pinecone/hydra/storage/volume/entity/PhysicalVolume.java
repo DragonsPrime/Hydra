@@ -1,8 +1,10 @@
 package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
+import com.pinecone.hydra.storage.volume.VolumeTree;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,4 +21,12 @@ public interface PhysicalVolume extends Volume{
     void channelReceive( KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number offset, Number endSize ) throws IOException;
     void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, GUID frameGuid, int threadNum, int threadId) throws IOException;
     void streamReceive(KOMFileSystem fileSystem, FileNode file, InputStream inputStream) throws IOException;
+
+
+
+
+    MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel ) throws IOException;
+    MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel, Number offset, Number endSize ) throws IOException;
+    MiddleStorageObject channelExport( VolumeTree volumeTree, ExportStorageObject exportStorageObject, FileChannel channel ) throws IOException;
+
 }

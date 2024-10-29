@@ -10,7 +10,7 @@ public interface FileSystemConfig extends KernelObjectConfig {
 
     GUID getLocalhostGUID();
 
+    Number getTinyFileStripSizing();
 
-    // TODO 删掉
-    long stripSize1 = 1024 * 1024;
+
 }

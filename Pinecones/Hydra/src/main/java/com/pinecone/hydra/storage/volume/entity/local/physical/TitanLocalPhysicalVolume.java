@@ -1,7 +1,8 @@
-package com.pinecone.hydra.storage.volume.entity.local;
+package com.pinecone.hydra.storage.volume.entity.local.physical;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.transmit.exporter.channel.ChannelExporterEntity;
@@ -14,7 +15,12 @@ import com.pinecone.hydra.storage.file.transmit.receiver.stream.GenericStreamRec
 import com.pinecone.hydra.storage.file.transmit.receiver.stream.StreamReceiverEntity;
 import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.entity.ArchVolume;
+import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
+import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
+import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
+import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirectChannelExportEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.physical.receive.TitanDirectChannelReceiveEntity64;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
 
 import java.io.File;
@@ -24,7 +30,7 @@ import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 
-public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysicalVolume{
+public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysicalVolume {
     private MountPoint                  mountPoint;
     private PhysicalVolumeManipulator   physicalVolumeManipulator;
 
@@ -97,5 +103,30 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
 
     public void setPhysicalVolumeManipulator( PhysicalVolumeManipulator physicalVolumeManipulator ){
         this.physicalVolumeManipulator = physicalVolumeManipulator;
+    }
+
+
+    @Override
+    public MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel) throws IOException {
+        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeTree, receiveStorageObject, this.mountPoint.getMountPoint(), channel);
+        MiddleStorageObject middleStorageObject = titanDirectChannelReceiveEntity64.receive();
+        middleStorageObject.setBottomGuid( this.guid );
+        return middleStorageObject;
+    }
+
+    @Override
+    public MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel, Number offset, Number endSize) throws IOException {
+        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeTree, receiveStorageObject, this.mountPoint.getMountPoint(), channel);
+        MiddleStorageObject middleStorageObject = titanDirectChannelReceiveEntity64.receive(offset, endSize);
+        middleStorageObject.setBottomGuid( this.getGuid() );
+        return middleStorageObject;
+    }
+
+    @Override
+    public MiddleStorageObject channelExport(VolumeTree volumeTree, ExportStorageObject exportStorageObject, FileChannel channel) throws IOException {
+        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64( volumeTree, exportStorageObject,channel );
+        MiddleStorageObject middleStorageObject = titanDirectChannelExportEntity64.export();
+        middleStorageObject.setBottomGuid( this.getGuid() );
+        return middleStorageObject;
     }
 }

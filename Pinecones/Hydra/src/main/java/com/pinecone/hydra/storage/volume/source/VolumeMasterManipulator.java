@@ -10,4 +10,5 @@ public interface VolumeMasterManipulator extends KOIMasterManipulator {
     StripedVolumeManipulator   getStripedVolumeManipulator();
     VolumeCapacityManipulator   getVolumeCapacityManipulator();
     PhysicalVolumeManipulator   getPhysicalVolumeManipulator();
+    VolumeAllocateManipulator   getVolumeAllocateManipulator();
 }

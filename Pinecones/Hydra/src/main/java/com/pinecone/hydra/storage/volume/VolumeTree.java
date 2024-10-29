@@ -19,4 +19,6 @@ public interface VolumeTree extends KOMInstrument {
     GUID insertPhysicalVolume( PhysicalVolume physicalVolume );
 
     void purgePhysicalVolume( GUID guid );
+
+    void insertAllocate( GUID objectGuid, GUID childVolumeGuid, GUID parentVolumeGuid );
 }

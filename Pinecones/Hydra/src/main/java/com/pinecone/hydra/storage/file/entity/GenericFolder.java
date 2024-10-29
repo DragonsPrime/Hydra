@@ -103,7 +103,7 @@ public class GenericFolder extends ArchElementNode implements Folder{
             }
             else if( node instanceof FileNode ){
                 FileNode file = (FileNode) node;
-                size += file.size();
+                size += file.size().longValue();
             }
         }
         return size;
@@ -115,12 +115,12 @@ public class GenericFolder extends ArchElementNode implements Folder{
     }
 
     @Override
-    public long size() {
+    public Number size() {
         long size = 0;
         List<TreeNode> children = this.fileSystem.getChildren(this.guid);
         for( TreeNode node : children ){
             ElementNode elementNode = (ElementNode) node;
-            size += elementNode.size();
+            size += elementNode.size().longValue();
         }
         return size;
     }

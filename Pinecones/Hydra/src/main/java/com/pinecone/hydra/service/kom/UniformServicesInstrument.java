@@ -14,6 +14,7 @@ import com.pinecone.hydra.service.kom.operator.GenericServiceOperatorFactory;
 import com.pinecone.hydra.service.kom.source.ApplicationNodeManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
+import com.pinecone.hydra.service.kom.source.ServiceNodeManipulator;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
@@ -39,6 +40,8 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
 
     private ApplicationNodeManipulator  applicationNodeManipulator;
 
+    private ServiceNodeManipulator      serviceNodeManipulator;
+
 
 
     public UniformServicesInstrument(Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
@@ -48,6 +51,7 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
         this.serviceMasterManipulator    = (ServiceMasterManipulator) masterManipulator;
         this.serviceNamespaceManipulator = serviceMasterManipulator.getNamespaceManipulator();
         this.applicationNodeManipulator  = serviceMasterManipulator.getApplicationNodeManipulator();
+        this.serviceNodeManipulator      = serviceMasterManipulator.getServiceNodeManipulator();
         KOISkeletonMasterManipulator skeletonMasterManipulator = this.serviceMasterManipulator.getSkeletonMasterManipulator();
         TreeMasterManipulator        treeMasterManipulator     = (TreeMasterManipulator) skeletonMasterManipulator;
         this.distributedTrieTree         = new GenericDistributedTrieTree(treeMasterManipulator);
@@ -56,7 +60,7 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
 
         this.pathResolver                =  new KOPathResolver( this.kernelObjectConfig );
         this.pathSelector                =  new StandardPathSelector(
-                this.pathResolver, this.distributedTrieTree, this.serviceNamespaceManipulator, new GUIDNameManipulator[] { this.applicationNodeManipulator }
+                this.pathResolver, this.distributedTrieTree, this.serviceNamespaceManipulator, new GUIDNameManipulator[] { this.applicationNodeManipulator,this.serviceNodeManipulator }
         );
 
         this.mReparseKOM                 =  new GenericReparseKOMTreeAddition( this );

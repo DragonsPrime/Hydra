@@ -10,14 +10,19 @@ import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.volume.UniformVolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
+import com.pinecone.hydra.storage.volume.entity.TitanExportStorageObject;
+import com.pinecone.hydra.storage.volume.entity.TitanReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
+import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirectChannelExportEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.physical.receive.TitanDirectChannelReceiveEntity64;
 import com.pinecone.hydra.storage.volume.runtime.ArchStripedTaskThread;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJob;
@@ -62,7 +67,9 @@ class Alice extends Radium {
         //this.TestRaid0Receive( fileSystem, volumeTree );
 
 
-        this.testSimpleThread();
+        //this.testSimpleThread();
+        //this.testDirectReceive( volumeTree );
+        this.testDirectExport( volumeTree );
     }
 
 
@@ -90,6 +97,28 @@ class Alice extends Radium {
         volumeTree.insertPhysicalVolume( physicalVolume );
         volumeTree.put( simpleVolume );
     }
+    private void testDirectReceive(VolumeTree volumeTree ) throws IOException {
+        TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
+        titanReceiveStorageObject.setName("视频");
+        titanReceiveStorageObject.setSize(201*1024*1024);
+        String destDirPath = "D:\\文件系统\\大文件";
+        File sourceFile = new File("D:\\井盖视频块\\4月13日 (2).mp4");
+        Path path = sourceFile.toPath();
+        FileChannel channel = FileChannel.open(path, StandardOpenOption.READ);
+        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeTree,titanReceiveStorageObject,destDirPath,channel);
+        titanDirectChannelReceiveEntity64.receive();
+    }
+
+    private void testDirectExport( VolumeTree volumeTree ) throws IOException {
+        File file = new File("D:\\文件系统\\大文件\\视频.mp4");
+        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        TitanExportStorageObject titanExportStorageObject = new TitanExportStorageObject();
+        titanExportStorageObject.setSize( 201*1024*1024 );
+        titanExportStorageObject.setSourceName("D:\\文件系统\\大文件\\视频_d95a91f4.storage");
+        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64( volumeTree, titanExportStorageObject,channel);
+        titanDirectChannelExportEntity64.export();
+    }
+
 
     private void testChannelReceive(KOMFileSystem fileSystem, UniformVolumeTree volumeTree ) throws IOException {
         SimpleVolume simpleVolume  = volumeTree.get(GUIDs.GUID72("03e7f10-0003dd-0002-98")).evinceSimpleVolume();

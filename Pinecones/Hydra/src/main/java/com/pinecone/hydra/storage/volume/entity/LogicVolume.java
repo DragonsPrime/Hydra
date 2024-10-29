@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.volume.VolumeTree;
@@ -46,4 +47,7 @@ public interface LogicVolume extends Volume, TreeNode {
         return null;
     }
     void setVolumeTree( VolumeTree volumeTree );
+
+
+    MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel ) throws IOException;
 }

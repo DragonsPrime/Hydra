@@ -25,4 +25,12 @@ public interface ServiceNodeMapper extends ServiceNodeManipulator {
     void updateServiceNode(GenericServiceElement serviceNode);
     @Select("SELECT `id` AS `enumId`, `guid` , `name` FROM `hydra_service_service_node` WHERE name=#{name}")
     List<GenericServiceElement> fetchServiceNodeByName(@Param("name") String name);
+
+    @Override
+    @Select( "SELECT `guid` FROM `hydra_service_service_node` WHERE `name` = #{name}" )
+    List<GUID> getGuidsByName(String name);
+
+    @Override
+    @Select( "SELECT `guid` FROM `hydra_service_service_node` WHERE `name` = #{name} AND `guid` = #{guid}" )
+    List<GUID> getGuidsByNameID(String name, GUID guid);
 }

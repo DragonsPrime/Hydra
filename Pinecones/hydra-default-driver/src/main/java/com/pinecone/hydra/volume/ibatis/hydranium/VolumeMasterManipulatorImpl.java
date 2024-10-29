@@ -7,6 +7,7 @@ import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.StripedVolumeManipulator;
+import com.pinecone.hydra.storage.volume.source.VolumeAllocateManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeCapacityManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
@@ -17,6 +18,7 @@ import com.pinecone.hydra.volume.ibatis.PhysicalVolumeMapper;
 import com.pinecone.hydra.volume.ibatis.SimpleVolumeMapper;
 import com.pinecone.hydra.volume.ibatis.SpannedVolumeMapper;
 import com.pinecone.hydra.volume.ibatis.StripedVolumeMapper;
+import com.pinecone.hydra.volume.ibatis.VolumeAllocateMapper;
 import com.pinecone.hydra.volume.ibatis.VolumeCapacityMapper;
 import org.springframework.stereotype.Component;
 
@@ -55,6 +57,10 @@ public class VolumeMasterManipulatorImpl implements VolumeMasterManipulator {
     @Resource
     @Structure( type = PhysicalVolumeMapper.class )
     PhysicalVolumeManipulator physicalVolumeManipulator;
+
+    @Resource
+    @Structure( type = VolumeAllocateMapper.class )
+    VolumeAllocateManipulator volumeAllocateManipulator;
 
     public VolumeMasterManipulatorImpl() {
 
@@ -102,5 +108,10 @@ public class VolumeMasterManipulatorImpl implements VolumeMasterManipulator {
     @Override
     public PhysicalVolumeManipulator getPhysicalVolumeManipulator() {
         return this.physicalVolumeManipulator;
+    }
+
+    @Override
+    public VolumeAllocateManipulator getVolumeAllocateManipulator() {
+        return this.volumeAllocateManipulator;
     }
 }

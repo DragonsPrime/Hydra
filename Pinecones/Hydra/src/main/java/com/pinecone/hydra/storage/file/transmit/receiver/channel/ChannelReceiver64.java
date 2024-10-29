@@ -27,7 +27,7 @@ import java.util.zip.CRC32;
 
 public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
     protected KOMFileSystem           mKOMFileSystem;
-    protected FrameSegmentNaming mFrameSegmentNaming;
+    protected FrameSegmentNaming      mFrameSegmentNaming;
 
     public ChannelReceiver64(KOMFileSystem komFileSystem ) {
         this.mKOMFileSystem      = komFileSystem;
@@ -180,11 +180,11 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
         String destDirPath = channelReceiverEntity.getDestDirPath();
         FileNode file = channelReceiverEntity.getFile();
         KOMFileSystem fileSystem = channelReceiverEntity.getFileSystem();
+        long tinyFileStripSizing = fileSystem.getConfig().getTinyFileStripSizing().longValue();
 
-        long stripSize = FileSystemConfig.stripSize1;
-        long offset = FileSystemConfig.stripSize1 * threadId;
+        long offset = tinyFileStripSizing * threadId;
         long stripId = threadId;
-        ByteBuffer buffer = ByteBuffer.allocate((int) stripSize);
+        ByteBuffer buffer = ByteBuffer.allocate((int) tinyFileStripSizing);
         FSNodeAllotment allotment = fileSystem.getFSNodeAllotment();
         long bytesRead = 0;
 
@@ -213,7 +213,7 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
                 chunkChannel.write(buffer);
             }
             strip.setFileStartOffset( offset );
-            offset += stripSize * threadNum;
+            offset += tinyFileStripSizing * threadNum;
             stripId += threadNum;
             strip.save();
         }

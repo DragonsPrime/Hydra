@@ -15,6 +15,7 @@ import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.StripedVolumeManipulator;
+import com.pinecone.hydra.storage.volume.source.VolumeAllocateManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeCapacityManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
 import com.pinecone.hydra.system.Hydrarum;
@@ -45,6 +46,7 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
     protected StripedVolumeManipulator          stripedVolumeManipulator;
     protected VolumeCapacityManipulator         volumeCapacityManipulator;
     protected VolumeMasterManipulator           volumeMasterManipulator;
+    protected VolumeAllocateManipulator         volumeAllocateManipulator;
 
 
     public UniformVolumeTree(Hydrarum hydrarum, KOIMasterManipulator masterManipulator) {
@@ -63,6 +65,7 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
         this.spannedVolumeManipulator   =   this.volumeMasterManipulator.getSpannedVolumeManipulator();
         this.stripedVolumeManipulator   =   this.volumeMasterManipulator.getStripedVolumeManipulator();
         this.volumeCapacityManipulator  =   this.volumeMasterManipulator.getVolumeCapacityManipulator();
+        this.volumeAllocateManipulator  =   this.volumeMasterManipulator.getVolumeAllocateManipulator();
     }
 
     public UniformVolumeTree( KOIMappingDriver driver ){
@@ -239,6 +242,11 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
         this.physicalVolumeManipulator.remove( guid );
         this.volumeCapacityManipulator.remove( guid );
         this.mountPointManipulator.removeByVolumeGuid( guid );
+    }
+
+    @Override
+    public void insertAllocate(GUID objectGuid, GUID childVolumeGuid, GUID parentVolumeGuid) {
+        this.volumeAllocateManipulator.insert( objectGuid, childVolumeGuid, parentVolumeGuid);
     }
 
     private String getNodeName(DistributedTreeNode node ){

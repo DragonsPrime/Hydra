@@ -5,7 +5,7 @@ import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
-import com.pinecone.hydra.storage.volume.entity.local.TitanLocalPhysicalVolume;
+import com.pinecone.hydra.storage.volume.entity.local.physical.TitanLocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.TitanLocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.spanned.TitanLocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TitanLocalStripedVolume;

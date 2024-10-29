@@ -68,8 +68,9 @@ class Jesse extends Radium {
         //Debug.trace( servicesInstrument.get( GUIDs.GUID72("03e60e8-000117-0000-18") ) );
 //        Debug.trace( servicesTree.get( GUIDs.GUID72( "02be396-0001e9-0000-e4" ) ) );
         //Debug.trace( servicesInstrument.affirmApplication( "Test1/App1" ) );
-        Debug.trace( servicesInstrument.affirmService( "Test1/特殊服务" ) );
-
+        //Debug.trace( servicesInstrument.affirmService( "Test1/特殊服务" ) );
+        Debug.trace( servicesInstrument.affirmApplication( "Test1/特殊应用" ) );
+        Debug.trace( servicesInstrument.affirmNamespace(" game/我的世界/村庄 ") );
         Debug.trace( servicesInstrument.affirmNamespace( "Test1" ).fetchChildren() );
 
     }
