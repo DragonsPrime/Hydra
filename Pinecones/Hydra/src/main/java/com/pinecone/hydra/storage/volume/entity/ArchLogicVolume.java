@@ -9,7 +9,7 @@ import java.util.List;
 public abstract class ArchLogicVolume extends ArchVolume implements LogicVolume{
 
     protected List<LogicVolume>            children;
-    protected VolumeCapacity64 volumeCapacity;
+    protected VolumeCapacity64             volumeCapacity;
 
     public ArchLogicVolume(VolumeTree volumeTree) {
         super(volumeTree);
