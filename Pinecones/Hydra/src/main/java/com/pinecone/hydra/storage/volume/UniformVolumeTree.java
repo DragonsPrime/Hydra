@@ -14,6 +14,7 @@ import com.pinecone.hydra.storage.volume.source.MountPointManipulator;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
+import com.pinecone.hydra.storage.volume.source.SqliteVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.StripedVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeAllocateManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeCapacityManipulator;
@@ -47,6 +48,7 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
     protected VolumeCapacityManipulator         volumeCapacityManipulator;
     protected VolumeMasterManipulator           volumeMasterManipulator;
     protected VolumeAllocateManipulator         volumeAllocateManipulator;
+    protected SqliteVolumeManipulator           sqliteVolumeManipulator;
 
 
     public UniformVolumeTree(Hydrarum hydrarum, KOIMasterManipulator masterManipulator) {
@@ -66,6 +68,7 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
         this.stripedVolumeManipulator   =   this.volumeMasterManipulator.getStripedVolumeManipulator();
         this.volumeCapacityManipulator  =   this.volumeMasterManipulator.getVolumeCapacityManipulator();
         this.volumeAllocateManipulator  =   this.volumeMasterManipulator.getVolumeAllocateManipulator();
+        this.sqliteVolumeManipulator    =   this.volumeMasterManipulator.getSqliteVolumeManipulator();
     }
 
     public UniformVolumeTree( KOIMappingDriver driver ){
@@ -247,6 +250,16 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
     @Override
     public void insertAllocate(GUID objectGuid, GUID childVolumeGuid, GUID parentVolumeGuid) {
         this.volumeAllocateManipulator.insert( objectGuid, childVolumeGuid, parentVolumeGuid);
+    }
+
+    @Override
+    public PhysicalVolume getSmallestCapacityPhysicalVolume() {
+        return this.physicalVolumeManipulator.getSmallestCapacityPhysicalVolume();
+    }
+
+    @Override
+    public GUID getSqlitePhysicsVolume(GUID volumeGuid) {
+        return this.sqliteVolumeManipulator.getPhysicsGuid(volumeGuid);
     }
 
     private String getNodeName(DistributedTreeNode node ){

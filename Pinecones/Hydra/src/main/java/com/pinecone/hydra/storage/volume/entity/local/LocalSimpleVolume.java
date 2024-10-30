@@ -9,5 +9,5 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 public interface LocalSimpleVolume extends SimpleVolume {
-    void channelReceive(KOMFileSystem fileSystem, FileNode file, GUID frameGuid, int threadNum, int threadId) throws IOException;
+
 }

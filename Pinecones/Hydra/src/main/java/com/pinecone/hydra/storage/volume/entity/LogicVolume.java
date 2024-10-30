@@ -10,6 +10,7 @@ import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 import java.util.List;
 
 public interface LogicVolume extends Volume, TreeNode {
@@ -28,12 +29,6 @@ public interface LogicVolume extends Volume, TreeNode {
     void extendLogicalVolume( GUID physicalGuid );
     List< GUID > listPhysicalVolume();
 
-    void channelExport( KOMFileSystem fileSystem, FileNode file ) throws IOException;
-    void streamExport( KOMFileSystem fileSystem, FileNode file ) throws IOException;
-    void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel) throws IOException;
-    void channelReceive( KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number offset, Number endSize ) throws IOException;
-    void streamReceive(KOMFileSystem fileSystem, FileNode file, InputStream inputStream) throws IOException;
-
     default MirroredVolume evinceMirroredVolume(){
         return null;
     }
@@ -49,5 +44,7 @@ public interface LogicVolume extends Volume, TreeNode {
     void setVolumeTree( VolumeTree volumeTree );
 
 
-    MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel ) throws IOException;
+    MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel ) throws IOException, SQLException;
+    MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel, Number offset, Number endSize ) throws IOException, SQLException;
+    MiddleStorageObject channelExport( ExportStorageObject exportStorageObject, FileChannel channel ) throws IOException;
 }

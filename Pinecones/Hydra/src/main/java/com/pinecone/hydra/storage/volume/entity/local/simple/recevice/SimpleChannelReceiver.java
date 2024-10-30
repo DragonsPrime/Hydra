@@ -4,8 +4,9 @@ import com.pinecone.hydra.storage.MiddleStorageObject;
 
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public interface SimpleChannelReceiver extends SimpleReceiver {
-    MiddleStorageObject receive( ) throws IOException;
-    MiddleStorageObject receive( Number offset, Number endSize) throws IOException;
+    MiddleStorageObject channelReceive( ) throws IOException, SQLException;
+    MiddleStorageObject channelReceive(Number offset, Number endSize) throws IOException;
 }

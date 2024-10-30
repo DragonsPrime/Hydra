@@ -7,16 +7,19 @@ import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
+import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
+import com.pinecone.hydra.storage.volume.entity.local.simple.export.TitanSimpleChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleChannelReceiverEntity64;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 import java.util.List;
 
 public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimpleVolume {
@@ -44,26 +47,6 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         return super.getChildren();
     }
 
-    @Override
-    public void channelExport( KOMFileSystem fileSystem, FileNode file ) throws IOException {
-        List<GUID> physicalVolumes = this.listPhysicalVolume();
-        PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicalVolumes.get(0));
-        physicalVolume.channelExport( fileSystem,file );
-    }
-
-    @Override
-    public void streamExport( KOMFileSystem fileSystem, FileNode file ) throws IOException {
-        List<GUID> physicalVolumes = this.listPhysicalVolume();
-        PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicalVolumes.get(0));
-        physicalVolume.streamExport( fileSystem, file );
-    }
-
-    @Override
-    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel) throws IOException {
-        List<GUID> physicalVolumes = this.listPhysicalVolume();
-        PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicalVolumes.get(0));
-        physicalVolume.channelReceive( fileSystem, file, channel );
-    }
 
     @Override
     public void extendLogicalVolume(GUID physicalGuid) {
@@ -75,32 +58,27 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         return this.simpleVolumeManipulator.lsblk( this.guid );
     }
 
-    @Override
-    public void streamReceive(KOMFileSystem fileSystem, FileNode file, InputStream inputStream) throws IOException {
-        List<GUID> physicalVolumes = this.listPhysicalVolume();
-        PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicalVolumes.get(0));
-        physicalVolume.streamReceive( fileSystem,file,inputStream );
-    }
 
     @Override
-    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number offset, Number endSize) throws IOException {
-        List<GUID> physicalVolumes = this.listPhysicalVolume();
-        PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicalVolumes.get(0));
-        physicalVolume.channelReceive( fileSystem,file,channel,offset,endSize );
-    }
-
-    @Override
-    public void channelReceive(KOMFileSystem fileSystem, FileNode file, GUID frameGuid, int threadNum, int threadId) throws IOException {
-
-    }
-
-
-    @Override
-    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject,String destDirPath, FileChannel channel) throws IOException {
-        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64(this.volumeTree, receiveStorageObject, destDirPath, channel, this);
+    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject,String destDirPath, FileChannel channel) throws IOException, SQLException {
+        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeTree, receiveStorageObject, destDirPath, channel, this );
         MiddleStorageObject middleStorageObject = titanSimpleChannelReceiverEntity64.receive();
         middleStorageObject.setBottomGuid( this.guid );
         return middleStorageObject;
+    }
+
+    @Override
+    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel, Number offset, Number endSize) throws IOException, SQLException {
+        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeTree, receiveStorageObject, destDirPath, channel, this );
+        MiddleStorageObject middleStorageObject = titanSimpleChannelReceiverEntity64.receive(offset,endSize);
+        middleStorageObject.setBottomGuid( this.guid );
+        return middleStorageObject;
+    }
+
+    @Override
+    public MiddleStorageObject channelExport(ExportStorageObject exportStorageObject, FileChannel channel) throws IOException {
+        TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeTree, exportStorageObject, channel );
+        return titanSimpleChannelExportEntity64.export();
     }
 
     @Override

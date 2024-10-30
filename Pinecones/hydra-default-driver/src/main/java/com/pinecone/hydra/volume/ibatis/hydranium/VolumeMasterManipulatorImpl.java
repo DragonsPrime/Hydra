@@ -6,6 +6,7 @@ import com.pinecone.hydra.storage.volume.source.MountPointManipulator;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
+import com.pinecone.hydra.storage.volume.source.SqliteVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.StripedVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeAllocateManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeCapacityManipulator;
@@ -17,6 +18,7 @@ import com.pinecone.hydra.volume.ibatis.MountPointMapper;
 import com.pinecone.hydra.volume.ibatis.PhysicalVolumeMapper;
 import com.pinecone.hydra.volume.ibatis.SimpleVolumeMapper;
 import com.pinecone.hydra.volume.ibatis.SpannedVolumeMapper;
+import com.pinecone.hydra.volume.ibatis.SqliteVolumeMapper;
 import com.pinecone.hydra.volume.ibatis.StripedVolumeMapper;
 import com.pinecone.hydra.volume.ibatis.VolumeAllocateMapper;
 import com.pinecone.hydra.volume.ibatis.VolumeCapacityMapper;
@@ -61,6 +63,10 @@ public class VolumeMasterManipulatorImpl implements VolumeMasterManipulator {
     @Resource
     @Structure( type = VolumeAllocateMapper.class )
     VolumeAllocateManipulator volumeAllocateManipulator;
+
+    @Resource
+    @Structure( type = SqliteVolumeMapper.class )
+    SqliteVolumeManipulator   sqliteVolumeManipulator;
 
     public VolumeMasterManipulatorImpl() {
 
@@ -113,5 +119,10 @@ public class VolumeMasterManipulatorImpl implements VolumeMasterManipulator {
     @Override
     public VolumeAllocateManipulator getVolumeAllocateManipulator() {
         return this.volumeAllocateManipulator;
+    }
+
+    @Override
+    public SqliteVolumeManipulator getSqliteVolumeManipulator() {
+        return null;
     }
 }

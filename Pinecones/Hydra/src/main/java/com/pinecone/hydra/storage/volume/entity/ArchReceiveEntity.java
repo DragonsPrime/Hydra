@@ -5,6 +5,7 @@ import com.pinecone.hydra.storage.volume.VolumeTree;
 
 public abstract class ArchReceiveEntity implements ReceiveEntity{
     protected VolumeTree volumeTree;
+
     protected ReceiveStorageObject receiveStorageObject;
 
     protected String     destDirPath;

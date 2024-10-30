@@ -9,6 +9,7 @@ import com.pinecone.hydra.storage.volume.VolumeTree;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 
 public interface PhysicalVolume extends Volume{
     MountPoint getMountPoint();
@@ -25,8 +26,8 @@ public interface PhysicalVolume extends Volume{
 
 
 
-    MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel ) throws IOException;
-    MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel, Number offset, Number endSize ) throws IOException;
+    MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel, String destDirPath ) throws IOException, SQLException;
+    MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel, String destDirPath, Number offset, Number endSize ) throws IOException;
     MiddleStorageObject channelExport( VolumeTree volumeTree, ExportStorageObject exportStorageObject, FileChannel channel ) throws IOException;
 
 }

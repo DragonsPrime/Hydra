@@ -2,17 +2,21 @@ package com.pinecone.hydra.storage.volume.entity.local.mirrored;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
+import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
+import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.local.LocalMirroredVolume;
 import com.pinecone.hydra.storage.volume.source.MirroredVolumeManipulator;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 import java.util.List;
 
 public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMirroredVolume {
@@ -37,20 +41,6 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
         return this.toJSONString();
     }
 
-    @Override
-    public void channelExport(KOMFileSystem fileSystem, FileNode file) throws IOException {
-
-    }
-
-    @Override
-    public void streamExport(KOMFileSystem fileSystem, FileNode file) throws IOException {
-
-    }
-
-    @Override
-    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number offset, Number endSize) {
-
-    }
 
     @Override
     public void extendLogicalVolume(GUID physicalGuid) {
@@ -62,19 +52,24 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
         return null;
     }
 
-    @Override
-    public void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel) throws IOException {
-        List<LogicVolume> volumes = this.getChildren();
-
-    }
-
-    @Override
-    public void streamReceive(KOMFileSystem fileSystem, FileNode file, InputStream inputStream) {
-
-    }
 
     @Override
     public void setVolumeTree(VolumeTree volumeTree) {
         this.volumeTree = volumeTree;
+    }
+
+    @Override
+    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel) throws IOException {
+        return null;
+    }
+
+    @Override
+    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel, Number offset, Number endSize) throws IOException, SQLException {
+        return null;
+    }
+
+    @Override
+    public MiddleStorageObject channelExport(ExportStorageObject exportStorageObject, FileChannel channel) throws IOException {
+        return null;
     }
 }

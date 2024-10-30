@@ -10,32 +10,35 @@ import com.pinecone.hydra.storage.volume.entity.local.physical.receive.TitanDire
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 import java.util.List;
 
-public class TitanSimpleChannelReceiver64 implements SimpleChannelReceiver64{
+public class TitanSimpleChannelReceiver64   implements SimpleChannelReceiver64{
     private SimpleVolume            simpleVolume;
     private FileChannel             fileChannel;
     private VolumeTree              volumeTree;
     private ReceiveStorageObject    receiveStorageObject;
+    private String                  destDirPath;
 
     public TitanSimpleChannelReceiver64( SimpleChannelReceiverEntity entity ){
         this.volumeTree = entity.getVolumeTree();
         this.simpleVolume = entity.getSimpleVolume();
         this.fileChannel = entity.getChannel();
         this.receiveStorageObject = entity.getReceiveStorageObject();
+        this.destDirPath = entity.getDestDirPath();
     }
     @Override
-    public MiddleStorageObject receive() throws IOException {
+    public MiddleStorageObject channelReceive() throws IOException, SQLException {
         List<GUID> guids = simpleVolume.listPhysicalVolume();
         PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(guids.get(0));
 
-        return physicalVolume.channelReceive( this.volumeTree,this.receiveStorageObject,this.fileChannel );
+        return physicalVolume.channelReceive( this.volumeTree,this.receiveStorageObject,this.fileChannel, this.destDirPath );
     }
 
     @Override
-    public MiddleStorageObject receive(Number offset, Number endSize) throws IOException {
+    public MiddleStorageObject channelReceive(Number offset, Number endSize) throws IOException {
         List<GUID> guids = simpleVolume.listPhysicalVolume();
         PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(guids.get(0));
-        return physicalVolume.channelReceive( this.volumeTree,this.receiveStorageObject,this.fileChannel,offset,endSize );
+        return physicalVolume.channelReceive( this.volumeTree,this.receiveStorageObject,this.fileChannel, this.destDirPath, offset,endSize );
     }
 }

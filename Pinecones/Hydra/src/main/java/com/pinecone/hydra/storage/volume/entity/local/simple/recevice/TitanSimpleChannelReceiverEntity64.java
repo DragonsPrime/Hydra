@@ -8,12 +8,13 @@ import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 
 public class TitanSimpleChannelReceiverEntity64 extends ArchReceiveEntity implements SimpleChannelReceiverEntity64{
 
     private FileChannel channel;
     private SimpleVolume simpleVolume;
-    private TitanSimpleChannelReceiver64 titanSimpleChannelReceiver64;
+    private SimpleChannelReceiver64 titanSimpleChannelReceiver64;
 
     public TitanSimpleChannelReceiverEntity64(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel, SimpleVolume simpleVolume) {
         super(volumeTree, receiveStorageObject, destDirPath);
@@ -40,12 +41,12 @@ public class TitanSimpleChannelReceiverEntity64 extends ArchReceiveEntity implem
 
 
     @Override
-    public MiddleStorageObject receive() throws IOException {
-        return this.titanSimpleChannelReceiver64.receive();
+    public MiddleStorageObject receive() throws IOException, SQLException {
+        return this.titanSimpleChannelReceiver64.channelReceive();
     }
 
     @Override
     public MiddleStorageObject receive(Number offset, Number endSize) throws IOException {
-        return this.titanSimpleChannelReceiver64.receive( offset, endSize );
+        return this.titanSimpleChannelReceiver64.channelReceive( offset, endSize );
     }
 }

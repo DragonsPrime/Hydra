@@ -4,6 +4,8 @@ import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.Debug;
+import com.pinecone.framework.util.rdb.sqlite.SqliteHost;
+import com.pinecone.framework.util.rdb.sqlite.SqliteMethod;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
@@ -69,7 +71,16 @@ class Alice extends Radium {
 
         //this.testSimpleThread();
         //this.testDirectReceive( volumeTree );
-        this.testDirectExport( volumeTree );
+        //this.testDirectExport( volumeTree );
+        SqliteMethod sqliteMethod = new SqliteMethod( new SqliteHost("D:\\对象存储\\测试文件.db") );
+        sqliteMethod.executeUpdate( "CREATE TABLE IF NOT EXISTS users (\n" +
+                "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
+                "    name TEXT NOT NULL,\n" +
+                "    email TEXT UNIQUE,\n" +
+                "    age INTEGER CHECK (age >= 0),\n" +
+                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n" +
+                "); " );
+
     }
 
 
@@ -128,7 +139,7 @@ class Alice extends Radium {
         FileNode fileNode = fileSystem.getFSNodeAllotment().newFileNode();
         fileNode.setName(sourceFile.getName());
         fileNode.setGuid( fileSystem.getGuidAllocator().nextGUID72() );
-        simpleVolume.channelReceive( fileSystem, fileNode,FileChannel.open(path, StandardOpenOption.READ));
+        //simpleVolume.channelReceive( fileSystem, fileNode,FileChannel.open(path, StandardOpenOption.READ));
     }
 
     private void testChannelExport( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ) throws IOException {
@@ -136,7 +147,7 @@ class Alice extends Radium {
         FileTreeNode fileTreeNode = fileSystem.get(GUIDs.GUID72("0271940-00035d-0001-58"));
         FileNode file = fileTreeNode.evinceFileNode();
         File file1 = new File("D:\\文件系统\\大文件\\视频.mp4");
-        simpleVolume.channelExport(fileSystem, file);
+        //simpleVolume.channelExport(fileSystem, file);
     }
 
     private void testRaid0Insert( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ){
@@ -204,7 +215,7 @@ class Alice extends Radium {
         fileNode.setName(sourceFile.getName());
         fileNode.setGuid( fileSystem.getGuidAllocator().nextGUID72() );
         fileNode.setDefinitionSize(200*1024*1024);
-        volume3.channelReceive( fileSystem,fileNode,FileChannel.open(path, StandardOpenOption.READ) );
+        ///volume3.channelReceive( fileSystem,fileNode,FileChannel.open(path, StandardOpenOption.READ) );
     }
 
     private void testSimpleThread() throws Exception {

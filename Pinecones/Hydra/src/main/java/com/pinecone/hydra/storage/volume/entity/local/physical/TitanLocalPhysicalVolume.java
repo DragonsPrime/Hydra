@@ -2,6 +2,8 @@ package com.pinecone.hydra.storage.volume.entity.local.physical;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.framework.util.rdb.sqlite.SqliteHost;
+import com.pinecone.framework.util.rdb.sqlite.SqliteMethod;
 import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
@@ -17,6 +19,7 @@ import com.pinecone.hydra.storage.volume.VolumeTree;
 import com.pinecone.hydra.storage.volume.entity.ArchVolume;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
+import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirectChannelExportEntity64;
@@ -29,6 +32,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.sql.SQLException;
 
 public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysicalVolume {
     private MountPoint                  mountPoint;
@@ -107,16 +111,30 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
 
 
     @Override
-    public MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel) throws IOException {
-        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeTree, receiveStorageObject, this.mountPoint.getMountPoint(), channel);
+    public MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel, String destDirPath) throws IOException, SQLException {
+        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeTree, receiveStorageObject, this.mountPoint.getMountPoint()+"\\"+destDirPath, channel);
         MiddleStorageObject middleStorageObject = titanDirectChannelReceiveEntity64.receive();
         middleStorageObject.setBottomGuid( this.guid );
+        GUID physicsGuid = this.volumeTree.getSqlitePhysicsVolume(this.guid);
+        if( physicsGuid == null ){
+            PhysicalVolume smallestCapacityPhysicalVolume = this.volumeTree.getSmallestCapacityPhysicalVolume();
+            String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid;
+            SqliteMethod sqliteMethod = new SqliteMethod(new SqliteHost(url));
+            sqliteMethod.executeUpdate( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36), `child_volume_guid` VARCHAR(36) );" );
+            sqliteMethod.executeUpdate( "INSERT INTO `table` ( storage_object_guid ) VALUES ( `"+ middleStorageObject.getObjectGuid()+ "` )" );
+        }
+        else {
+            PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicsGuid);
+            String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid;
+            SqliteMethod sqliteMethod = new SqliteMethod(new SqliteHost(url));
+            sqliteMethod.executeUpdate( "INSERT INTO `table` ( storage_object_guid ) VALUES ( `"+ middleStorageObject.getObjectGuid()+ "` )" );
+        }
         return middleStorageObject;
     }
 
     @Override
-    public MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel, Number offset, Number endSize) throws IOException {
-        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeTree, receiveStorageObject, this.mountPoint.getMountPoint(), channel);
+    public MiddleStorageObject channelReceive(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, FileChannel channel, String destDirPath,  Number offset, Number endSize) throws IOException {
+        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeTree, receiveStorageObject, this.mountPoint.getMountPoint()+"\\"+destDirPath, channel);
         MiddleStorageObject middleStorageObject = titanDirectChannelReceiveEntity64.receive(offset, endSize);
         middleStorageObject.setBottomGuid( this.getGuid() );
         return middleStorageObject;
