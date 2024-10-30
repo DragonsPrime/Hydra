@@ -95,9 +95,13 @@ public class GenericDistributedTrieTree implements UniDistributedTrieTree {
     }
 
     @Override
-    public boolean containsKey( GUID key ) {
-        GUIDDistributedTrieNode guidDistributedTrieNode = this.trieTreeManipulator.getNode(key);
-        return guidDistributedTrieNode == null;
+    public boolean contains( GUID key ) {
+        return this.trieTreeManipulator.contains( key );
+    }
+
+    @Override
+    public boolean containsChild( GUID parentGuid, GUID childGuid ) {
+        return this.trieTreeManipulator.countNode( parentGuid, childGuid ) > 0;
     }
 
     @Override

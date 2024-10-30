@@ -326,7 +326,7 @@ public class RegistryJPathSelector extends ReparseLinkSelector implements KOMSel
         if( szSelector != null ) {
             // For thread safe.
             return new RegistryJPathSelector(
-                    new StringReader( szSelector ), this.pathResolver, this.mRegistry, this.dirManipulator, this.fileManipulators
+                    new StringReader( szSelector ), this.pathResolver, this.mRegistry, this.dirManipulators[ 0 ], this.fileManipulators
             );
         }
         return this;

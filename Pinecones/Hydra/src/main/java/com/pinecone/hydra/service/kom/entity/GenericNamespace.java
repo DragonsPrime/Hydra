@@ -96,4 +96,14 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
     public List<GUID > fetchChildrenGuids() {
         return super.fetchChildrenGuids();
     }
+
+    @Override
+    public void addChild( ElementNode child ) {
+        super.addChild( child );
+    }
+
+    @Override
+    public boolean containsChild( String childName ) {
+        return super.containsChild( childName );
+    }
 }

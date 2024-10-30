@@ -2,8 +2,8 @@ package com.pinecone.hydra.storage.volume.entity.local.physical;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
-import com.pinecone.framework.util.rdb.sqlite.SqliteHost;
-import com.pinecone.framework.util.rdb.sqlite.SqliteMethod;
+import com.pinecone.framework.util.sqlite.SQLiteHost;
+import com.pinecone.framework.util.sqlite.SQLiteMethod;
 import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
@@ -119,14 +119,14 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
         if( physicsGuid == null ){
             PhysicalVolume smallestCapacityPhysicalVolume = this.volumeTree.getSmallestCapacityPhysicalVolume();
             String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid;
-            SqliteMethod sqliteMethod = new SqliteMethod(new SqliteHost(url));
+            SQLiteMethod sqliteMethod = new SQLiteMethod(new SQLiteHost(url));
             sqliteMethod.executeUpdate( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36), `child_volume_guid` VARCHAR(36) );" );
             sqliteMethod.executeUpdate( "INSERT INTO `table` ( storage_object_guid ) VALUES ( `"+ middleStorageObject.getObjectGuid()+ "` )" );
         }
         else {
             PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicsGuid);
             String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid;
-            SqliteMethod sqliteMethod = new SqliteMethod(new SqliteHost(url));
+            SQLiteMethod sqliteMethod = new SQLiteMethod(new SQLiteHost(url));
             sqliteMethod.executeUpdate( "INSERT INTO `table` ( storage_object_guid ) VALUES ( `"+ middleStorageObject.getObjectGuid()+ "` )" );
         }
         return middleStorageObject;

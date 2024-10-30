@@ -1,12 +1,4 @@
-package com.pinecone.framework.util.rdb.sqlite;
-
-import com.pinecone.framework.util.json.JSONArray;
-import com.pinecone.framework.util.json.JSONArraytron;
-import com.pinecone.framework.util.json.JSONMaptron;
-import com.pinecone.framework.util.rdb.DirectResultSession;
-import com.pinecone.framework.util.rdb.MappedExecutor;
-import com.pinecone.framework.util.rdb.MappedSQLSplicer;
-import com.pinecone.framework.util.rdb.ResultSession;
+package com.pinecone.framework.util.rdb;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -17,45 +9,44 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class SqliteExecutor implements MappedExecutor {
-    private SqliteHost sqliteHost;
+import com.pinecone.framework.util.json.JSONArray;
+import com.pinecone.framework.util.json.JSONArraytron;
+import com.pinecone.framework.util.json.JSONMaptron;
+
+public abstract class ArchRDBExecutor implements MappedExecutor {
+    private RDBHost          mRDBSQLHost;
 
     private MappedSQLSplicer mSimpleSQLSpawner = null ;
-
-    private Statement mCurrentStatement             ;
 
     private void init() {
         this.mSimpleSQLSpawner = new MappedSQLSplicer();
     }
 
-    public SqliteHost getSqliteHost(){
+
+    @Override
+    public RDBHost getRDBSQLHost() {
         this.init();
-        return this.sqliteHost;
+        return this.mRDBSQLHost;
     }
 
-    public SqliteExecutor( SqliteHost sqliteHost ){
+    public ArchRDBExecutor( RDBHost rdbHost ) {
         this.init();
-        this.sqliteHost = sqliteHost;
+        this.mRDBSQLHost = rdbHost;
     }
 
-    private void affirmCurrentStatement0() throws SQLException {
-        ///[Warning] Multi-thread has error ! Notice framework change.
-        if( this.mCurrentStatement == null || this.sqliteHost.isClosed() ) {
-            this.mCurrentStatement = this.sqliteHost.createStatement();
-        }
+    protected Statement createStatement() throws SQLException {
+        return this.mRDBSQLHost.createStatement();
     }
 
-    private Statement createStatement() throws SQLException {
-        return this.sqliteHost.createStatement();
-    }
-
-    public ResultSession query(String szSQL ) throws SQLException {
+    @Override
+    public ResultSession query( String szSQL ) throws SQLException {
         //this.affirmCurrentStatement();
         Statement statement = this.createStatement();
         ResultSet resultSet = statement.executeQuery( szSQL );
-        return new DirectResultSession( this.sqliteHost, statement, resultSet );
+        return new DirectResultSession( this.mRDBSQLHost, statement, resultSet );
     }
 
+    @Override
     public long execute( String szSQL, boolean bIgnoreNoAffected ) throws SQLException {
         //this.affirmCurrentStatement();
         Statement statement = this.createStatement();
@@ -146,6 +137,7 @@ public class SqliteExecutor implements MappedExecutor {
         return queryResult;
     }
 
+    @Override
     public JSONArray fetch     (String szSQL ) throws SQLException {
         ResultSession session = this.query( szSQL );
         ResultSet resultSet   = session.getResultSet();
@@ -195,6 +187,7 @@ public class SqliteExecutor implements MappedExecutor {
         return -1;
     }
 
+    @Override
     public long insertWithArray ( String szSimpleTable, Map dataMap ) throws SQLException {
         return insertWithArray(szSimpleTable,dataMap,false);
     }
@@ -202,6 +195,7 @@ public class SqliteExecutor implements MappedExecutor {
 
 
     /** Update Function **/
+    @Override
     public long updateWithArray ( String szSimpleTable, Map dataMap, List<Map.Entry> conditionMap, String szConditionGlue ) throws SQLException {
         if ( dataMap != null ) {
             return this.execute(
@@ -221,6 +215,7 @@ public class SqliteExecutor implements MappedExecutor {
         return this.updateWithArray( szSimpleTable, dataMap, conditionMap, "AND" );
     }
 
+    @Override
     public long updateWithArray ( String szSimpleTable, Map dataMap, Map conditionMap, String szConditionGlue ) throws SQLException {
         if ( dataMap != null ) {
             return this.execute(
@@ -263,6 +258,7 @@ public class SqliteExecutor implements MappedExecutor {
 
 
     /** Delete Function **/
+    @Override
     public long deleteWithArray ( String szSimpleTable, List<Map.Entry> conditionMap,  String szConditionGlue ) throws SQLException {
         if ( conditionMap != null ) {
             return this.execute( this.mSimpleSQLSpawner.spliceDeleteSQL( szSimpleTable, conditionMap, szConditionGlue ) );
@@ -270,6 +266,7 @@ public class SqliteExecutor implements MappedExecutor {
         return this.execute("TRUNCATE `" + szSimpleTable + '`');
     }
 
+    @Override
     public long deleteWithArray ( String szSimpleTable, Map conditionMap,  String szConditionGlue ) throws SQLException {
         if ( conditionMap != null ) {
             return this.execute( this.mSimpleSQLSpawner.spliceDeleteSQL( szSimpleTable, conditionMap, szConditionGlue ) );

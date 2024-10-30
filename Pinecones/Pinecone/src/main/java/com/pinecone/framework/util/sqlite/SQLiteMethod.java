@@ -1,4 +1,4 @@
-package com.pinecone.framework.util.rdb.sqlite;
+package com.pinecone.framework.util.sqlite;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 
@@ -9,11 +9,11 @@ import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SqliteMethod implements Pinenut {
-    private   SqliteHost   sqliteHost;
+public class SQLiteMethod implements Pinenut {
+    private SQLiteHost sqliteHost;
     private   Statement    statement;
 
-    public SqliteMethod( SqliteHost sqliteHost ) throws SQLException {
+    public SQLiteMethod(SQLiteHost sqliteHost ) throws SQLException {
         this.sqliteHost = sqliteHost;
         this.statement  = sqliteHost.createStatement();
     }

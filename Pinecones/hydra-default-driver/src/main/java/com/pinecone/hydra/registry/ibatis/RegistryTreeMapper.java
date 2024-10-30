@@ -42,6 +42,9 @@ public interface RegistryTreeMapper extends TrieTreeManipulator {
         return node;
     }
 
+    @Select("SELECT COUNT( `id` ) FROM hydra_registry_nodes WHERE guid=#{guid}")
+    boolean contains( GUID key );
+
     @Select("SELECT id, guid, parent_guid, linked_type FROM hydra_registry_node_tree WHERE guid = #{guid} AND parent_guid = #{parentGuid}")
     GUIDDistributedTrieNode getTreeNodeOnly( @Param("guid") GUID guid, @Param("parentGuid") GUID parentGuid );
 

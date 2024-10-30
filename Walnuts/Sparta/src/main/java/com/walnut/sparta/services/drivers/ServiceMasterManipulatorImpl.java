@@ -23,7 +23,7 @@ import com.pinecone.hydra.service.kom.source.ServiceNodeManipulator;
 import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
 import com.pinecone.hydra.unit.udtt.source.TireOwnerManipulator;
 import com.pinecone.hydra.unit.udtt.source.TrieTreeManipulator;
-import com.pinecone.hydra.service.ibatis.ServiceTrieTreeMapper;
+import com.pinecone.hydra.service.ibatis.ServiceTreeMapper;
 import com.pinecone.hydra.service.ibatis.ServiceNodeOwnerMapper;
 import com.pinecone.hydra.service.ibatis.ServicePathCacheMapper;
 import org.springframework.stereotype.Component;
@@ -32,8 +32,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ServiceMasterManipulatorImpl implements ServiceMasterManipulator {
     @Resource
-    @Structure(type = ServiceTrieTreeMapper.class)
-    private ServiceTrieTreeMapper          trieTreeManipulator;
+    @Structure(type = ServiceTreeMapper.class)
+    private ServiceTreeMapper trieTreeManipulator;
     @Resource
     @Structure(type = ServiceCommonDataMapper.class)
     private CommonDataManipulator          commonDataManipulator;

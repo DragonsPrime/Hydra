@@ -68,11 +68,17 @@ class Jesse extends Radium {
         //Debug.trace( servicesInstrument.get( GUIDs.GUID72("03e60e8-000117-0000-18") ) );
 //        Debug.trace( servicesTree.get( GUIDs.GUID72( "02be396-0001e9-0000-e4" ) ) );
         //Debug.trace( servicesInstrument.affirmApplication( "Test1/App1" ) );
-        //Debug.trace( servicesInstrument.affirmService( "Test1/特殊服务" ) );
-        Debug.trace( servicesInstrument.affirmApplication( "Test1/特殊应用" ) );
-        Debug.trace( servicesInstrument.affirmNamespace(" game/我的世界/村庄 ") );
-        Debug.trace( servicesInstrument.affirmNamespace( "Test1" ).fetchChildren() );
 
+        Debug.trace( servicesInstrument.affirmService( "root/特殊服务" ) );
+        Debug.trace( servicesInstrument.affirmApplication( "root/species/orc" ) );
+        Debug.trace( servicesInstrument.affirmNamespace("root/species") );
+        Debug.trace( servicesInstrument.affirmNamespace( "root" ).fetchChildren() );
+
+        servicesInstrument.affirmApplication( "root/species/orc" ).addChild( new GenericServiceElement( new JSONMaptron( "{ name: slaughter }" ) ) );
+
+        Debug.trace( servicesInstrument.affirmApplication( "root/species/orc" ).fetchChildren() );
+
+        Debug.trace( servicesInstrument.queryElement( "root/species/orc/slaughter" ) );
     }
 
     private void testDelete( ServicesInstrument servicesInstrument){

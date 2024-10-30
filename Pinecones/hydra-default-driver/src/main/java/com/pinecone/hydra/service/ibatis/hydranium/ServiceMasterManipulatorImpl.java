@@ -10,7 +10,7 @@ import com.pinecone.hydra.service.ibatis.ServiceFamilyTreeMapper;
 import com.pinecone.hydra.service.ibatis.ServiceMetaMapper;
 import com.pinecone.hydra.service.ibatis.ServiceNodeMapper;
 import com.pinecone.hydra.service.ibatis.ServiceNodeOwnerMapper;
-import com.pinecone.hydra.service.ibatis.ServiceTrieTreeMapper;
+import com.pinecone.hydra.service.ibatis.ServiceTreeMapper;
 import com.pinecone.hydra.service.kom.source.ApplicationMetaManipulator;
 import com.pinecone.hydra.service.kom.source.ApplicationNodeManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
@@ -34,7 +34,7 @@ public class ServiceMasterManipulatorImpl implements ServiceMasterManipulator {
     @Structure(type = ServiceMasterTreeManipulatorImpl.class )
     KOISkeletonMasterManipulator skeletonMasterManipulator;
     @Resource
-    @Structure(type = ServiceTrieTreeMapper.class )
+    @Structure(type = ServiceTreeMapper.class )
     TrieTreeManipulator             trieTreeManipulator;
     @Resource
     @Structure(type = ServiceCommonDataMapper.class )

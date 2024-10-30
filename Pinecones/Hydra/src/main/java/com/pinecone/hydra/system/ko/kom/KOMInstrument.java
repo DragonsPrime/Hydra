@@ -29,6 +29,8 @@ public interface KOMInstrument extends KernelObjectInstrument {
         return this.assertPath( path, "path" );
     }
 
+    boolean contains( GUID nodeGuid );
+
     GUID put( TreeNode treeNode );
 
     TreeNode get( GUID guid );
@@ -51,7 +53,7 @@ public interface KOMInstrument extends KernelObjectInstrument {
 
     EntityNode queryNode( String path );
 
-    List<? extends TreeNode> fetchRoot();
+    List<? extends TreeNode > fetchRoot();
 
     void rename( GUID guid, String name );
 

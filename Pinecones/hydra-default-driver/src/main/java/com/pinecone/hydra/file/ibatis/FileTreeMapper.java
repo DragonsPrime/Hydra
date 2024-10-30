@@ -35,6 +35,10 @@ public interface FileTreeMapper extends TrieTreeManipulator {
     @Select("SELECT `id` AS `enumId`, `guid`, `type`, base_data_guid AS baseDataGUID, node_meta_guid AS nodeMetadataGUID FROM hydra_uofs_nodes WHERE guid=#{guid}")
     GUIDDistributedTrieNode getNodeExtendsFromMeta( GUID guid );
 
+    @Select("SELECT COUNT( `id` ) FROM hydra_uofs_nodes WHERE guid=#{guid}")
+    boolean contains( GUID key );
+
+
     @Override
     default GUIDDistributedTrieNode getNode( GUID guid ) {
         GUIDDistributedTrieNode node = this.getNodeExtendsFromMeta( guid );

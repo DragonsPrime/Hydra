@@ -4,8 +4,8 @@ import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.Debug;
-import com.pinecone.framework.util.rdb.sqlite.SqliteHost;
-import com.pinecone.framework.util.rdb.sqlite.SqliteMethod;
+import com.pinecone.framework.util.sqlite.SQLiteHost;
+import com.pinecone.framework.util.sqlite.SQLiteMethod;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
@@ -72,7 +72,7 @@ class Alice extends Radium {
         //this.testSimpleThread();
         //this.testDirectReceive( volumeTree );
         //this.testDirectExport( volumeTree );
-        SqliteMethod sqliteMethod = new SqliteMethod( new SqliteHost("D:\\对象存储\\测试文件.db") );
+        SQLiteMethod sqliteMethod = new SQLiteMethod( new SQLiteHost("D:\\对象存储\\测试文件.db") );
         sqliteMethod.executeUpdate( "CREATE TABLE IF NOT EXISTS users (\n" +
                 "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
                 "    name TEXT NOT NULL,\n" +

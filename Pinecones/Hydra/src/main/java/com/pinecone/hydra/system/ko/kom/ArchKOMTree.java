@@ -57,12 +57,17 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
     }
 
     @Override
+    public boolean contains( GUID nodeGuid ) {
+        return this.distributedTrieTree.contains( nodeGuid );
+    }
+
+    @Override
     public TreeNode get( GUID guid, int depth ) {
         return this.getOperatorByGuid( guid ).get( guid, depth );
     }
 
     @Override
-    public TreeNode getSelf( GUID guid) {
+    public TreeNode getSelf( GUID guid ) {
         return this.getOperatorByGuid( guid ).getSelf( guid );
     }
 

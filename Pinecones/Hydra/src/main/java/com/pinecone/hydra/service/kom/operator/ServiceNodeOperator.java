@@ -44,9 +44,9 @@ public class ServiceNodeOperator extends ArchServiceOperator implements ServiceO
         this.serviceNodeManipulator.insert(serviceElement);
 
         //将应用节点基础信息存入信息表
-        GUID descriptionGUID = guidAllocator.nextGUID72();
+        GUID metaGUID = guidAllocator.nextGUID72();
         if ( serviceElement.getMetaGuid() == null ){
-            serviceElement.setMetaGuid( descriptionGUID);
+            serviceElement.setMetaGuid( metaGUID );
         }
         this.serviceMetaManipulator.insert( serviceElement );
 
@@ -57,10 +57,10 @@ public class ServiceNodeOperator extends ArchServiceOperator implements ServiceO
 
         //将节点信息存入主表
         GUIDDistributedTrieNode node = new GUIDDistributedTrieNode();
-        node.setNodeMetadataGUID(descriptionGUID);
-        node.setGuid(serviceNodeGUID);
+        node.setNodeMetadataGUID( metaGUID );
+        node.setGuid( serviceNodeGUID );
         node.setType( UOIUtils.createLocalJavaClass( nodeWideData.getClass().getName() ) );
-        this.distributedTrieTree.insert( node);
+        this.distributedTrieTree.insert( node );
         return serviceNodeGUID;
     }
 

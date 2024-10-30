@@ -52,7 +52,7 @@ public interface Namespace extends ElementNode {
     List<RegistryTreeNode > listItem();
 
 
-    void put ( String key, RegistryTreeNode val );
+    void put ( RegistryTreeNode child );
 
     void remove ( String key );
 

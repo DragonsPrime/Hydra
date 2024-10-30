@@ -84,12 +84,13 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
     }
 
     @Override
-    public void put( String key, RegistryTreeNode val ) {
-        if ( this.getChildren().get(key) != null ){
+    public void put( RegistryTreeNode child ) {
+        String key = child.getName();
+        if ( this.getChildren().get( key ) != null ){
             throw new IllegalArgumentException( "key is exist." );
         }
-        this.getChildren().put(key, val);
-        this.registry.affirmOwnedNode( this.guid, val.getGuid() );
+        this.getChildren().put( key, child );
+        this.registry.affirmOwnedNode( this.guid, child.getGuid() );
     }
 
     @Override

@@ -129,4 +129,22 @@ public abstract class ArchElementNode extends ArchServiceFamilyMeta implements E
     protected List<GUID > fetchChildrenGuids() {
         return this.servicesInstrument.fetchChildrenGuids( this.getGuid() );
     }
+
+    protected void addChild( ElementNode child ) {
+        GUID childId;
+        boolean bContainsChild = this.containsChild( child.getName() );
+        if( bContainsChild ) {
+            return;
+        }
+        else {
+            childId = this.servicesInstrument.put( child );
+        }
+
+
+        this.servicesInstrument.affirmOwnedNode( this.guid, childId );
+    }
+
+    protected boolean containsChild( String childName ) {
+        return this.servicesInstrument.containsChild( this.guid, childName );
+    }
 }

@@ -15,6 +15,8 @@ public interface TrieTreeManipulator extends Pinenut {
     /** With detail meta data node information. */
     GUIDDistributedTrieNode getNode( GUID guid );
 
+    boolean contains( GUID key ) ;
+
     /** Only with tree node index information. */
     GUIDDistributedTrieNode getTreeNodeOnly( GUID guid, GUID parentGuid );
 

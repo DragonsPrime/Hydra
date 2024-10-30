@@ -8,13 +8,17 @@ import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
 import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
 import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
 
-public class ReparseLinkSelector extends StandardPathSelector implements ReparsePointSelector {
-    public ReparseLinkSelector( StandardPathSelector pathSelector ) {
-        super( pathSelector.pathResolver, pathSelector.distributedTrieTree, pathSelector.dirManipulator, pathSelector.fileManipulators );
+public class ReparseLinkSelector extends MultiFolderPathSelector implements ReparsePointSelector {
+    public ReparseLinkSelector( MultiFolderPathSelector pathSelector ) {
+        super( pathSelector.pathResolver, pathSelector.distributedTrieTree, pathSelector.dirManipulators, pathSelector.fileManipulators );
     }
 
     public ReparseLinkSelector( PathResolver pathResolver, DistributedTrieTree trieTree, GUIDNameManipulator dirMan, GUIDNameManipulator[] fileMans ) {
-        super( pathResolver, trieTree, dirMan, fileMans );
+        super( pathResolver, trieTree, new GUIDNameManipulator[]{ dirMan }, fileMans );
+    }
+
+    public ReparseLinkSelector( PathResolver pathResolver, DistributedTrieTree trieTree, GUIDNameManipulator[] dirMans, GUIDNameManipulator[] fileMans ) {
+        super( pathResolver, trieTree, dirMans, fileMans );
     }
 
     @Override

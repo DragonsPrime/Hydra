@@ -39,7 +39,20 @@ public class GenericApplicationElement extends ArchServoElement implements Appli
     }
 
     @Override
-    public List<GUID> fetchChildrenGuids() {
+    public List<GUID > fetchChildrenGuids() {
         return super.fetchChildrenGuids();
+    }
+
+    @Override
+    public void addChild( ElementNode child ) {
+        if( child instanceof FolderElement ) {
+            throw new IllegalArgumentException( "Foisting `FolderElement` into application node is not accepted." );
+        }
+        super.addChild( child );
+    }
+
+    @Override
+    public boolean containsChild( String childName ) {
+        return super.containsChild( childName );
     }
 }

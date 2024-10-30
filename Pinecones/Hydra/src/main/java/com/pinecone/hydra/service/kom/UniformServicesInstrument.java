@@ -1,5 +1,8 @@
 package com.pinecone.hydra.service.kom;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.service.kom.entity.ApplicationElement;
@@ -23,6 +26,7 @@ import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
 import com.pinecone.hydra.system.ko.kom.ArchReparseKOMTree;
 import com.pinecone.hydra.system.ko.kom.GenericReparseKOMTreeAddition;
+import com.pinecone.hydra.system.ko.kom.MultiFolderPathSelector;
 import com.pinecone.hydra.system.ko.kom.StandardPathSelector;
 import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
 import com.pinecone.hydra.unit.udtt.GenericDistributedTrieTree;
@@ -30,21 +34,25 @@ import com.pinecone.hydra.unit.udtt.source.TreeMasterManipulator;
 import com.pinecone.ulf.util.id.GUIDs;
 
 public class UniformServicesInstrument extends ArchReparseKOMTree implements ServicesInstrument {
-    protected Hydrarum                  hydrarum;
+    protected Hydrarum                    hydrarum;
     //GenericDistributedScopeTree
-    private DistributedTrieTree         distributedTrieTree;
+    protected DistributedTrieTree         distributedTrieTree;
 
-    private ServiceMasterManipulator    serviceMasterManipulator;
+    protected ServiceMasterManipulator    serviceMasterManipulator;
 
-    private ServiceNamespaceManipulator serviceNamespaceManipulator;
+    protected ServiceNamespaceManipulator serviceNamespaceManipulator;
 
-    private ApplicationNodeManipulator  applicationNodeManipulator;
+    protected ApplicationNodeManipulator  applicationNodeManipulator;
 
-    private ServiceNodeManipulator      serviceNodeManipulator;
+    protected ServiceNodeManipulator      serviceNodeManipulator;
+
+    protected List<GUIDNameManipulator >  folderManipulators;
+
+    protected List<GUIDNameManipulator >  fileManipulators;
 
 
 
-    public UniformServicesInstrument(Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
+    public UniformServicesInstrument( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
         super( hydrarum,masterManipulator, ServicesInstrument.KernelServiceConfig);
         Debug.trace(masterManipulator);
         this.hydrarum = hydrarum;
@@ -58,9 +66,13 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
         this.guidAllocator               = GUIDs.newGuidAllocator();
         this.operatorFactory             = new GenericServiceOperatorFactory(this,(ServiceMasterManipulator) masterManipulator);
 
-        this.pathResolver                =  new KOPathResolver( this.kernelObjectConfig );
-        this.pathSelector                =  new StandardPathSelector(
-                this.pathResolver, this.distributedTrieTree, this.serviceNamespaceManipulator, new GUIDNameManipulator[] { this.applicationNodeManipulator,this.serviceNodeManipulator }
+        this.pathResolver                = new KOPathResolver( this.kernelObjectConfig );
+
+        // TODO for customize service tree architecture.
+        this.folderManipulators          = new ArrayList<>( List.of( this.serviceNamespaceManipulator, this.applicationNodeManipulator ) );
+        this.fileManipulators            = new ArrayList<>( List.of( this.applicationNodeManipulator, this.serviceNodeManipulator ) );
+        this.pathSelector                = new MultiFolderPathSelector(
+                this.pathResolver, this.distributedTrieTree, this.folderManipulators.toArray( new GUIDNameManipulator[]{} ), this.fileManipulators.toArray( new GUIDNameManipulator[]{} )
         );
 
         this.mReparseKOM                 =  new GenericReparseKOMTreeAddition( this );
@@ -94,8 +106,8 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
                 }
                 else {
                     Namespace namespace = (Namespace) this.dynamicFactory.optNewInstance( nsSup, new Object[]{ this } );
-                    namespace.setName(parts[i]);
-                    GUID guid = this.put(namespace);
+                    namespace.setName( parts[i] );
+                    GUID guid = this.put( namespace );
                     if ( i != 0 ){
                         this.affirmOwnedNode( parentGuid, guid );
                         parentGuid = guid;
@@ -140,7 +152,21 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
         return ( Namespace ) this.affirmTreeNodeByPath( path, null, GenericNamespace.class );
     }
 
-    public UniformServicesInstrument(KOIMappingDriver driver ) {
+    @Override
+    public boolean containsChild( GUID parentGuid, String childName ) {
+        for( GUIDNameManipulator manipulator : this.fileManipulators ) {
+            List<GUID > guids = manipulator.getGuidsByName( childName );
+            for( GUID guid : guids ) {
+                List<GUID > ps = this.distributedTrieTree.fetchParentGuids( guid );
+                if( ps.contains( parentGuid ) ){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public UniformServicesInstrument( KOIMappingDriver driver ) {
         this(
                 driver.getSystem(),
                 driver.getMasterManipulator()

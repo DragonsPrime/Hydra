@@ -1,4 +1,4 @@
-package com.pinecone.framework.util.rdb.sqlite;
+package com.pinecone.framework.util.sqlite;
 
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.rdb.RDBHost;
@@ -8,34 +8,38 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class SqliteHost implements RDBHost {
-    private String      mszLocation;
+public class SQLiteHost implements RDBHost {
+    protected String      mszLocation;
 
-    private String      mszUsername;
+    protected String      mszUsername;
 
-    private String      mszPassword;
+    protected String      mszPassword;
 
-    private String      mszCharset;
+    protected String      mszCharset;
 
-    private Connection mGlobalConnection;
+    protected String      mszDriver;
 
-    public SqliteHost( String dbLocation, String dbUsername, String dbPassword ) throws SQLException {
-        this.mszLocation = dbLocation;
-        this.mszUsername = dbUsername;
-        this.mszPassword = dbPassword;
-        this.mszCharset = "UTF-8";
+    protected Connection  mGlobalConnection;
+
+
+    public SQLiteHost( String dbLocation, String dbUsername, String dbPassword ) throws SQLException {
+        this( dbLocation, dbUsername, dbPassword, "UTF-8" );
+    }
+
+    public SQLiteHost( String dbLocation, String dbUsername, String dbPassword, String dbCharset ) throws SQLException {
+        this( dbLocation, dbUsername, dbPassword, dbCharset, "org.sqlite.JDBC" );
+    }
+
+    public SQLiteHost( String dbLocation, String dbUsername, String dbPassword, String dbCharset, String driver ) throws SQLException {
+        this.mszLocation = dbLocation ;
+        this.mszUsername = dbUsername ;
+        this.mszPassword = dbPassword ;
+        this.mszCharset  = dbCharset  ;
+        this.mszDriver   = driver     ;
         this.connect();
     }
 
-    public SqliteHost( String dbLocation, String dbUsername, String dbPassword, String dbCharset ) throws SQLException {
-        this.mszLocation = dbLocation;
-        this.mszUsername = dbUsername;
-        this.mszPassword = dbPassword;
-        this.mszCharset = dbCharset;
-        this.connect();
-    }
-
-    public SqliteHost( String dbLocation ) throws SQLException {
+    public SQLiteHost( String dbLocation ) throws SQLException {
         this.mszLocation = dbLocation;
         this.connect();
     }
@@ -58,13 +62,13 @@ public class SqliteHost implements RDBHost {
     @Override
     public void connect() throws SQLException {
         try{
-            Class.forName("org.sqlite.JDBC");
+            Class.forName( this.mszDriver );
         }
         catch ( ClassNotFoundException e ){
             throw new SQLException( "JDBC Driver is not found.", "CLASS_NOT_FOUND", e );
         }
         String url = "jdbc:sqlite:" + this.mszLocation;
-        this.mGlobalConnection = DriverManager.getConnection(url);
+        this.mGlobalConnection = DriverManager.getConnection( url );
     }
 
     @Override

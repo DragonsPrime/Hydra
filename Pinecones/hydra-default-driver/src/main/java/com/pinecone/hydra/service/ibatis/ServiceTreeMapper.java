@@ -19,7 +19,7 @@ import java.util.List;
 
 @Mapper
 @IbatisDataAccessObject
-public interface ServiceTrieTreeMapper extends TrieTreeManipulator {
+public interface ServiceTreeMapper extends TrieTreeManipulator {
     @Insert("INSERT INTO `hydra_service_node_tree` (`guid`, `linked_type`) VALUES ( #{guid}, #{linkedType} )")
     void insertRootNode(@Param("guid")  GUID guid, @Param("linkedType") LinkedType linkedType );
 
@@ -29,11 +29,14 @@ public interface ServiceTrieTreeMapper extends TrieTreeManipulator {
         ownerManipulator.insertRootNode( node.getGuid() );
     }
 
-    @Insert("INSERT INTO hydra_service_meta_map (`guid`, `type`,`base_data_guid`,`node_metadata_guid`) VALUES (#{guid},#{type},#{baseDataGuid},#{nodeMetaGuid})")
+    @Insert("INSERT INTO hydra_service_nodes (`guid`, `type`,`base_data_guid`,`node_metadata_guid`) VALUES (#{guid},#{type},#{baseDataGuid},#{nodeMetaGuid})")
     void insertTreeNode( @Param("guid") GUID guid, @Param("type") UOI type, @Param("baseDataGuid") GUID baseDataGuid, @Param("nodeMetaGuid") GUID nodeMetaGuid );
 
-    @Select("SELECT `id` AS `enumId`, `guid`, `type`, base_data_guid AS baseDataGUID, node_metadata_guid AS nodeMetadataGUID FROM hydra_service_meta_map WHERE guid=#{guid}")
+    @Select("SELECT `id` AS `enumId`, `guid`, `type`, base_data_guid AS baseDataGUID, node_metadata_guid AS nodeMetadataGUID FROM hydra_service_nodes WHERE guid=#{guid}")
     GUIDDistributedTrieNode getNodeExtendsFromMeta( GUID guid );
+
+    @Select("SELECT COUNT( `id` ) FROM hydra_service_nodes WHERE guid=#{guid}")
+    boolean contains( GUID key );
 
     @Override
     default GUIDDistributedTrieNode getNode( GUID guid ) {
@@ -61,7 +64,7 @@ public interface ServiceTrieTreeMapper extends TrieTreeManipulator {
         this.removeOwnedTreeNode( guid );
     }
 
-    @Delete("DELETE FROM `hydra_service_meta_map` WHERE `guid`=#{guid}")
+    @Delete("DELETE FROM `hydra_service_nodes` WHERE `guid`=#{guid}")
     void removeNodeMeta( @Param("guid") GUID guid );
 
     @Delete("DELETE FROM `hydra_service_node_tree` WHERE `guid` = #{guid}")
@@ -91,7 +94,7 @@ public interface ServiceTrieTreeMapper extends TrieTreeManipulator {
     @Select("SELECT `parent_guid` FROM `hydra_service_node_tree` WHERE `guid`=#{guid}")
     List<GUID > fetchParentGuids( GUID guid );
 
-    @Update("UPDATE `hydra_service_meta_map` SET `type` = #{type} WHERE guid=#{guid}")
+    @Update("UPDATE `hydra_service_nodes` SET `type` = #{type} WHERE guid=#{guid}")
     void updateType( UOI type , GUID guid );
 
     @Select( "SELECT guid FROM hydra_service_node_tree WHERE parent_guid IS NULL " )

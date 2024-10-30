@@ -3,7 +3,7 @@ package com.pinecone.hydra.service.ibatis.hydranium;
 import com.pinecone.framework.system.construction.Structure;
 import com.pinecone.hydra.service.ibatis.ServiceNodeOwnerMapper;
 import com.pinecone.hydra.service.ibatis.ServicePathCacheMapper;
-import com.pinecone.hydra.service.ibatis.ServiceTrieTreeMapper;
+import com.pinecone.hydra.service.ibatis.ServiceTreeMapper;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.unit.udtt.source.TireOwnerManipulator;
 import com.pinecone.hydra.unit.udtt.source.TreeMasterManipulator;
@@ -24,7 +24,7 @@ public class ServiceMasterTreeManipulatorImpl implements TreeMasterManipulator {
     TireOwnerManipulator tireOwnerManipulator;
 
     @Resource
-    @Structure( type = ServiceTrieTreeMapper.class )
+    @Structure( type = ServiceTreeMapper.class )
     TrieTreeManipulator  trieTreeManipulator;
 
     public ServiceMasterTreeManipulatorImpl() {

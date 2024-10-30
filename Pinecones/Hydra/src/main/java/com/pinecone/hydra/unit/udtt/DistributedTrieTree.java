@@ -21,7 +21,9 @@ public interface DistributedTrieTree extends PineUnit {
 
     void put( GUID guid, GUIDDistributedTrieNode distributedTreeNode );
 
-    boolean containsKey( GUID key );
+    boolean contains( GUID key );
+
+    boolean containsChild( GUID parentGuid, GUID childGuid );
 
     GUID queryGUIDByPath( String path );
 
@@ -38,7 +40,7 @@ public interface DistributedTrieTree extends PineUnit {
 
     void removeCachePath( GUID guid );
 
-    GUID getOwner( GUID guid);
+    GUID getOwner( GUID guid );
 
     void setOwner( GUID sourceGuid, GUID targetGuid );
 

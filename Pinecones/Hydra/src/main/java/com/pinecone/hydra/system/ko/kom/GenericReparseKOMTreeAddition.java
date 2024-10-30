@@ -9,10 +9,16 @@ public class GenericReparseKOMTreeAddition implements ReparseKOMTreeAddition {
     protected DistributedTrieTree   mDistributedTrieTree;
     protected ReparsePointSelector  mReparsePointSelector;
 
+    public GenericReparseKOMTreeAddition( ArchKOMTree tree, ReparsePointSelector reparsePointSelector ) {
+        this.mKOMTree              = tree;
+        this.mDistributedTrieTree  = tree.getMasterTrieTree();
+        this.mReparsePointSelector = reparsePointSelector ;
+    }
+
     public GenericReparseKOMTreeAddition( ArchKOMTree tree ) {
         this.mKOMTree              = tree;
         this.mDistributedTrieTree  = tree.getMasterTrieTree();
-        this.mReparsePointSelector = new ReparseLinkSelector( (StandardPathSelector) this.mKOMTree.pathSelector ) ;
+        this.mReparsePointSelector = new ReparseLinkSelector( (MultiFolderPathSelector) this.mKOMTree.pathSelector ) ;
     }
 
     @Override

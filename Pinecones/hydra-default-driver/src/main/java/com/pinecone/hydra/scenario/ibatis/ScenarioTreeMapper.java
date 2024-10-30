@@ -19,6 +19,9 @@ public interface ScenarioTreeMapper extends TrieTreeManipulator {
     @Insert("INSERT INTO hydra_scenario_node_map (guid, type, base_data_guid, node_meta_guid) VALUES (#{guid},#{type},#{baseDataGUID},#{nodeMetadataGUID})")
     void insert (GUIDDistributedTrieNode distributedConfTreeNode);
 
+    @Select("SELECT COUNT( `id` ) FROM hydra_scenario_node_map WHERE guid=#{guid}")
+    boolean contains( GUID key );
+
     default GUIDDistributedTrieNode getNode(GUID guid){
         GUIDDistributedTrieNode metaNode = this.getMetaNode(guid);
         List<GUID> parentNodes = this.fetchParentGuids(guid);
