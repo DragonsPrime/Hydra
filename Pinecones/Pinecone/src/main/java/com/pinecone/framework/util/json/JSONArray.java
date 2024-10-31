@@ -232,6 +232,10 @@ public interface JSONArray extends PineUnit, List<Object >, JSONDictium, Seriali
 
     JSONArray put( Object value ) ;
 
+    JSONArray put( JSONObject value ) ;
+
+    JSONArray put( JSONArray value ) ;
+
     JSONArray put( int index, boolean value ) throws JSONException ;
 
     JSONArray put( int index, Collection value ) throws JSONException ;
@@ -245,6 +249,10 @@ public interface JSONArray extends PineUnit, List<Object >, JSONDictium, Seriali
     JSONArray put( int index, Map value ) throws JSONException ;
 
     JSONArray put( int index, Object value ) throws JSONException ;
+
+    JSONArray put( int index, JSONObject value ) throws JSONException ;
+
+    JSONArray put( int index, JSONArray value ) throws JSONException ;
 
     JSONObject toJSONObject( JSONArray names ) throws JSONException ;
 

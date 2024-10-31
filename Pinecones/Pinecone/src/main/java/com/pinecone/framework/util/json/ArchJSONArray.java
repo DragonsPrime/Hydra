@@ -672,6 +672,18 @@ public abstract class ArchJSONArray implements JSONArray {
     }
 
     @Override
+    public JSONArray put( JSONObject value ) {
+        this.innerListAdd( value );
+        return this;
+    }
+
+    @Override
+    public JSONArray put( JSONArray value ) {
+        this.innerListAdd( value );
+        return this;
+    }
+
+    @Override
     public JSONArray put( int index, boolean value ) throws JSONException {
         this.put( index, (Object)(value ? Boolean.TRUE : Boolean.FALSE) );
         return this;
@@ -695,6 +707,18 @@ public abstract class ArchJSONArray implements JSONArray {
     @Override
     public JSONArray put( int index, long value ) throws JSONException {
         this.put( index, (Long)value );
+        return this;
+    }
+
+    @Override
+    public JSONArray put( int index, JSONArray value ) throws JSONException {
+        this.innerListSet( index, value );
+        return this;
+    }
+
+    @Override
+    public JSONArray put( int index, JSONObject value ) throws JSONException {
+        this.innerListSet( index, value );
         return this;
     }
 

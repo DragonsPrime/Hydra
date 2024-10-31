@@ -133,9 +133,7 @@ public abstract class ArchServoElement extends ArchElementNode implements ServoE
 
     @Override
     public String toJSONString() {
-        return BeanJSONEncoder.BasicEncoder.encode( this, Set.of(
-                "distributedTreeNode"
-        ) );
+        return BeanJSONEncoder.BasicEncoder.encode( this, ServoElement.UnbeanifiedKeys );
     }
 
     @Override

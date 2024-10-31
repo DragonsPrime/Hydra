@@ -1,11 +1,14 @@
 package com.pinecone.hydra.service.kom.entity;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.service.kom.ServiceFamilyNode;
 
 public interface ServoElement extends ElementNode, ServiceFamilyNode {
+    Set<String > UnbeanifiedKeys = Set.of( "distributedTreeNode" );
+
     long getEnumId();
     void setEnumId( long id );
 

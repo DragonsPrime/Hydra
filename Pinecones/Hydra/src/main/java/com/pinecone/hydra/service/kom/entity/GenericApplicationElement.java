@@ -1,6 +1,9 @@
 package com.pinecone.hydra.service.kom.entity;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.framework.util.json.JSONMaptron;
+import com.pinecone.framework.util.json.JSONObject;
+import com.pinecone.framework.util.json.hometype.BeanColonist;
 import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
 
@@ -54,5 +57,18 @@ public class GenericApplicationElement extends ArchServoElement implements Appli
     @Override
     public boolean containsChild( String childName ) {
         return super.containsChild( childName );
+    }
+
+    @Override
+    public JSONObject toJSONObject() {
+        List<ElementNode > children = this.fetchChildren();
+        JSONObject jo         = BeanColonist.DirectColonist.populate( this, ServoElement.UnbeanifiedKeys );
+        JSONObject joChildren = new JSONMaptron();
+
+        for( ElementNode node : children ) {
+            joChildren.put( node.getName(), node.toJSONObject() );
+        }
+        jo.put( "children", joChildren );
+        return jo;
     }
 }

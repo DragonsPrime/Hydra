@@ -5,6 +5,8 @@ import java.util.List;
 import com.pinecone.framework.unit.KeyValue;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.JSONEncoder;
+import com.pinecone.framework.util.json.JSONMaptron;
+import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.service.kom.GenericNamespaceRules;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
 import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
@@ -46,32 +48,43 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
 
     @Override
     public GenericNamespaceRules getClassificationRules() {
-        return classificationRules;
+        return this.classificationRules;
     }
 
     @Override
-    public void setClassificationRules(GenericNamespaceRules classificationRules) {
+    public void setClassificationRules( GenericNamespaceRules classificationRules ) {
         this.classificationRules = classificationRules;
     }
 
     @Override
     public ArchElementNode getAttributes() {
-        return nodeAttributes;
+        return this.nodeAttributes;
     }
 
     @Override
-    public void setNodeCommonData(ArchElementNode nodeAttributes) {
+    public void setNodeCommonData( ArchElementNode nodeAttributes ) {
         this.nodeAttributes = nodeAttributes;
     }
 
     @Override
     public GUID getRulesGUID() {
-        return rulesGUID;
+        return this.rulesGUID;
     }
 
     @Override
-    public void setRulesGUID(GUID rulesGUID) {
+    public void setRulesGUID( GUID rulesGUID ) {
         this.rulesGUID = rulesGUID;
+    }
+
+    @Override
+    public JSONObject toJSONObject() {
+        List<ElementNode > children = this.fetchChildren();
+        JSONObject jo = new JSONMaptron();
+
+        for( ElementNode node : children ) {
+            jo.put( node.getName(), node.toJSONObject() );
+        }
+        return jo;
     }
 
     @Override

@@ -12,4 +12,8 @@ public interface ServiceTreeNode extends TreeNode {
     default ServiceTreeNode evinceTreeNode(){
         return this;
     }
+
+    default ElementNode evinceElementNode(){
+        return null;
+    }
 }

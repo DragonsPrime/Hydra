@@ -18,7 +18,7 @@ public abstract class ArchConfigNode extends ArchElementNode implements ConfigNo
 
     }
 
-    public ArchConfigNode(KOMRegistry registry ) {
+    public ArchConfigNode( KOMRegistry registry ) {
         this.registry = registry;
 
         GuidAllocator guidAllocator = this.registry.getGuidAllocator();

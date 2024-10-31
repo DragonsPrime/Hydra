@@ -37,7 +37,7 @@ public interface Namespace extends ElementNode {
 
     NamespaceMeta getNamespaceWithMeta();
 
-    void setNamespaceMeta(NamespaceMeta namespaceMeta);
+    void setNamespaceMeta( NamespaceMeta namespaceMeta );
 
     Attributes getAttributes();
 

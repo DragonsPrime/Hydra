@@ -37,7 +37,7 @@ class Jesse extends Radium {
         //this.testDelete( servicesTree );
     }
 
-    private void testInsert( ServicesInstrument servicesInstrument){
+    private void testInsert( ServicesInstrument servicesInstrument ){
 //        GenericNamespace namespace = new GenericNamespace();
 //        namespace.setName( "Test1" );
 //        servicesInstrument.put( namespace );
@@ -78,7 +78,11 @@ class Jesse extends Radium {
 
         Debug.trace( servicesInstrument.affirmApplication( "root/species/orc" ).fetchChildren() );
 
-        Debug.trace( servicesInstrument.queryElement( "root/species/orc/slaughter" ) );
+        Debug.trace( servicesInstrument.queryElement( "root/species/orc/slaughter" ).toJSONObject() );
+
+
+        Debug.fmp( 2, servicesInstrument.queryElement( "root" ).toJSONObject() );
+
     }
 
     private void testDelete( ServicesInstrument servicesInstrument){

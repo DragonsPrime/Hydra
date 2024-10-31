@@ -6,6 +6,7 @@ import java.util.List;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.service.kom.entity.ApplicationElement;
+import com.pinecone.hydra.service.kom.entity.ElementNode;
 import com.pinecone.hydra.service.kom.entity.GenericApplicationElement;
 import com.pinecone.hydra.service.kom.entity.GenericNamespace;
 import com.pinecone.hydra.service.kom.entity.GenericServiceElement;
@@ -138,10 +139,10 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
     }
 
     @Override
-    public ServiceTreeNode queryElement( String path ) {
+    public ElementNode queryElement( String path ) {
         GUID guid = this.queryGUIDByPath( path );
         if( guid != null ) {
-            return  this.get( guid );
+            return this.get( guid ).evinceElementNode();
         }
 
         return null;

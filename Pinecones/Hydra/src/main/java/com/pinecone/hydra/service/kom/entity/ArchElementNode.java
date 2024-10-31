@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.framework.util.json.JSONObject;
+import com.pinecone.framework.util.json.hometype.BeanColonist;
 import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
 import com.pinecone.hydra.service.ArchServiceFamilyMeta;
@@ -146,5 +148,10 @@ public abstract class ArchElementNode extends ArchServiceFamilyMeta implements E
 
     protected boolean containsChild( String childName ) {
         return this.servicesInstrument.containsChild( this.guid, childName );
+    }
+
+    @Override
+    public JSONObject toJSONObject() {
+        return BeanColonist.DirectColonist.populate( this, ServoElement.UnbeanifiedKeys );
     }
 }
