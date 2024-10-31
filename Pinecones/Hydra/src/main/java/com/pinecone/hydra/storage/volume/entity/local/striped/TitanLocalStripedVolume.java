@@ -79,4 +79,9 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
     public String toString() {
         return this.toJSONString();
     }
+
+    @Override
+    public boolean existStorageObject(GUID storageObject) throws SQLException {
+        return false;
+    }
 }

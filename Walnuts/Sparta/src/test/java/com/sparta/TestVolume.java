@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.sql.SQLException;
 
 
 class Alice extends Radium {
@@ -72,15 +73,7 @@ class Alice extends Radium {
         //this.testSimpleThread();
         //this.testDirectReceive( volumeTree );
         //this.testDirectExport( volumeTree );
-        SQLiteMethod sqliteMethod = new SQLiteMethod( new SQLiteHost("D:\\对象存储\\测试文件.db") );
-        sqliteMethod.executeUpdate( "CREATE TABLE IF NOT EXISTS users (\n" +
-                "    id INTEGER PRIMARY KEY AUTOINCREMENT,\n" +
-                "    name TEXT NOT NULL,\n" +
-                "    email TEXT UNIQUE,\n" +
-                "    age INTEGER CHECK (age >= 0),\n" +
-                "    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP\n" +
-                "); " );
-
+        this.testSpannedChannelReceive( volumeTree );
     }
 
 
@@ -150,6 +143,16 @@ class Alice extends Radium {
         //simpleVolume.channelExport(fileSystem, file);
     }
 
+    private void testSpannedChannelReceive( UniformVolumeTree volumeTree ) throws IOException, SQLException {
+        LogicVolume volume = volumeTree.get(GUIDs.GUID72("0516ca8-000367-0006-60"));
+        TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
+        titanReceiveStorageObject.setName( "视频" );
+        titanReceiveStorageObject.setSize( 85 * 1024 * 1024 );
+        File file = new File("D:\\井盖视频块\\4月13日 (1).mp4");
+        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
+        volume.channelReceive( titanReceiveStorageObject,"文件夹", channel);
+    }
+
     private void testRaid0Insert( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ){
         VolumeAllotment volumeAllotment = volumeTree.getVolumeAllotment();
         VolumeCapacity64 volumeCapacity1 = volumeAllotment.newVolumeCapacity();
@@ -203,18 +206,18 @@ class Alice extends Radium {
     }
 
     private void TestRaid0Receive( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ) throws IOException {
-//        LogicVolume volume1 = volumeTree.get(GUIDs.GUID72("0414fd8-00011e-0004-78"));
-//        volume1.extendLogicalVolume( GUIDs.GUID72("0414fd8-00011e-0000-9c") );
-//        LogicVolume volume2 = volumeTree.get(GUIDs.GUID72("0414fd8-00011e-0005-78"));
-//        volume2.extendLogicalVolume(GUIDs.GUID72("0414fd8-00011e-0002-78"));
+        LogicVolume volume1 = volumeTree.get(GUIDs.GUID72("0516ca8-000367-0004-60"));
+        volume1.extendLogicalVolume( GUIDs.GUID72("0516ca8-000367-0000-68") );
+        LogicVolume volume2 = volumeTree.get(GUIDs.GUID72("0516ca8-000367-0005-60"));
+        volume2.extendLogicalVolume(GUIDs.GUID72("0516ca8-000367-0002-68"));
 
-        LogicVolume volume3 = volumeTree.get(GUIDs.GUID72("0414fd8-00011e-0006-78"));
-        File sourceFile = new File("D:\\井盖视频块\\4月13日 (2).mp4");
-        Path path = sourceFile.toPath();
-        FileNode fileNode = fileSystem.getFSNodeAllotment().newFileNode();
-        fileNode.setName(sourceFile.getName());
-        fileNode.setGuid( fileSystem.getGuidAllocator().nextGUID72() );
-        fileNode.setDefinitionSize(200*1024*1024);
+//        LogicVolume volume3 = volumeTree.get(GUIDs.GUID72("0414fd8-00011e-0006-78"));
+//        File sourceFile = new File("D:\\井盖视频块\\4月13日 (2).mp4");
+//        Path path = sourceFile.toPath();
+//        FileNode fileNode = fileSystem.getFSNodeAllotment().newFileNode();
+//        fileNode.setName(sourceFile.getName());
+//        fileNode.setGuid( fileSystem.getGuidAllocator().nextGUID72() );
+//        fileNode.setDefinitionSize(200*1024*1024);
         ///volume3.channelReceive( fileSystem,fileNode,FileChannel.open(path, StandardOpenOption.READ) );
     }
 

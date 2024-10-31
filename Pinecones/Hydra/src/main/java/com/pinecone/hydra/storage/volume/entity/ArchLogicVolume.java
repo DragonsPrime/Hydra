@@ -25,7 +25,8 @@ public abstract class ArchLogicVolume extends ArchVolume implements LogicVolume{
             ArrayList<LogicVolume> logicVolumes = new ArrayList<>();
             List<TreeNode> nodes = this.volumeTree.getChildren( this.guid );
             for( TreeNode node : nodes ){
-                logicVolumes.add( (LogicVolume) node);
+                LogicVolume volume = this.volumeTree.get(node.getGuid());
+                logicVolumes.add( volume );
             }
             this.children = logicVolumes;
         }

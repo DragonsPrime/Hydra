@@ -7,5 +7,5 @@ import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
 import java.nio.channels.FileChannel;
 
 public interface LocalSpannedVolume extends SpannedVolume {
-    void channelReceive(KOMFileSystem fileSystem, FileNode file, FileChannel channel, String raidRule);
+
 }

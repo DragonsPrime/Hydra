@@ -14,6 +14,6 @@ public interface VolumeCapacityMapper extends VolumeCapacityManipulator {
     @Update("UPDATE `hydra_uofs_volumes` SET `definition_capacity` = #{definitionCapacity}, `used_size` = #{usedSize}, `quota_capacity` = #{quotaCapacity} WHERE `guid` = #{volumeGuid}")
     void insert( VolumeCapacity64 volumeCapacity );
     void remove( GUID guid );
-    @Select("SELECT `guid` AS volumeGuid, `definition_capacity` AS definitionCapacity, `used_size` AS userSize, `quota_capacity` AS quotaCapacity FROM `hydra_uofs_volumes` WHERE `guid` = #{guid}")
+    @Select("SELECT `guid` AS volumeGuid, `definition_capacity` AS definitionCapacity, `used_size` AS usedSize, `quota_capacity` AS quotaCapacity FROM `hydra_uofs_volumes` WHERE `guid` = #{guid}")
     TitanVolumeCapacity64 getVolumeCapacity(GUID guid);
 }

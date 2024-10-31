@@ -72,4 +72,9 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
     public MiddleStorageObject channelExport(ExportStorageObject exportStorageObject, FileChannel channel) throws IOException {
         return null;
     }
+
+    @Override
+    public boolean existStorageObject(GUID storageObject) throws SQLException {
+        return false;
+    }
 }

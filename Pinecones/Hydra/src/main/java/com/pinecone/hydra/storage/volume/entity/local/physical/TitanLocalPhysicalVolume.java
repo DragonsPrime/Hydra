@@ -2,6 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.physical;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.framework.util.sqlite.SQLiteMethod;
 import com.pinecone.hydra.storage.MiddleStorageObject;
@@ -55,45 +56,6 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
         return this.toJSONString();
     }
 
-    @Override
-    public void channelExport( KOMFileSystem fileSystem, FileNode file ) throws IOException {
-        File temporaryFile = new File(this.mountPoint.getMountPoint());
-        FileChannel channel = FileChannel.open(temporaryFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-        ChannelExporterEntity exporterEntity = new GenericChannelExporterEntity(fileSystem, file, channel);
-        exporterEntity.export();
-    }
-
-    @Override
-    public void streamExport( KOMFileSystem fileSystem, FileNode file ) throws IOException {
-        File temporaryFile = new File(this.mountPoint.getMountPoint());
-        FileOutputStream fileOutputStream = new FileOutputStream(temporaryFile);
-        StreamExporterEntity exporterEntity = new GenericStreamExporterEntity(fileSystem, file, fileOutputStream);
-        exporterEntity.export();
-    }
-
-    @Override
-    public void channelReceive( KOMFileSystem fileSystem, FileNode file, FileChannel channel ) throws IOException {
-        ChannelReceiverEntity receiveEntity = new GenericChannelReceiveEntity(fileSystem, this.mountPoint.getMountPoint(), file, channel);
-        receiveEntity.receive();
-    }
-
-    @Override
-    public void channelReceive( KOMFileSystem fileSystem, FileNode file, FileChannel channel, Number offset, Number endSize ) throws IOException {
-        ChannelReceiverEntity receiveEntity = new GenericChannelReceiveEntity(fileSystem, this.mountPoint.getMountPoint(), file, channel);
-        receiveEntity.receive( offset,endSize );
-    }
-
-    @Override
-    public void channelReceive( KOMFileSystem fileSystem, FileNode file,FileChannel channel, GUID frameGuid, int threadNum, int threadId ) throws IOException {
-        ChannelReceiverEntity receiveEntity = new GenericChannelReceiveEntity(fileSystem, this.mountPoint.getMountPoint(), file, channel);
-        receiveEntity.receive( frameGuid,threadId,threadNum );
-    }
-
-    @Override
-    public void streamReceive( KOMFileSystem fileSystem, FileNode file, InputStream inputStream ) throws IOException {
-        StreamReceiverEntity receiverEntity = new GenericStreamReceiverEntity(fileSystem, this.mountPoint.getMountPoint(), file, inputStream);
-        receiverEntity.receive();
-    }
 
     @Override
     public MountPoint getMountPoint() {
@@ -115,20 +77,7 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
         TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeTree, receiveStorageObject, this.mountPoint.getMountPoint()+"\\"+destDirPath, channel);
         MiddleStorageObject middleStorageObject = titanDirectChannelReceiveEntity64.receive();
         middleStorageObject.setBottomGuid( this.guid );
-        GUID physicsGuid = this.volumeTree.getSqlitePhysicsVolume(this.guid);
-        if( physicsGuid == null ){
-            PhysicalVolume smallestCapacityPhysicalVolume = this.volumeTree.getSmallestCapacityPhysicalVolume();
-            String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid;
-            SQLiteMethod sqliteMethod = new SQLiteMethod(new SQLiteHost(url));
-            sqliteMethod.executeUpdate( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36), `child_volume_guid` VARCHAR(36) );" );
-            sqliteMethod.executeUpdate( "INSERT INTO `table` ( storage_object_guid ) VALUES ( `"+ middleStorageObject.getObjectGuid()+ "` )" );
-        }
-        else {
-            PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicsGuid);
-            String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid;
-            SQLiteMethod sqliteMethod = new SQLiteMethod(new SQLiteHost(url));
-            sqliteMethod.executeUpdate( "INSERT INTO `table` ( storage_object_guid ) VALUES ( `"+ middleStorageObject.getObjectGuid()+ "` )" );
-        }
+
         return middleStorageObject;
     }
 

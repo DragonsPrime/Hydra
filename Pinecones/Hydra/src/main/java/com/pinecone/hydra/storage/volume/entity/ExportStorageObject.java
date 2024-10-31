@@ -1,5 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity;
 
+import com.pinecone.framework.util.id.GUID;
+
 public interface ExportStorageObject {
     String getSourceName();
     void setSourceName( String sourceName );
@@ -9,4 +11,7 @@ public interface ExportStorageObject {
 
     Number getSize();
     void setSize( Number size );
+
+    GUID getStorageObjectGuid();
+    void setStorageObjectGuid(GUID storageObjectGuid );
 }
