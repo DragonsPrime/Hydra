@@ -254,12 +254,18 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
 
     @Override
     public PhysicalVolume getSmallestCapacityPhysicalVolume() {
-        return this.physicalVolumeManipulator.getSmallestCapacityPhysicalVolume();
+        PhysicalVolume smallestCapacityPhysicalVolume = this.physicalVolumeManipulator.getSmallestCapacityPhysicalVolume();
+        return this.getPhysicalVolume( smallestCapacityPhysicalVolume.getGuid() );
     }
 
     @Override
     public GUID getSqlitePhysicsVolume(GUID volumeGuid) {
         return this.sqliteVolumeManipulator.getPhysicsGuid(volumeGuid);
+    }
+
+    @Override
+    public void insertSqliteMeta(GUID physicsGuid, GUID volumeGuid) {
+        this.sqliteVolumeManipulator.insert( physicsGuid, volumeGuid );
     }
 
     private String getNodeName(DistributedTreeNode node ){

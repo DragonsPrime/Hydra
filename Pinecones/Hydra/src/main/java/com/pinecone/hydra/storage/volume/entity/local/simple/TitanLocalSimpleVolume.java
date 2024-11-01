@@ -106,9 +106,9 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     public boolean existStorageObject(GUID storageObject) throws SQLException {
         GUID physicsGuid = this.volumeTree.getSqlitePhysicsVolume(this.guid);
         PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicsGuid);
-        String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid;
+        String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-        ResultSession query = sqLiteExecutor.query(" SELECT COUNT(*) FROM table WHERE `storage_object_guid` = " + storageObject + " ");
+        ResultSession query = sqLiteExecutor.query(" SELECT COUNT(*) FROM `table` WHERE `storage_object_guid` = '" + storageObject + "' ");
         ResultSet resultSet = query.getResultSet();
         if( resultSet.next() ){
             int count = resultSet.getInt(1);
@@ -121,16 +121,17 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         GUID physicsGuid = this.volumeTree.getSqlitePhysicsVolume(this.guid);
         if( physicsGuid == null ){
             PhysicalVolume smallestCapacityPhysicalVolume = this.volumeTree.getSmallestCapacityPhysicalVolume();
-            String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid;
+            this.volumeTree.insertSqliteMeta( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+            String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
             SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-            sqLiteExecutor.execute( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36), `child_volume_guid` VARCHAR(36) );" );
-            sqLiteExecutor.execute( "INSERT INTO `table` ( storage_object_guid ) VALUES ( `"+ middleStorageObject.getObjectGuid()+ "` )" );
+            sqLiteExecutor.execute( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36) );" );
+            sqLiteExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` ) VALUES ( '"+ middleStorageObject.getObjectGuid()+ "' )" );
         }
         else {
             PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicsGuid);
-            String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid;
+            String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
             SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-            sqLiteExecutor.execute( "INSERT INTO `table` ( storage_object_guid ) VALUES ( `"+ middleStorageObject.getObjectGuid()+ "` )" );
+            sqLiteExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` ) VALUES ( '"+ middleStorageObject.getObjectGuid()+ "' )" );
         }
     }
 }

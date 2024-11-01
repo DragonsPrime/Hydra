@@ -7,6 +7,7 @@ import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.framework.util.sqlite.SQLiteMethod;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
+import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
@@ -73,7 +74,8 @@ class Alice extends Radium {
         //this.testSimpleThread();
         //this.testDirectReceive( volumeTree );
         //this.testDirectExport( volumeTree );
-        this.testSpannedChannelReceive( volumeTree );
+        //this.testSpannedChannelReceive( volumeTree );
+        this.testSpannedChannelExport( volumeTree );
     }
 
 
@@ -150,7 +152,18 @@ class Alice extends Radium {
         titanReceiveStorageObject.setSize( 85 * 1024 * 1024 );
         File file = new File("D:\\井盖视频块\\4月13日 (1).mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        volume.channelReceive( titanReceiveStorageObject,"文件夹", channel);
+        MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "文件夹", channel);
+    }
+
+    private void testSpannedChannelExport( UniformVolumeTree volumeTree ) throws IOException, SQLException {
+        File file = new File("D:\\文件系统\\大文件\\视频.mp4");
+        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        LogicVolume volume = volumeTree.get(GUIDs.GUID72("0516ca8-000367-0006-60"));
+        TitanExportStorageObject titanExportStorageObject = new TitanExportStorageObject();
+        titanExportStorageObject.setSize( 85 * 1024 *1024 );
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("052d026-000369-0005-74") );
+        titanExportStorageObject.setSourceName("D:\\文件系统\\簇1\\文件夹\\视频_4a148d14.storage");
+        volume.channelExport( titanExportStorageObject, channel );
     }
 
     private void testRaid0Insert( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ){

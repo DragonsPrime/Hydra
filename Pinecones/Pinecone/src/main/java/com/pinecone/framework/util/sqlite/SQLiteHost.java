@@ -41,6 +41,7 @@ public class SQLiteHost implements RDBHost {
 
     public SQLiteHost( String dbLocation ) throws SQLException {
         this.mszLocation = dbLocation;
+        this.mszDriver   = "org.sqlite.JDBC";
         this.connect();
     }
 

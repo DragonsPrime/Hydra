@@ -123,6 +123,6 @@ public class VolumeMasterManipulatorImpl implements VolumeMasterManipulator {
 
     @Override
     public SqliteVolumeManipulator getSqliteVolumeManipulator() {
-        return null;
+        return this.sqliteVolumeManipulator;
     }
 }

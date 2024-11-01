@@ -25,4 +25,5 @@ public interface VolumeTree extends KOMInstrument {
     PhysicalVolume getSmallestCapacityPhysicalVolume();
 
     GUID getSqlitePhysicsVolume( GUID volumeGuid );
+    void insertSqliteMeta( GUID physicsGuid, GUID volumeGuid );
 }
