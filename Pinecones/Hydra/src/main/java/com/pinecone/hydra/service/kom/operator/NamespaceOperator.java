@@ -4,18 +4,15 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.service.kom.GenericNamespaceRules;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
-import com.pinecone.hydra.service.kom.entity.ElementNode;
 import com.pinecone.hydra.service.kom.entity.GenericApplicationElement;
 import com.pinecone.hydra.service.kom.entity.GenericNamespace;
 import com.pinecone.hydra.service.kom.entity.Namespace;
-import com.pinecone.hydra.service.kom.entity.ServiceTreeNode;
 import com.pinecone.hydra.service.kom.source.NamespaceRulesManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
 import com.pinecone.hydra.system.ko.UOIUtils;
 import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.ulf.util.id.GUIDs;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.util.List;
@@ -37,11 +34,11 @@ public class NamespaceOperator extends ArchElementOperator implements ElementOpe
 
     @Override
     public GUID insert( TreeNode treeNode ) {
-        Namespace ns = ( Namespace ) treeNode;
+        GenericNamespace ns = ( GenericNamespace ) treeNode;
 
         //存节点基础信息
-        GuidAllocator guidAllocator = this.servicesInstrument.getGuidAllocator();
-        GUID     namespaceRulesGuid = ns.getGuid();
+        GuidAllocator          guidAllocator = this.servicesInstrument.getGuidAllocator();
+        GUID              namespaceRulesGuid = ns.getGuid();
         GenericNamespaceRules namespaceRules = ns.getClassificationRules();
         if ( namespaceRules!= null ){
             namespaceRules.setGuid( namespaceRulesGuid );
@@ -52,20 +49,19 @@ public class NamespaceOperator extends ArchElementOperator implements ElementOpe
 
         GUID namespaceGuid = guidAllocator.nextGUID72();
         ns.setGuid( namespaceGuid );
+        ns.setRulesGUID( namespaceRulesGuid );
         this.namespaceManipulator.insert( ns );
 
         //存元信息
-        GUID metaGUID = guidAllocator.nextGUID72();
-        if ( ns.getMetaGuid() == null ){
-            ns.setMetaGuid( metaGUID );
-        }
+        GUID metadataGUID = guidAllocator.nextGUID72();
+        ns.setMetaGuid( metadataGUID );
         this.commonDataManipulator.insertNS( ns );
 
-        //将节点信息存入主表
+
         GUIDDistributedTrieNode node = new GUIDDistributedTrieNode();
         node.setBaseDataGUID( namespaceRulesGuid );
         node.setGuid( namespaceGuid );
-        node.setNodeMetadataGUID( metaGUID );
+        node.setNodeMetadataGUID( metadataGUID );
         node.setType( UOIUtils.createLocalJavaClass( treeNode.getClass().getName() ) );
         this.distributedTrieTree.insert( node );
         return namespaceGuid;
@@ -122,11 +118,13 @@ public class NamespaceOperator extends ArchElementOperator implements ElementOpe
             namespace.setRulesGUID( namespaceRules.getGuid() );
             namespace.setClassificationRules( namespaceRules );
         }
+
+        GUID metaGuid = guidDistributedTrieNode.getNodeMetadataGUID();
         namespace.setDistributedTreeNode( guidDistributedTrieNode );
         namespace.setName( this.namespaceManipulator.getNamespace( guid ).getName() );
+        this.applyCommonMeta( namespace, this.commonDataManipulator.getNodeCommonData( metaGuid ) ); // GUID / MetaGUID difference.
         namespace.setGuid( guid );
-        namespace.setMetaGuid( guidDistributedTrieNode.getNodeMetadataGUID() );
-        this.applyCommonMeta( namespace, this.commonDataManipulator.getNodeCommonData( namespace.getMetaGuid() ) );
+        namespace.setMetaGuid( metaGuid );
 
         return namespace;
     }

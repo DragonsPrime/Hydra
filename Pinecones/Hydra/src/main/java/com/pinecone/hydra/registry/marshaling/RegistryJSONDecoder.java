@@ -18,7 +18,7 @@ import com.pinecone.hydra.registry.entity.TextFile;
 import com.pinecone.hydra.registry.entity.TextValueTypes;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
-public class RegistryJSONDecoder  implements RegistryDecoder {
+public class RegistryJSONDecoder implements RegistryDecoder {
     protected KOMRegistry registry;
 
     public RegistryJSONDecoder( KOMRegistry registry ) {
@@ -104,7 +104,7 @@ public class RegistryJSONDecoder  implements RegistryDecoder {
                         }
                         else {
                             throw new IllegalArgumentException(
-                                    String.format( "Existed child-destination [%s] should be namespace.", szName )
+                                    String.format( "<Registry> Existed child-destination [%s] should be namespace.", szName )
                             );
                         }
                     }

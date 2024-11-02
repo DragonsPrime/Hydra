@@ -129,7 +129,7 @@ public class ApplicationElementOperator extends ArchElementOperator implements E
     }
 
     @Override
-    public ApplicationElement getSelf( GUID guid) {
+    public ApplicationElement getSelf( GUID guid ) {
         return this.get( guid );
     }
 

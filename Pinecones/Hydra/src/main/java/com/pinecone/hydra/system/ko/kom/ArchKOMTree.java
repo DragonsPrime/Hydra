@@ -129,7 +129,11 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
 
     @Override
     public TreeNode get( GUID guid ) {
-        return this.getOperatorByGuid( guid ).get( guid );
+        TreeNodeOperator operator = this.getOperatorByGuid( guid );
+        if( operator == null ) {
+            return null;
+        }
+        return operator.get( guid );
     }
 
     /** Final Solution 20240929: 无法获取类型 */
@@ -234,7 +238,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
     }
 
     @Override
-    public EntityNode queryNode(String path ) {
+    public EntityNode queryNode( String path ) {
         return this.queryNodeByNS( path, null, null );
     }
 

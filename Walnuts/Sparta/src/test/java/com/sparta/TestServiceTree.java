@@ -12,6 +12,7 @@ import com.pinecone.hydra.service.kom.ServicesInstrument;
 import com.pinecone.hydra.service.kom.entity.GenericApplicationElement;
 import com.pinecone.hydra.service.kom.entity.GenericNamespace;
 import com.pinecone.hydra.service.kom.entity.GenericServiceElement;
+import com.pinecone.hydra.service.kom.marshaling.ServicesJSONDecoder;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
 import com.pinecone.ulf.util.id.GUIDs;
@@ -75,9 +76,9 @@ class Jesse extends Radium {
 //        Debug.trace( servicesInstrument.affirmApplication( "root/species/orc" ) );
 //        Debug.trace( servicesInstrument.affirmNamespace("root/species") );
 //        Debug.trace( servicesInstrument.affirmNamespace( "root" ).fetchChildren() );
-
-        servicesInstrument.affirmApplication( "root/species/orc" ).addChild( new GenericServiceElement( new JSONMaptron( "{ name: slaughter }" ) ) );
-
+//
+//        servicesInstrument.affirmApplication( "root/species/orc" ).addChild( new GenericServiceElement( new JSONMaptron( "{ name: slaughter }" ) ) );
+//
 //        Debug.trace( servicesInstrument.affirmApplication( "root/species/orc" ).fetchChildren() );
 //
 //        Debug.trace( servicesInstrument.queryElement( "root/species/orc/slaughter" ).toJSONObject() );
@@ -85,6 +86,14 @@ class Jesse extends Radium {
 //        servicesInstrument.affirmNamespace( "root" ).addChild( new GenericNamespace( new JSONMaptron( "{ name: weapon, scenario: s1, description: d1, level:L1, primaryImplLang:Java }" ) ) );
 //
 //        Debug.fmp( 2, servicesInstrument.queryElement( "root/weapon" ).evinceNamespace().toJSONDetails() );
+
+
+
+
+        ServicesJSONDecoder decoder = new ServicesJSONDecoder( servicesInstrument );
+        decoder.decode( new JSONMaptron( "{ root: { test: { app: { metaType: ApplicationElement, alias:as, services: { ser: { metaType: ServiceElement, type: Microservice } } } } } }" ) );
+
+        Debug.fmp( 2, servicesInstrument.queryElement( "root" ).toJSONObject() );
 
     }
 

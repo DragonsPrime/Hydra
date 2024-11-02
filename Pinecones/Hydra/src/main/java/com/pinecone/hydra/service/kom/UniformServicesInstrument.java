@@ -30,6 +30,8 @@ import com.pinecone.hydra.system.ko.kom.GenericReparseKOMTreeAddition;
 import com.pinecone.hydra.system.ko.kom.MultiFolderPathSelector;
 import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
 import com.pinecone.hydra.unit.udtt.GenericDistributedTrieTree;
+import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
 import com.pinecone.hydra.unit.udtt.source.TreeMasterManipulator;
 import com.pinecone.ulf.util.id.GUIDs;
 
@@ -152,15 +154,28 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
         return ( Namespace ) this.affirmTreeNodeByPath( path, null, GenericNamespace.class );
     }
 
+    protected boolean containsChild( GUIDNameManipulator manipulator, GUID parentGuid, String childName ) {
+        List<GUID > guids = manipulator.getGuidsByName( childName );
+        for( GUID guid : guids ) {
+            List<GUID > ps = this.distributedTrieTree.fetchParentGuids( guid );
+            if( ps.contains( parentGuid ) ){
+                return true;
+            }
+        }
+        return false;
+    }
+
     @Override
     public boolean containsChild( GUID parentGuid, String childName ) {
         for( GUIDNameManipulator manipulator : this.fileManipulators ) {
-            List<GUID > guids = manipulator.getGuidsByName( childName );
-            for( GUID guid : guids ) {
-                List<GUID > ps = this.distributedTrieTree.fetchParentGuids( guid );
-                if( ps.contains( parentGuid ) ){
-                    return true;
-                }
+            if( this.containsChild( manipulator, parentGuid, childName ) ) {
+                return true;
+            }
+        }
+
+        for( GUIDNameManipulator manipulator : this.folderManipulators ) {
+            if( this.containsChild( manipulator, parentGuid, childName ) ) {
+                return true;
             }
         }
         return false;
@@ -188,6 +203,12 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
     @Override
     public ServiceTreeNode get( GUID guid ){
         return (ServiceTreeNode) super.get( guid );
+    }
+
+    @Override
+    public void update( TreeNode treeNode ) {
+        TreeNodeOperator operator = this.operatorFactory.getOperator( treeNode.getMetaType() );
+        operator.update( treeNode );
     }
 
 
