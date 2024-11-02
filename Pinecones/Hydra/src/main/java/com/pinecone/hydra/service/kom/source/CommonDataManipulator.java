@@ -3,14 +3,17 @@ package com.pinecone.hydra.service.kom.source;
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.service.kom.ServiceFamilyNode;
+import com.pinecone.hydra.service.kom.entity.CommonMeta;
+import com.pinecone.hydra.service.kom.entity.Namespace;
 
 public interface CommonDataManipulator extends Pinenut {
-    //NodeMetadata节点的CRUD
-    void insert(ServiceFamilyNode node);
+    void insert( ServiceFamilyNode node );
 
-    void remove(GUID guid);
+    void insertNS( Namespace node );
 
-    ServiceFamilyNode getNodeCommonData(GUID guid);
+    void remove( GUID guid );
 
-    void update(ServiceFamilyNode node);
+    CommonMeta getNodeCommonData( GUID guid );
+
+    void update( ServiceFamilyNode node );
 }

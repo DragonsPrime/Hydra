@@ -63,8 +63,8 @@ class StanMarsh extends Radium {
     }
 
     private void testDeletion( KOMRegistry registry ) {
-//        registry.remove( "game" );
-//        registry.remove("game3a");
+        registry.remove( "game" );
+        registry.remove("game3a");
 //        registry.remove( "game/witcher" );
 //        registry.remove( "game/minecraft" );
 //        registry.remove("game/terraria");

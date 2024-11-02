@@ -1,19 +1,19 @@
 package com.pinecone.hydra.service.kom.source;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.service.kom.entity.GenericNamespace;
+import com.pinecone.hydra.service.kom.entity.Namespace;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
 
 import java.util.List;
 
 public interface ServiceNamespaceManipulator extends GUIDNameManipulator {
-    void insert(GenericNamespace classificationNode);
+    void insert( Namespace ns );
 
-    void remove(GUID guid);
+    void remove( GUID guid );
 
-    GenericNamespace getNamespace(GUID guid);
+    Namespace getNamespace( GUID guid );
 
-    void update(GenericNamespace classificationNode);
+    void update( Namespace ns );
 
-    List<GenericNamespace> fetchNamespaceNodeByName(String name);
+    List<Namespace > fetchNamespaceNodeByName( String name );
 }

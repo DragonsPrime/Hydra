@@ -17,7 +17,7 @@ public interface ServicesInstrument extends ReparseKOMTree {
 
     ServiceElement     affirmService     ( String path );
 
-    ElementNode        queryElement      (String path );
+    ElementNode        queryElement      ( String path );
 
     boolean            containsChild     ( GUID parentGuid, String childName );
 

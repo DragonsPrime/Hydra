@@ -22,6 +22,11 @@ public class GenericApplicationElement extends ArchServoElement implements Appli
         BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
     }
 
+    public GenericApplicationElement( Map<String, Object > joEntity, ServicesInstrument servicesInstrument ) {
+        super( joEntity, servicesInstrument );
+        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+    }
+
     public GenericApplicationElement( ServicesInstrument servicesInstrument ) {
         super( servicesInstrument );
     }
@@ -68,7 +73,7 @@ public class GenericApplicationElement extends ArchServoElement implements Appli
         for( ElementNode node : children ) {
             joChildren.put( node.getName(), node.toJSONObject() );
         }
-        jo.put( "children", joChildren );
+        jo.put( "services", joChildren );
         return jo;
     }
 }

@@ -1,8 +1,9 @@
-package com.util;
+package com.util.json;
 
 import com.pinecone.Pinecone;
 import com.pinecone.framework.system.prototype.ObjectiveBean;
 import com.pinecone.framework.system.prototype.ObjectiveClass;
+import com.pinecone.framework.system.prototype.ObjectiveEvaluator;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.*;
 import com.pinecone.framework.util.json.hometype.*;
@@ -103,9 +104,6 @@ class Vagina {
     }
 }
 
-
-
-
 public class TestJSON {
     public static void testDirectlyInjector() {
         Shit shit = new Shit();
@@ -161,6 +159,13 @@ public class TestJSON {
             naBean.set( key, bean.get( key ) );
         }
         Debug.trace( vagina, na );
+
+        Debug.trace( ObjectiveEvaluator.MapStructures.get( na, "name" ) );
+        ObjectiveEvaluator.MapStructures.set( na, "name", "test2" );
+        Debug.trace( ObjectiveEvaluator.MapStructures.get( na, "name" ) );
+        Debug.trace( ObjectiveEvaluator.MapStructures.get( na, "emnus" ) );
+        ObjectiveEvaluator.MapStructures.set( na, "emnus", 124 );
+        Debug.trace( ObjectiveEvaluator.MapStructures.get( na, "emnus" ) );
     }
 
     public static void testStringfiy() {
@@ -170,7 +175,12 @@ public class TestJSON {
         Object[] arr = new Object[] { "v1", 1, 3.1415926, null, false, "v_end" };
         Debug.trace( arr );
 
-     }
+    }
+
+    public static void testMarshal() {
+        Object j = JSON.unmarshal( "{ name:Slave, length:1234, parasite:{ name: parasite, length:20241102 }, atts: { key:val }, li:[1,2,3, 'ssss']  }", Slave.class );
+        Debug.trace( j );
+    }
 
 
     public static void main( String[] args ) throws Exception {
@@ -180,8 +190,9 @@ public class TestJSON {
             //TestJSON.testDirectlyInjector();
             //TestJSON.testAnnotatedInjector();
             //TestJSON.testObjectom();
-            TestJSON.testObjectiveBean();
+            //TestJSON.testObjectiveBean();
             //TestJSON.testStringfiy();
+            TestJSON.testMarshal();
 
 
 

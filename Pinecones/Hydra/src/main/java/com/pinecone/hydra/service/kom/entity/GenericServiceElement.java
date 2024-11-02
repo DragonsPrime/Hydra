@@ -18,6 +18,11 @@ public class GenericServiceElement extends ArchServoElement implements ServiceEl
         BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
     }
 
+    public GenericServiceElement( Map<String, Object > joEntity, ServicesInstrument servicesInstrument ) {
+        super( joEntity, servicesInstrument );
+        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+    }
+
     public GenericServiceElement( ServicesInstrument servicesInstrument ) {
         super( servicesInstrument );
     }

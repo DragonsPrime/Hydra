@@ -65,7 +65,6 @@ class Alice extends Radium {
         UniformVolumeTree volumeTree = new UniformVolumeTree( koiMappingDriver );
         VolumeAllotment volumeAllotment = volumeTree.getVolumeAllotment();
 
-        //this.testInsert( volumeTree );
         //this.testChannelReceive( fileSystem,volumeTree );
         //this.testRaid0Insert( fileSystem,volumeTree );
         //this.TestRaid0Receive( fileSystem, volumeTree );
@@ -75,34 +74,10 @@ class Alice extends Radium {
         //this.testDirectReceive( volumeTree );
         //this.testDirectExport( volumeTree );
         //this.testSpannedChannelReceive( volumeTree );
-        this.testSpannedChannelExport( volumeTree );
+        //this.testSpannedChannelExport( volumeTree );
+        ///Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三" ) );
     }
 
-
-    private void testBaseInsert(UniformVolumeTree volumeTree ){
-        VolumeAllotment volumeAllotment = volumeTree.getVolumeAllotment();
-        VolumeCapacity64 physicalVolumeCapacity = volumeAllotment.newVolumeCapacity();
-        VolumeCapacity64 logicVolumeCapacity = volumeAllotment.newVolumeCapacity();
-        physicalVolumeCapacity.setDefinitionCapacity(1000);
-        logicVolumeCapacity.setDefinitionCapacity( 1000 );
-
-        LocalPhysicalVolume physicalVolume = volumeAllotment.newLocalPhysicalVolume();
-        physicalVolume.setName("D");
-        physicalVolume.setType("PhysicalVolume");
-        MountPoint mountPoint = volumeAllotment.newMountPoint();
-        mountPoint.setMountPoint("D:\\文件系统");
-        mountPoint.setVolumeGuid( physicalVolume.getGuid() );
-        physicalVolume.setMountPoint( mountPoint );
-        physicalVolume.setVolumeCapacity( physicalVolumeCapacity );
-
-        LocalSimpleVolume simpleVolume = volumeAllotment.newLocalSimpleVolume();
-        simpleVolume.setName("简单卷一");
-        simpleVolume.setType("SimpleVolume");
-        simpleVolume.setVolumeCapacity( logicVolumeCapacity );
-
-        volumeTree.insertPhysicalVolume( physicalVolume );
-        volumeTree.put( simpleVolume );
-    }
     private void testDirectReceive(VolumeTree volumeTree ) throws IOException {
         TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
         titanReceiveStorageObject.setName("视频");
@@ -126,7 +101,7 @@ class Alice extends Radium {
     }
 
 
-    private void testChannelReceive(KOMFileSystem fileSystem, UniformVolumeTree volumeTree ) throws IOException {
+    private void testChannelReceive( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ) throws IOException {
         SimpleVolume simpleVolume  = volumeTree.get(GUIDs.GUID72("03e7f10-0003dd-0002-98")).evinceSimpleVolume();
         simpleVolume.extendLogicalVolume( GUIDs.GUID72("03e7f10-0003dd-0000-84") );
         File sourceFile = new File("D:\\井盖视频块\\4月13日 (2).mp4");
@@ -146,23 +121,23 @@ class Alice extends Radium {
     }
 
     private void testSpannedChannelReceive( UniformVolumeTree volumeTree ) throws IOException, SQLException {
-        LogicVolume volume = volumeTree.get(GUIDs.GUID72("0516ca8-000367-0006-60"));
+        LogicVolume volume = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0006-48"));
         TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
-        titanReceiveStorageObject.setName( "视频" );
+        titanReceiveStorageObject.setName( "image" );
         titanReceiveStorageObject.setSize( 85 * 1024 * 1024 );
-        File file = new File("D:\\井盖视频块\\4月13日 (1).mp4");
+        File file = new File("E:\\MyFiles\\Picture\\Avatar/cat1.jpg");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "文件夹", channel);
+        MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "s1", channel);
     }
 
     private void testSpannedChannelExport( UniformVolumeTree volumeTree ) throws IOException, SQLException {
-        File file = new File("D:\\文件系统\\大文件\\视频.mp4");
+        File file = new File("E:/1.jpg");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-        LogicVolume volume = volumeTree.get(GUIDs.GUID72("0516ca8-000367-0006-60"));
+        LogicVolume volume = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0006-48"));
         TitanExportStorageObject titanExportStorageObject = new TitanExportStorageObject();
         titanExportStorageObject.setSize( 85 * 1024 *1024 );
-        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("052d026-000369-0005-74") );
-        titanExportStorageObject.setSourceName("D:\\文件系统\\簇1\\文件夹\\视频_4a148d14.storage");
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("056b6f4-0000b1-0005-cc") );
+        titanExportStorageObject.setSourceName("E:\\fs\\cluster\\s1\\image_8e3d1dde.storage");
         volume.channelExport( titanExportStorageObject, channel );
     }
 
@@ -176,17 +151,17 @@ class Alice extends Radium {
         LocalPhysicalVolume physicalVolume1 = volumeAllotment.newLocalPhysicalVolume();
         physicalVolume1.setType("PhysicalVolume");
         physicalVolume1.setVolumeCapacity( volumeCapacity1 );
-        physicalVolume1.setName( "D" );
+        physicalVolume1.setName( "E" );
         MountPoint mountPoint1 = volumeAllotment.newMountPoint();
-        mountPoint1.setMountPoint("D:\\文件系统\\簇1");
+        mountPoint1.setMountPoint("E:/fs/cluster");
         physicalVolume1.setMountPoint( mountPoint1 );
 
         LocalPhysicalVolume physicalVolume2 = volumeAllotment.newLocalPhysicalVolume();
         physicalVolume2.setType("PhysicalVolume");
         physicalVolume2.setVolumeCapacity( volumeCapacity2 );
-        physicalVolume2.setName( "E" );
+        physicalVolume2.setName( "D" );
         MountPoint mountPoint2 = volumeAllotment.newMountPoint();
-        mountPoint2.setMountPoint( "D:\\文件系统\\簇2" );
+        mountPoint2.setMountPoint( "E:/fs2/cluster" );
         physicalVolume2.setMountPoint( mountPoint2 );
 
         VolumeCapacity64 logicVolumeCapacity1 = volumeAllotment.newVolumeCapacity();
@@ -219,10 +194,10 @@ class Alice extends Radium {
     }
 
     private void TestRaid0Receive( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ) throws IOException {
-        LogicVolume volume1 = volumeTree.get(GUIDs.GUID72("0516ca8-000367-0004-60"));
-        volume1.extendLogicalVolume( GUIDs.GUID72("0516ca8-000367-0000-68") );
-        LogicVolume volume2 = volumeTree.get(GUIDs.GUID72("0516ca8-000367-0005-60"));
-        volume2.extendLogicalVolume(GUIDs.GUID72("0516ca8-000367-0002-68"));
+        LogicVolume volume1 = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0004-48"));
+        volume1.extendLogicalVolume( GUIDs.GUID72("056b342-0001d1-0000-48") );
+        LogicVolume volume2 = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0005-48"));
+        volume2.extendLogicalVolume(GUIDs.GUID72("056b342-0001d1-0002-48"));
 
 //        LogicVolume volume3 = volumeTree.get(GUIDs.GUID72("0414fd8-00011e-0006-78"));
 //        File sourceFile = new File("D:\\井盖视频块\\4月13日 (2).mp4");

@@ -74,8 +74,8 @@ public class UnifyStructureInjector extends ObjectInjector {
     }
 
 
-    protected Object getFromMapLinked    ( Object mapLiked, String key ) {
-        return Units.getFromMapLinked( mapLiked, key, true, true );
+    protected Object getFromMapStructure    ( Object mapLiked, String key ) {
+        return Units.getFromMapStructure( mapLiked, key, true, true );
     }
 
     protected Object injectMapLinked     ( Object mapLiked, Class<?> type, Object instance ) {
@@ -101,9 +101,9 @@ public class UnifyStructureInjector extends ObjectInjector {
                 }
 
 
-                Object val = this.getFromMapLinked( mapLiked, this.getFieldName( szMappedKey ) );
+                Object val = this.getFromMapStructure( mapLiked, this.getFieldName( szMappedKey ) );
                 if( val == null ){
-                    val = this.getFromMapLinked( mapLiked, szMappedKey );
+                    val = this.getFromMapStructure( mapLiked, szMappedKey );
                 }
                 if( val == null && szMappedKey.contains( "." ) ){
                     val = this.getValueFromMapRecursively( mapLiked, szMappedKey );
@@ -228,7 +228,7 @@ public class UnifyStructureInjector extends ObjectInjector {
         String[] keys = key.split("\\.|\\/");
         Object value = mapLiked;
         for ( String k : keys ) {
-            value = this.getFromMapLinked( value, k );
+            value = this.getFromMapStructure( value, k );
         }
         return value;
     }

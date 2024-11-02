@@ -1,12 +1,15 @@
 package com.pinecone.hydra.service.kom.entity;
 
 import java.util.List;
+import java.util.Map;
 
 import com.pinecone.framework.unit.KeyValue;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.JSONEncoder;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
+import com.pinecone.framework.util.json.hometype.BeanColonist;
+import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
 import com.pinecone.hydra.service.kom.GenericNamespaceRules;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
 import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
@@ -15,16 +18,27 @@ import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
 public class GenericNamespace extends ArchElementNode implements Namespace {
     protected GUID                        rulesGUID;
 
+    protected GUID                        metaGuid;
+
     protected GUIDDistributedTrieNode     distributedTreeNode;
 
     protected GenericNamespaceRules       classificationRules;
-
-    protected ArchElementNode             nodeAttributes;
 
     protected ServiceNamespaceManipulator namespaceManipulator;
 
 
     public GenericNamespace() {
+        super();
+    }
+
+    public GenericNamespace( Map<String, Object > joEntity ) {
+        super( joEntity );
+        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+    }
+
+    public GenericNamespace( Map<String, Object > joEntity, ServicesInstrument servicesInstrument ) {
+        super( joEntity, servicesInstrument );
+        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public GenericNamespace( ServicesInstrument servicesInstrument ) {
@@ -57,13 +71,13 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
     }
 
     @Override
-    public ArchElementNode getAttributes() {
-        return this.nodeAttributes;
+    public GUID getMetaGuid() {
+        return this.metaGuid;
     }
 
     @Override
-    public void setNodeCommonData( ArchElementNode nodeAttributes ) {
-        this.nodeAttributes = nodeAttributes;
+    public void setMetaGuid( GUID metaGuid ) {
+        this.metaGuid = metaGuid;
     }
 
     @Override
@@ -85,6 +99,11 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
             jo.put( node.getName(), node.toJSONObject() );
         }
         return jo;
+    }
+
+    @Override
+    public JSONObject toJSONDetails() {
+        return BeanColonist.DirectColonist.populate( this, Namespace.UnbeanifiedKeys );
     }
 
     @Override

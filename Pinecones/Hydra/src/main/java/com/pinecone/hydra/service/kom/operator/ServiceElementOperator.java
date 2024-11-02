@@ -15,16 +15,16 @@ import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
-public class ServiceNodeOperator extends ArchServiceOperator implements ServiceOperator {
+public class ServiceElementOperator extends ArchElementOperator implements ElementOperator {
     protected ServiceNodeManipulator  serviceNodeManipulator;
     protected ServiceMetaManipulator  serviceMetaManipulator;
 
-    public ServiceNodeOperator( ServiceOperatorFactory factory ) {
+    public ServiceElementOperator( ElementOperatorFactory factory ) {
         this( factory.getServiceMasterManipulator(),factory.getServicesTree() );
         this.factory = factory;
     }
 
-    public ServiceNodeOperator(ServiceMasterManipulator masterManipulator, ServicesInstrument servicesInstrument){
+    public ServiceElementOperator( ServiceMasterManipulator masterManipulator, ServicesInstrument servicesInstrument ){
         super( masterManipulator, servicesInstrument);
        this.serviceNodeManipulator = masterManipulator.getServiceNodeManipulator();
        this.serviceMetaManipulator = masterManipulator.getServiceMetaManipulator();
@@ -33,15 +33,15 @@ public class ServiceNodeOperator extends ArchServiceOperator implements ServiceO
 
 
     @Override
-    public GUID insert(TreeNode nodeWideData) {
-        GenericServiceElement serviceElement=(GenericServiceElement) nodeWideData;
+    public GUID insert( TreeNode treeNode ) {
+        GenericServiceElement serviceElement = (GenericServiceElement) treeNode;
 
         //将信息写入数据库
         //将节点信息存入应用节点表
-        GuidAllocator guidAllocator = GUIDs.newGuidAllocator();
+        GuidAllocator guidAllocator = this.servicesInstrument.getGuidAllocator();
         GUID serviceNodeGUID = guidAllocator.nextGUID72();
         serviceElement.setGuid(serviceNodeGUID);
-        this.serviceNodeManipulator.insert(serviceElement);
+        this.serviceNodeManipulator.insert( serviceElement );
 
         //将应用节点基础信息存入信息表
         GUID metaGUID = guidAllocator.nextGUID72();
@@ -59,45 +59,45 @@ public class ServiceNodeOperator extends ArchServiceOperator implements ServiceO
         GUIDDistributedTrieNode node = new GUIDDistributedTrieNode();
         node.setNodeMetadataGUID( metaGUID );
         node.setGuid( serviceNodeGUID );
-        node.setType( UOIUtils.createLocalJavaClass( nodeWideData.getClass().getName() ) );
+        node.setType( UOIUtils.createLocalJavaClass( treeNode.getClass().getName() ) );
         this.distributedTrieTree.insert( node );
         return serviceNodeGUID;
     }
 
     @Override
-    public void purge(GUID guid ) {
+    public void purge( GUID guid ) {
         this.removeNode( guid );
     }
 
     @Override
-    public ServiceTreeNode get(GUID guid) {
+    public ServiceElement get( GUID guid ) {
         GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
         ServiceElement serviceElement = new GenericServiceElement();
         if( node.getNodeMetadataGUID() != null ){
             serviceElement = this.serviceMetaManipulator.getServiceMeta( node.getNodeMetadataGUID() );
         }
 
-        this.applyServiceNode( serviceElement, this.commonDataManipulator.getNodeCommonData( guid ) );
+        this.applyCommonMeta( serviceElement, this.commonDataManipulator.getNodeCommonData( guid ) );
 
         serviceElement.setDistributedTreeNode(node);
-        serviceElement.setGuid(guid);
-        serviceElement.setName(this.serviceNodeManipulator.getServiceNode(guid).getName());
+        serviceElement.setGuid( guid );
+        serviceElement.setName( this.serviceNodeManipulator.getServiceNode(guid).getName() );
 
         return serviceElement;
     }
 
     @Override
-    public TreeNode get(GUID guid, int depth) {
-        return null;
-    }
-
-    @Override
-    public TreeNode getSelf(GUID guid) {
+    public ServiceElement get( GUID guid, int depth ) {
         return this.get( guid );
     }
 
     @Override
-    public void update(TreeNode nodeWideData) {
+    public ServiceElement getSelf( GUID guid ) {
+        return this.get( guid );
+    }
+
+    @Override
+    public void update( TreeNode nodeWideData ) {
 
     }
 
@@ -109,18 +109,9 @@ public class ServiceNodeOperator extends ArchServiceOperator implements ServiceO
     private void removeNode( GUID guid ){
         GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
         this.distributedTrieTree.purge( guid );
-        this.distributedTrieTree.removeCachePath(guid);
-        this.serviceNodeManipulator.remove(node.getGuid());
-        this.serviceMetaManipulator.remove(node.getAttributesGUID());
-        this.commonDataManipulator.remove(node.getNodeMetadataGUID());
-    }
-
-    private void applyServiceNode( ServiceElement serviceElement, ServiceFamilyNode serviceFamilyNode ){
-        serviceElement.setGuid( serviceFamilyNode.getGuid() );
-        serviceElement.setScenario( serviceFamilyNode.getScenario() );
-        serviceElement.setPrimaryImplLang( serviceFamilyNode.getPrimaryImplLang() );
-        serviceElement.setExtraInformation( serviceFamilyNode.getExtraInformation() );
-        serviceElement.setLevel( serviceElement.getLevel() );
-        serviceElement.setDescription( serviceElement.getDescription() );
+        this.distributedTrieTree.removeCachePath( guid );
+        this.serviceNodeManipulator.remove( node.getGuid() );
+        this.serviceMetaManipulator.remove( node.getAttributesGUID() );
+        this.commonDataManipulator.remove( node.getNodeMetadataGUID() );
     }
 }

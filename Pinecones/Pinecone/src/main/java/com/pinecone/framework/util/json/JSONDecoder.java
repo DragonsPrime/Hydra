@@ -15,7 +15,7 @@ public interface JSONDecoder extends Pinenut {
 
     JSONDecoder INNER_JSON_ARRAY_DECODER = new JSONArrayDecoder() {
         @Override
-        protected void add( Object self, Object val ) {
+        protected void add( Object self, Object parent, Object indexKey, Object val ) {
             ( (JSONArray) self ).add( val );
         }
     };
@@ -31,11 +31,11 @@ public interface JSONDecoder extends Pinenut {
     JSONDecoder INNER_LIST_DECODER = new JSONArrayDecoder() {
         @Override
         @SuppressWarnings( "unchecked" )
-        protected void add( Object self, Object val ) {
+        protected void add( Object self, Object parent, Object indexKey, Object val ) {
             ( (List<Object>) self ).add( val );
         }
     };
 
 
-    void decode( Object self, ArchCursorParser x ) ;
+    void decode( Object self, Object parent, Object indexKey, ArchCursorParser x ) ;
 }

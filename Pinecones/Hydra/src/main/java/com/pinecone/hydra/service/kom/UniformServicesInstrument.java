@@ -14,7 +14,7 @@ import com.pinecone.hydra.service.kom.entity.Namespace;
 import com.pinecone.hydra.service.kom.entity.ServiceElement;
 import com.pinecone.hydra.service.kom.entity.ServiceTreeNode;
 import com.pinecone.hydra.service.kom.entity.ServoElement;
-import com.pinecone.hydra.service.kom.operator.GenericServiceOperatorFactory;
+import com.pinecone.hydra.service.kom.operator.GenericElementOperatorFactory;
 import com.pinecone.hydra.service.kom.source.ApplicationNodeManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
@@ -28,7 +28,6 @@ import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
 import com.pinecone.hydra.system.ko.kom.ArchReparseKOMTree;
 import com.pinecone.hydra.system.ko.kom.GenericReparseKOMTreeAddition;
 import com.pinecone.hydra.system.ko.kom.MultiFolderPathSelector;
-import com.pinecone.hydra.system.ko.kom.StandardPathSelector;
 import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
 import com.pinecone.hydra.unit.udtt.GenericDistributedTrieTree;
 import com.pinecone.hydra.unit.udtt.source.TreeMasterManipulator;
@@ -65,7 +64,7 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
         TreeMasterManipulator        treeMasterManipulator     = (TreeMasterManipulator) skeletonMasterManipulator;
         this.distributedTrieTree         = new GenericDistributedTrieTree(treeMasterManipulator);
         this.guidAllocator               = GUIDs.newGuidAllocator();
-        this.operatorFactory             = new GenericServiceOperatorFactory(this,(ServiceMasterManipulator) masterManipulator);
+        this.operatorFactory             = new GenericElementOperatorFactory(this,(ServiceMasterManipulator) masterManipulator);
 
         this.pathResolver                = new KOPathResolver( this.kernelObjectConfig );
 

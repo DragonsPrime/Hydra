@@ -128,11 +128,6 @@ public class UniformVolumeTree extends ArchKOMTree implements VolumeTree{
     }
 
     @Override
-    public GUID queryGUIDByPath(String path) {
-        return null;
-    }
-
-    @Override
     public GUID queryGUIDByFN(String fullName) {
         return null;
     }

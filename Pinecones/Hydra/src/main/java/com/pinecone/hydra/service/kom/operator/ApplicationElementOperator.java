@@ -1,6 +1,5 @@
 package com.pinecone.hydra.service.kom.operator;
 
-import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.service.kom.ServiceFamilyNode;
@@ -19,16 +18,16 @@ import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.util.List;
 
-public class ApplicationNodeOperator extends ArchServiceOperator implements ServiceOperator {
+public class ApplicationElementOperator extends ArchElementOperator implements ElementOperator {
     protected ApplicationNodeManipulator        applicationNodeManipulator;
     protected ApplicationMetaManipulator        applicationMetaManipulator;
 
-    public ApplicationNodeOperator( ServiceOperatorFactory factory ) {
+    public ApplicationElementOperator(ElementOperatorFactory factory ) {
         this( factory.getServiceMasterManipulator(),factory.getServicesTree() );
         this.factory = factory;
     }
 
-    public ApplicationNodeOperator( ServiceMasterManipulator masterManipulator, ServicesInstrument servicesInstrument ){
+    public ApplicationElementOperator(ServiceMasterManipulator masterManipulator, ServicesInstrument servicesInstrument ){
         super( masterManipulator, servicesInstrument);
         this.applicationNodeManipulator = masterManipulator.getApplicationNodeManipulator();
         this.applicationMetaManipulator = masterManipulator.getApplicationElementManipulator();
@@ -39,7 +38,7 @@ public class ApplicationNodeOperator extends ArchServiceOperator implements Serv
     public GUID insert( TreeNode treeNode ) {
         GenericApplicationElement applicationElement = (GenericApplicationElement) treeNode;
 
-        GuidAllocator guidAllocator = GUIDs.newGuidAllocator();
+        GuidAllocator guidAllocator = this.servicesInstrument.getGuidAllocator();
         GUID applicationNodeGUID = guidAllocator.nextGUID72();
         applicationElement.setGuid( applicationNodeGUID );
         this.applicationNodeManipulator.insert( applicationElement );
@@ -101,13 +100,13 @@ public class ApplicationNodeOperator extends ArchServiceOperator implements Serv
                 metaType = newInstance.getMetaType();
             }
 
-            ServiceOperator operator = this.getOperatorFactory().getOperator( metaType );
+            ElementOperator operator = this.getOperatorFactory().getOperator( metaType );
             operator.purge( guid );
         }
     }
 
     @Override
-    public ServiceTreeNode get( GUID guid ) {
+    public ApplicationElement get( GUID guid ) {
         GUIDDistributedTrieNode node = this.distributedTrieTree.getNode( guid );
         ApplicationElement applicationElement;
         if( node.getNodeMetadataGUID() != null ){
@@ -117,7 +116,7 @@ public class ApplicationNodeOperator extends ArchServiceOperator implements Serv
             applicationElement = new GenericApplicationElement();
         }
 
-        this.applyApplicationNode( applicationElement, this.commonDataManipulator.getNodeCommonData(guid) );
+        this.applyCommonMeta( applicationElement, this.commonDataManipulator.getNodeCommonData( guid ) );
 
         applicationElement.setName( this.applicationNodeManipulator.getApplicationNode(guid).getName() );
         applicationElement.setGuid(applicationElement.getGuid());
@@ -125,12 +124,12 @@ public class ApplicationNodeOperator extends ArchServiceOperator implements Serv
     }
 
     @Override
-    public TreeNode get( GUID guid, int depth ) {
-        return null;
+    public ApplicationElement get( GUID guid, int depth ) {
+        return this.get( guid );
     }
 
     @Override
-    public TreeNode getSelf(GUID guid) {
+    public ApplicationElement getSelf( GUID guid) {
         return this.get( guid );
     }
 
@@ -144,21 +143,12 @@ public class ApplicationNodeOperator extends ArchServiceOperator implements Serv
 
     }
 
-    private void removeNode( GUID guid ){
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
+    protected void removeNode( GUID guid ){
+        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode( guid );
         this.distributedTrieTree.purge( guid );
         this.distributedTrieTree.removeCachePath(guid);
-        this.applicationMetaManipulator.remove(node.getAttributesGUID());
-        this.commonDataManipulator.remove(node.getNodeMetadataGUID());
-        this.applicationNodeManipulator.remove(node.getGuid());
-    }
-
-    private void applyApplicationNode( ApplicationElement app, ServiceFamilyNode serviceFamilyNode ){
-        app.setGuid( serviceFamilyNode.getGuid() );
-        app.setScenario( serviceFamilyNode.getScenario() );
-        app.setPrimaryImplLang( serviceFamilyNode.getPrimaryImplLang() );
-        app.setExtraInformation( serviceFamilyNode.getExtraInformation() );
-        app.setLevel( serviceFamilyNode.getLevel() );
-        app.setDescription( serviceFamilyNode.getDescription() );
+        this.applicationMetaManipulator.remove( node.getAttributesGUID() );
+        this.commonDataManipulator.remove( node.getNodeMetadataGUID() );
+        this.applicationNodeManipulator.remove( node.getGuid( ));
     }
 }

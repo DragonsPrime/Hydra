@@ -18,12 +18,12 @@ public class JSONCursorParser extends ArchCursorParser {
     }
 
     @Override
-    protected JSONArray newJSONArray( ArchCursorParser parser ) {
+    protected JSONArray newJSONArray( Object indexKey, ArchCursorParser parser, Object parent ) {
         return new JSONArraytron( parser );
     }
 
     @Override
-    protected JSONObject newJSONObject( ArchCursorParser parser ) {
+    protected JSONObject newJSONObject( Object indexKey, ArchCursorParser parser, Object parent ) {
         return new JSONMaptron( parser );
     }
 }

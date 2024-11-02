@@ -4,7 +4,7 @@ public abstract class JSONObjectDecoder implements JSONDecoder {
     protected abstract void set( Object self, String key, Object val );
 
     @Override
-    public void decode( Object self, ArchCursorParser x ) {
+    public void decode( Object self, Object parent, Object indexKey, ArchCursorParser x ) {
         if ( x.nextClean() != '{' ) {
             throw x.syntaxError("A JSONObject text must begin with '{'");
         }
@@ -24,13 +24,13 @@ public abstract class JSONObjectDecoder implements JSONDecoder {
                         String key = null;
                         Object val = null;
                         try {
-                            key = x.nextValue( self ).toString();
+                            key = x.nextValue( null, self ).toString();
                             c = x.nextClean();
                             if ( c != ':' && c != '=' ) {
                                 throw x.syntaxError( "Expected a ':', '=' after a key" );
                             }
 
-                            val = x.nextValue( self );
+                            val = x.nextValue( key, self );
                             this.set( self, key, val );
                         }
                         catch ( JSONParserRedirectException e ) {

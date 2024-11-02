@@ -33,6 +33,11 @@ public abstract class ArchServoElement extends ArchElementNode implements ServoE
         BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
     }
 
+    public ArchServoElement( Map<String, Object > joEntity, ServicesInstrument servicesInstrument ) {
+        this( joEntity );
+        this.apply( servicesInstrument );
+    }
+
     public ArchServoElement( ServicesInstrument servicesInstrument ) {
         super( servicesInstrument );
     }

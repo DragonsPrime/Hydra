@@ -3,11 +3,11 @@ package com.pinecone.hydra.service.kom.operator;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.service.kom.GenericNamespaceRules;
-import com.pinecone.hydra.service.kom.entity.ArchElementNode;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
-import com.pinecone.hydra.service.kom.entity.GenericCommonMeta;
+import com.pinecone.hydra.service.kom.entity.ElementNode;
 import com.pinecone.hydra.service.kom.entity.GenericApplicationElement;
 import com.pinecone.hydra.service.kom.entity.GenericNamespace;
+import com.pinecone.hydra.service.kom.entity.Namespace;
 import com.pinecone.hydra.service.kom.entity.ServiceTreeNode;
 import com.pinecone.hydra.service.kom.source.NamespaceRulesManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
@@ -20,29 +20,29 @@ import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.util.List;
 
-public class ServiceNamespaceOperator extends ArchServiceOperator implements ServiceOperator{
+public class NamespaceOperator extends ArchElementOperator implements ElementOperator {
     protected ServiceNamespaceManipulator   namespaceManipulator;
     protected NamespaceRulesManipulator     namespaceRulesManipulator;
 
-    public ServiceNamespaceOperator( ServiceOperatorFactory factory ) {
+    public NamespaceOperator( ElementOperatorFactory factory ) {
         this( factory.getServiceMasterManipulator(),factory.getServicesTree() );
         this.factory = factory;
     }
 
-    public ServiceNamespaceOperator(ServiceMasterManipulator masterManipulator, ServicesInstrument servicesInstrument){
+    public NamespaceOperator( ServiceMasterManipulator masterManipulator, ServicesInstrument servicesInstrument ){
         super( masterManipulator, servicesInstrument);
         this.namespaceManipulator = masterManipulator.getNamespaceManipulator();
         this.namespaceRulesManipulator = masterManipulator.getNamespaceRulesManipulator();
     }
 
     @Override
-    public GUID insert( TreeNode nodeWideData ) {
-        GenericNamespace namespaceInformation = ( GenericNamespace ) nodeWideData;
+    public GUID insert( TreeNode treeNode ) {
+        Namespace ns = ( Namespace ) treeNode;
 
-        //将应用节点基础信息存入信息表
-        GuidAllocator guidAllocator = GUIDs.newGuidAllocator();
-        GUID     namespaceRulesGuid = namespaceInformation.getGuid();
-        GenericNamespaceRules namespaceRules = namespaceInformation.getClassificationRules();
+        //存节点基础信息
+        GuidAllocator guidAllocator = this.servicesInstrument.getGuidAllocator();
+        GUID     namespaceRulesGuid = ns.getGuid();
+        GenericNamespaceRules namespaceRules = ns.getClassificationRules();
         if ( namespaceRules!= null ){
             namespaceRules.setGuid( namespaceRulesGuid );
         }
@@ -50,37 +50,24 @@ public class ServiceNamespaceOperator extends ArchServiceOperator implements Ser
             namespaceRulesGuid = null;
         }
 
-
-        //将信息写入数据库
-        //将节点信息存入应用节点表
         GUID namespaceGuid = guidAllocator.nextGUID72();
-        namespaceInformation.setGuid(namespaceGuid);
-        namespaceInformation.setRulesGUID( namespaceRulesGuid );
-        this.namespaceManipulator.insert( namespaceInformation );
+        ns.setGuid( namespaceGuid );
+        this.namespaceManipulator.insert( ns );
 
-        //将应用元信息存入元信息表
-        GUID           metadataGUID;
-        ArchElementNode metadata = namespaceInformation.getAttributes();
-        if( metadata == null ) {
-            metadataGUID = guidAllocator.nextGUID72();
-            metadata = new GenericCommonMeta();
-            metadata.setGuid( metadataGUID );
+        //存元信息
+        GUID metaGUID = guidAllocator.nextGUID72();
+        if ( ns.getMetaGuid() == null ){
+            ns.setMetaGuid( metaGUID );
         }
-        else {
-            metadataGUID = null;
-        }
-
-        metadata.setGuid( metadataGUID );
-        this.commonDataManipulator.insert(metadata);
-
+        this.commonDataManipulator.insertNS( ns );
 
         //将节点信息存入主表
         GUIDDistributedTrieNode node = new GUIDDistributedTrieNode();
-        node.setBaseDataGUID(namespaceRulesGuid);
-        node.setGuid(namespaceGuid);
-        node.setNodeMetadataGUID(metadataGUID);
-        node.setType( UOIUtils.createLocalJavaClass( nodeWideData.getClass().getName() ) );
-        this.distributedTrieTree.insert( node);
+        node.setBaseDataGUID( namespaceRulesGuid );
+        node.setGuid( namespaceGuid );
+        node.setNodeMetadataGUID( metaGUID );
+        node.setType( UOIUtils.createLocalJavaClass( treeNode.getClass().getName() ) );
+        this.distributedTrieTree.insert( node );
         return namespaceGuid;
     }
 
@@ -119,56 +106,57 @@ public class ServiceNamespaceOperator extends ArchServiceOperator implements Ser
                 metaType = newInstance.getMetaType();
             }
 
-            ServiceOperator operator = this.getOperatorFactory().getOperator( metaType );
+            ElementOperator operator = this.getOperatorFactory().getOperator( metaType );
             operator.purge( guid );
         }
     }
 
     @Override
-    public ServiceTreeNode get( GUID guid ) {
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
-        GenericNamespace namespace = new GenericNamespace( this.servicesInstrument );
-        GenericNamespaceRules namespaceRules = this.namespaceRulesManipulator.getNamespaceRules( node.getAttributesGUID() );
-        GUIDDistributedTrieNode guidDistributedTrieNode = this.distributedTrieTree.getNode(node.getGuid());
+    public Namespace get( GUID guid ) {
+        GUIDDistributedTrieNode                    node = this.distributedTrieTree.getNode( guid );
+        GenericNamespace                      namespace = new GenericNamespace( this.servicesInstrument );
+        GenericNamespaceRules            namespaceRules = this.namespaceRulesManipulator.getNamespaceRules( node.getAttributesGUID() );
+        GUIDDistributedTrieNode guidDistributedTrieNode = this.distributedTrieTree.getNode( node.getGuid() );
 
-        if ( namespaceRules!=null ){
+        if ( namespaceRules != null ){
             namespace.setRulesGUID( namespaceRules.getGuid() );
-            namespace.setClassificationRules(namespaceRules);
+            namespace.setClassificationRules( namespaceRules );
         }
         namespace.setDistributedTreeNode( guidDistributedTrieNode );
-        namespace.setName( this.namespaceManipulator.getNamespace(guid).getName() );
+        namespace.setName( this.namespaceManipulator.getNamespace( guid ).getName() );
         namespace.setGuid( guid );
-
+        namespace.setMetaGuid( guidDistributedTrieNode.getNodeMetadataGUID() );
+        this.applyCommonMeta( namespace, this.commonDataManipulator.getNodeCommonData( namespace.getMetaGuid() ) );
 
         return namespace;
     }
 
     @Override
-    public TreeNode get(GUID guid, int depth) {
-        return null;
+    public Namespace get( GUID guid, int depth ) {
+        return this.get( guid );
     }
 
     @Override
-    public TreeNode getSelf(GUID guid) {
-        return null;
+    public Namespace getSelf( GUID guid ) {
+        return this.get( guid );
     }
 
     @Override
-    public void update(TreeNode nodeWideData) {
+    public void update( TreeNode nodeWideData ) {
 
     }
 
     @Override
-    public void updateName(GUID guid, String name) {
+    public void updateName( GUID guid, String name ) {
 
     }
 
-    private void removeNode( GUID guid ){
+    protected void removeNode( GUID guid ){
         GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
         this.distributedTrieTree.purge( guid );
-        this.distributedTrieTree.removeCachePath(guid);
-        this.namespaceManipulator.remove(node.getGuid());
-        this.namespaceRulesManipulator.remove(node.getNodeMetadataGUID());
+        this.distributedTrieTree.removeCachePath( guid );
+        this.namespaceManipulator.remove( node.getGuid() );
+        this.namespaceRulesManipulator.remove( node.getNodeMetadataGUID() );
         this.commonDataManipulator.remove( node.getAttributesGUID() );
     }
 }

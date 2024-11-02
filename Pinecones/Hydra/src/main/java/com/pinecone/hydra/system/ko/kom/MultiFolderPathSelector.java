@@ -1,5 +1,6 @@
 package com.pinecone.hydra.system.ko.kom;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
@@ -220,9 +221,10 @@ public class MultiFolderPathSelector implements PathSelector {
                 guids.addAll( this.dirManipulators[ i ].getGuidsByName( partName ) );
             }
             guids.removeIf( guid -> !this.distributedTrieTree.isRoot( guid ) );
+            return guids;
         }
 
-        return List.of();
+        return new ArrayList<>();
     }
 
     protected List<GUID > fetchAllGuidsRootCase( String partName ) {

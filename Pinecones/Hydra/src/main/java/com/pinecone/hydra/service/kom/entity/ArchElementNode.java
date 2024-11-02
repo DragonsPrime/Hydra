@@ -29,6 +29,12 @@ public abstract class ArchElementNode extends ArchServiceFamilyMeta implements E
         BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
     }
 
+    public ArchElementNode( Map<String, Object > joEntity, ServicesInstrument servicesInstrument ) {
+        super( joEntity );
+        this.apply( servicesInstrument );
+        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+    }
+
     public ArchElementNode( ServicesInstrument servicesInstrument ) {
         this.apply( servicesInstrument );
     }

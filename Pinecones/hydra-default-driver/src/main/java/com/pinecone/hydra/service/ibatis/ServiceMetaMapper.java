@@ -17,10 +17,10 @@ public interface ServiceMetaMapper extends ServiceMetaManipulator {
     void insert( ServiceElement serviceElement );
 
     @Delete("DELETE FROM `hydra_service_serv_node_meta` WHERE `guid`=#{guid}")
-    void remove(@Param("guid")GUID guid);
+    void remove( @Param("guid") GUID guid );
 
-    void update(ServiceElement serviceElement);
+    void update( ServiceElement serviceElement );
 
     @Select("SELECT `id` AS `enumId`, `guid`, `name`, `path`, `type`, `alias`, `resource_type` AS resourceType, `service_type` AS serviceType, `create_time` AS createTime, `update_time` AS updateTime FROM `hydra_service_serv_node_meta` WHERE `guid`=#{guid}")
-    GenericServiceElement getServiceMeta(@Param("guid")GUID guid);
+    GenericServiceElement getServiceMeta( @Param("guid") GUID guid );
 }

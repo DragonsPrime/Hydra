@@ -147,7 +147,7 @@ public class JSONMaptron extends ArchJSONObject implements JSONObject, Serializa
 
     @Override
     protected void jsonDecode0( ArchCursorParser x ) throws JSONException {
-        JSONObjectDecoder.INNER_JSON_OBJECT_DECODER.decode( this, x );
+        JSONObjectDecoder.INNER_JSON_OBJECT_DECODER.decode( this, null, null, x );
     }
 
     @Override

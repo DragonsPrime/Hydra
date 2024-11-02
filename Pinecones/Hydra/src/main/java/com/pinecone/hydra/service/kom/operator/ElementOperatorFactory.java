@@ -8,7 +8,7 @@ import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
 import com.pinecone.hydra.unit.udtt.operator.OperatorFactory;
 import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
 
-public interface ServiceOperatorFactory extends OperatorFactory {
+public interface ElementOperatorFactory extends OperatorFactory {
     String DefaultServiceNode     =  ServiceElement.class.getSimpleName();
     String DefaultNamespace       =  Namespace.class.getSimpleName();
     String DefaultApplicationNode =  ApplicationElement.class.getSimpleName();
@@ -21,7 +21,7 @@ public interface ServiceOperatorFactory extends OperatorFactory {
 
     String getMetaType( String classFullName );
 
-    ServiceOperator getOperator(String typeName );
+    ElementOperator getOperator(String typeName );
 
     ServicesInstrument getServicesTree();
 

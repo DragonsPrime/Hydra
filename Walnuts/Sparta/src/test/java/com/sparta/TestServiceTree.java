@@ -3,7 +3,9 @@ package com.sparta;
 import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.Debug;
+import com.pinecone.framework.util.json.JSON;
 import com.pinecone.framework.util.json.JSONMaptron;
+import com.pinecone.framework.util.json.ObjectJSONCursorUnmarshal;
 import com.pinecone.hydra.service.ibatis.hydranium.ServiceMappingDriver;
 import com.pinecone.hydra.service.kom.UniformServicesInstrument;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
@@ -69,19 +71,20 @@ class Jesse extends Radium {
 //        Debug.trace( servicesTree.get( GUIDs.GUID72( "02be396-0001e9-0000-e4" ) ) );
         //Debug.trace( servicesInstrument.affirmApplication( "Test1/App1" ) );
 
-        Debug.trace( servicesInstrument.affirmService( "root/特殊服务" ) );
-        Debug.trace( servicesInstrument.affirmApplication( "root/species/orc" ) );
-        Debug.trace( servicesInstrument.affirmNamespace("root/species") );
-        Debug.trace( servicesInstrument.affirmNamespace( "root" ).fetchChildren() );
+//        Debug.trace( servicesInstrument.affirmService( "root/特殊服务" ) );
+//        Debug.trace( servicesInstrument.affirmApplication( "root/species/orc" ) );
+//        Debug.trace( servicesInstrument.affirmNamespace("root/species") );
+//        Debug.trace( servicesInstrument.affirmNamespace( "root" ).fetchChildren() );
 
         servicesInstrument.affirmApplication( "root/species/orc" ).addChild( new GenericServiceElement( new JSONMaptron( "{ name: slaughter }" ) ) );
 
-        Debug.trace( servicesInstrument.affirmApplication( "root/species/orc" ).fetchChildren() );
-
-        Debug.trace( servicesInstrument.queryElement( "root/species/orc/slaughter" ).toJSONObject() );
-
-
-        Debug.fmp( 2, servicesInstrument.queryElement( "root" ).toJSONObject() );
+//        Debug.trace( servicesInstrument.affirmApplication( "root/species/orc" ).fetchChildren() );
+//
+//        Debug.trace( servicesInstrument.queryElement( "root/species/orc/slaughter" ).toJSONObject() );
+//
+//        servicesInstrument.affirmNamespace( "root" ).addChild( new GenericNamespace( new JSONMaptron( "{ name: weapon, scenario: s1, description: d1, level:L1, primaryImplLang:Java }" ) ) );
+//
+//        Debug.fmp( 2, servicesInstrument.queryElement( "root/weapon" ).evinceNamespace().toJSONDetails() );
 
     }
 

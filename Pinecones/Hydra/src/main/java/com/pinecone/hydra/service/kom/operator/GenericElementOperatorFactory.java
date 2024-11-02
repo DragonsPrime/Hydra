@@ -10,9 +10,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class GenericServiceOperatorFactory implements ServiceOperatorFactory{
+public class GenericElementOperatorFactory implements ElementOperatorFactory {
     protected ServiceMasterManipulator      serviceMasterManipulator;
-    protected ServicesInstrument servicesInstrument;
+    protected ServicesInstrument            servicesInstrument;
     protected Map<String, TreeNodeOperator> registerer = new HashMap<>();
 
     protected Map<String, String >             metaTypeMap = new TreeMap<>();
@@ -25,23 +25,23 @@ public class GenericServiceOperatorFactory implements ServiceOperatorFactory{
         this.registerDefaultMetaType( GenericFileNode.class );
     }
 
-    public GenericServiceOperatorFactory(ServicesInstrument servicesInstrument, ServiceMasterManipulator serviceMasterManipulator ){
+    public GenericElementOperatorFactory(ServicesInstrument servicesInstrument, ServiceMasterManipulator serviceMasterManipulator ){
         this.servicesInstrument = servicesInstrument;
         this.serviceMasterManipulator = serviceMasterManipulator;
 
         this.registerer.put(
-                ServiceOperatorFactory.DefaultServiceNode,
-                new ServiceNodeOperator( this )
+                ElementOperatorFactory.DefaultServiceNode,
+                new ServiceElementOperator( this )
         );
 
         this.registerer.put(
-                ServiceOperatorFactory.DefaultApplicationNode,
-                new ApplicationNodeOperator(this)
+                ElementOperatorFactory.DefaultApplicationNode,
+                new ApplicationElementOperator(this)
         );
 
         this.registerer.put(
-                ServiceOperatorFactory.DefaultNamespace,
-                new ServiceNamespaceOperator(this)
+                ElementOperatorFactory.DefaultNamespace,
+                new NamespaceOperator(this)
         );
 
         this.registerDefaultMetaTypes();
@@ -77,9 +77,9 @@ public class GenericServiceOperatorFactory implements ServiceOperatorFactory{
     }
 
     @Override
-    public ServiceOperator getOperator(String typeName ) {
+    public ElementOperator getOperator(String typeName ) {
         //Debug.trace( this.registerer.toString() );
-        return (ServiceOperator) this.registerer.get( typeName );
+        return (ElementOperator) this.registerer.get( typeName );
     }
 
 }

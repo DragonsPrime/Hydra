@@ -6,7 +6,6 @@ import com.pinecone.hydra.service.ibatis.ApplicationNodeMapper;
 import com.pinecone.hydra.service.ibatis.ServiceNamespaceMapper;
 import com.pinecone.hydra.service.ibatis.NamespaceRulesMapper;
 import com.pinecone.hydra.service.ibatis.ServiceCommonDataMapper;
-import com.pinecone.hydra.service.ibatis.ServiceFamilyTreeMapper;
 import com.pinecone.hydra.service.ibatis.ServiceMetaMapper;
 import com.pinecone.hydra.service.ibatis.ServiceNodeMapper;
 import com.pinecone.hydra.service.ibatis.ServiceNodeOwnerMapper;
@@ -16,7 +15,6 @@ import com.pinecone.hydra.service.kom.source.ApplicationNodeManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
 import com.pinecone.hydra.service.kom.source.NamespaceRulesManipulator;
 import com.pinecone.hydra.service.kom.source.CommonDataManipulator;
-import com.pinecone.hydra.service.kom.source.ServiceFamilyTreeManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceMetaManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceNodeManipulator;
@@ -57,9 +55,7 @@ public class ServiceMasterManipulatorImpl implements ServiceMasterManipulator {
     @Resource
     @Structure( type = NamespaceRulesMapper.class )
     NamespaceRulesManipulator namespaceRulesManipulator;
-    @Resource
-    @Structure( type = ServiceFamilyTreeMapper.class )
-    ServiceFamilyTreeManipulator    serviceFamilyTreeManipulator;
+
     @Resource
     @Structure( type = ServiceNodeOwnerMapper.class )
     TireOwnerManipulator            tireOwnerManipulator;
@@ -111,11 +107,6 @@ public class ServiceMasterManipulatorImpl implements ServiceMasterManipulator {
     @Override
     public NamespaceRulesManipulator getNamespaceRulesManipulator() {
         return this.namespaceRulesManipulator;
-    }
-
-    @Override
-    public ServiceFamilyTreeManipulator getServiceFamilyTreeManipulator() {
-        return this.serviceFamilyTreeManipulator;
     }
 
     @Override
