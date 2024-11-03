@@ -10,7 +10,7 @@ import java.util.Map;
 
 public final class InternalErrors {
     public static void sendInternalError( ChannelControlBlock channel, Status errorCode, Map<String, Object > exInfo ) throws IOException {
-        UMCMessage errorMsg = new UlfMCMessage( exInfo );
+        UMCMessage errorMsg = new UlfPutMessage( exInfo );
         errorMsg.getHead().setStatus( errorCode );
         channel.sendMsg( errorMsg, true );
     }

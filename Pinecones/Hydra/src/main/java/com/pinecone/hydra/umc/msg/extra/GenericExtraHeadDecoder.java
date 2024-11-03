@@ -12,11 +12,11 @@ import java.util.Map;
 public class GenericExtraHeadDecoder implements ExtraHeadDecoder {
     @Override
     @SuppressWarnings( "unchecked" )
-    public Map<String, Object > decode( UMCHead head, byte[] raw ) {
+    public Object decode( UMCHead head, byte[] raw ) {
         ExtraEncode encode = head.getExtraEncode();
         switch ( encode ) {
             case JSONString: {
-                JSONObject jo = new JSONMaptron( head.getExtraHead(), true );
+                JSONObject jo = new JSONMaptron( head.evalMapExtraHead(), true );
                 jo.jsonDecode( new String( raw ) );
                 return jo;
             }
@@ -26,7 +26,7 @@ public class GenericExtraHeadDecoder implements ExtraHeadDecoder {
 
                 Object o = decompiler.decompile();
                 if( o instanceof JSONObject ) {
-                    return (JSONObject) o;
+                    return o;
                 }
                 else if( o instanceof Map ) {
                     return new JSONMaptron( (Map<String, Object >)o, true ) ;
@@ -35,6 +35,9 @@ public class GenericExtraHeadDecoder implements ExtraHeadDecoder {
                 throw new ExtraHeadMarshalingException(
                         "Illegal decompiler Binary json, requires Map<String, Object > but " + o.getClass().getSimpleName() + " found."
                 );
+            }
+            case Prototype: {
+                return raw;
             }
         }
 

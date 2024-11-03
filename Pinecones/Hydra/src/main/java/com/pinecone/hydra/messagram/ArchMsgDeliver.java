@@ -1,13 +1,18 @@
 package com.pinecone.hydra.messagram;
 
 import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.umc.msg.*;
+
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.express.Package;
+import com.pinecone.hydra.umc.msg.Status;
+import com.pinecone.hydra.umc.msg.UMCHead;
+import com.pinecone.hydra.umc.msg.UMCMessage;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Map;
+import java.io.InputStream;
+import java.io.ObjectInputStream;
 
 public abstract class ArchMsgDeliver implements MessageDeliver {
     protected String          mszName;
@@ -70,13 +75,28 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
         }
 
         UMCHead head                    = msg.getHead();
-        Map<String, Object > joExHead   = head.getExtraHead();
-        String szServiceKey             = (String) joExHead.get( this.getServiceKeyword() );
+        String szServiceKey             = (String) head.getExHeaderVal( this.getServiceKeyword() );
         if( szServiceKey == null ) {
-            szServiceKey = (String) joExHead.get( "/" );
+            szServiceKey = (String) head.getExHeaderVal( "/" );
         }
 
-        //Debug.trace( new String( msg.getStreamBody().readAllBytes() ) );
+
+//        try ( ByteArrayInputStream byteStream = new ByteArrayInputStream( (byte[]) msg.getExHead() ); ObjectInputStream objectStream = new ObjectInputStream(byteStream) ) {
+//            try{
+//                Debug.trace( objectStream.readObject() );
+//            }
+//            catch ( ClassNotFoundException e ) {
+//
+//            }
+//        }
+        Debug.trace( msg.getExHead() );
+        if( msg.evincePostMessage() != null ) {
+            InputStream is = (InputStream)msg.evincePostMessage().getBody();
+            Debug.trace( msg.getExHead(), new String( is.readAllBytes() ) );
+        }
+
+
+
         if( this.isMyJob( that, szServiceKey ) ) {
             msgPackage.entrust( this );
 

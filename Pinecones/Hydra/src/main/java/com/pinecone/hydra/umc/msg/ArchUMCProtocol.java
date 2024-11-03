@@ -101,7 +101,15 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         return this.mMessageSource.getMessageNode().getExtraHeadCoder();
     }
 
+    protected void flush() throws IOException {
+        this.mOutputStream.flush();
+    }
+
     protected void sendMsgHead( UMCHead head ) throws IOException {
+        this.sendMsgHead( head, true );
+    }
+
+    protected void sendMsgHead( UMCHead head, boolean bFlush ) throws IOException {
         head.applyExtraHeadCoder( this.getExtraHeadCoder() );
         head.transApplyExHead();
 
@@ -135,7 +143,9 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         nBufLength += head.getExtraHeadLength();
 
         this.mOutputStream.write( byteBuffer.array(), 0, nBufLength );
-        this.mOutputStream.flush();
+        if( bFlush ) {
+            this.mOutputStream.flush();
+        }
     }
 
     protected UMCHead readMsgHead() throws IOException {
@@ -154,7 +164,7 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         }
 
         try {
-            Map<String, Object > jo = this.getExtraHeadCoder().getDecoder().decode( head, headBuf );
+            Object jo = this.getExtraHeadCoder().getDecoder().decode( head, headBuf );
             head.setExtraHead( jo );
         }
         catch ( JSONException e ) {

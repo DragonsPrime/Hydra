@@ -1,8 +1,10 @@
 package com.pinecone.hydra.umc.msg;
 
+import com.pinecone.framework.system.prototype.ObjectiveBean;
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.unit.KeyValue;
 import com.pinecone.framework.unit.LinkedTreeMap;
+import com.pinecone.framework.util.ReflectionUtils;
 import com.pinecone.framework.util.json.JSON;
 import com.pinecone.framework.util.json.JSONEncoder;
 import com.pinecone.framework.util.json.JSONObject;
@@ -25,7 +27,7 @@ public class UMCHead implements Pinenut {
     protected Status                 status            = Status.OK              ; // sizeof( Status/Short ) = 2
     protected ExtraEncode            extraEncode       = ExtraEncode.Undefined  ; // sizeof( ExtraEncode/Short ) = 2
     protected byte[]                 extraHead         = {}                     ;
-    protected Map<String,Object >    joExtraHead       = new LinkedTreeMap<>()  ;
+    protected Object                 dyExtraHead       = new LinkedTreeMap<>()  ;
 
     protected ExtraHeadCoder         extraHeadCoder                             ;
 
@@ -43,9 +45,13 @@ public class UMCHead implements Pinenut {
         this.method            = umcMethod;
     }
 
-    UMCHead( String szSignature, UMCMethod umcMethod, Map<String,Object > joEx ) {
+    public UMCHead( String szSignature, UMCMethod umcMethod, Object ex ) {
         this( szSignature, umcMethod );
-        this.joExtraHead = joEx;
+        this.dyExtraHead = ex;
+    }
+
+    UMCHead( String szSignature, UMCMethod umcMethod, Map<String,Object > joEx ) {
+        this( szSignature, umcMethod, (Object) joEx );
     }
 
 
@@ -73,16 +79,20 @@ public class UMCHead implements Pinenut {
     }
 
     void setExtraHead        ( JSONObject jo          ) {
-        this.joExtraHead = jo.getMap();
+        this.dyExtraHead = jo.getMap();
     }
 
     void setExtraHead        ( Map<String,Object > jo ) {
-        this.joExtraHead = jo;
+        this.dyExtraHead = jo;
+    }
+
+    void setExtraHead        ( Object jo              ) {
+        this.dyExtraHead = jo;
     }
 
     void transApplyExHead    (                        ) {
-        if ( this.joExtraHead != null ) {
-            this.extraHead         = this.extraHeadCoder.getEncoder().encode( this, this.joExtraHead );
+        if ( this.dyExtraHead != null ) {
+            this.extraHead         = this.extraHeadCoder.getEncoder().encode( this, this.dyExtraHead );
             this.nExtraHeadLength  = this.extraHead .length;
         }
         else {
@@ -90,8 +100,8 @@ public class UMCHead implements Pinenut {
                 this.extraHead  = "{}".getBytes();
             }
             else {
-                this.joExtraHead = this.extraHeadCoder.newExtraHead();
-                this.extraHead   = this.extraHeadCoder.getEncoder().encode( this, this.joExtraHead );
+                this.dyExtraHead = this.extraHeadCoder.newExtraHead();
+                this.extraHead   = this.extraHeadCoder.getEncoder().encode( this, this.dyExtraHead );
             }
         }
 
@@ -151,35 +161,72 @@ public class UMCHead implements Pinenut {
         return this.extraHead ;
     }
 
-    public Map<String,Object > getExtraHead() {
-        return this.joExtraHead;
+    @SuppressWarnings( "unchecked" )
+    public Map<String, Object > evalMapExtraHead() {
+        if( this.dyExtraHead instanceof Map ) {
+            return (Map) this.dyExtraHead;
+        }
+        return ( new ObjectiveBean( this.dyExtraHead ) ).toMap();
     }
 
+    @SuppressWarnings( "unchecked" )
+    public Map<String, Object > getMapExtraHead() {
+        if( this.dyExtraHead instanceof Map ) {
+            return (Map) this.dyExtraHead;
+        }
+        return null;
+    }
+
+    public Object getExtraHead() {
+        return this.dyExtraHead;
+    }
+
+    public void putExHeaderVal( String key, Object val ) throws IllegalArgumentException {
+        if( this.dyExtraHead instanceof Map ) {
+            this.getMapExtraHead().put( key, val );
+        }
+        else {
+            ReflectionUtils.beanSet( this.dyExtraHead, key, val );
+        }
+    }
+
+    public Object getExHeaderVal( String key ) {
+        if( this.dyExtraHead instanceof Map ) {
+            return this.getMapExtraHead().get( key );
+        }
+        else {
+            return ReflectionUtils.beanGet( this.dyExtraHead, key );
+        }
+    }
 
     protected UMCHead applyExHead( Map<String, Object > jo      ) {
-        if( this.getExtraHead() == null || this.getExtraHead().size() == 0 ) {
+        if( !( this.dyExtraHead instanceof Map ) ) {
+            throw new IllegalArgumentException( "Current extra headed is not dynamic." );
+        }
+
+        if( this.getMapExtraHead() == null || this.getMapExtraHead().size() == 0 ) {
             this.setExtraHead( jo );
         }
         else {
-            if( jo.size() > this.getExtraHead().size() ) {
-                jo.putAll( this.getExtraHead() );
+            if( jo.size() > this.getMapExtraHead().size() ) {
+                jo.putAll( this.getMapExtraHead() );
                 this.setExtraHead( jo );
             }
             else {
-                this.getExtraHead().putAll( jo );
+                this.getMapExtraHead().putAll( jo );
             }
         }
         return this;
     }
 
     public UMCHead receiveSet( Map<String, Object > joExtraHead ) {
-        this.joExtraHead = joExtraHead;
+        this.dyExtraHead = joExtraHead;
         return this;
     }
 
     public void release() {
         // Help GC
-        this.joExtraHead = null;
+        this.dyExtraHead = null;
     }
 
     @Override
@@ -197,7 +244,7 @@ public class UMCHead implements Pinenut {
                 new KeyValue<>( "KeepAlive"      , this.getKeepAlive()                   ),
                 new KeyValue<>( "Status"         , this.getStatus().getName()            ),
                 new KeyValue<>( "ExtraEncode"    , this.getExtraEncode().getName()       ),
-                new KeyValue<>( "ExtraHead"      , JSON.stringify( this.getExtraHead() ) ),
+                new KeyValue<>( "ExtraHead"      , JSON.stringify( this.getMapExtraHead() ) ),
         } );
     }
 }

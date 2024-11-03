@@ -24,9 +24,13 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
     }
 
     public void sendPostMsgHead( JSONObject msg ) throws IOException {
+        this.sendPostMsgHead( msg, false );
+    }
+
+    public void sendPostMsgHead( JSONObject msg, boolean bFlush ) throws IOException {
         this.mHead.applyExHead( msg );
         this.mHead.setMethod( UMCMethod.POST );
-        this.sendMsgHead( this.mHead );
+        this.sendMsgHead( this.mHead, bFlush );
     }
 
     public void sendPostMsgContent( byte[] frame, int len ) throws IOException {
@@ -43,7 +47,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
     public void sendPostMsg( JSONObject msg, byte[] bytes, Status status ) throws IOException {
         this.mHead.setBodyLength( bytes.length );
         this.mHead.setStatus( status );
-        this.sendPostMsgHead( msg );
+        this.sendPostMsgHead( msg, false );
         this.onlySendPostBody( bytes );
     }
 
@@ -52,7 +56,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
         this.sendPostMsg( msg, bytes, Status.OK );
     }
 
-    protected void onlySendPostBody(InputStream is, boolean bNoneBuffered ) throws IOException {
+    protected void onlySendPostBody( InputStream is, boolean bNoneBuffered ) throws IOException {
         //this.mnFrameSize = 2;
         byte[] buf;
         if( bNoneBuffered ) {
@@ -82,7 +86,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
     @Override
     public void sendPostMsg( JSONObject msg, InputStream is ) throws IOException {
         this.mHead.setBodyLength( is.available() );
-        this.sendPostMsgHead( msg );
+        this.sendPostMsgHead( msg, false );
         this.onlySendPostBody( is, false );
     }
 
@@ -96,8 +100,8 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
             this.sendMsgHead( this.mHead );
         }
         else if( msg.getMethod() == UMCMethod.POST ) {
-            this.sendMsgHead( this.mHead );
-            Object body = msg.getBody();
+            this.sendMsgHead( this.mHead, false );
+            Object body = msg.evincePostMessage().getBody();
             if( body instanceof byte[] ) {
                 byte[] bytes = (byte[])body;
                 this.onlySendPostBody( bytes );

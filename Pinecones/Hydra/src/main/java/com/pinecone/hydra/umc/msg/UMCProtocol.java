@@ -18,11 +18,11 @@ public interface UMCProtocol extends MsgProtocol {
     UMCHead getHead();
 
     default void setHead( String szKey, Object val ) {
-        this.getHead().getExtraHead().put( szKey, val );
+        this.getHead().putExHeaderVal( szKey, val );
     }
 
     default Object getHead( String szKey ) {
-        return this.getHead().getExtraHead().get( szKey );
+        return this.getHead().getExHeaderVal( szKey );
     }
 
     void setHead  ( UMCHead head );

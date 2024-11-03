@@ -1,5 +1,8 @@
 package com.mc;
 
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectOutputStream;
+
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
 import io.netty.channel.ChannelHandlerContext;
 import com.pinecone.Pinecone;
@@ -8,12 +11,12 @@ import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.umc.msg.Medium;
-import com.pinecone.hydra.umc.msg.UMCHead;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.messagram.WolfMCExpress;
 import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
 
-import com.pinecone.hydra.umc.wolfmc.UlfMCMessage;
+import com.pinecone.hydra.umc.wolfmc.UlfBytesPostMessage;
+import com.pinecone.hydra.umc.wolfmc.UlfPutMessage;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.sauron.radium.messagron.Messagron;
 
@@ -49,31 +52,51 @@ class Jesus extends JesusChrist {
         JSONObject jsonObject = new JSONMaptron(
                 "{Messagelet:'ServiceCenter', 'do': 'queryHeistConfTPL', 'heist': 'NeteaseMusic', 'instance': 'RavageAlbums'}"
         );
-        //Debug.trace( wolf.sendSyncMsg( new UlfMCMessage( jsonObject, "fuck me" ) ) );
+//        Debug.trace( wolf.sendSyncMsg( new UlfBytesPostMessage( new JSONMaptron( "{Messagelet:'ServiceCenter', 'do': '1'}" ), "test 12345678 Messagers.Messagers.WolfMCKingpin 1 fuck me" ) ) );
+//        Debug.trace( wolf.sendSyncMsg( new UlfBytesPostMessage( new JSONMaptron( "{Messagelet:'ServiceCenter', 'do': '2'}" ), "test 12345678 Messagers.Messagers.WolfMCKingpin 2 fuck me" ) ) );
+//        Debug.trace( wolf.sendSyncMsg( new UlfBytesPostMessage( new JSONMaptron( "{Messagelet:'ServiceCenter', 'do': '3'}" ), "test 12345678 Messagers.Messagers.WolfMCKingpin 3 fuck me" ) ) );
+//        Debug.trace( wolf.sendSyncMsg( new UlfBytesPostMessage( new JSONMaptron( "{Messagelet:'ServiceCenter', 'do': '4'}" ), "test 12345678 Messagers.Messagers.WolfMCKingpin 4 fuck me" ) ) );
+//        Debug.trace( wolf.sendSyncMsg( new UlfBytesPostMessage( new JSONMaptron( "{Messagelet:'ServiceCenter', 'do': '5'}" ), "test 12345678 Messagers.Messagers.WolfMCKingpin 5 fuck me" ) ) );
+//        Debug.trace( wolf.sendSyncMsg( new UlfBytesPostMessage( new JSONMaptron( "{Messagelet:'ServiceCenter', 'do': '6'}" ), "test 12345678 Messagers.Messagers.WolfMCKingpin 6 fuck he" ) ) );
+//        Debug.trace( wolf.sendSyncMsg( new UlfBytesPostMessage( new JSONMaptron( "{Messagelet:'ServiceCenter', 'do': '7'}" ), "test 12345678 Messagers.Messagers.WolfMCKingpin 7 fuck she" ) ) );
+//        Debug.trace( wolf.sendSyncMsg( new UlfBytesPostMessage( new JSONMaptron( "{Messagelet:'ServiceCenter', 'do': '8'}" ), "test 12345678 Messagers.Messagers.WolfMCKingpin 8 fuck it" ) ) );
+//        Debug.trace( wolf.sendSyncMsg( new UlfBytesPostMessage( new JSONMaptron( "{Messagelet:'ServiceCenter', 'do': '9'}" ), "test 12345678 Messagers.Messagers.WolfMCKingpin 9 fuck those" ) ) );
 
-        Debug.trace( wolf.sendSyncMsg( new UlfMCMessage( jsonObject, new byte[]{ 123 } ) ) );
 
-        Debug.trace( wolf.sendSyncMsg( new UlfMCMessage( jsonObject ) ).getHead().getExtraHead() );
-        Debug.trace( wolf.sendSyncMsg( new UlfMCMessage( jsonObject ) ) );
-        //wolf.sendAsynMsg( new UlfMCMessage( jsonObject ) );
 
-        wolf.sendAsynMsg( new UlfMCMessage(jsonObject), new UlfAsyncMsgHandleAdapter() {
-            @Override
-            public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
-                Debug.trace( "Ajax" ,msg );
-                Debug.trace( msg.getHead() );
-            }
-        });
+        JSONObject jo = new JSONMaptron( "{'do': 'Morning' }" );
+        try ( ByteArrayOutputStream byteStream = new ByteArrayOutputStream(); ObjectOutputStream objectStream = new ObjectOutputStream(byteStream) ) {
+            objectStream.writeObject( jo );  // 写对象到输出流
+            byte[] bytes = byteStream.toByteArray();
+            Debug.trace( wolf.sendSyncMsg( new UlfPutMessage( bytes ) ) );
+        }
 
-        //wolf.sendAsynMsg( new UlfMCMessage( jsonObject ) );
-        //wolf.sendAsynMsg( new UlfMCMessage( jsonObject ) );
 
-        wolf.sendAsynMsg( new UlfMCMessage(jsonObject), new UlfAsyncMsgHandleAdapter() {
-            @Override
-            public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
-                Debug.trace( "fuck javascript" ,msg );
-            }
-        });
+
+
+
+
+//        Debug.trace( wolf.sendSyncMsg( new UlfPutMessage( jsonObject ) ).getHead().getExtraHead() );
+//        Debug.trace( wolf.sendSyncMsg( new UlfPutMessage( jsonObject ) ) );
+//        //wolf.sendAsynMsg( new UlfPutMessage( jsonObject ) );
+//
+//        wolf.sendAsynMsg( new UlfPutMessage(jsonObject), new UlfAsyncMsgHandleAdapter() {
+//            @Override
+//            public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
+//                Debug.trace( "Ajax" ,msg );
+//                Debug.trace( msg.getHead() );
+//            }
+//        });
+//
+//        //wolf.sendAsynMsg( new UlfMCMessage( jsonObject ) );
+//        //wolf.sendAsynMsg( new UlfMCMessage( jsonObject ) );
+//
+//        wolf.sendAsynMsg( new UlfPutMessage(jsonObject), new UlfAsyncMsgHandleAdapter() {
+//            @Override
+//            public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
+//                Debug.trace( "fuck javascript" ,msg );
+//            }
+//        });
         this.getTaskManager().add( wolf );
 
 

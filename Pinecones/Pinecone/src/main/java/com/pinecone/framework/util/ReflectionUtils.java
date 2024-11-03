@@ -3,6 +3,7 @@ package com.pinecone.framework.util;
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.unit.ConcurrentReferenceHashMap;
 
+import java.beans.IntrospectionException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -16,7 +17,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ReflectionUtils {
+public final class ReflectionUtils {
     private static final String CGLIB_RENAMED_METHOD_PREFIX = "CGLIB$";
     private static final Map<Class<?>, Method[]> declaredMethodsCache = new ConcurrentReferenceHashMap(256);
     public static ReflectionUtils.FieldFilter COPYABLE_FIELDS = new ReflectionUtils.FieldFilter() {
@@ -426,18 +427,54 @@ public abstract class ReflectionUtils {
      */
     public static Object tryAccessibleInvoke( Method method, Object obj, Object... args ) throws IllegalArgumentException, InvocationTargetException {
         try{
+            method.setAccessible( true );
             return method.invoke( obj, args );
         }
         catch ( IllegalAccessException eae ) {
-            try {
-                method.setAccessible( true );
-                Object ret = method.invoke( obj, args );
-                method.setAccessible( false );
-                return ret;
+            throw new ProxyProvokeHandleException( eae );
+        }
+    }
+
+
+    /**
+     *   Version: New add in Pinecone Java Ver 20241006
+     */
+    public static Object beanGet( Object bean, String propertyKey ) {
+        try{
+            java.beans.PropertyDescriptor propertyDescriptor = new java.beans.PropertyDescriptor( propertyKey, bean.getClass() );
+            Method readMethod = propertyDescriptor.getReadMethod();
+            if ( readMethod != null ) {
+                try{
+                    readMethod.setAccessible( true );
+                    return readMethod.invoke( bean );
+                }
+                catch ( InvocationTargetException | IllegalArgumentException | IllegalAccessException e ) {
+                    return null;
+                }
             }
-            catch ( IllegalAccessException eae2 ) {
-                throw new ProxyProvokeHandleException( eae2 );
+        }
+        catch ( IntrospectionException e ) {
+            return null;
+        }
+        return null;
+    }
+
+    public static void beanSet( Object bean, String propertyKey, Object val ) throws IllegalArgumentException {
+        try{
+            java.beans.PropertyDescriptor propertyDescriptor = new java.beans.PropertyDescriptor( propertyKey, bean.getClass() );
+            Method writeMethod = propertyDescriptor.getWriteMethod();
+            if ( writeMethod != null ) {
+                try{
+                    writeMethod.setAccessible( true );
+                    writeMethod.invoke( bean, val );
+                }
+                catch ( InvocationTargetException | IllegalArgumentException | IllegalAccessException e ) {
+                    throw new IllegalArgumentException( e );
+                }
             }
+        }
+        catch ( IntrospectionException e ) {
+            throw new IllegalArgumentException( e );
         }
     }
 

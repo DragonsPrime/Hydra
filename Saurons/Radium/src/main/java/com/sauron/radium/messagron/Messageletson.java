@@ -22,7 +22,7 @@ public abstract class Messageletson extends ArchMessagelet {
     // PHP Style
     @Override
     protected Map<String, Object > $_MSG() {
-        return this.getReceivedMessage().getExHead();
+        return this.getReceivedMessage().getHead().evalMapExtraHead();
     }
 
     @Override

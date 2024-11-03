@@ -20,7 +20,7 @@ public interface MessagePackage extends Package {
 
     @Override
     default String  getConsignee() {
-        Object e = this.getMessage().getExHead().get( this.getDeliver().getServiceKeyword() );
+        Object e = this.getMessage().getHead().getExHeaderVal( this.getDeliver().getServiceKeyword() );
         if( e instanceof String ) {
             return (String) e;
         }

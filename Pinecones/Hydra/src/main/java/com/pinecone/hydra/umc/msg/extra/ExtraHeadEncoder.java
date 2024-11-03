@@ -6,5 +6,5 @@ import com.pinecone.hydra.umc.msg.UMCHead;
 import java.util.Map;
 
 public interface ExtraHeadEncoder extends Pinenut {
-    byte[] encode( UMCHead head, Map<String, Object > jo );
+    byte[] encode( UMCHead head, Object jo );
 }

@@ -4,6 +4,7 @@ public enum ExtraEncode {
     Undefined   ( 0x01, "Undefined"   ),
     JSONString  ( 0x02, "JSONString"  ),
     Binary      ( 0x03, "Binary"      ), // Bson
+    Prototype   ( 0x04, "Prototype"   ), // Prototype Raw Binary
     Custom      ( 0xFF, "Custom"      );
 
     private final int value;

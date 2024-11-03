@@ -5,7 +5,7 @@ import com.pinecone.hydra.umc.msg.ChannelControlBlock;
 import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
-import com.pinecone.hydra.umc.wolfmc.UlfMCMessage;
+import com.pinecone.hydra.umc.wolfmc.UlfPutMessage;
 import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
 import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
@@ -31,8 +31,7 @@ class Christ extends JesusChrist {
     @Override
     public void vitalize () throws Exception {
         this.testServer();
-        //this.testSystemServer();
-        //this.testServerCos();
+        // this.testSystemServer();
     }
 
     public void testServer() throws Exception {
@@ -49,6 +48,16 @@ class Christ extends JesusChrist {
         this.getTaskManager().syncWaitingTerminated();
     }
 
+    public void testSystemServer() throws Exception {
+//        WolfMCServer wolf   = (WolfMCServer)this.getMiddlewareManager().getMessagersManager().getMessageNodeByName( "WolfKing" );
+//        wolf.execute();
+//
+//        this.getTaskManager().add( wolf );
+
+
+        this.getTaskManager().syncWaitingTerminated();
+    }
+
     public void testServerCos() throws Exception {
         Messagron messagron = new Messagron( "", this, new JSONMaptron() );
         WolfMCServer wolf = new WolfMCServer( "", this, new JSONMaptron("{host: \"0.0.0.0\",\n" +
@@ -56,8 +65,8 @@ class Christ extends JesusChrist {
 
         wolf.apply( new UlfAsyncMsgHandleAdapter() {
             public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
-                UlfMCMessage mc = (UlfMCMessage) rawMsg;
-                Map<String,Object > jo = mc.getHead().getExtraHead();
+                UlfPutMessage mc = (UlfPutMessage) rawMsg;
+                Map<String,Object > jo = mc.getHead().getMapExtraHead();
                 String dos = jo.get( "do" ).toString();
                 if( dos.equals( "queryHeistConfTPL" ) ) {
                     Debug.trace( "hahahaha" );
@@ -71,16 +80,6 @@ class Christ extends JesusChrist {
         wolf.execute();
 
         this.getTaskManager().add( wolf );
-        this.getTaskManager().syncWaitingTerminated();
-    }
-
-    public void testSystemServer() throws Exception {
-//        WolfMCServer wolf   = (WolfMCServer)this.getMiddlewareManager().getMessagersManager().getMessageNodeByName( "WolfKing" );
-//        wolf.execute();
-//
-//        this.getTaskManager().add( wolf );
-
-
         this.getTaskManager().syncWaitingTerminated();
     }
 }

@@ -11,7 +11,8 @@ public abstract class ArchUMCReceiver extends ArchUMCProtocol implements UMCRece
         super( messageSource );
     }
 
-    public Map<String, Object> readPutMsg() throws IOException {
+    @Override
+    public Object readPutMsg() throws IOException {
         UMCHead head = this.readMsgHead();
         if( head.method != UMCMethod.PUT ) {
             throw new IOException( "[UMCProtocol] Illegal protocol method." );
@@ -27,26 +28,33 @@ public abstract class ArchUMCReceiver extends ArchUMCProtocol implements UMCRece
         return head;
     }
 
-    protected void onlyReadPostBody( ArchUMCMessage message, boolean bAllBytes ) throws IOException {
+    protected void onlyReadPostBody( PostMessage message, boolean bAllBytes ) throws IOException {
         if( bAllBytes ) {
-            message.setBody( this.mInputStream.readAllBytes() );
+            ( (ArchBytesPostMessage)message ).setBody( this.mInputStream.readAllBytes() );
         }
         else {
-            message.setBody( this.mInputStream );
+            ( (ArchStreamPostMessage)message ).setBody( this.mInputStream );
         }
     }
 
-    public UMCMessage readMsg( boolean bAllBytes, Class<? extends ArchUMCMessage > stereotype ) throws IOException {
+    public UMCMessage readMsg( boolean bAllBytes, MessageStereotypes stereotypes ) throws IOException {
         try{
             UMCHead head = this.readMsgHead();
-            ArchUMCMessage message = stereotype.getConstructor( UMCHead.class ).newInstance( head );
+            UMCMessage message;
             if( head.getMethod() == UMCMethod.POST ){
-                this.onlyReadPostBody( message, bAllBytes );
+                if( bAllBytes ) {
+                    message = (UMCMessage) stereotypes.postBytesType().getConstructor( UMCHead.class ).newInstance( head );
+                }
+                else {
+                    message = (UMCMessage) stereotypes.postStreamType().getConstructor( UMCHead.class ).newInstance( head );
+                }
+                this.onlyReadPostBody( (PostMessage)message, bAllBytes );
             }
             else {
                 if( head.getMethod() != UMCMethod.PUT ){
                     throw new IOException( " [UMCProtocol] Unrecognized protocol method." );
                 }
+                message = (UMCMessage) stereotypes.putType().getConstructor( UMCHead.class ).newInstance( head );
             }
 
             return message;

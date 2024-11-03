@@ -47,7 +47,7 @@ public class WrappedErrorMessageException extends PineRuntimeException {
     }
 
     public static WrappedErrorMessageException wrap( UMCHead head ) {
-        Object what = head.getExtraHead().get( "What" );
+        Object what = head.getExHeaderVal( "What" );
         if( what instanceof String ) {
             return new WrappedErrorMessageException( (String) what, head.getStatus() );
         }

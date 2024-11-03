@@ -1,8 +1,5 @@
 package com.pinecone.hydra.umc.msg;
 
-import java.io.InputStream;
-import java.util.Map;
-
 public interface UMCMessage extends Message {
     UMCHead     getHead();
 
@@ -10,13 +7,15 @@ public interface UMCMessage extends Message {
         return this.getHead().getMethod();
     }
 
-    default Map<String,Object > getExHead() {
-        return this.getHead().joExtraHead;
+    default Object getExHead() {
+        return this.getHead().getExtraHead();
     }
 
-    byte[]      getBytesBody();
+    default PutMessage evincePutMessage() {
+        return null;
+    }
 
-    InputStream getStreamBody() ;
-
-    Object     getBody() ;
+    default PostMessage evincePostMessage() {
+        return null;
+    }
 }
