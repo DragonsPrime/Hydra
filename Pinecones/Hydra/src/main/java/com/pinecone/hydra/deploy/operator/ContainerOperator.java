@@ -21,6 +21,11 @@ public class ContainerOperator implements TreeNodeOperator {
     }
 
     @Override
+    public TreeNode get(GUID guid, int depth) {
+        return null;
+    }
+
+    @Override
     public TreeNode getSelf(GUID guid) {
         return null;
     }

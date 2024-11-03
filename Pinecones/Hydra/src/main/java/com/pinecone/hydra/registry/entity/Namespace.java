@@ -37,7 +37,7 @@ public interface Namespace extends ElementNode {
 
     NamespaceMeta getNamespaceWithMeta();
 
-    void setNamespaceMeta(NamespaceMeta namespaceMeta);
+    void setNamespaceMeta( NamespaceMeta namespaceMeta );
 
     Attributes getAttributes();
 
@@ -45,14 +45,14 @@ public interface Namespace extends ElementNode {
 
     Map<String, RegistryTreeNode > getChildren();
 
-    List<GUID > getChildrenGuids();
+    List<GUID > fetchChildrenGuids();
 
     void setChildrenGuids( List<GUID> contentGuids, int depth );
 
     List<RegistryTreeNode > listItem();
 
 
-    void put ( String key, RegistryTreeNode val );
+    void put ( RegistryTreeNode child );
 
     void remove ( String key );
 

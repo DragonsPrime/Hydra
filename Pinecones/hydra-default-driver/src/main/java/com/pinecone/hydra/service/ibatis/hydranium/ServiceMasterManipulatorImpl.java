@@ -1,27 +1,23 @@
 package com.pinecone.hydra.service.ibatis.hydranium;
 
 import com.pinecone.framework.system.construction.Structure;
-import com.pinecone.hydra.registry.ibatis.hydranium.RegistryMasterManipulatorImpl;
-import com.pinecone.hydra.registry.ibatis.hydranium.RegistryMasterTreeManipulatorImpl;
 import com.pinecone.hydra.service.ibatis.AppNodeMetaMapper;
 import com.pinecone.hydra.service.ibatis.ApplicationNodeMapper;
-import com.pinecone.hydra.service.ibatis.ClassifNodeMapper;
-import com.pinecone.hydra.service.ibatis.ClassifRulesMapper;
+import com.pinecone.hydra.service.ibatis.ServiceNamespaceMapper;
+import com.pinecone.hydra.service.ibatis.NamespaceRulesMapper;
 import com.pinecone.hydra.service.ibatis.ServiceCommonDataMapper;
-import com.pinecone.hydra.service.ibatis.ServiceFamilyTreeMapper;
 import com.pinecone.hydra.service.ibatis.ServiceMetaMapper;
 import com.pinecone.hydra.service.ibatis.ServiceNodeMapper;
 import com.pinecone.hydra.service.ibatis.ServiceNodeOwnerMapper;
-import com.pinecone.hydra.service.ibatis.ServiceTrieTreeMapper;
-import com.pinecone.hydra.service.tree.source.ApplicationMetaManipulator;
-import com.pinecone.hydra.service.tree.source.ApplicationNodeManipulator;
-import com.pinecone.hydra.service.tree.source.ClassifNodeManipulator;
-import com.pinecone.hydra.service.tree.source.ClassifRulesManipulator;
-import com.pinecone.hydra.service.tree.source.CommonDataManipulator;
-import com.pinecone.hydra.service.tree.source.ServiceFamilyTreeManipulator;
-import com.pinecone.hydra.service.tree.source.ServiceMasterManipulator;
-import com.pinecone.hydra.service.tree.source.ServiceMetaManipulator;
-import com.pinecone.hydra.service.tree.source.ServiceNodeManipulator;
+import com.pinecone.hydra.service.ibatis.ServiceTreeMapper;
+import com.pinecone.hydra.service.kom.source.ApplicationMetaManipulator;
+import com.pinecone.hydra.service.kom.source.ApplicationNodeManipulator;
+import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
+import com.pinecone.hydra.service.kom.source.NamespaceRulesManipulator;
+import com.pinecone.hydra.service.kom.source.CommonDataManipulator;
+import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
+import com.pinecone.hydra.service.kom.source.ServiceMetaManipulator;
+import com.pinecone.hydra.service.kom.source.ServiceNodeManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
 import com.pinecone.hydra.unit.udtt.source.TireOwnerManipulator;
@@ -36,7 +32,7 @@ public class ServiceMasterManipulatorImpl implements ServiceMasterManipulator {
     @Structure(type = ServiceMasterTreeManipulatorImpl.class )
     KOISkeletonMasterManipulator skeletonMasterManipulator;
     @Resource
-    @Structure(type = ServiceTrieTreeMapper.class )
+    @Structure(type = ServiceTreeMapper.class )
     TrieTreeManipulator             trieTreeManipulator;
     @Resource
     @Structure(type = ServiceCommonDataMapper.class )
@@ -54,14 +50,12 @@ public class ServiceMasterManipulatorImpl implements ServiceMasterManipulator {
     @Structure( type = ServiceMetaMapper.class )
     ServiceMetaManipulator          serviceMetaManipulator;
     @Resource
-    @Structure( type = ClassifNodeMapper.class )
-    ClassifNodeManipulator          classifNodeManipulator;
+    @Structure( type = ServiceNamespaceMapper.class )
+    ServiceNamespaceManipulator serviceNamespaceManipulator;
     @Resource
-    @Structure( type = ClassifRulesMapper.class )
-    ClassifRulesManipulator         classifRulesManipulator;
-    @Resource
-    @Structure( type = ServiceFamilyTreeMapper.class )
-    ServiceFamilyTreeManipulator    serviceFamilyTreeManipulator;
+    @Structure( type = NamespaceRulesMapper.class )
+    NamespaceRulesManipulator namespaceRulesManipulator;
+
     @Resource
     @Structure( type = ServiceNodeOwnerMapper.class )
     TireOwnerManipulator            tireOwnerManipulator;
@@ -91,7 +85,7 @@ public class ServiceMasterManipulatorImpl implements ServiceMasterManipulator {
     }
 
     @Override
-    public ApplicationMetaManipulator getApplicationMetaManipulator() {
+    public ApplicationMetaManipulator getApplicationElementManipulator() {
         return this.applicationMetaManipulator;
     }
 
@@ -106,18 +100,13 @@ public class ServiceMasterManipulatorImpl implements ServiceMasterManipulator {
     }
 
     @Override
-    public ClassifNodeManipulator getClassifNodeManipulator() {
-        return this.classifNodeManipulator;
+    public ServiceNamespaceManipulator getNamespaceManipulator() {
+        return this.serviceNamespaceManipulator;
     }
 
     @Override
-    public ClassifRulesManipulator getClassifRulesManipulator() {
-        return this.classifRulesManipulator;
-    }
-
-    @Override
-    public ServiceFamilyTreeManipulator getServiceFamilyTreeManipulator() {
-        return this.serviceFamilyTreeManipulator;
+    public NamespaceRulesManipulator getNamespaceRulesManipulator() {
+        return this.namespaceRulesManipulator;
     }
 
     @Override

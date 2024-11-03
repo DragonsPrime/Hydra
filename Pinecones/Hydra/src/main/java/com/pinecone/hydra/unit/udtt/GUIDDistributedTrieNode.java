@@ -50,7 +50,7 @@ public class GUIDDistributedTrieNode implements DistributedTreeNode {
     }
 
     @Override
-    public void setEnumId(long enumId) {
+    public void setEnumId( long enumId ) {
         this.enumId = enumId;
     }
 

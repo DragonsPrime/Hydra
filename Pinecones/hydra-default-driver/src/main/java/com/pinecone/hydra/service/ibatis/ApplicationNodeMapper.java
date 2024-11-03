@@ -1,8 +1,9 @@
 package com.pinecone.hydra.service.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.service.tree.nodes.GenericApplicationNode;
-import com.pinecone.hydra.service.tree.source.ApplicationNodeManipulator;
+import com.pinecone.hydra.service.kom.entity.ApplicationElement;
+import com.pinecone.hydra.service.kom.entity.GenericApplicationElement;
+import com.pinecone.hydra.service.kom.source.ApplicationNodeManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -16,13 +17,21 @@ import java.util.List;
 @IbatisDataAccessObject
 public interface ApplicationNodeMapper extends ApplicationNodeManipulator {
     @Insert("INSERT INTO  `hydra_service_application_node` (`guid`, `name`) VALUES (#{guid},#{name})")
-    void insert(GenericApplicationNode applicationNode);
+    void insert( ApplicationElement applicationElement );
 
     @Delete("DELETE FROM `hydra_service_application_node` WHERE `guid`=#{guid}")
-    void remove(@Param("guid")GUID guid);
+    void remove( @Param("guid")GUID guid );
 
     @Select("SELECT `id` AS `enumId`, `guid`, `name` FROM `hydra_service_application_node` WHERE `guid`=#{guid}")
-    GenericApplicationNode getApplicationNode(@Param("guid")GUID guid);
+    GenericApplicationElement getApplicationNode(@Param("guid")GUID guid);
 
-    void update(GenericApplicationNode applicationNode);
+    void update( ApplicationElement applicationElement );
+
+    @Override
+    @Select( "SELECT `guid` FROM `hydra_service_application_node` WHERE `name` = #{name}" )
+    List<GUID > getGuidsByName( String name );
+
+    @Override
+    @Select( "SELECT `guid` FROM `hydra_service_application_node` WHERE `name` = #{name} AND `guid` = #{guid}" )
+    List<GUID > getGuidsByNameID( @Param("name") String name, @Param("guid") GUID guid );
 }

@@ -163,25 +163,30 @@ public abstract class JSONUtils {
         }
     }
 
-    public static Object wrapValue( Object value ) {
+    public static Object wrapValue( Object value, boolean bWrapBean ) {
         try {
-            if (value == null) {
+            if ( value == null ) {
                 return JSON.NULL;
             }
             else if (!(value instanceof JSONObject) && !(value instanceof JSONArray) && !JSON.NULL.equals(value) && !(value instanceof JSONString) && !(value instanceof Byte) && !(value instanceof Character) && !(value instanceof Short) && !(value instanceof Integer) && !(value instanceof Long) && !(value instanceof Boolean) && !(value instanceof Float) && !(value instanceof Double) && !(value instanceof String)) {
                 if (value instanceof Collection) {
                     return new JSONArraytron((Collection)value);
                 }
-                else if (value.getClass().isArray()) {
+                else if ( value.getClass().isArray() ) {
                     return new JSONArraytron(value);
                 }
-                else if (value instanceof Map) {
+                else if ( value instanceof Map ) {
                     return new JSONMaptron((Map)value);
                 }
                 else {
-                    Package objectPackage = value.getClass().getPackage();
-                    String objectPackageName = objectPackage != null ? objectPackage.getName() : "";
-                    return !objectPackageName.startsWith("java.") && !objectPackageName.startsWith("javax.") && value.getClass().getClassLoader() != null ? new JSONMaptron(value) : value.toString();
+                    if( bWrapBean ) {
+                        Package objectPackage = value.getClass().getPackage();
+                        String objectPackageName = objectPackage != null ? objectPackage.getName() : "";
+                        return !objectPackageName.startsWith("java.") && !objectPackageName.startsWith("javax.") && value.getClass().getClassLoader() != null ? new JSONMaptron(value) : value.toString();
+                    }
+                    else {
+                        return null;
+                    }
                 }
             }
             else {
@@ -191,6 +196,10 @@ public abstract class JSONUtils {
         catch ( Exception e ) {
             return null;
         }
+    }
+
+    public static Object wrapValue( Object value ) {
+        return JSONUtils.wrapValue( value, true );
     }
 
     public static String[] getOwnPropertyNames ( JSONObject that ) {

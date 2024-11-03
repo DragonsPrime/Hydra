@@ -19,6 +19,7 @@ import com.pinecone.hydra.registry.entity.RegistryTreeNode;
 import com.pinecone.hydra.registry.entity.TextFile;
 import com.pinecone.hydra.system.ko.kom.KOMSelector;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
+import com.pinecone.hydra.system.ko.kom.ReparseLinkSelector;
 
 /**
  * RegistryJPathSelector
@@ -242,7 +243,7 @@ public class RegistryJPathSelector extends ReparseLinkSelector implements KOMSel
             }
             else {
                 // Case3: For middle and last parts, retrieve children GUIDs using distributedTrieTree
-                guids = this.distributedTrieTree.getChildrenGuids( parentGuid );
+                guids = this.distributedTrieTree.fetchChildrenGuids( parentGuid );
             }
 
             this.getNextToken();
@@ -325,7 +326,7 @@ public class RegistryJPathSelector extends ReparseLinkSelector implements KOMSel
         if( szSelector != null ) {
             // For thread safe.
             return new RegistryJPathSelector(
-                    new StringReader( szSelector ), this.pathResolver, this.mRegistry, this.dirManipulator, this.fileManipulators
+                    new StringReader( szSelector ), this.pathResolver, this.mRegistry, this.dirManipulators[ 0 ], this.fileManipulators
             );
         }
         return this;

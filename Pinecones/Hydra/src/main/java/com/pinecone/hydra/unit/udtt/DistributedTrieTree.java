@@ -1,9 +1,8 @@
 package com.pinecone.hydra.unit.udtt;
 
-import com.pinecone.framework.system.NotImplementedException;
 import com.pinecone.framework.system.prototype.PineUnit;
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.system.ko.KOMInstrument;
+import com.pinecone.hydra.system.ko.KernelObjectInstrument;
 import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
 
 import java.util.List;
@@ -22,15 +21,17 @@ public interface DistributedTrieTree extends PineUnit {
 
     void put( GUID guid, GUIDDistributedTrieNode distributedTreeNode );
 
-    boolean containsKey( GUID key );
+    boolean contains( GUID key );
+
+    boolean containsChild( GUID parentGuid, GUID childGuid );
 
     GUID queryGUIDByPath( String path );
 
     List<GUIDDistributedTrieNode> getChildren( GUID guid );
 
-    List<GUID> getChildrenGuids( GUID parentGuid );
+    List<GUID > fetchChildrenGuids( GUID parentGuid );
 
-    List<GUID> getParentGuids( GUID guid );
+    List<GUID > fetchParentGuids( GUID guid );
 
     void removeInheritance( GUID childGuid,GUID parentGuid );
 
@@ -39,7 +40,7 @@ public interface DistributedTrieTree extends PineUnit {
 
     void removeCachePath( GUID guid );
 
-    GUID getOwner( GUID guid);
+    GUID getOwner( GUID guid );
 
     void setOwner( GUID sourceGuid, GUID targetGuid );
 
@@ -49,7 +50,8 @@ public interface DistributedTrieTree extends PineUnit {
 
     void insertCachePath( GUID guid,String path );
 
-    List<GUID > listRoot();
+
+    List<GUID > fetchRoot();
 
     boolean isRoot( GUID guid );
 
@@ -73,7 +75,7 @@ public interface DistributedTrieTree extends PineUnit {
 
     void moveTo( GUID sourceGuid, GUID destinationGuid );
 
-    void newLinkTag( GUID originalGuid, GUID dirGuid, String tagName, KOMInstrument instrument );
+    void newLinkTag( GUID originalGuid, GUID dirGuid, String tagName, KernelObjectInstrument instrument );
 
     void updateLinkTagName( GUID tagGuid, String tagName );
 

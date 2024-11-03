@@ -6,30 +6,33 @@ import com.pinecone.framework.util.rdb.RDBHost;
 import java.sql.*;
 
 public class MySQLHost implements RDBHost {
-    private String      mszLocation;
+    protected String      mszLocation;
 
-    private String      mszUsername;
+    protected String      mszUsername;
 
-    private String      mszPassword;
+    protected String      mszPassword;
 
-    private String      mszCharset;
+    protected String      mszCharset;
 
-    private Connection  mGlobalConnection;
+    protected String      mszDriver;
+
+    protected Connection  mGlobalConnection;
 
 
     public MySQLHost( String dbLocation, String dbUsername, String dbPassword ) throws SQLException {
-        this.mszLocation = dbLocation;
-        this.mszUsername = dbUsername;
-        this.mszPassword = dbPassword;
-        this.mszCharset = "UTF-8";
-        this.connect();
+        this( dbLocation, dbUsername, dbPassword, "UTF-8" );
     }
 
     public MySQLHost( String dbLocation, String dbUsername, String dbPassword, String dbCharset ) throws SQLException {
-        this.mszLocation = dbLocation;
-        this.mszUsername = dbUsername;
-        this.mszPassword = dbPassword;
-        this.mszCharset = dbCharset;
+        this( dbLocation, dbUsername, dbPassword, dbCharset, "com.mysql.jdbc.Driver" );
+    }
+
+    public MySQLHost( String dbLocation, String dbUsername, String dbPassword, String dbCharset, String driver ) throws SQLException {
+        this.mszLocation = dbLocation ;
+        this.mszUsername = dbUsername ;
+        this.mszPassword = dbPassword ;
+        this.mszCharset  = dbCharset  ;
+        this.mszDriver   = driver     ;
         this.connect();
     }
 
@@ -51,7 +54,7 @@ public class MySQLHost implements RDBHost {
     @Override
     public void connect() throws SQLException {
         try{
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName( this.mszDriver );
         }
         catch ( ClassNotFoundException e ){
             throw new SQLException( "JDBC Driver is not found.", "CLASS_NOT_FOUND", e );

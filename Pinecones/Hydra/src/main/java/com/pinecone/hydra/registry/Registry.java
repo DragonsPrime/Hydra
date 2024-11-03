@@ -65,7 +65,7 @@ public interface Registry extends KernelObjectInstrument {
 
     void copy( String sourcePath, String destinationPath );
 
-    List<RegistryTreeNode> listRoot();
+    List<RegistryTreeNode> fetchRoot();
 
 
 

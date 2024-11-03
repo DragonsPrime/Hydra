@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.List;
 
 public interface MappedExecutor {
+    RDBHost getRDBSQLHost();
+
     long execute( String szSQL, boolean bIgnoreNoAffected ) throws SQLException;
 
     ResultSession query( String szSQL ) throws SQLException;

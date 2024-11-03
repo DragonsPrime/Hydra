@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Set;
 
 import com.pinecone.framework.system.stereotype.JavaBeans;
 import com.pinecone.framework.util.StringUtils;
@@ -29,7 +30,7 @@ public class GenericBeanJSONEncoder implements BeanJSONEncoder {
     }
 
     @Override
-    public String encode( Object bean ) {
+    public String encode( Object bean, Set<String > exceptedKeys ) {
         Class klass = bean.getClass();
         boolean includeSuperClass = klass.getClassLoader() != null;
         Method[] methods = includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
@@ -43,6 +44,10 @@ public class GenericBeanJSONEncoder implements BeanJSONEncoder {
                     if( !StringUtils.isEmpty( key ) ) {
                         if ( Character.isUpperCase( key.charAt(0) ) && method.getParameterTypes().length == 0 ) {
                             key = JavaBeans.methodKeyNameLowerCaseNormalize( key );
+
+                            if( exceptedKeys != null && exceptedKeys.contains( key ) ) {
+                                continue;
+                            }
 
                             Object val;
                             try {
@@ -82,6 +87,11 @@ public class GenericBeanJSONEncoder implements BeanJSONEncoder {
 //        catch ( IOException e ){
 //            return null;
 //        }
+    }
+
+    @Override
+    public String encode( Object bean ) {
+        return this.encode( bean, (Set<String >) null );
     }
 
     @Override

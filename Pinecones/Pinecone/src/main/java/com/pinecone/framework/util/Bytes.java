@@ -126,4 +126,20 @@ public final class Bytes {
     public static double bytesToFloat64BE( byte[] bytes ) {
         return Double.longBitsToDouble( Bytes.bytesToInt64BE( bytes ) );
     }
+
+
+
+
+    public static int calculateParity( byte b ) {
+        int count = 0;
+        for ( int i = 0; i < 8; i++ ) {
+            if ((b & (1 << i)) != 0) {
+                count++;
+            }
+        }
+        if( (count % 2) == 0 ){
+            return 1;
+        }
+        return 0;
+    }
 }

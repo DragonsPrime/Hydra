@@ -1,8 +1,8 @@
 package com.pinecone.framework.util.json.hometype;
 
 import com.pinecone.framework.system.functions.Executable;
-import com.pinecone.framework.system.hometype.HomeInjector;
-import com.pinecone.framework.system.hometype.StereotypicInjector;
+import com.pinecone.framework.system.homotype.HomoInjector;
+import com.pinecone.framework.system.homotype.StereotypicInjector;
 import com.pinecone.framework.system.prototype.Prototype;
 import com.pinecone.framework.util.ReflectionUtils;
 import com.pinecone.framework.util.json.JSON;
@@ -25,7 +25,7 @@ import java.util.LinkedList;
 import java.util.ArrayList;
 import java.util.concurrent.Callable;
 
-public abstract class ObjectInjector implements HomeInjector, StereotypicInjector {
+public abstract class ObjectInjector implements HomoInjector, StereotypicInjector {
     protected Class<?> mType;
 
     protected String getFieldName( String szKey ){

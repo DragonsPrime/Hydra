@@ -7,13 +7,11 @@ import com.pinecone.hydra.registry.KOMRegistry;
 import com.pinecone.hydra.registry.entity.ArchElementNode;
 import com.pinecone.hydra.registry.source.RegistryAttributesManipulator;
 import com.pinecone.hydra.registry.source.RegistryMasterManipulator;
-import com.pinecone.hydra.service.tree.UOIUtils;
+import com.pinecone.hydra.system.ko.UOIUtils;
 import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
 import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
 import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.GenericDistributedTrieTree;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.hydra.unit.udtt.source.TreeMasterManipulator;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 public abstract class ArchRegistryOperator implements RegistryNodeOperator {
@@ -31,7 +29,7 @@ public abstract class ArchRegistryOperator implements RegistryNodeOperator {
 
     public ArchRegistryOperator( RegistryMasterManipulator masterManipulator, KOMRegistry registry ){
         this.registryMasterManipulator     = masterManipulator;
-        this.distributedTrieTree           = new GenericDistributedTrieTree( (TreeMasterManipulator) masterManipulator.getSkeletonMasterManipulator() );
+        this.distributedTrieTree           = registry.getMasterTrieTree();
         this.attributesManipulator         = this.registryMasterManipulator.getAttributesManipulator();
 
         this.registry                      = registry;

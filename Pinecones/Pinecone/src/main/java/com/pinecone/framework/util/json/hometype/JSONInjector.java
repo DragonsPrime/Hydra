@@ -3,7 +3,7 @@ package com.pinecone.framework.util.json.hometype;
 import com.pinecone.framework.system.functions.Executable;
 import com.pinecone.framework.system.functions.Executor;
 import com.pinecone.framework.system.functions.Function;
-import com.pinecone.framework.system.hometype.HomeInjector;
+import com.pinecone.framework.system.homotype.HomoInjector;
 import com.pinecone.framework.util.ReflectionUtils;
 import com.pinecone.framework.util.json.*;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
-public abstract class JSONInjector implements HomeInjector {
+public abstract class JSONInjector implements HomoInjector {
     public JSONInjector(){
 
     }

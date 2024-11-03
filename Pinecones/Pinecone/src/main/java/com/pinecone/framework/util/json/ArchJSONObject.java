@@ -621,6 +621,8 @@ public abstract class ArchJSONObject implements JSONObject, Serializable {
         return this.putIfAbsent( key.toString(), value );
     }
 
+
+
     @Override
     public JSONObject put( String key, boolean value ) throws JSONException {
         this.put(key, (Object)(value ? Boolean.TRUE : Boolean.FALSE));
@@ -653,6 +655,18 @@ public abstract class ArchJSONObject implements JSONObject, Serializable {
 
     @Override
     public abstract JSONObject put( String key, Map value ) throws JSONException ;
+
+    @Override
+    public JSONObject put( String key, JSONArray value ) throws JSONException {
+        this.innerMapPut( key, value );
+        return this;
+    }
+
+    @Override
+    public JSONObject put( String key, JSONObject value ) throws JSONException {
+        this.innerMapPut( key, value );
+        return this;
+    }
 
     @Override
     public JSONObject put( String key, Object value ) throws JSONException {
@@ -716,6 +730,22 @@ public abstract class ArchJSONObject implements JSONObject, Serializable {
     @Override
     public Object remove( String key ) {
         return this.innerMapRemove(key);
+    }
+
+    @Override
+    public JSONObject removeAll( Collection<String > keys ) {
+        for( String key : keys ) {
+            this.remove( key );
+        }
+        return this;
+    }
+
+    @Override
+    public JSONObject removeAll( String[] keys ) {
+        for( String key : keys ) {
+            this.remove( key );
+        }
+        return this;
     }
 
     @Override

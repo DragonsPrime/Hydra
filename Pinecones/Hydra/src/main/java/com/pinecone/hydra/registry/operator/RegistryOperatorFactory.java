@@ -7,9 +7,10 @@ import com.pinecone.hydra.registry.entity.Namespace;
 import com.pinecone.hydra.registry.entity.Properties;
 import com.pinecone.hydra.registry.entity.TextFile;
 import com.pinecone.hydra.registry.source.RegistryMasterManipulator;
+import com.pinecone.hydra.unit.udtt.operator.OperatorFactory;
 import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
 
-public interface RegistryOperatorFactory extends Pinenut {
+public interface RegistryOperatorFactory extends OperatorFactory {
     String DefaultNamespaceNodeKey          =   Namespace.class.getSimpleName();
     String DefaultConfigNodeKey             =   ConfigNode.class.getSimpleName();
     String DefaultPropertyConfigNodeKey     =   Properties.class.getSimpleName();

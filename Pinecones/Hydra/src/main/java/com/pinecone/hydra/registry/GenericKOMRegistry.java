@@ -2,9 +2,6 @@ package com.pinecone.hydra.registry;
 
 import com.pinecone.framework.system.Nullable;
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.framework.util.lang.DynamicFactory;
-import com.pinecone.framework.util.lang.GenericDynamicFactory;
-import com.pinecone.framework.util.name.path.PathResolver;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.registry.entity.ConfigNode;
 import com.pinecone.hydra.registry.entity.DefaultPropertyConverter;
@@ -24,15 +21,13 @@ import com.pinecone.hydra.registry.entity.TypeConverter;
 import com.pinecone.hydra.registry.operator.RegistryNodeOperator;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
+import com.pinecone.hydra.system.ko.kom.ArchReparseKOMTree;
+import com.pinecone.hydra.system.ko.kom.GenericReparseKOMTreeAddition;
 import com.pinecone.hydra.system.ko.kom.KOMSelector;
-import com.pinecone.hydra.system.ko.kom.PathSelector;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
-import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
-import com.pinecone.hydra.system.ko.kom.ReparsePointSelector;
-import com.pinecone.hydra.unit.udtt.entity.EntityNode;
-import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
+import com.pinecone.hydra.system.ko.kom.StandardPathSelector;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 import com.pinecone.hydra.registry.operator.GenericRegistryOperatorFactory;
 import com.pinecone.hydra.registry.operator.RegistryOperatorFactory;
@@ -42,13 +37,8 @@ import com.pinecone.hydra.registry.source.RegistryConfigNodeManipulator;
 import com.pinecone.hydra.registry.source.RegistryNSNodeManipulator;
 import com.pinecone.hydra.registry.source.RegistryPropertiesManipulator;
 import com.pinecone.hydra.registry.source.RegistryTextFileManipulator;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
 import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.GenericDistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.source.TreeMasterManipulator;
 import com.pinecone.ulf.util.id.GUIDs;
-import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.io.StringReader;
 import java.time.LocalDateTime;
@@ -57,56 +47,59 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class GenericKOMRegistry implements KOMRegistry {
-    protected Hydrarum                        hydrarum;
-    protected GuidAllocator                   guidAllocator;
-    protected RegistryConfig                  registryConfig;
-    protected DynamicFactory                  dynamicFactory;
-    protected PathResolver                    pathResolver;
-    protected PathSelector                    pathSelector;
-    protected ReparsePointSelector            reparsePointSelector;
-
-    protected DistributedTrieTree             distributedTrieTree;
+/**
+ *  Pinecone Ursus For Java Uniform KOMRegistry
+ *  Author: Harold.E (Dragon King), Ken
+ *  Copyright © 2008 - 2028 Bean Nuts Foundation All rights reserved.
+ *  *****************************************************************************************
+ *  Uniform Distribute Kernel Object Model Registry (Config KOM Registry)
+ *  *****************************************************************************************
+ */
+public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistry {
     protected RegistryMasterManipulator       registryMasterManipulator;
     protected RegistryPropertiesManipulator   registryPropertiesManipulator;
     protected RegistryTextFileManipulator     registryTextFileManipulator;
     protected RegistryConfigNodeManipulator   configNodeManipulator;
     protected RegistryNSNodeManipulator       namespaceNodeManipulator;
-    protected RegistryOperatorFactory         registryOperatorFactory;
 
     protected TypeConverter                   propertyTypeConverter;
     protected TypeConverter                   textValueTypeConverter;
 
 
-    public GenericKOMRegistry( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
-        this.hydrarum                      =  hydrarum;
-        this.registryConfig                =  Registry.KernelRegistryConfig;
+    public GenericKOMRegistry( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, KOMRegistry parent, String name ){
+        // Phase [1] Construct system.
+        super( hydrarum, masterManipulator, Registry.KernelRegistryConfig, parent, name );
+
+        // Phase [2] Construct fundamentals.
         this.registryMasterManipulator     =  (RegistryMasterManipulator) masterManipulator;
-        this.dynamicFactory                =  new GenericDynamicFactory( hydrarum.getTaskManager().getClassLoader() );
-        this.pathResolver                  =  new KOPathResolver( this.registryConfig );
+        this.pathResolver                  =  new KOPathResolver( this.kernelObjectConfig );
+        this.guidAllocator                 =  GUIDs.newGuidAllocator();
 
-        KOISkeletonMasterManipulator skeletonMasterManipulator = this.registryMasterManipulator.getSkeletonMasterManipulator();
-        TreeMasterManipulator        treeMasterManipulator     = (TreeMasterManipulator) skeletonMasterManipulator;
-
-        this.distributedTrieTree           =  new GenericDistributedTrieTree( treeMasterManipulator );
+        // Phase [3] Construct manipulators.
         this.registryPropertiesManipulator =  this.registryMasterManipulator.getPropertiesManipulator();
         this.registryTextFileManipulator   =  this.registryMasterManipulator.getTextFileManipulator();
         this.configNodeManipulator         =  this.registryMasterManipulator.getConfigNodeManipulator();
         this.namespaceNodeManipulator      =  this.registryMasterManipulator.getNSNodeManipulator();
-        this.registryOperatorFactory       =  new GenericRegistryOperatorFactory( this, this.registryMasterManipulator );
+        this.operatorFactory               =  new GenericRegistryOperatorFactory( this, this.registryMasterManipulator );
 
-        this.guidAllocator                 =  GUIDs.newGuidAllocator();
+        // Phase [4] Construct selectors.
         this.pathSelector                  =  new StandardPathSelector(
                 this.pathResolver, this.distributedTrieTree, this.namespaceNodeManipulator, new GUIDNameManipulator[] { this.configNodeManipulator }
         );
-        this.reparsePointSelector          =  new ReparseLinkSelector( (StandardPathSelector) this.pathSelector );
+        // Warning: ReparseKOMTreeAddition must be constructed only after `pathSelector` has been constructed.
+        this.mReparseKOM                   =  new GenericReparseKOMTreeAddition( this );
 
+        // Phase [5] Construct misc.
         this.propertyTypeConverter         =  new DefaultPropertyConverter();
         this.textValueTypeConverter        =  new DefaultTextValueConverter();
     }
 
+    public GenericKOMRegistry( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
+        this( hydrarum, masterManipulator, null, KOMRegistry.class.getSimpleName() );
+    }
+
     public GenericKOMRegistry( Hydrarum hydrarum ) {
-        this.hydrarum = hydrarum;
+        this( hydrarum, null );
     }
 
     public GenericKOMRegistry( KOIMappingDriver driver ) {
@@ -114,6 +107,24 @@ public class GenericKOMRegistry implements KOMRegistry {
                 driver.getSystem(),
                 driver.getMasterManipulator()
         );
+    }
+
+    public GenericKOMRegistry( KOIMappingDriver driver, KOMRegistry parent, String name ) {
+        this(
+                driver.getSystem(),
+                driver.getMasterManipulator(),
+                parent,
+                name
+        );
+    }
+
+    @Override
+    public RegistryConfig getConfig() {
+        return (RegistryConfig) this.kernelObjectConfig;
+    }
+
+    public RegistryOperatorFactory getOperatorFactory() {
+        return (RegistryOperatorFactory) this.operatorFactory;
     }
 
     @Override
@@ -137,98 +148,31 @@ public class GenericKOMRegistry implements KOMRegistry {
     }
 
 
-
-
-    @Override
-    public GuidAllocator getGuidAllocator() {
-        return this.guidAllocator;
-    }
-
-    @Override
-    public DistributedTrieTree getMasterTrieTree() {
-        return this.distributedTrieTree;
-    }
-
     @Override
     public RegistryConfig getRegistryConfig() {
-        return this.registryConfig;
+        return this.getConfig();
     }
 
 
-
-
-    protected String getNS( GUID guid, String szSeparator ) {
-        String path = this.distributedTrieTree.getCachePath(guid);
-        if ( path != null ) {
-            return path;
-        }
-
-        DistributedTreeNode node = this.distributedTrieTree.getNode(guid);
-        GUID owner = this.distributedTrieTree.getOwner(guid);
-        if ( owner == null ){
-            String assemblePath = this.getNodeName(node);
-            while ( !node.getParentGUIDs().isEmpty() && this.allNonNull( node.getParentGUIDs() ) ){
-                List<GUID> parentGuids = node.getParentGUIDs();
-                for( int i = 0; i < parentGuids.size(); ++i ){
-                    if ( parentGuids.get(i) != null ){
-                        node = this.distributedTrieTree.getNode( parentGuids.get(i) );
-                        break;
-                    }
-                }
-                String nodeName = this.getNodeName(node);
-                assemblePath = nodeName + szSeparator + assemblePath;
-            }
-            this.distributedTrieTree.insertCachePath( guid, assemblePath );
-            return assemblePath;
-        }
-        else{
-            String assemblePath = this.getNodeName( node );
-            while ( !node.getParentGUIDs().isEmpty() && this.allNonNull( node.getParentGUIDs() ) ){
-                node = this.distributedTrieTree.getNode( owner );
-                String nodeName = this.getNodeName( node );
-                assemblePath = nodeName + szSeparator + assemblePath;
-                owner = this.distributedTrieTree.getOwner( node.getGuid() );
-            }
-            this.distributedTrieTree.insertCachePath( guid, assemblePath );
-            return assemblePath;
-        }
-    }
 
     @Override
-    public String getPath( GUID guid ) {
-        return this.getNS( guid, this.registryConfig.getPathNameSeparator() );
-    }
-
-    @Override
-    public String getFullName( GUID guid ) {
-        return this.getNS( guid, this.registryConfig.getFullNameSeparator() );
-    }
-
-    @Override
-    public GUID put( TreeNode treeNode ) {
-        TreeNodeOperator operator = this.registryOperatorFactory.getOperator(treeNode.getMetaType());
-        return operator.insert( treeNode );
-    }
-
     protected RegistryNodeOperator getOperatorByGuid( GUID guid ) {
-        DistributedTreeNode node = this.distributedTrieTree.getNode( guid );
-        TreeNode newInstance = (TreeNode)node.getType().newInstance( new Class<? >[]{ KOMRegistry.class }, this );
-        return this.registryOperatorFactory.getOperator( newInstance.getMetaType() );
+        return (RegistryNodeOperator) super.getOperatorByGuid( guid );
     }
 
     @Override
     public RegistryTreeNode get( GUID guid ) {
-        return this.getOperatorByGuid( guid ).get( guid );
+        return (RegistryTreeNode) super.get( guid );
     }
 
     @Override
     public RegistryTreeNode get( GUID guid, int depth ) {
-        return this.getOperatorByGuid( guid ).get( guid, depth );
+        return (RegistryTreeNode) super.get( guid, depth );
     }
 
     @Override
     public RegistryTreeNode getSelf( GUID guid ) {
-        return this.getOperatorByGuid( guid ).getSelf( guid );
+        return (RegistryTreeNode) super.getSelf( guid );
     }
 
     @Override
@@ -238,6 +182,7 @@ public class GenericKOMRegistry implements KOMRegistry {
         if( guid != null ) {
             return (ElementNode) this.get( guid );
         }
+
         return null;
     }
 
@@ -248,7 +193,11 @@ public class GenericKOMRegistry implements KOMRegistry {
 
     @Override
     public Properties getProperties( String path ) {
-        return this.getProperties( this.queryGUIDByPath( path ) );
+        GUID guid = this.queryGUIDByPath( path );
+        if( guid == null ) {
+            return null;
+        }
+        return this.getProperties( guid );
     }
 
     @Override
@@ -258,7 +207,11 @@ public class GenericKOMRegistry implements KOMRegistry {
 
     @Override
     public Namespace getNamespace( String path ){
-        return this.getNamespace( this.queryGUIDByPath( path ) );
+        GUID guid = this.queryGUIDByPath( path );
+        if( guid == null ) {
+            return null;
+        }
+        return this.getNamespace( guid );
     }
 
     @Override
@@ -272,7 +225,11 @@ public class GenericKOMRegistry implements KOMRegistry {
 
     @Override
     public List<Property > fetchProperties( String path ) {
-        return this.fetchProperties( this.queryGUIDByPath( path ) );
+        GUID guid = this.queryGUIDByPath( path );
+        if( guid == null ) {
+            return null;
+        }
+        return this.fetchProperties( guid );
     }
 
     @Override
@@ -282,44 +239,11 @@ public class GenericKOMRegistry implements KOMRegistry {
 
     @Override
     public TextValue getTextValue( String path ) {
-        return this.getTextValue( this.queryGUIDByPath( path ) );
-    }
-
-
-
-    /** Final Solution 20240929: 无法获取类型 */
-    public GUID queryGUIDByNS( String path, String szBadSep, String szTargetSep ) {
-        if( szTargetSep != null ) {
-            path = path.replace( szBadSep, szTargetSep );
+        GUID guid = this.queryGUIDByPath( path );
+        if( guid == null ) {
+            return null;
         }
-
-        String[] parts = this.pathResolver.segmentPathParts( path );
-        List<String > resolvedParts = this.pathResolver.resolvePath( parts );
-        path = this.pathResolver.assemblePath( resolvedParts );
-
-        GUID guid = this.distributedTrieTree.queryGUIDByPath( path );
-        if ( guid != null ){
-            return guid;
-        }
-
-
-        guid = this.pathSelector.searchGUID( resolvedParts );
-        if( guid != null ){
-            this.distributedTrieTree.insertCachePath( guid, path );
-        }
-        return guid;
-    }
-
-    @Override
-    public GUID queryGUIDByPath( String path ) {
-        return this.queryGUIDByNS( path, null, null );
-    }
-
-    @Override
-    public GUID queryGUIDByFN( String fullName ) {
-        return this.queryGUIDByNS(
-                fullName, this.registryConfig.getFullNameSeparator(), this.registryConfig.getPathNameSeparator()
-        );
+        return this.getTextValue( guid );
     }
 
     @Override
@@ -328,43 +252,6 @@ public class GenericKOMRegistry implements KOMRegistry {
         property.setCreateTime( LocalDateTime.now() );
         property.setUpdateTime( LocalDateTime.now() );
         this.registryPropertiesManipulator.insert( property );
-    }
-
-    @Override
-    public void newLinkTag( String originalPath, String dirPath, String tagName ) {
-        GUID originalGuid           = this.queryGUIDByPath( originalPath );
-        GUID dirGuid                = this.queryGUIDByPath( dirPath );
-
-        if( this.distributedTrieTree.getOriginalGuid( tagName, dirGuid ) == null ) {
-            this.distributedTrieTree.newLinkTag( originalGuid, dirGuid, tagName, this );
-        }
-    }
-
-
-
-    @Override
-    public void remove( GUID guid ){
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode( guid );
-        TreeNode newInstance = (TreeNode)node.getType().newInstance();
-        TreeNodeOperator operator = this.registryOperatorFactory.getOperator( newInstance.getMetaType() );
-        operator.purge( guid );
-    }
-
-    @Override
-    public void removeReparseLink( GUID guid ) {
-        this.distributedTrieTree.removeReparseLink( guid );
-    }
-
-    @Override
-    public void remove( String path ) {
-        Object handle = this.queryEntityHandle( path );
-        if( handle instanceof GUID ) {
-            this.remove( (GUID) handle );
-        }
-        else if( handle instanceof ReparseLinkNode ) {
-            ReparseLinkNode linkNode = (ReparseLinkNode) handle;
-            this.removeReparseLink( linkNode.getTagGuid() );
-        }
     }
 
     @Override
@@ -401,88 +288,9 @@ public class GenericKOMRegistry implements KOMRegistry {
         this.registryTextFileManipulator.remove(guid);
     }
 
-
-
-    @Override
-    public void affirmOwnedNode( GUID parentGuid, GUID childGuid ) {
-        this.distributedTrieTree.affirmOwnedNode( childGuid, parentGuid );
-    }
-
-    @Override
-    public void newHardLink( GUID sourceGuid, GUID targetGuid ) {
-        this.distributedTrieTree.newHardLink( sourceGuid, targetGuid );
-    }
-
     @Override
     public void setDataAffinityGuid( GUID childGuid, GUID parentGuid ) {
         this.configNodeManipulator.setDataAffinityGuid( childGuid, parentGuid );
-    }
-
-    @Override
-    public void newLinkTag( GUID originalGuid, GUID dirGuid, String tagName ) {
-        this.distributedTrieTree.newLinkTag( originalGuid, dirGuid, tagName, this );
-    }
-
-    @Override
-    public void updateLinkTag( GUID tagGuid, String tagName ) {
-        this.distributedTrieTree.updateLinkTagName( tagGuid, tagName );
-    }
-
-    @Override
-    public List<TreeNode > getChildren( GUID guid ) {
-        List<GUIDDistributedTrieNode > childNodes = this.distributedTrieTree.getChildren( guid );
-        ArrayList<TreeNode > configNodes = new ArrayList<>();
-        for( GUIDDistributedTrieNode node : childNodes ){
-            TreeNode treeNode =  this.get(node.getGuid());
-            configNodes.add( treeNode );
-        }
-        return configNodes;
-    }
-
-
-    public ReparseLinkNode queryReparseLinkByNS( String path, String szBadSep, String szTargetSep ) {
-        if( szTargetSep != null ) {
-            path = path.replace( szBadSep, szTargetSep );
-        }
-
-        String[] parts = this.pathResolver.segmentPathParts( path );
-        return this.reparsePointSelector.searchLinkNode( parts );
-    }
-
-    /** ReparseLinkNode or GUID **/
-    public Object queryEntityHandleByNS( String path, String szBadSep, String szTargetSep ) {
-        if( szTargetSep != null ) {
-            path = path.replace( szBadSep, szTargetSep );
-        }
-
-        String[] parts = this.pathResolver.segmentPathParts( path );
-        return this.reparsePointSelector.search( parts );
-    }
-
-    public EntityNode queryNodeByNS( String path, String szBadSep, String szTargetSep ) {
-        Object ret = this.queryEntityHandleByNS( path, szBadSep, szTargetSep );
-        if( ret instanceof EntityNode ) {
-            return (EntityNode) ret;
-        }
-        else if( ret instanceof GUID ) {
-            return this.get( (GUID) ret );
-        }
-
-        return null;
-    }
-
-    public Object queryEntityHandle( String path ) {
-        return this.queryEntityHandleByNS( path, null, null );
-    }
-
-    @Override
-    public EntityNode queryNode( String path ) {
-        return this.queryNodeByNS( path, null, null );
-    }
-
-    @Override
-    public ReparseLinkNode queryReparseLink( String path ) {
-        return this.queryReparseLinkByNS( path, null, null );
     }
 
     @Override
@@ -544,7 +352,7 @@ public class GenericKOMRegistry implements KOMRegistry {
         // Case1-2: Move "game/terraria/npc/." => "game/minecraft/npc/."
         if(
                 sourParts.get( sourParts.size() - 1 ).equals( szLastDestTarget ) || szLastDestTarget.equals( "." ) ||
-                ( sourcePath.endsWith( this.registryConfig.getPathNameSeparator() ) && destinationPath.endsWith( this.registryConfig.getPathNameSeparator() ) )
+                        ( sourcePath.endsWith( this.getConfig().getPathNameSeparator() ) && destinationPath.endsWith( this.getConfig().getPathNameSeparator() ) )
         ) {
             destParts.remove( destParts.size() - 1 );
             String szParentPath = this.pathResolver.assemblePath( destParts );
@@ -555,8 +363,8 @@ public class GenericKOMRegistry implements KOMRegistry {
         }
         // Case 2: "game/terraria/npc" => "game/minecraft/character/" || "game/minecraft/character/."
         //    game/terraria/npc => game/minecraft/character/npc
-        else if ( !sourcePath.endsWith( this.registryConfig.getPathNameSeparator() ) && (
-                destinationPath.endsWith( this.registryConfig.getPathNameSeparator() ) || destinationPath.endsWith( "." ) )
+        else if ( !sourcePath.endsWith( this.getConfig().getPathNameSeparator() ) && (
+                destinationPath.endsWith( this.getConfig().getPathNameSeparator() ) || destinationPath.endsWith( "." ) )
         ) {
             Namespace target = this.affirmNamespace( destinationPath );
             this.distributedTrieTree.moveTo( sourceGuid, target.getGuid() );
@@ -616,7 +424,7 @@ public class GenericKOMRegistry implements KOMRegistry {
         // Case1-2: Copy "game/terraria/npc/." => "game/minecraft/npc/."
         if(
                 sourParts.get( sourParts.size() - 1 ).equals( szLastDestTarget ) || szLastDestTarget.equals( "." ) ||
-                        ( sourcePath.endsWith( this.registryConfig.getPathNameSeparator() ) && destinationPath.endsWith( this.registryConfig.getPathNameSeparator() ) )
+                        ( sourcePath.endsWith( this.getConfig().getPathNameSeparator() ) && destinationPath.endsWith( this.getConfig().getPathNameSeparator() ) )
         ) {
             // Just return, copy to itself.
             return;
@@ -624,8 +432,8 @@ public class GenericKOMRegistry implements KOMRegistry {
 
         // Case 2: "game/terraria/npc" => "game/minecraft/character/" || "game/minecraft/character/."
         //    game/terraria/npc => game/minecraft/character/npc
-        if ( !sourcePath.endsWith( this.registryConfig.getPathNameSeparator() ) && (
-                destinationPath.endsWith( this.registryConfig.getPathNameSeparator() ) || destinationPath.endsWith( "." ) )
+        if ( !sourcePath.endsWith( this.getConfig().getPathNameSeparator() ) && (
+                destinationPath.endsWith( this.getConfig().getPathNameSeparator() ) || destinationPath.endsWith( "." ) )
         ) {
             this.copyTo( sourcePath, destinationPath );
         }
@@ -656,27 +464,6 @@ public class GenericKOMRegistry implements KOMRegistry {
     }
 
     @Override
-    public List<RegistryTreeNode> listRoot() {
-        List<GUID> guids = this.distributedTrieTree.listRoot();
-        ArrayList<RegistryTreeNode> registryTreeNodes = new ArrayList<>();
-        for( GUID guid : guids ){
-            RegistryTreeNode treeNode = this.get(guid);
-            registryTreeNodes.add(treeNode);
-        }
-        return registryTreeNodes;
-    }
-
-    @Override
-    public void rename( GUID guid, String name ) {
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
-        TreeNode newInstance = (TreeNode)node.getType().newInstance();
-        TreeNodeOperator operator = this.registryOperatorFactory.getOperator( newInstance.getMetaType() );
-        operator.updateName( guid, name );
-
-        this.distributedTrieTree.removeCachePath( guid );
-    }
-
-    @Override
     public List<TreeNode > getAllTreeNode() {
         List<GUID> nameSpaceNodes = this.namespaceNodeManipulator.dumpGuid();
         List<GUID> confNodes      = this.configNodeManipulator.dumpGuid();
@@ -692,7 +479,10 @@ public class GenericKOMRegistry implements KOMRegistry {
         return treeNodes;
     }
 
-
+    @SuppressWarnings( "unchecked" )
+    public List<RegistryTreeNode > fetchRoot() {
+        return (List) super.fetchRoot();
+    }
 
     // TODO, Unchecked type affirmed.
     protected RegistryTreeNode affirmTreeNodeByPath( String path, Class<? > cnSup, Class<? > nsSup ) {
@@ -707,7 +497,7 @@ public class GenericKOMRegistry implements KOMRegistry {
 
         RegistryTreeNode ret = null;
         for( int i = 0; i < parts.length; ++i ){
-            currentPath = currentPath + ( i > 0 ? this.registryConfig.getPathNameSeparator() : "" ) + parts[ i ];
+            currentPath = currentPath + ( i > 0 ? this.getConfig().getPathNameSeparator() : "" ) + parts[ i ];
             node = this.queryElement( currentPath );
             if ( node == null){
                 if ( i == parts.length - 1 && cnSup != null ){
@@ -801,10 +591,10 @@ public class GenericKOMRegistry implements KOMRegistry {
         return null;
     }
 
-    private String getNodeName( DistributedTreeNode node ){
+    private String getNodeName( DistributedTreeNode node ) {
         UOI type = node.getType();
         TreeNode newInstance = (TreeNode)type.newInstance();
-        TreeNodeOperator operator = this.registryOperatorFactory.getOperator(newInstance.getMetaType());
+        TreeNodeOperator operator = this.operatorFactory.getOperator(newInstance.getMetaType());
         TreeNode treeNode = operator.get(node.getGuid());
         return treeNode.getName();
     }

@@ -1,7 +1,9 @@
 package com.pinecone.hydra.unit.udtt;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.system.ko.KOMInstrument;
+import com.pinecone.hydra.system.ko.KernelObjectConfig;
+import com.pinecone.hydra.system.ko.KernelObjectInstrument;
+import com.pinecone.hydra.system.ko.kom.KOMInstrument;
 import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
 import com.pinecone.hydra.unit.udtt.source.TireOwnerManipulator;
 import com.pinecone.hydra.unit.udtt.source.TriePathCacheManipulator;
@@ -13,17 +15,45 @@ import com.pinecone.ulf.util.id.GuidAllocator;
 import java.util.List;
 
 public class GenericDistributedTrieTree implements UniDistributedTrieTree {
-    private TrieTreeManipulator      trieTreeManipulator;
+    static TreeMasterManipulator evalTreeMasterManipulator( KOMInstrument komInstrument ) {
+        return ((ArchTrieObjectModel) komInstrument).getTreeMasterManipulator();
+    }
 
-    private TireOwnerManipulator     tireOwnerManipulator;
+    static KernelObjectConfig evalKernelObjectConfig( KOMInstrument komInstrument ) {
+        return komInstrument.getConfig();
+    }
 
-    private TriePathCacheManipulator triePathCacheManipulator;
+    protected TrieTreeManipulator      trieTreeManipulator;
 
-    public GenericDistributedTrieTree( TreeMasterManipulator masterManipulator ){
+    protected TireOwnerManipulator     tireOwnerManipulator;
+
+    protected TriePathCacheManipulator triePathCacheManipulator;
+
+    protected KernelObjectConfig       kernelObjectConfig;
+
+    protected int                      shortPathLength;
+
+    public GenericDistributedTrieTree( TreeMasterManipulator masterManipulator ) {
         this.trieTreeManipulator      =  masterManipulator.getTrieTreeManipulator();
         this.tireOwnerManipulator     =  masterManipulator.getTireOwnerManipulator();
         this.triePathCacheManipulator =  masterManipulator.getTriePathCacheManipulator();
+        this.shortPathLength          =  TrieTreeConstants.DefaultShortPathLength;
     }
+
+    public GenericDistributedTrieTree( TreeMasterManipulator masterManipulator, KernelObjectConfig config ) {
+        this( masterManipulator );
+
+        this.kernelObjectConfig = config;
+        this.shortPathLength    = config.getShortPathLength();
+    }
+
+    public GenericDistributedTrieTree( KOMInstrument komInstrument ) {
+        this(
+                GenericDistributedTrieTree.evalTreeMasterManipulator(komInstrument),
+                GenericDistributedTrieTree.evalKernelObjectConfig(komInstrument)
+        );
+    }
+
 
 
     @Override
@@ -65,9 +95,13 @@ public class GenericDistributedTrieTree implements UniDistributedTrieTree {
     }
 
     @Override
-    public boolean containsKey( GUID key ) {
-        GUIDDistributedTrieNode guidDistributedTrieNode = this.trieTreeManipulator.getNode(key);
-        return guidDistributedTrieNode == null;
+    public boolean contains( GUID key ) {
+        return this.trieTreeManipulator.contains( key );
+    }
+
+    @Override
+    public boolean containsChild( GUID parentGuid, GUID childGuid ) {
+        return this.trieTreeManipulator.countNode( parentGuid, childGuid ) > 0;
     }
 
     @Override
@@ -81,13 +115,13 @@ public class GenericDistributedTrieTree implements UniDistributedTrieTree {
     }
 
     @Override
-    public List<GUID > getChildrenGuids( GUID parentGuid ) {
-        return this.trieTreeManipulator.getChildrenGuids( parentGuid );
+    public List<GUID > fetchChildrenGuids( GUID parentGuid ) {
+        return this.trieTreeManipulator.fetchChildrenGuids( parentGuid );
     }
 
     @Override
-    public List<GUID > getParentGuids( GUID guid ) {
-        return this.trieTreeManipulator.getParentGuids(guid);
+    public List<GUID > fetchParentGuids( GUID guid ) {
+        return this.trieTreeManipulator.fetchParentGuids(guid);
     }
 
     @Override
@@ -142,12 +176,21 @@ public class GenericDistributedTrieTree implements UniDistributedTrieTree {
 
     @Override
     public void insertCachePath( GUID guid, String path ) {
-        this.triePathCacheManipulator.insert( guid, path );
+        if ( path.length() > this.shortPathLength ){
+            String part1 = path.substring( 0, this.shortPathLength );
+            String part2 = path.substring( this.shortPathLength    );
+            this.triePathCacheManipulator.insertLongPath( guid, part1, part2 );
+        }
+        else {
+            this.triePathCacheManipulator.insert( guid, path );
+        }
     }
 
+
+
     @Override
-    public List<GUID > listRoot() {
-        return this.trieTreeManipulator.listRoot();
+    public List<GUID > fetchRoot() {
+        return this.trieTreeManipulator.fetchRoot();
     }
 
 
@@ -191,7 +234,7 @@ public class GenericDistributedTrieTree implements UniDistributedTrieTree {
     }
 
     @Override
-    public void newLinkTag( GUID originalGuid, GUID dirGuid, String tagName, KOMInstrument instrument ) {
+    public void newLinkTag( GUID originalGuid, GUID dirGuid, String tagName, KernelObjectInstrument instrument ) {
         GuidAllocator guidAllocator = instrument.getGuidAllocator();
         GUID tagGuid = guidAllocator.nextGUID72();
         this.trieTreeManipulator.newLinkTag( originalGuid, dirGuid, tagName, tagGuid );

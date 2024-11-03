@@ -38,7 +38,7 @@ public class ClassCandidateScanner implements ClassScanner {
     }
 
     @Override
-    public void addIterator          (NamespaceIterator classIter, NamespaceIterator packageIter ) {
+    public void addIterator          ( NamespaceIterator classIter, NamespaceIterator packageIter ) {
         this.addIterator( new ClassIteratorPair( classIter, packageIter ) );
     }
 
@@ -79,6 +79,9 @@ public class ClassCandidateScanner implements ClassScanner {
                 }
             }
         }
+
+        // Clear cache, to prevent next unexpected iteration.
+        pairs.clear();
     }
 
     protected boolean filter( String szClassName ) {

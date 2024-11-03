@@ -22,6 +22,11 @@ public class QuickOperator implements TreeNodeOperator {
     }
 
     @Override
+    public TreeNode get(GUID guid, int depth) {
+        return null;
+    }
+
+    @Override
     public RegistryTreeNode getSelf(GUID guid) {
         return null;
     }

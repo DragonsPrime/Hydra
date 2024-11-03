@@ -11,6 +11,8 @@ public interface TreeNodeOperator extends Pinenut {
 
     TreeNode get( GUID guid );
 
+    TreeNode get( GUID guid, int depth );
+
     TreeNode getSelf( GUID guid );
 
     void update( TreeNode treeNode );

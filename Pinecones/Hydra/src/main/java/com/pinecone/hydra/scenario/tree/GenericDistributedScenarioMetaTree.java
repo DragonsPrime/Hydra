@@ -17,7 +17,7 @@ import com.pinecone.hydra.scenario.source.ScenarioMasterManipulator;
 import com.pinecone.hydra.scenario.source.NamespaceNodeManipulator;
 import com.pinecone.hydra.scenario.source.NamespaceNodeMetaManipulator;
 import com.pinecone.hydra.scenario.source.ScenarioCommonDataManipulator;
-import com.pinecone.hydra.service.tree.UOIUtils;
+import com.pinecone.hydra.system.ko.UOIUtils;
 import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
 import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
 import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
@@ -144,7 +144,7 @@ public class GenericDistributedScenarioMetaTree implements DistributedScenarioMe
         }
         else {
             for(GUIDDistributedTrieNode childNode : childNodes){
-                List<GUID> parentNodes = this.distributedScenarioTree.getParentGuids(childNode.getGuid());
+                List<GUID> parentNodes = this.distributedScenarioTree.fetchParentGuids(childNode.getGuid());
                 if (parentNodes.size() > 1){
                     this.distributedScenarioTree.removeInheritance(childNode.getGuid(),guid);
                 }else {

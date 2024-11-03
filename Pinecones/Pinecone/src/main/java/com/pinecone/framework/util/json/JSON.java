@@ -1,6 +1,7 @@
 package com.pinecone.framework.util.json;
 
 import java.io.IOException;
+import java.io.Reader;
 import java.io.StringWriter;
 
 public final class JSON {
@@ -25,6 +26,16 @@ public final class JSON {
 
     public static String marshal   ( Object that, boolean bOnlyMarshalAnnotated ) {
         return JSON.decode( that, new JSONMarshal( bOnlyMarshalAnnotated ) );
+    }
+
+    public static Object unmarshal ( String szJsonString, Class<? > classType ) {
+        ObjectJSONCursorUnmarshal unmarshal = new ObjectJSONCursorUnmarshal( szJsonString, classType );
+        return unmarshal.nextValue();
+    }
+
+    public static Object unmarshal ( Reader reader, Class<? > classType ) {
+        ObjectJSONCursorUnmarshal unmarshal = new ObjectJSONCursorUnmarshal( reader, classType );
+        return unmarshal.nextValue();
     }
 
     public static String decode    ( Object that, JSONEncoder encoder ) {

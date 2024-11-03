@@ -51,11 +51,7 @@ public abstract class ArchCascadeComponent extends ArchComponent implements Casc
 
     @Override
     public void setName( String name ) {
-        Namespace p = null;
-        if( this.parent() != null ) {
-            p = this.parent().getName();
-        }
-        this.setName( new UniNamespace( name, p ) );
+        CascadeComponent.super.setName( name );
     }
 
     @Override

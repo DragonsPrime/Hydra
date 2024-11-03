@@ -236,6 +236,10 @@ public interface JSONObject extends PineUnit, Map<String, Object>, JSONDictium, 
 
     JSONObject put( String key, Map value ) throws JSONException ;
 
+    JSONObject put( String key, JSONArray value ) throws JSONException ;
+
+    JSONObject put( String key, JSONObject value ) throws JSONException ;
+
     @Override
     JSONObject put( String key, Object value ) throws JSONException ;
 
@@ -252,6 +256,10 @@ public interface JSONObject extends PineUnit, Map<String, Object>, JSONDictium, 
 
 
     Object remove( String key ) ;
+
+    JSONObject removeAll( Collection<String > keys );
+
+    JSONObject removeAll( String[] keys );
 
     JSONArray toJSONArray( JSONArray names ) throws JSONException ;
 

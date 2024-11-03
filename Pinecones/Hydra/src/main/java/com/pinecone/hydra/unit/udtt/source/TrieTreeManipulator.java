@@ -15,6 +15,8 @@ public interface TrieTreeManipulator extends Pinenut {
     /** With detail meta data node information. */
     GUIDDistributedTrieNode getNode( GUID guid );
 
+    boolean contains( GUID key ) ;
+
     /** Only with tree node index information. */
     GUIDDistributedTrieNode getTreeNodeOnly( GUID guid, GUID parentGuid );
 
@@ -54,15 +56,15 @@ public interface TrieTreeManipulator extends Pinenut {
     /** Lineage / Affinity */
     List<GUIDDistributedTrieNode > getChildren( GUID guid );
 
-    List<GUID > getChildrenGuids( GUID parentGuid );
+    List<GUID > fetchChildrenGuids( GUID parentGuid );
 
-    List<GUID > getParentGuids( GUID guid );
+    List<GUID > fetchParentGuids( GUID guid );
 
     void removeInheritance( GUID childNode, GUID parentGUID );
 
     void updateType       ( UOI type, GUID guid );
 
-    List<GUID > listRoot();
+    List<GUID > fetchRoot();
 
     boolean isRoot( GUID guid );
 

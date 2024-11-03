@@ -66,7 +66,7 @@ public interface JSONDictium extends Dictium<Object > {
      * @return null for nothing, object for the value which just be queried.
      */
     default Object query( String evalKey ) {
-        return Units.getValueFromMapLinkedRecursively( this, evalKey );
+        return Units.getValueFromMapStructureRecursively( this, evalKey );
     }
 
     default String queryString( String evalKey, String defaultValue ) {

@@ -10,4 +10,6 @@ public interface KernelObjectConfig extends Pinenut {
     String getPathNameSepRegex();
 
     String getFullNameSepRegex();
+
+    int getShortPathLength();
 }

@@ -3,6 +3,7 @@ package com.pinecone.framework.util.json;
 import com.pinecone.framework.system.stereotype.JavaBeans;
 import com.pinecone.framework.unit.LinkedTreeMap;
 import com.pinecone.framework.util.ReflectionUtils;
+import com.pinecone.framework.util.json.hometype.BeanColonist;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -85,7 +86,7 @@ public class JSONMaptron extends ArchJSONObject implements JSONObject, Serializa
 
     public JSONMaptron( Object bean ) {
         this();
-        this.populateMap(bean);
+        this.populateMap( bean );
     }
 
     public JSONMaptron( Object object, String[] names ) {
@@ -98,7 +99,8 @@ public class JSONMaptron extends ArchJSONObject implements JSONObject, Serializa
             try {
                 this.putOpt( name, c.getField(name).get(object) );
             }
-            catch ( Exception e ) {
+            catch ( Exception ignore ) {
+                //Do nothing.
             }
         }
 
@@ -145,7 +147,7 @@ public class JSONMaptron extends ArchJSONObject implements JSONObject, Serializa
 
     @Override
     protected void jsonDecode0( ArchCursorParser x ) throws JSONException {
-        JSONObjectDecoder.INNER_JSON_OBJECT_DECODER.decode( this, x );
+        JSONObjectDecoder.INNER_JSON_OBJECT_DECODER.decode( this, null, null, x );
     }
 
     @Override
@@ -234,36 +236,8 @@ public class JSONMaptron extends ArchJSONObject implements JSONObject, Serializa
 
 
 
-    private void populateMap( Object bean ) {
-        Class klass = bean.getClass();
-        boolean includeSuperClass = klass.getClassLoader() != null;
-        Method[] methods = includeSuperClass ? klass.getMethods() : klass.getDeclaredMethods();
-
-        for( int i = 0; i < methods.length; ++i ) {
-            try {
-                Method method = methods[i];
-                if ( Modifier.isPublic( method.getModifiers() ) ) {
-                    String key = JavaBeans.getGetterMethodKeyName( method );
-                    if( key == null ) {
-                        continue;
-                    }
-
-                    if ( key.length() > 0 && Character.isUpperCase( key.charAt(0) ) && method.getParameterTypes().length == 0 ) {
-                        key = JavaBeans.methodKeyNameLowerCaseNormalize( key );
-
-                        method.setAccessible( true );
-                        Object result = method.invoke( bean, (Object[])null );
-                        if ( result != null ) {
-                            this.innerMapPut( key, JSONUtils.wrapValue( result ) );
-                        }
-                    }
-                }
-            }
-            catch ( InvocationTargetException | IllegalAccessException e ) {
-                e.printStackTrace();
-                // Do nothing.
-            }
-        }
+    protected void populateMap( Object bean ) {
+        BeanColonist.WrappedColonist.populate( bean, this );
     }
 
     @Override

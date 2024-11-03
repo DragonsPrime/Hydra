@@ -85,7 +85,6 @@ public class Radium extends Hydradom implements RadiumSystem, Slf4jTraceable {
 
     protected void prepare_system_skeleton() {
         this.infoLifecycle( "Skeleton Initialization", LogStatuses.StatusStart );
-        super.prepare_system_skeleton();
         this.mTracerScope            = new GenericTracerScope( this );
         this.mPrimaryConfigScope     = new ConfigScope( ConfigScope.KeyGlobal, this, this.getGlobalConfig() );
         this.mMiddlewareManager      = new MiddlewareManager( this );
@@ -104,6 +103,8 @@ public class Radium extends Hydradom implements RadiumSystem, Slf4jTraceable {
         this.getComponentManager().addComponent( this.mDispenserCenter      );
         //Debug.trace( this.getComponentManager().getComponents() );
         //Debug.echo( ( (JSONObject)this.getGlobalConfigScope().thisScope() ).toJSONStringI(4) );
+
+        super.prepare_system_skeleton();
         this.infoLifecycle( "Skeleton Initialization", LogStatuses.StatusReady );
     }
 

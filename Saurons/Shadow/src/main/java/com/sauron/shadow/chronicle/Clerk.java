@@ -1,6 +1,6 @@
 package com.sauron.shadow.chronicle;
 
-import com.pinecone.framework.system.hometype.StereotypicInjector;
+import com.pinecone.framework.system.homotype.StereotypicInjector;
 import com.pinecone.framework.util.json.JSONObject;
 import com.sauron.radium.heistron.chronic.Raider;
 

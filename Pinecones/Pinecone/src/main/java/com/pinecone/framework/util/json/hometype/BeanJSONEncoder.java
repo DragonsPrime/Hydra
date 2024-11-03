@@ -2,6 +2,7 @@ package com.pinecone.framework.util.json.hometype;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Set;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 
@@ -9,6 +10,8 @@ public interface BeanJSONEncoder extends Pinenut {
     BeanJSONEncoder BasicEncoder = new GenericBeanJSONEncoder();
 
     String encode( Object bean );
+
+    String encode( Object bean, Set<String > exceptedKeys );
 
     void encode( Object bean, Writer writer, int nIndentFactor ) throws IOException;
 

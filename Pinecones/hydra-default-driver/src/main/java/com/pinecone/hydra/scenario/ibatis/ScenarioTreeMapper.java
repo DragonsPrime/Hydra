@@ -19,9 +19,12 @@ public interface ScenarioTreeMapper extends TrieTreeManipulator {
     @Insert("INSERT INTO hydra_scenario_node_map (guid, type, base_data_guid, node_meta_guid) VALUES (#{guid},#{type},#{baseDataGUID},#{nodeMetadataGUID})")
     void insert (GUIDDistributedTrieNode distributedConfTreeNode);
 
+    @Select("SELECT COUNT( `id` ) FROM hydra_scenario_node_map WHERE guid=#{guid}")
+    boolean contains( GUID key );
+
     default GUIDDistributedTrieNode getNode(GUID guid){
         GUIDDistributedTrieNode metaNode = this.getMetaNode(guid);
-        List<GUID> parentNodes = this.getParentGuids(guid);
+        List<GUID> parentNodes = this.fetchParentGuids(guid);
         if (parentNodes != null){
             metaNode.setParentGUID(parentNodes);
         }else {
@@ -48,7 +51,7 @@ public interface ScenarioTreeMapper extends TrieTreeManipulator {
     void removeInheritance(@Param("childGuid") GUID childGuid, @Param("parentGuid") GUID parentGuid);
 
     @Select("SELECT `parent_guid` FROM `hydra_scenario_node_tree` WHERE `guid`=#{guid}")
-    List<GUID> getParentGuids(GUID guid);
+    List<GUID> fetchParentGuids(GUID guid);
 
     @Select("SELECT `path` FROM `hydra_scenario_node_path` WHERE `guid`=#{guid}")
     String getPath(GUID guid);

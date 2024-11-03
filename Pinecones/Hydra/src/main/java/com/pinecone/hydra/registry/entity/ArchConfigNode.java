@@ -11,13 +11,14 @@ public abstract class ArchConfigNode extends ArchElementNode implements ConfigNo
     protected GUID                    dataAffinityGuid;
 
     protected ConfigNodeMeta          configNodeMeta;
-    protected KOMRegistry registry;
+
+    protected KOMRegistry             registry;
 
     protected ArchConfigNode() {
 
     }
 
-    public ArchConfigNode(KOMRegistry registry ) {
+    public ArchConfigNode( KOMRegistry registry ) {
         this.registry = registry;
 
         GuidAllocator guidAllocator = this.registry.getGuidAllocator();

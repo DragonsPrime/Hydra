@@ -1,7 +1,6 @@
 package com.pinecone.framework.unit;
 
-import com.pinecone.framework.system.prototype.ObjectiveBean;
-import com.pinecone.framework.system.prototype.ObjectiveClass;
+import com.pinecone.framework.system.prototype.ObjectiveEvaluator;
 import com.pinecone.framework.system.prototype.Objectom;
 import com.pinecone.framework.util.lang.DynamicFactory;
 
@@ -59,7 +58,7 @@ public final class Units {
 
 
     /**
-     * getFromMapLinked
+     * getFromMapStructure
      * Similar to other dynamic languages(e.g. Javascript/PHP/Python/etc.), which is using to retrieve the value from the potential gettable object.
      * @param mapLiked Any object that resembles the map operation (get/set/index/query/etc.) in form.
      * @param key The string key( number-fmt/string-key/etc. ) that uses to retrieve the value from the map-liked object.
@@ -67,7 +66,7 @@ public final class Units {
      * @param bIncludeAnyPotentialMapLiked if true, for other any potential map-liked objects will try get from bean-liked-object.
      * @return null for not found, object for the value which is affiliated to the key.
      */
-    public static Object getFromMapLinked ( Object mapLiked, String key, boolean bIncludeIterable, boolean bIncludeAnyPotentialMapLiked ) {
+    public static Object getFromMapStructure ( Object mapLiked, String key, boolean bIncludeIterable, boolean bIncludeAnyPotentialMapLiked ) {
         if( mapLiked instanceof Map ) {
             return ((Map) mapLiked).get( key );
         }
@@ -120,30 +119,24 @@ public final class Units {
         }
 
         if( bIncludeAnyPotentialMapLiked ) {
-            Objectom wrap = new ObjectiveBean( mapLiked );
-            Object v = wrap.get( key );
-            if( v == null ) {
-                wrap = new ObjectiveClass( mapLiked );
-                return wrap.get( key );
-            }
-            return v;
+            return ObjectiveEvaluator.MapStructures.classGet( mapLiked, key );
         }
         return null;
     }
 
-    public static Object getValueFromMapLinkedRecursively( Object mapLiked, String key, String szSplitRegex, boolean bIncludeIterable, boolean bIncludeAnyPotentialMapLiked ) {
+    public static Object getValueFromMapStructureRecursively( Object mapLiked, String key, String szSplitRegex, boolean bIncludeIterable, boolean bIncludeAnyPotentialMapLiked ) {
         String[] keys = key.split( szSplitRegex );
         Object value = mapLiked;
         for ( String k : keys ) {
-            value = Units.getFromMapLinked(
+            value = Units.getFromMapStructure(
                     value, k, bIncludeIterable, bIncludeAnyPotentialMapLiked
             );
         }
         return value;
     }
 
-    public static Object getValueFromMapLinkedRecursively( Object mapLiked, String key ) {
-        return Units.getValueFromMapLinkedRecursively(
+    public static Object getValueFromMapStructureRecursively( Object mapLiked, String key ) {
+        return Units.getValueFromMapStructureRecursively(
                 mapLiked, key, "\\.|\\/", true, true
         );
     }

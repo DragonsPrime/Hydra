@@ -7,7 +7,7 @@ import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.hydra.service.tree.UOIUtils;
+import com.pinecone.hydra.system.ko.UOIUtils;
 import com.pinecone.hydra.task.entity.GenericTaskCommonData;
 import com.pinecone.hydra.task.entity.GenericTaskNode;
 import com.pinecone.hydra.task.entity.GenericTaskNodeMeta;
@@ -144,7 +144,7 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
         }
         else {
             for(GUIDDistributedTrieNode childNode : childNodes){
-                List<GUID> parentNodes = this.distributedTrieTree.getParentGuids(childNode.getGuid());
+                List<GUID> parentNodes = this.distributedTrieTree.fetchParentGuids(childNode.getGuid());
                 if (parentNodes.size() > 1){
                     this.distributedTrieTree.removeInheritance(childNode.getGuid(),guid);
                 }else {

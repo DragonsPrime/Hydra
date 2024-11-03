@@ -12,5 +12,5 @@ public interface CursorParser extends Pinenut {
 
     Object nextValue() throws ParseException ;
 
-    Object nextValue( Object parent ) throws ParseException ;
+    Object nextValue( Object indexKey, Object parent ) throws ParseException ;
 }

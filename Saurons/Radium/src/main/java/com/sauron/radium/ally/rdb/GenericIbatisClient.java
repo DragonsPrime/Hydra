@@ -11,6 +11,8 @@ import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 import com.pinecone.slime.source.DAOScanner;
 import com.pinecone.slime.source.DataAccessObject;
 import com.pinecone.slime.source.rdb.ArchRelationalDatabase;
+
+import org.apache.ibatis.binding.BindingException;
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.*;
@@ -227,7 +229,12 @@ public class GenericIbatisClient extends ArchRelationalDatabase implements Ibati
 
     @Override
     public <T> void addMapper( Class<T> type ) {
-        this.mConfiguration.addMapper( type );
+        try{
+            this.mConfiguration.addMapper( type );
+        }
+        catch ( BindingException ignore ) {
+            // Do nothing.
+        }
     }
 
     @Override
