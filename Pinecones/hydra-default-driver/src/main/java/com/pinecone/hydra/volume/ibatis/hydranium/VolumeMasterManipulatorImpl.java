@@ -1,6 +1,7 @@
 package com.pinecone.hydra.volume.ibatis.hydranium;
 
 import com.pinecone.framework.system.construction.Structure;
+import com.pinecone.hydra.storage.volume.source.LogicVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.MirroredVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.MountPointManipulator;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
@@ -16,6 +17,7 @@ import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
 import com.pinecone.hydra.volume.ibatis.MirroredVolumeMapper;
 import com.pinecone.hydra.volume.ibatis.MountPointMapper;
 import com.pinecone.hydra.volume.ibatis.PhysicalVolumeMapper;
+import com.pinecone.hydra.volume.ibatis.PrimeLogicVolumeMapper;
 import com.pinecone.hydra.volume.ibatis.SimpleVolumeMapper;
 import com.pinecone.hydra.volume.ibatis.SpannedVolumeMapper;
 import com.pinecone.hydra.volume.ibatis.SQLiteVolumeMapper;
@@ -67,6 +69,10 @@ public class VolumeMasterManipulatorImpl implements VolumeMasterManipulator {
     @Resource
     @Structure( type = SQLiteVolumeMapper.class )
     SQLiteVolumeManipulator   sqliteVolumeManipulator;
+
+    @Resource
+    @Structure( type = PrimeLogicVolumeMapper.class )
+    protected LogicVolumeManipulator primeLogicVolumeManipulator;
 
     public VolumeMasterManipulatorImpl() {
 
@@ -124,5 +130,10 @@ public class VolumeMasterManipulatorImpl implements VolumeMasterManipulator {
     @Override
     public SQLiteVolumeManipulator getSQLiteVolumeManipulator() {
         return this.sqliteVolumeManipulator;
+    }
+
+    @Override
+    public LogicVolumeManipulator getPrimeLogicVolumeManipulator() {
+        return this.primeLogicVolumeManipulator;
     }
 }

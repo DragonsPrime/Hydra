@@ -9,6 +9,7 @@ import com.pinecone.hydra.storage.volume.entity.TitanVolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.operator.TitanVolumeOperatorFactory;
+import com.pinecone.hydra.storage.volume.source.LogicVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.MirroredVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.MountPointManipulator;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
@@ -21,9 +22,11 @@ import com.pinecone.hydra.storage.volume.source.VolumeCapacityManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
+import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.system.ko.kom.ArchKOMTree;
+import com.pinecone.hydra.system.ko.kom.SimplePathSelector;
 import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
 import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
 import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
@@ -48,26 +51,32 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     protected VolumeMasterManipulator           volumeMasterManipulator;
     protected VolumeAllocateManipulator         volumeAllocateManipulator;
     protected SQLiteVolumeManipulator           sqliteVolumeManipulator;
+    protected LogicVolumeManipulator            primeLogicVolumeManipulator;
 
 
     public UniformVolumeManager( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, VolumeManager parent, String name ) {
         super( hydrarum, masterManipulator, VolumeManager.KernelVolumeConfig, parent, name );
 
-        this.volumeMasterManipulator    =   ( VolumeMasterManipulator ) masterManipulator;
-        this.pathResolver               =   new KOPathResolver( this.kernelObjectConfig );
-        this.guidAllocator              =   GUIDs.newGuidAllocator();
+        this.volumeMasterManipulator       =   ( VolumeMasterManipulator ) masterManipulator;
+        this.pathResolver                  =   new KOPathResolver( this.kernelObjectConfig );
+        this.guidAllocator                 =   GUIDs.newGuidAllocator();
 
-        this.operatorFactory      =   new TitanVolumeOperatorFactory( this, this.volumeMasterManipulator );
-        this.volumeAllotment            =   new TitanVolumeAllotment( this,this.volumeMasterManipulator );
-        this.mirroredVolumeManipulator  =   this.volumeMasterManipulator.getMirroredVolumeManipulator();
-        this.mountPointManipulator      =   this.volumeMasterManipulator.getMountPointManipulator();
-        this.physicalVolumeManipulator  =   this.volumeMasterManipulator.getPhysicalVolumeManipulator();
-        this.simpleVolumeManipulator    =   this.volumeMasterManipulator.getSimpleVolumeManipulator();
-        this.spannedVolumeManipulator   =   this.volumeMasterManipulator.getSpannedVolumeManipulator();
-        this.stripedVolumeManipulator   =   this.volumeMasterManipulator.getStripedVolumeManipulator();
-        this.volumeCapacityManipulator  =   this.volumeMasterManipulator.getVolumeCapacityManipulator();
-        this.volumeAllocateManipulator  =   this.volumeMasterManipulator.getVolumeAllocateManipulator();
-        this.sqliteVolumeManipulator    =   this.volumeMasterManipulator.getSQLiteVolumeManipulator();
+        this.operatorFactory               =   new TitanVolumeOperatorFactory( this, this.volumeMasterManipulator );
+        this.volumeAllotment               =   new TitanVolumeAllotment( this,this.volumeMasterManipulator );
+        this.mirroredVolumeManipulator     =   this.volumeMasterManipulator.getMirroredVolumeManipulator();
+        this.mountPointManipulator         =   this.volumeMasterManipulator.getMountPointManipulator();
+        this.physicalVolumeManipulator     =   this.volumeMasterManipulator.getPhysicalVolumeManipulator();
+        this.simpleVolumeManipulator       =   this.volumeMasterManipulator.getSimpleVolumeManipulator();
+        this.spannedVolumeManipulator      =   this.volumeMasterManipulator.getSpannedVolumeManipulator();
+        this.stripedVolumeManipulator      =   this.volumeMasterManipulator.getStripedVolumeManipulator();
+        this.volumeCapacityManipulator     =   this.volumeMasterManipulator.getVolumeCapacityManipulator();
+        this.volumeAllocateManipulator     =   this.volumeMasterManipulator.getVolumeAllocateManipulator();
+        this.sqliteVolumeManipulator       =   this.volumeMasterManipulator.getSQLiteVolumeManipulator();
+        this.primeLogicVolumeManipulator   =   this.volumeMasterManipulator.getPrimeLogicVolumeManipulator();
+
+        this.pathSelector                  =   new SimplePathSelector(
+                this.pathResolver, this.distributedTrieTree, this.primeLogicVolumeManipulator, new GUIDNameManipulator[] {}
+        );
     }
 
     public UniformVolumeManager( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ) {
@@ -157,11 +166,6 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     }
 
     @Override
-    public GUID queryGUIDByNS(String path, String szBadSep, String szTargetSep) {
-        return null;
-    }
-
-    @Override
     public TreeNode get(GUID guid, int depth) {
         return null;
     }
@@ -218,6 +222,7 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     public void rename(GUID guid, String name) {
 
     }
+
     private boolean allNonNull( List<?> list ) {
         return list.stream().noneMatch( Objects::isNull );
     }

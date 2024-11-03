@@ -51,6 +51,8 @@ class Jesus extends JesusChrist {
         );
         //Debug.trace( wolf.sendSyncMsg( new UlfMCMessage( jsonObject, "fuck me" ) ) );
 
+        Debug.trace( wolf.sendSyncMsg( new UlfMCMessage( jsonObject, new byte[]{ 123 } ) ) );
+
         Debug.trace( wolf.sendSyncMsg( new UlfMCMessage( jsonObject ) ).getHead().getExtraHead() );
         Debug.trace( wolf.sendSyncMsg( new UlfMCMessage( jsonObject ) ) );
         //wolf.sendAsynMsg( new UlfMCMessage( jsonObject ) );

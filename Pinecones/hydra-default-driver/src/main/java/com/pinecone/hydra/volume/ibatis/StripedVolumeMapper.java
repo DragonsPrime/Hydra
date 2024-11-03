@@ -9,11 +9,14 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 
 @IbatisDataAccessObject
-public interface StripedVolumeMapper extends StripedVolumeManipulator {
+public interface StripedVolumeMapper extends StripedVolumeManipulator, PrimeLogicVolumeMapper {
     @Insert("INSERT INTO `hydra_uofs_volumes` (`guid`, `create_time`, `update_time`, `name`, `definition_capacity`, `used_size`, `quota_capacity`, `type`, `ext_config`) VALUES ( #{guid}, #{createTime}, #{updateTime}, #{name}, #{definitionCapacity}, #{usedSize}, #{quotaCapacity}, #{type}, #{extConfig} )")
     void insert( StripedVolume stripedVolume );
+
     @Delete("DELETE FROM `hydra_uofs_volumes` where `guid` = #{guid}")
     void remove( GUID guid );
+
+    @Override
     default TitanLocalStripedVolume getStripedVolume(GUID guid){
         TitanLocalStripedVolume stripedVolume0 = this.getStripedVolume0( guid );
         stripedVolume0.setStripedVolumeManipulator( this );

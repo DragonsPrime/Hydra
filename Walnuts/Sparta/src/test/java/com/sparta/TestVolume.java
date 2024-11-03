@@ -73,7 +73,7 @@ class Alice extends Radium {
         //this.testDirectExport( volumeTree );
         //this.testSpannedChannelReceive( volumeTree );
         //this.testSpannedChannelExport( volumeTree );
-        ///Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三" ) );
+        Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
     }
 
     private void testDirectReceive(VolumeManager volumeManager) throws IOException {

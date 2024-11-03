@@ -9,8 +9,6 @@ import com.pinecone.framework.util.json.ObjectJSONCursorUnmarshal;
 import com.pinecone.hydra.service.ibatis.hydranium.ServiceMappingDriver;
 import com.pinecone.hydra.service.kom.UniformServicesInstrument;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
-import com.pinecone.hydra.service.kom.entity.GenericApplicationElement;
-import com.pinecone.hydra.service.kom.entity.GenericNamespace;
 import com.pinecone.hydra.service.kom.entity.GenericServiceElement;
 import com.pinecone.hydra.service.kom.marshaling.ServicesJSONDecoder;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;

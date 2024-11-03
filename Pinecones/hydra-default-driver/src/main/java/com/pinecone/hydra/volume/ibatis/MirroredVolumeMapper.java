@@ -10,11 +10,13 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
 @IbatisDataAccessObject
-public interface MirroredVolumeMapper extends MirroredVolumeManipulator {
+public interface MirroredVolumeMapper extends MirroredVolumeManipulator, PrimeLogicVolumeMapper {
     @Insert("INSERT INTO `hydra_uofs_volumes` (`guid`, `create_time`, `update_time`, `name`, `definition_capacity`, `used_size`, `quota_capacity`, `type`, `ext_config`) VALUES ( #{guid}, #{createTime}, #{updateTime}, #{name}, #{definitionCapacity}, #{usedSize}, #{quotaCapacity}, #{type}, #{extConfig} )")
     void insert( MirroredVolume mirroredVolume );
+
     @Delete("DELETE FROM `hydra_uofs_volumes` where `guid` = #{guid}")
     void remove( GUID guid );
+
     default TitanLocalMirroredVolume getMirroredVolume(GUID guid){
         TitanLocalMirroredVolume mirroredVolume0 = this.getMirroredVolume0(guid);
         mirroredVolume0.setMirroredVolumeManipulator( this );

@@ -188,6 +188,14 @@ public class MultiFolderPathSelector implements PathSelector {
         }
     }
 
+    protected List<GUID > searchLinks ( GUID guid, String partName ) {
+        GUID linkGuid = this.distributedTrieTree.getOriginalGuidByNodeGuid( partName, guid );
+        if( linkGuid != null ) {
+            return List.of( linkGuid );
+        }
+        return null;
+    }
+
     protected List<GUID > searchDirAndLinks ( GUID guid, String partName ) {
         for( GUIDNameManipulator dirMans : this.dirManipulators ) {
             List<GUID > guids = dirMans.getGuidsByNameID( partName, guid );
@@ -196,11 +204,11 @@ public class MultiFolderPathSelector implements PathSelector {
             }
         }
 
-        GUID linkGuid = this.distributedTrieTree.getOriginalGuidByNodeGuid( partName, guid );
-        if( linkGuid != null ) {
-            return List.of( linkGuid );
-        }
-        return null;
+        return this.searchLinks( guid, partName );
+    }
+
+    protected List<GUID > searchLinksFirstCase ( String partName ) {
+        return this.distributedTrieTree.fetchOriginalGuidRoot( partName );
     }
 
     protected List<GUID > searchDirAndLinksFirstCase ( String partName ) {
@@ -211,7 +219,7 @@ public class MultiFolderPathSelector implements PathSelector {
             }
         }
 
-        return this.distributedTrieTree.fetchOriginalGuidRoot( partName );
+        return this.searchLinksFirstCase( partName );
     }
 
     protected List<GUID > fetchDirsAllGuids( String partName ) {
@@ -227,6 +235,10 @@ public class MultiFolderPathSelector implements PathSelector {
         return new ArrayList<>();
     }
 
+    protected void fetchAllOriginalGuidsRootCase( List<GUID > guids, String partName ) {
+        guids.addAll( this.distributedTrieTree.fetchOriginalGuidRoot( partName ) );
+    }
+
     protected List<GUID > fetchAllGuidsRootCase( String partName ) {
         List<GUID > guids = this.fetchDirsAllGuids( partName );
 
@@ -240,8 +252,8 @@ public class MultiFolderPathSelector implements PathSelector {
             }
         }
 
-        guids.addAll( this.distributedTrieTree.fetchOriginalGuidRoot( partName ) );
 
+        this.fetchAllOriginalGuidsRootCase( guids, partName );
         return guids;
     }
 

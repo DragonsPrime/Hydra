@@ -12,5 +12,5 @@ public interface StripedVolumeManipulator extends LogicVolumeManipulator {
     void remove( GUID guid );
     StripedVolume getStripedVolume(GUID guid);
     void extendLogicalVolume( GUID logicGuid, GUID physicalGuid );
-    List<GUID> lsblk(GUID logicGuid );
+    List<GUID> listPhysicalVolume(GUID logicGuid );
 }

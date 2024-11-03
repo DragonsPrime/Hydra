@@ -56,7 +56,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
 
     @Override
     public List<GUID> listPhysicalVolume() {
-        return this.simpleVolumeManipulator.lsblk( this.guid );
+        return this.simpleVolumeManipulator.listPhysicalVolume( this.guid );
     }
 
 
@@ -103,7 +103,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     public boolean existStorageObject(GUID storageObject) throws SQLException {
         GUID physicsGuid = this.volumeManager.getSQLitePhysicsVolume(this.guid);
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
-        String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
+        String url = physicalVolume.getMountPoint().getMountPoint()+ "/" +this.guid+".db";
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
         ResultSession query = sqLiteExecutor.query(" SELECT COUNT(*) FROM `table` WHERE `storage_object_guid` = '" + storageObject + "' ");
         ResultSet resultSet = query.getResultSet();
@@ -119,7 +119,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         if( physicsGuid == null ){
             PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
             this.volumeManager.insertSQLiteMeta( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
-            String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
+            String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + "/" + this.guid + ".db";
             SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
             sqLiteExecutor.execute( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36) );" );
             sqLiteExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` ) VALUES ( '"+ middleStorageObject.getObjectGuid()+ "' )" );
