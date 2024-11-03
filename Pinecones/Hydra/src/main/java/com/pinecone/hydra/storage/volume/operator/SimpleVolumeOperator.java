@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.volume.operator;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
@@ -21,12 +21,12 @@ public class SimpleVolumeOperator extends ArchVolumeOperator  implements VolumeO
     protected SimpleVolumeManipulator       simpleVolumeManipulator;
 
     public SimpleVolumeOperator( VolumeOperatorFactory  factory ){
-        this( factory.getMasterManipulator(), factory.getVolumeTree() );
+        this( factory.getMasterManipulator(), factory.getVolumeManager() );
         this.factory = factory;
     }
 
-    public SimpleVolumeOperator(VolumeMasterManipulator masterManipulator, VolumeTree volumeTree) {
-        super(masterManipulator, volumeTree);
+    public SimpleVolumeOperator(VolumeMasterManipulator masterManipulator, VolumeManager volumeManager) {
+        super(masterManipulator, volumeManager);
         this.simpleVolumeManipulator    =  masterManipulator.getSimpleVolumeManipulator();
     }
 
@@ -62,7 +62,7 @@ public class SimpleVolumeOperator extends ArchVolumeOperator  implements VolumeO
         SimpleVolume simpleVolume = this.simpleVolumeManipulator.getSimpleVolume(guid);
         VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
         simpleVolume.setVolumeCapacity( volumeCapacity );
-        simpleVolume.setVolumeTree( this.volumeTree );
+        simpleVolume.setVolumeTree( this.volumeManager);
         return simpleVolume;
     }
 

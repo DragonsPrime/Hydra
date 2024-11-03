@@ -1,25 +1,24 @@
 package com.pinecone.hydra.storage.volume.entity;
 
-import com.pinecone.hydra.storage.file.KOMFileSystem;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 
 public abstract  class ArchExportEntity implements ExporterEntity{
-    protected VolumeTree            volumeTree;
+    protected VolumeManager volumeManager;
     protected ExportStorageObject   exportStorageObject;
 
-    public ArchExportEntity( VolumeTree volumeTree, ExportStorageObject exportStorageObject ){
-        this.volumeTree = volumeTree;
+    public ArchExportEntity(VolumeManager volumeManager, ExportStorageObject exportStorageObject ){
+        this.volumeManager = volumeManager;
         this.exportStorageObject = exportStorageObject;
 
     }
     @Override
-    public VolumeTree getVolumeTree() {
-        return this.volumeTree;
+    public VolumeManager getVolumeManager() {
+        return this.volumeManager;
     }
 
     @Override
-    public void setVolumeTree(VolumeTree volumeTree) {
-        this.volumeTree = volumeTree;
+    public void setVolumeManager(VolumeManager volumeManager) {
+        this.volumeManager = volumeManager;
     }
 
     @Override

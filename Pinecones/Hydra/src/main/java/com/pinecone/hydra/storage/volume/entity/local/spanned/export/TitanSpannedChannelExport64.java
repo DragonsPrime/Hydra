@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.spanned.export;
 
 import com.pinecone.hydra.storage.MiddleStorageObject;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
@@ -12,13 +12,13 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class TitanSpannedChannelExport64 implements SpannedChannelExport64{
-    private VolumeTree              volumeTree;
+    private VolumeManager volumeManager;
     private ExportStorageObject     exportStorageObject;
     private FileChannel             channel;
     private SpannedVolume           spannedVolume;
 
     public TitanSpannedChannelExport64(SpannedChannelExportEntity entity , SpannedVolume spannedVolume){
-        this.volumeTree          =  entity.getVolumeTree();
+        this.volumeManager =  entity.getVolumeManager();
         this.exportStorageObject =  entity.getExportStorageObject();
         this.channel             =  entity.getChannel();
         this.spannedVolume       =  spannedVolume;

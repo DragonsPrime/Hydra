@@ -1,30 +1,29 @@
 package com.pinecone.hydra.storage.volume.entity;
 
-import com.pinecone.hydra.storage.volume.VolumeFile;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 
 public abstract class ArchReceiveEntity implements ReceiveEntity{
-    protected VolumeTree volumeTree;
+    protected VolumeManager volumeManager;
 
     protected ReceiveStorageObject receiveStorageObject;
 
     protected String     destDirPath;
 
-    public ArchReceiveEntity( VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, String destDirPath ){
-        this.volumeTree = volumeTree;
+    public ArchReceiveEntity(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, String destDirPath ){
+        this.volumeManager = volumeManager;
         this.receiveStorageObject = receiveStorageObject;
         this.destDirPath = destDirPath;
     }
 
 
     @Override
-    public VolumeTree getVolumeTree() {
-        return this.volumeTree;
+    public VolumeManager getVolumeManager() {
+        return this.volumeManager;
     }
 
     @Override
-    public void setVolumeTree(VolumeTree volumeTree) {
-        this.volumeTree = volumeTree;
+    public void setVolumeManager(VolumeManager volumeManager) {
+        this.volumeManager = volumeManager;
     }
 
     @Override

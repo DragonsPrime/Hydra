@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.volume.operator;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
@@ -21,12 +21,12 @@ public class StripedVolumeOperator extends ArchVolumeOperator  implements Volume
     protected StripedVolumeManipulator          stripedVolumeManipulator;
 
     public StripedVolumeOperator( VolumeOperatorFactory  factory ){
-        this( factory.getMasterManipulator(), factory.getVolumeTree() );
+        this( factory.getMasterManipulator(), factory.getVolumeManager() );
         this.factory = factory;
     }
 
-    public StripedVolumeOperator(VolumeMasterManipulator masterManipulator, VolumeTree volumeTree) {
-        super(masterManipulator, volumeTree);
+    public StripedVolumeOperator(VolumeMasterManipulator masterManipulator, VolumeManager volumeManager) {
+        super(masterManipulator, volumeManager);
         this.stripedVolumeManipulator = masterManipulator.getStripedVolumeManipulator();
     }
 
@@ -62,7 +62,7 @@ public class StripedVolumeOperator extends ArchVolumeOperator  implements Volume
         StripedVolume stripedVolume = this.stripedVolumeManipulator.getStripedVolume(guid);
         VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
         stripedVolume.setVolumeCapacity( volumeCapacity );
-        stripedVolume.setVolumeTree( this.volumeTree );
+        stripedVolume.setVolumeTree( this.volumeManager);
         return stripedVolume;
     }
 

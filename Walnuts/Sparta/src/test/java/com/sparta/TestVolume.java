@@ -4,16 +4,14 @@ import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.Debug;
-import com.pinecone.framework.util.sqlite.SQLiteHost;
-import com.pinecone.framework.util.sqlite.SQLiteMethod;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
 import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.FileTreeNode;
-import com.pinecone.hydra.storage.volume.UniformVolumeTree;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.UniformVolumeManager;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
@@ -62,7 +60,7 @@ class Alice extends Radium {
 
         KOMFileSystem fileSystem = new UniformObjectFileSystem( koiFileMappingDriver );
 
-        UniformVolumeTree volumeTree = new UniformVolumeTree( koiMappingDriver );
+        UniformVolumeManager volumeTree = new UniformVolumeManager( koiMappingDriver );
         VolumeAllotment volumeAllotment = volumeTree.getVolumeAllotment();
 
         //this.testChannelReceive( fileSystem,volumeTree );
@@ -78,7 +76,7 @@ class Alice extends Radium {
         ///Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三" ) );
     }
 
-    private void testDirectReceive(VolumeTree volumeTree ) throws IOException {
+    private void testDirectReceive(VolumeManager volumeManager) throws IOException {
         TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
         titanReceiveStorageObject.setName("视频");
         titanReceiveStorageObject.setSize(201*1024*1024);
@@ -86,22 +84,22 @@ class Alice extends Radium {
         File sourceFile = new File("D:\\井盖视频块\\4月13日 (2).mp4");
         Path path = sourceFile.toPath();
         FileChannel channel = FileChannel.open(path, StandardOpenOption.READ);
-        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeTree,titanReceiveStorageObject,destDirPath,channel);
+        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager,titanReceiveStorageObject,destDirPath,channel);
         titanDirectChannelReceiveEntity64.receive();
     }
 
-    private void testDirectExport( VolumeTree volumeTree ) throws IOException {
+    private void testDirectExport( VolumeManager volumeManager) throws IOException {
         File file = new File("D:\\文件系统\\大文件\\视频.mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         TitanExportStorageObject titanExportStorageObject = new TitanExportStorageObject();
         titanExportStorageObject.setSize( 201*1024*1024 );
         titanExportStorageObject.setSourceName("D:\\文件系统\\大文件\\视频_d95a91f4.storage");
-        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64( volumeTree, titanExportStorageObject,channel);
+        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, titanExportStorageObject,channel);
         titanDirectChannelExportEntity64.export();
     }
 
 
-    private void testChannelReceive( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ) throws IOException {
+    private void testChannelReceive( KOMFileSystem fileSystem, UniformVolumeManager volumeTree ) throws IOException {
         SimpleVolume simpleVolume  = volumeTree.get(GUIDs.GUID72("03e7f10-0003dd-0002-98")).evinceSimpleVolume();
         simpleVolume.extendLogicalVolume( GUIDs.GUID72("03e7f10-0003dd-0000-84") );
         File sourceFile = new File("D:\\井盖视频块\\4月13日 (2).mp4");
@@ -112,7 +110,7 @@ class Alice extends Radium {
         //simpleVolume.channelReceive( fileSystem, fileNode,FileChannel.open(path, StandardOpenOption.READ));
     }
 
-    private void testChannelExport( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ) throws IOException {
+    private void testChannelExport( KOMFileSystem fileSystem, UniformVolumeManager volumeTree ) throws IOException {
         SimpleVolume simpleVolume  = volumeTree.get(GUIDs.GUID72("03e7f10-0003dd-0002-98")).evinceSimpleVolume();
         FileTreeNode fileTreeNode = fileSystem.get(GUIDs.GUID72("0271940-00035d-0001-58"));
         FileNode file = fileTreeNode.evinceFileNode();
@@ -120,7 +118,7 @@ class Alice extends Radium {
         //simpleVolume.channelExport(fileSystem, file);
     }
 
-    private void testSpannedChannelReceive( UniformVolumeTree volumeTree ) throws IOException, SQLException {
+    private void testSpannedChannelReceive( UniformVolumeManager volumeTree ) throws IOException, SQLException {
         LogicVolume volume = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0006-48"));
         TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
         titanReceiveStorageObject.setName( "image" );
@@ -130,7 +128,7 @@ class Alice extends Radium {
         MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "s1", channel);
     }
 
-    private void testSpannedChannelExport( UniformVolumeTree volumeTree ) throws IOException, SQLException {
+    private void testSpannedChannelExport( UniformVolumeManager volumeTree ) throws IOException, SQLException {
         File file = new File("E:/1.jpg");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         LogicVolume volume = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0006-48"));
@@ -141,7 +139,7 @@ class Alice extends Radium {
         volume.channelExport( titanExportStorageObject, channel );
     }
 
-    private void testRaid0Insert( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ){
+    private void testRaid0Insert( KOMFileSystem fileSystem, UniformVolumeManager volumeTree ){
         VolumeAllotment volumeAllotment = volumeTree.getVolumeAllotment();
         VolumeCapacity64 volumeCapacity1 = volumeAllotment.newVolumeCapacity();
         volumeCapacity1.setDefinitionCapacity( 100*1024*1024 );
@@ -193,7 +191,7 @@ class Alice extends Radium {
         volumeTree.put( spannedVolume );
     }
 
-    private void TestRaid0Receive( KOMFileSystem fileSystem, UniformVolumeTree volumeTree ) throws IOException {
+    private void TestRaid0Receive( KOMFileSystem fileSystem, UniformVolumeManager volumeTree ) throws IOException {
         LogicVolume volume1 = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0004-48"));
         volume1.extendLogicalVolume( GUIDs.GUID72("056b342-0001d1-0000-48") );
         LogicVolume volume2 = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0005-48"));

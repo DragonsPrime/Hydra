@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.volume.operator;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
@@ -21,12 +21,12 @@ public class SpannedVolumeOperator extends ArchVolumeOperator  implements Volume
     protected SpannedVolumeManipulator     SpannedVolumeManipulator;
 
     public SpannedVolumeOperator( VolumeOperatorFactory  factory ){
-        this( factory.getMasterManipulator(), factory.getVolumeTree() );
+        this( factory.getMasterManipulator(), factory.getVolumeManager() );
         this.factory = factory;
     }
 
-    public SpannedVolumeOperator(VolumeMasterManipulator masterManipulator, VolumeTree volumeTree) {
-        super(masterManipulator, volumeTree);
+    public SpannedVolumeOperator(VolumeMasterManipulator masterManipulator, VolumeManager volumeManager) {
+        super(masterManipulator, volumeManager);
         this.SpannedVolumeManipulator = masterManipulator.getSpannedVolumeManipulator();
     }
 
@@ -62,7 +62,7 @@ public class SpannedVolumeOperator extends ArchVolumeOperator  implements Volume
         SpannedVolume spannedVolume = this.SpannedVolumeManipulator.getSpannedVolume(guid);
         VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
         spannedVolume.setVolumeCapacity( volumeCapacity );
-        spannedVolume.setVolumeTree( this.volumeTree );
+        spannedVolume.setVolumeTree( this.volumeManager);
         return spannedVolume;
     }
 

@@ -54,8 +54,8 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
 
 
 
-    public UniformServicesInstrument( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
-        super( hydrarum,masterManipulator, ServicesInstrument.KernelServiceConfig);
+    public UniformServicesInstrument( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, ServicesInstrument parent, String name ){
+        super( hydrarum,masterManipulator, ServicesInstrument.KernelServiceConfig, parent, name );
         Debug.trace(masterManipulator);
         this.hydrarum = hydrarum;
         this.serviceMasterManipulator    = (ServiceMasterManipulator) masterManipulator;
@@ -80,9 +80,29 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
         this.mReparseKOM                 =  new GenericReparseKOMTreeAddition( this );
     }
 
-//    public CentralServicesTree( Hydrarum hydrarum ) {
+    public UniformServicesInstrument( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
+        this( hydrarum, masterManipulator, null, ServicesInstrument.class.getSimpleName() );
+    }
+
+//    public UniformServicesInstrument( Hydrarum hydrarum ) {
 //        this.hydrarum = hydrarum;
 //    }
+
+    public UniformServicesInstrument( KOIMappingDriver driver ) {
+        this(
+                driver.getSystem(),
+                driver.getMasterManipulator()
+        );
+    }
+
+    public UniformServicesInstrument( KOIMappingDriver driver, ServicesInstrument parent, String name ) {
+        this(
+                driver.getSystem(),
+                driver.getMasterManipulator(),
+                parent,
+                name
+        );
+    }
 
     protected ServiceTreeNode affirmTreeNodeByPath( String path, Class<? > cnSup, Class<? > nsSup ) {
         String[] parts = this.pathResolver.segmentPathParts( path );
@@ -179,13 +199,6 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
             }
         }
         return false;
-    }
-
-    public UniformServicesInstrument( KOIMappingDriver driver ) {
-        this(
-                driver.getSystem(),
-                driver.getMasterManipulator()
-        );
     }
 
 

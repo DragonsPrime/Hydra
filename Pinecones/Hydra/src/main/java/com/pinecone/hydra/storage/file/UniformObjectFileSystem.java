@@ -70,9 +70,9 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     protected SymbolicMetaManipulator           symbolicMetaManipulator;
 
 
-    public UniformObjectFileSystem( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
+    public UniformObjectFileSystem( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, KOMFileSystem parent, String name ){
         // Phase [1] Construct system.
-        super( hydrarum, masterManipulator, KernelFileSystemConfig);
+        super( hydrarum, masterManipulator, KernelFileSystemConfig, parent, name );
 
         // Phase [2] Construct fundamentals.
         this.fileMasterManipulator         = (FileMasterManipulator) masterManipulator;
@@ -107,6 +107,19 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
 //    public GenericKOMFileSystem( Hydrarum hydrarum ) {
 //        this.hydrarum = hydrarum;
 //    }
+
+    public UniformObjectFileSystem( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
+        this( hydrarum, masterManipulator, null, KOMFileSystem.class.getSimpleName() );
+    }
+
+    public UniformObjectFileSystem( KOIMappingDriver driver, KOMFileSystem parent, String name ) {
+        this(
+                driver.getSystem(),
+                driver.getMasterManipulator(),
+                parent,
+                name
+        );
+    }
 
     public UniformObjectFileSystem( KOIMappingDriver driver ) {
         this(

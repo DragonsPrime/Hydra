@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity;
 
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
@@ -12,40 +12,40 @@ import com.pinecone.hydra.storage.volume.entity.local.striped.TitanLocalStripedV
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
 
 public class TitanVolumeAllotment implements VolumeAllotment{
-    private VolumeTree              volumeTree;
+    private VolumeManager volumeManager;
     private VolumeMasterManipulator masterManipulator;
 
-    public TitanVolumeAllotment( VolumeTree volumeTree, VolumeMasterManipulator volumeMasterManipulator ){
-        this.volumeTree = volumeTree;
+    public TitanVolumeAllotment(VolumeManager volumeManager, VolumeMasterManipulator volumeMasterManipulator ){
+        this.volumeManager = volumeManager;
         this.masterManipulator= volumeMasterManipulator;
     }
     @Override
     public VolumeCapacity64 newVolumeCapacity() {
-        return new TitanVolumeCapacity64( this.volumeTree,this.masterManipulator.getVolumeCapacityManipulator() );
+        return new TitanVolumeCapacity64( this.volumeManager,this.masterManipulator.getVolumeCapacityManipulator() );
     }
 
     @Override
     public LocalStripedVolume newLocalStripedVolume() {
-        return new TitanLocalStripedVolume( this.volumeTree, this.masterManipulator.getStripedVolumeManipulator() );
+        return new TitanLocalStripedVolume( this.volumeManager, this.masterManipulator.getStripedVolumeManipulator() );
     }
 
     @Override
     public LocalSpannedVolume newLocalSpannedVolume() {
-        return new TitanLocalSpannedVolume( this.volumeTree, this.masterManipulator.getSpannedVolumeManipulator() );
+        return new TitanLocalSpannedVolume( this.volumeManager, this.masterManipulator.getSpannedVolumeManipulator() );
     }
 
     @Override
     public LocalSimpleVolume newLocalSimpleVolume() {
-        return new TitanLocalSimpleVolume( this.volumeTree, this.masterManipulator.getSimpleVolumeManipulator() );
+        return new TitanLocalSimpleVolume( this.volumeManager, this.masterManipulator.getSimpleVolumeManipulator() );
     }
 
     @Override
     public LocalPhysicalVolume newLocalPhysicalVolume() {
-        return new TitanLocalPhysicalVolume( this.volumeTree, this.masterManipulator.getPhysicalVolumeManipulator() );
+        return new TitanLocalPhysicalVolume( this.volumeManager, this.masterManipulator.getPhysicalVolumeManipulator() );
     }
 
     @Override
     public MountPoint newMountPoint() {
-        return new TitanMountPoint( this.volumeTree, this.masterManipulator.getMountPointManipulator() );
+        return new TitanMountPoint( this.volumeManager, this.masterManipulator.getMountPointManipulator() );
     }
 }

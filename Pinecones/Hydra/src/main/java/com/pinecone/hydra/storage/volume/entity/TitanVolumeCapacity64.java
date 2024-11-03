@@ -1,8 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity;
 
-import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.source.VolumeCapacityManipulator;
 
 public class TitanVolumeCapacity64 implements VolumeCapacity64 {
@@ -10,11 +9,11 @@ public class TitanVolumeCapacity64 implements VolumeCapacity64 {
     private long                        definitionCapacity;
     private long                        usedSize;
     private long                        quotaCapacity;
-    private VolumeTree                  volumeTree;
+    private VolumeManager volumeManager;
     private VolumeCapacityManipulator   volumeCapacityManipulator;
 
-    public TitanVolumeCapacity64(VolumeTree volumeTree, VolumeCapacityManipulator volumeCapacityManipulator ){
-        this.volumeTree = volumeTree;
+    public TitanVolumeCapacity64(VolumeManager volumeManager, VolumeCapacityManipulator volumeCapacityManipulator ){
+        this.volumeManager = volumeManager;
         this.volumeCapacityManipulator = volumeCapacityManipulator;
     }
 

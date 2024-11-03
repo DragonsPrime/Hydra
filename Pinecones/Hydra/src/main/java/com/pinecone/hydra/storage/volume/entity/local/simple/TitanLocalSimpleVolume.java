@@ -6,9 +6,7 @@ import com.pinecone.framework.util.rdb.ResultSession;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.MiddleStorageObject;
-import com.pinecone.hydra.storage.file.KOMFileSystem;
-import com.pinecone.hydra.storage.file.entity.FileNode;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
@@ -20,7 +18,6 @@ import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpl
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,13 +27,13 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     private SimpleVolumeManipulator simpleVolumeManipulator;
 
 
-    public TitanLocalSimpleVolume(VolumeTree volumeTree, SimpleVolumeManipulator simpleVolumeManipulator) {
-        super(volumeTree);
+    public TitanLocalSimpleVolume(VolumeManager volumeManager, SimpleVolumeManipulator simpleVolumeManipulator) {
+        super(volumeManager);
         this.simpleVolumeManipulator = simpleVolumeManipulator;
     }
 
-    public TitanLocalSimpleVolume( VolumeTree volumeTree ){
-        super( volumeTree );
+    public TitanLocalSimpleVolume( VolumeManager volumeManager){
+        super(volumeManager);
     }
 
     public TitanLocalSimpleVolume(){
@@ -65,7 +62,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
 
     @Override
     public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject,String destDirPath, FileChannel channel) throws IOException, SQLException {
-        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeTree, receiveStorageObject, destDirPath, channel, this );
+        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeManager, receiveStorageObject, destDirPath, channel, this );
         MiddleStorageObject middleStorageObject = titanSimpleChannelReceiverEntity64.receive();
         middleStorageObject.setBottomGuid( this.guid );
         this.saveMate( middleStorageObject );
@@ -74,7 +71,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
 
     @Override
     public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel, Number offset, Number endSize) throws IOException, SQLException {
-        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeTree, receiveStorageObject, destDirPath, channel, this );
+        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeManager, receiveStorageObject, destDirPath, channel, this );
         MiddleStorageObject middleStorageObject = titanSimpleChannelReceiverEntity64.receive(offset,endSize);
         middleStorageObject.setBottomGuid( this.guid );
         this.saveMate( middleStorageObject );
@@ -83,13 +80,13 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
 
     @Override
     public MiddleStorageObject channelExport(ExportStorageObject exportStorageObject, FileChannel channel) throws IOException {
-        TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeTree, exportStorageObject, channel );
+        TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeManager, exportStorageObject, channel );
         return titanSimpleChannelExportEntity64.export();
     }
 
     @Override
-    public void setVolumeTree(VolumeTree volumeTree) {
-        this.volumeTree = volumeTree;
+    public void setVolumeTree(VolumeManager volumeManager) {
+        this.volumeManager = volumeManager;
     }
 
     @Override
@@ -104,8 +101,8 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
 
     @Override
     public boolean existStorageObject(GUID storageObject) throws SQLException {
-        GUID physicsGuid = this.volumeTree.getSqlitePhysicsVolume(this.guid);
-        PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicsGuid);
+        GUID physicsGuid = this.volumeManager.getSQLitePhysicsVolume(this.guid);
+        PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
         String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
         ResultSession query = sqLiteExecutor.query(" SELECT COUNT(*) FROM `table` WHERE `storage_object_guid` = '" + storageObject + "' ");
@@ -118,17 +115,17 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     }
 
     private void saveMate(MiddleStorageObject middleStorageObject ) throws SQLException {
-        GUID physicsGuid = this.volumeTree.getSqlitePhysicsVolume(this.guid);
+        GUID physicsGuid = this.volumeManager.getSQLitePhysicsVolume(this.guid);
         if( physicsGuid == null ){
-            PhysicalVolume smallestCapacityPhysicalVolume = this.volumeTree.getSmallestCapacityPhysicalVolume();
-            this.volumeTree.insertSqliteMeta( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+            PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
+            this.volumeManager.insertSQLiteMeta( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
             String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
             SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
             sqLiteExecutor.execute( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36) );" );
             sqLiteExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` ) VALUES ( '"+ middleStorageObject.getObjectGuid()+ "' )" );
         }
         else {
-            PhysicalVolume physicalVolume = this.volumeTree.getPhysicalVolume(physicsGuid);
+            PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
             String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
             SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
             sqLiteExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` ) VALUES ( '"+ middleStorageObject.getObjectGuid()+ "' )" );

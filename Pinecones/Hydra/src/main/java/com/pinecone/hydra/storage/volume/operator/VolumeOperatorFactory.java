@@ -1,7 +1,6 @@
 package com.pinecone.hydra.storage.volume.operator;
 
-import com.pinecone.hydra.storage.volume.VolumeTree;
-import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
@@ -24,7 +23,7 @@ public interface VolumeOperatorFactory extends OperatorFactory {
 
     VolumeOperator getOperator(String typeName );
 
-    VolumeTree getVolumeTree();
+    VolumeManager getVolumeManager();
 
     VolumeMasterManipulator getMasterManipulator();
 }

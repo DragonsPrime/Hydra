@@ -2,13 +2,10 @@ package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.MiddleStorageObject;
-import com.pinecone.hydra.storage.file.KOMFileSystem;
-import com.pinecone.hydra.storage.file.entity.FileNode;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
@@ -41,7 +38,7 @@ public interface LogicVolume extends Volume, TreeNode {
     default StripedVolume  evinceStripeVolume(){
         return null;
     }
-    void setVolumeTree( VolumeTree volumeTree );
+    void setVolumeTree( VolumeManager volumeManager);
 
 
     MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel ) throws IOException, SQLException;

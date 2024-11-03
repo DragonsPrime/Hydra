@@ -11,5 +11,5 @@ public interface VolumeMasterManipulator extends KOIMasterManipulator {
     VolumeCapacityManipulator   getVolumeCapacityManipulator();
     PhysicalVolumeManipulator   getPhysicalVolumeManipulator();
     VolumeAllocateManipulator   getVolumeAllocateManipulator();
-    SqliteVolumeManipulator     getSqliteVolumeManipulator();
+    SQLiteVolumeManipulator     getSQLiteVolumeManipulator();
 }

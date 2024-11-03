@@ -2,7 +2,7 @@ package com.pinecone.hydra.storage.volume.operator;
 
 import com.pinecone.hydra.storage.file.entity.GenericFileNode;
 import com.pinecone.hydra.storage.file.entity.GenericFolder;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
 import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
 
@@ -12,13 +12,13 @@ import java.util.TreeMap;
 
 public class TitanVolumeOperatorFactory implements VolumeOperatorFactory{
     protected  VolumeMasterManipulator          volumeMasterManipulator;
-    protected  VolumeTree                       volumeTree;
+    protected VolumeManager volumeManager;
     protected Map<String, TreeNodeOperator>     registerer = new HashMap<>();
     protected Map<String, String >              metaTypeMap = new TreeMap<>();
 
     protected void registerDefaultMetaType( Class<?> genericType ) {
         this.metaTypeMap.put( genericType.getName(), genericType.getSimpleName().replace(
-                this.volumeTree.getConfig().getVersionSignature(), ""
+                this.volumeManager.getConfig().getVersionSignature(), ""
         ));
     }
 
@@ -27,8 +27,8 @@ public class TitanVolumeOperatorFactory implements VolumeOperatorFactory{
         this.registerDefaultMetaType( GenericFileNode.class );
     }
 
-    public TitanVolumeOperatorFactory( VolumeTree volumeTree, VolumeMasterManipulator volumeMasterManipulator ){
-        this.volumeTree = volumeTree;
+    public TitanVolumeOperatorFactory(VolumeManager volumeManager, VolumeMasterManipulator volumeMasterManipulator ){
+        this.volumeManager = volumeManager;
         this.volumeMasterManipulator = volumeMasterManipulator;
 
         this.registerer.put(
@@ -77,8 +77,8 @@ public class TitanVolumeOperatorFactory implements VolumeOperatorFactory{
     }
 
     @Override
-    public VolumeTree getVolumeTree() {
-        return this.volumeTree;
+    public VolumeManager getVolumeManager() {
+        return this.volumeManager;
     }
 
     @Override

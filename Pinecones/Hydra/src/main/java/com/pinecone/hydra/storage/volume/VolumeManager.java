@@ -5,11 +5,11 @@ import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.system.ko.kom.KOMInstrument;
 
-public interface VolumeTree extends KOMInstrument {
+public interface VolumeManager extends KOMInstrument {
     VolumeConfig KernelVolumeConfig = new KernelVolumeConfig();
 
     @Override
-    LogicVolume get(GUID guid);
+    LogicVolume get( GUID guid );
 
     @Override
     VolumeConfig getConfig();
@@ -24,6 +24,7 @@ public interface VolumeTree extends KOMInstrument {
 
     PhysicalVolume getSmallestCapacityPhysicalVolume();
 
-    GUID getSqlitePhysicsVolume( GUID volumeGuid );
-    void insertSqliteMeta( GUID physicsGuid, GUID volumeGuid );
+    GUID getSQLitePhysicsVolume( GUID volumeGuid );
+
+    void insertSQLiteMeta( GUID physicsGuid, GUID volumeGuid );
 }

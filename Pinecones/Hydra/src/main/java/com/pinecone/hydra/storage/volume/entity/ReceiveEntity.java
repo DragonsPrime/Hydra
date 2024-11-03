@@ -1,12 +1,11 @@
 package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.system.prototype.Pinenut;
-import com.pinecone.hydra.storage.volume.VolumeFile;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 
 public interface ReceiveEntity extends Pinenut {
-    VolumeTree getVolumeTree();
-    void setVolumeTree( VolumeTree volumeTree );
+    VolumeManager getVolumeManager();
+    void setVolumeManager(VolumeManager volumeManager);
 
     ReceiveStorageObject getReceiveStorageObject();
     void setReceiveStorageObject( ReceiveStorageObject receiveStorageObject );

@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.simple.export;
 
 import com.pinecone.hydra.storage.MiddleStorageObject;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchExportEntity;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 
@@ -11,8 +11,8 @@ import java.nio.channels.FileChannel;
 public class TitanSimpleChannelExportEntity64 extends ArchExportEntity implements SimpleChannelExportEntity64{
     private FileChannel                 channel;
     private SimpleChannelExport64       simpleChannelExport64;
-    public TitanSimpleChannelExportEntity64(VolumeTree volumeTree, ExportStorageObject exportStorageObject, FileChannel channel) {
-        super(volumeTree, exportStorageObject);
+    public TitanSimpleChannelExportEntity64(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel) {
+        super(volumeManager, exportStorageObject);
         this.channel = channel;
         this.simpleChannelExport64 = new TitanSimpleChannelExport64( this );
     }

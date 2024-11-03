@@ -12,9 +12,10 @@ public abstract class ArchReparseKOMTree extends ArchKOMTree implements ReparseK
     protected ReparseKOMTreeAddition mReparseKOM;
 
     public ArchReparseKOMTree(
-            Hydrarum hydrarum, KOIMasterManipulator masterManipulator , OperatorFactory operatorFactory, KernelObjectConfig kernelObjectConfig, PathSelector pathSelector
+            Hydrarum hydrarum, KOIMasterManipulator masterManipulator , OperatorFactory operatorFactory, KernelObjectConfig kernelObjectConfig, PathSelector pathSelector,
+            KOMInstrument parent, String name
     ){
-        this( hydrarum, masterManipulator, kernelObjectConfig );
+        this( hydrarum, masterManipulator, kernelObjectConfig, parent, name );
         this.pathResolver                  =  new KOPathResolver( kernelObjectConfig );
         this.pathSelector                  =  pathSelector;
         this.operatorFactory               =  operatorFactory;
@@ -22,9 +23,9 @@ public abstract class ArchReparseKOMTree extends ArchKOMTree implements ReparseK
     }
 
     public ArchReparseKOMTree (
-            Hydrarum hydrarum, KOIMasterManipulator masterManipulator ,KernelObjectConfig kernelObjectConfig
+            Hydrarum hydrarum, KOIMasterManipulator masterManipulator ,KernelObjectConfig kernelObjectConfig, KOMInstrument parent, String name
     ){
-        super( hydrarum, masterManipulator, kernelObjectConfig );
+        super( hydrarum, masterManipulator, kernelObjectConfig, parent, name );
     }
 
     @Override

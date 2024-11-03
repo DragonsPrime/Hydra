@@ -3,14 +3,13 @@ package com.pinecone.hydra.storage.volume.entity.local.spanned;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
 import com.pinecone.hydra.storage.MiddleStorageObject;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
-import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleChannelReceiverEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.spanned.export.TitanSpannedChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.spanned.receive.TitanSpannedChannelReceiveEntity64;
 import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
@@ -23,12 +22,12 @@ import java.util.List;
 public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpannedVolume {
     private SpannedVolumeManipulator spannedVolumeManipulator;
 
-    public TitanLocalSpannedVolume(VolumeTree volumeTree, SpannedVolumeManipulator spannedVolumeManipulator) {
-        super(volumeTree);
+    public TitanLocalSpannedVolume(VolumeManager volumeManager, SpannedVolumeManipulator spannedVolumeManipulator) {
+        super(volumeManager);
         this.spannedVolumeManipulator = spannedVolumeManipulator;
     }
-    public TitanLocalSpannedVolume( VolumeTree volumeTree ){
-        super( volumeTree );
+    public TitanLocalSpannedVolume( VolumeManager volumeManager){
+        super(volumeManager);
     }
 
     public TitanLocalSpannedVolume(){
@@ -54,13 +53,13 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
 
 
     @Override
-    public void setVolumeTree(VolumeTree volumeTree) {
-        this.volumeTree = volumeTree;
+    public void setVolumeTree(VolumeManager volumeManager) {
+        this.volumeManager = volumeManager;
     }
 
     @Override
     public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel) throws IOException, SQLException {
-        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeTree,receiveStorageObject,destDirPath,channel,this );
+        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeManager,receiveStorageObject,destDirPath,channel,this );
         MiddleStorageObject middleStorageObject = titanSpannedChannelReceiveEntity64.receive();
         middleStorageObject.setBottomGuid( this.guid );
         return middleStorageObject;
@@ -68,7 +67,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
 
     @Override
     public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel, Number offset, Number endSize) throws IOException, SQLException {
-        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeTree,receiveStorageObject,destDirPath,channel,this );
+        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeManager,receiveStorageObject,destDirPath,channel,this );
         MiddleStorageObject middleStorageObject = titanSpannedChannelReceiveEntity64.receive( offset, endSize );
         middleStorageObject.setBottomGuid( this.guid );
         return middleStorageObject;
@@ -76,7 +75,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
 
     @Override
     public MiddleStorageObject channelExport(ExportStorageObject exportStorageObject, FileChannel channel) throws IOException, SQLException {
-        TitanSpannedChannelExportEntity64 titanSpannedChannelExportEntity64 = new TitanSpannedChannelExportEntity64( this.volumeTree, exportStorageObject,channel, this );
+        TitanSpannedChannelExportEntity64 titanSpannedChannelExportEntity64 = new TitanSpannedChannelExportEntity64( this.volumeManager, exportStorageObject,channel, this );
         return titanSpannedChannelExportEntity64.export();
     }
 

@@ -3,9 +3,12 @@ package com.pinecone.hydra.system.ko.kom;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.lang.GenericDynamicFactory;
+import com.pinecone.framework.util.name.Namespace;
+import com.pinecone.framework.util.name.UniNamespace;
 import com.pinecone.framework.util.name.path.PathResolver;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.system.Hydrarum;
+import com.pinecone.hydra.system.ko.CascadeInstrument;
 import com.pinecone.hydra.system.ko.KernelObjectConfig;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.unit.udtt.ArchTrieObjectModel;
@@ -23,6 +26,9 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInstrument {
+    protected Namespace             mThisNamespace;
+    protected KOMInstrument         mParentInstrument;
+
     protected Hydrarum              hydrarum;
     protected GuidAllocator         guidAllocator;
     protected OperatorFactory       operatorFactory;
@@ -34,21 +40,48 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
 
     public ArchKOMTree (
             Hydrarum hydrarum, KOIMasterManipulator masterManipulator,
-            OperatorFactory operatorFactory, KernelObjectConfig kernelObjectConfig, PathSelector pathSelector
+            OperatorFactory operatorFactory, KernelObjectConfig kernelObjectConfig, PathSelector pathSelector,
+            KOMInstrument parent, String name
     ){
-        this( hydrarum, masterManipulator, kernelObjectConfig );
+        this( hydrarum, masterManipulator, kernelObjectConfig, parent, name );
 
         this.pathSelector              =  pathSelector;
         this.operatorFactory           =  operatorFactory;
     }
 
     public ArchKOMTree (
-            Hydrarum hydrarum, KOIMasterManipulator masterManipulator, KernelObjectConfig kernelObjectConfig
+            Hydrarum hydrarum, KOIMasterManipulator masterManipulator, KernelObjectConfig kernelObjectConfig,
+            KOMInstrument parent, String name
     ){
         super( masterManipulator, kernelObjectConfig );
-        this.hydrarum                      =  hydrarum;
-        this.dynamicFactory                =  new GenericDynamicFactory( hydrarum.getTaskManager().getClassLoader() );
+        this.hydrarum                      = hydrarum;
+        this.dynamicFactory                = new GenericDynamicFactory( hydrarum.getTaskManager().getClassLoader() );
+        this.mParentInstrument             = parent;
+        this.setName( name );
     }
+
+    //************************************** CascadeInstrument **************************************
+    @Override
+    public KOMInstrument parent() {
+        return this.mParentInstrument;
+    }
+
+    @Override
+    public void setParent( CascadeInstrument parent ) {
+        this.mParentInstrument = (KOMInstrument) parent;
+    }
+
+    @Override
+    public Namespace getName() {
+        return this.mThisNamespace;
+    }
+
+    @Override
+    public void setName( Namespace name ) {
+        this.mThisNamespace = name;
+    }
+
+    //************************************** CascadeInstrument End **************************************
 
     @Override
     public GUID put( TreeNode treeNode ) {

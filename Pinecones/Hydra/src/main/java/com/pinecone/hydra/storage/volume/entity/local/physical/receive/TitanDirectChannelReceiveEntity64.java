@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.physical.receive;
 
 import com.pinecone.hydra.storage.MiddleStorageObject;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 
@@ -11,8 +11,8 @@ import java.nio.channels.FileChannel;
 public class TitanDirectChannelReceiveEntity64 extends ArchReceiveEntity implements DirectChannelReceiveEntity64{
     private FileChannel channel;
 
-    public TitanDirectChannelReceiveEntity64(VolumeTree volumeTree, ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel) {
-        super(volumeTree, receiveStorageObject, destDirPath);
+    public TitanDirectChannelReceiveEntity64(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel) {
+        super(volumeManager, receiveStorageObject, destDirPath);
         this.channel = channel;
     }
 

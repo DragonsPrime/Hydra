@@ -2,7 +2,7 @@ package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.source.MountPointManipulator;
 
 import java.time.LocalDateTime;
@@ -15,13 +15,13 @@ public class TitanMountPoint implements MountPoint{
     protected String                  name;
     protected GUID                    volumeGuid;
     protected String                  mountPoint;
-    protected VolumeTree              volumeTree;
+    protected VolumeManager volumeManager;
     protected MountPointManipulator   mountPointManipulator;
 
-    public TitanMountPoint( VolumeTree volumeTree, MountPointManipulator mountPointManipulator ){
-        this.volumeTree                 =   volumeTree;
+    public TitanMountPoint(VolumeManager volumeManager, MountPointManipulator mountPointManipulator ){
+        this.volumeManager = volumeManager;
         this.mountPointManipulator      =   mountPointManipulator;
-        this.guid                       =   volumeTree.getGuidAllocator().nextGUID72();
+        this.guid                       =   volumeManager.getGuidAllocator().nextGUID72();
         this.createTime                 =   LocalDateTime.now();
         this.updateTime                 =   LocalDateTime.now();
     }

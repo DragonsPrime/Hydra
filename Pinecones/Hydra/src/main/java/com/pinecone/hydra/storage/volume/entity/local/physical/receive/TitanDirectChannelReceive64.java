@@ -7,7 +7,7 @@ import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.StorageNaming;
 import com.pinecone.hydra.storage.TitanMiddleStorageObject;
 import com.pinecone.hydra.storage.TitanStorageNaming;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
@@ -37,8 +37,8 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
     private MiddleStorageObject receiveWithOffsetAndSize(DirectChannelReceiveEntity entity, long offset, int size) throws IOException {
         ReceiveStorageObject receiveStorageObject = entity.getReceiveStorageObject();
         String destDirPath = entity.getDestDirPath();
-        VolumeTree volumeTree = entity.getVolumeTree();
-        GuidAllocator guidAllocator = volumeTree.getGuidAllocator();
+        VolumeManager volumeManager = entity.getVolumeManager();
+        GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
         FileChannel channel = entity.getChannel();
 
         int parityCheck = 0;

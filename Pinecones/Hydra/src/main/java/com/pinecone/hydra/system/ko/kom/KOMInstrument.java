@@ -1,13 +1,21 @@
 package com.pinecone.hydra.system.ko.kom;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.system.ko.KernelObjectInstrument;
+import com.pinecone.hydra.system.ko.CascadeInstrument;
 import com.pinecone.hydra.unit.udtt.entity.EntityNode;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
 import java.util.List;
 
-public interface KOMInstrument extends KernelObjectInstrument {
+public interface KOMInstrument extends CascadeInstrument {
+    @Override
+    KOMInstrument parent();
+
+    @Override
+    default void setName( String name ) {
+        CascadeInstrument.super.setName( name );
+    }
+
     String getPath( GUID guid );
 
     String getFullName( GUID guid );

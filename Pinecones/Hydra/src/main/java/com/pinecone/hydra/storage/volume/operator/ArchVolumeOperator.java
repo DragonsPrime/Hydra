@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.volume.operator;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.source.VolumeCapacityManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
@@ -14,15 +14,15 @@ import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 import java.time.LocalDateTime;
 
 public abstract class ArchVolumeOperator implements VolumeOperator{
-    protected VolumeTree                    volumeTree;
+    protected VolumeManager volumeManager;
     protected VolumeOperatorFactory         factory;
     protected DistributedTrieTree           distributedTrieTree;
     protected VolumeMasterManipulator       volumeMasterManipulator;
     protected VolumeCapacityManipulator     volumeCapacityManipulator;
 
-    public ArchVolumeOperator( VolumeMasterManipulator masterManipulator, VolumeTree volumeTree ){
-        this.distributedTrieTree       =  volumeTree.getMasterTrieTree();
-        this.volumeTree                =  volumeTree;
+    public ArchVolumeOperator( VolumeMasterManipulator masterManipulator, VolumeManager volumeManager){
+        this.distributedTrieTree       =  volumeManager.getMasterTrieTree();
+        this.volumeManager = volumeManager;
         this.volumeMasterManipulator   =  masterManipulator;
         this.volumeCapacityManipulator =  masterManipulator.getVolumeCapacityManipulator();
     }

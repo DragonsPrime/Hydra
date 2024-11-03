@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity;
 
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
 import java.util.ArrayList;
@@ -11,8 +11,8 @@ public abstract class ArchLogicVolume extends ArchVolume implements LogicVolume{
     protected List<LogicVolume>            children;
     protected VolumeCapacity64             volumeCapacity;
 
-    public ArchLogicVolume(VolumeTree volumeTree) {
-        super(volumeTree);
+    public ArchLogicVolume(VolumeManager volumeManager) {
+        super(volumeManager);
     }
 
     public ArchLogicVolume(){}
@@ -23,9 +23,9 @@ public abstract class ArchLogicVolume extends ArchVolume implements LogicVolume{
     public List<LogicVolume> getChildren() {
         if ( this.children == null || this.children.isEmpty() ){
             ArrayList<LogicVolume> logicVolumes = new ArrayList<>();
-            List<TreeNode> nodes = this.volumeTree.getChildren( this.guid );
+            List<TreeNode> nodes = this.volumeManager.getChildren( this.guid );
             for( TreeNode node : nodes ){
-                LogicVolume volume = this.volumeTree.get(node.getGuid());
+                LogicVolume volume = this.volumeManager.get(node.getGuid());
                 logicVolumes.add( volume );
             }
             this.children = logicVolumes;

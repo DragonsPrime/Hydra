@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.volume.VolumeTree;
+import com.pinecone.hydra.storage.volume.VolumeManager;
 
 import java.time.LocalDateTime;
 
@@ -13,12 +13,12 @@ public abstract class ArchVolume implements Volume{
     protected String                  name;
     protected String                  type;
     protected String                  extConfig;
-    protected VolumeTree              volumeTree;
+    protected VolumeManager volumeManager;
     protected VolumeCapacity64        volumeCapacity;
 
-    public ArchVolume( VolumeTree volumeTree ){
-        this.volumeTree = volumeTree;
-        this.guid = volumeTree.getGuidAllocator().nextGUID72();
+    public ArchVolume( VolumeManager volumeManager){
+        this.volumeManager = volumeManager;
+        this.guid = volumeManager.getGuidAllocator().nextGUID72();
         this.createTime = LocalDateTime.now();
         this.updateTime = LocalDateTime.now();
     }

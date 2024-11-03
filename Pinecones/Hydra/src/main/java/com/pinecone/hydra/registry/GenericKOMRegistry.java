@@ -66,9 +66,9 @@ public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistr
     protected TypeConverter                   textValueTypeConverter;
 
 
-    public GenericKOMRegistry( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
+    public GenericKOMRegistry( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, KOMRegistry parent, String name ){
         // Phase [1] Construct system.
-        super( hydrarum, masterManipulator, Registry.KernelRegistryConfig );
+        super( hydrarum, masterManipulator, Registry.KernelRegistryConfig, parent, name );
 
         // Phase [2] Construct fundamentals.
         this.registryMasterManipulator     =  (RegistryMasterManipulator) masterManipulator;
@@ -94,6 +94,10 @@ public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistr
         this.textValueTypeConverter        =  new DefaultTextValueConverter();
     }
 
+    public GenericKOMRegistry( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
+        this( hydrarum, masterManipulator, null, KOMRegistry.class.getSimpleName() );
+    }
+
     public GenericKOMRegistry( Hydrarum hydrarum ) {
         this( hydrarum, null );
     }
@@ -102,6 +106,15 @@ public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistr
         this(
                 driver.getSystem(),
                 driver.getMasterManipulator()
+        );
+    }
+
+    public GenericKOMRegistry( KOIMappingDriver driver, KOMRegistry parent, String name ) {
+        this(
+                driver.getSystem(),
+                driver.getMasterManipulator(),
+                parent,
+                name
         );
     }
 
