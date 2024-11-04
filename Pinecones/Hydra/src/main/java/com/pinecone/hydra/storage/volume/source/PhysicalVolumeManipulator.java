@@ -9,5 +9,6 @@ public interface PhysicalVolumeManipulator extends Pinenut {
     void insert( PhysicalVolume physicalVolume );
     void remove( GUID guid );
     PhysicalVolume getPhysicalVolume(GUID guid);
+    PhysicalVolume getPhysicalVolumeByName( String name );
     PhysicalVolume getSmallestCapacityPhysicalVolume();
 }

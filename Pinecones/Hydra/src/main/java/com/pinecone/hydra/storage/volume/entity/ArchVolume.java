@@ -2,6 +2,8 @@ package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.volume.VolumeManager;
+import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
+import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
 import java.time.LocalDateTime;
 
@@ -13,14 +15,16 @@ public abstract class ArchVolume implements Volume{
     protected String                  name;
     protected String                  type;
     protected String                  extConfig;
-    protected VolumeManager volumeManager;
+    protected VolumeManager           volumeManager;
     protected VolumeCapacity64        volumeCapacity;
+    protected OnVolumeFileSystem      kenVolumeFileSystem;
 
     public ArchVolume( VolumeManager volumeManager){
         this.volumeManager = volumeManager;
         this.guid = volumeManager.getGuidAllocator().nextGUID72();
         this.createTime = LocalDateTime.now();
         this.updateTime = LocalDateTime.now();
+        this. kenVolumeFileSystem = new KenVolumeFileSystem( this.volumeManager );
     }
 
     public ArchVolume(){}

@@ -33,4 +33,5 @@ public class TitanDirectChannelExportEntity64 extends ArchExportEntity implement
     public MiddleStorageObject export() throws IOException {
         return this.channelExporter.export( this );
     }
+
 }

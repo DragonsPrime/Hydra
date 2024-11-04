@@ -2,7 +2,6 @@ package com.pinecone.hydra.storage.volume.entity.local.simple;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
-import com.pinecone.framework.util.rdb.ResultSession;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.MiddleStorageObject;
@@ -12,14 +11,15 @@ import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
+import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.export.TitanSimpleChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleChannelReceiverEntity64;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -65,7 +65,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeManager, receiveStorageObject, destDirPath, channel, this );
         MiddleStorageObject middleStorageObject = titanSimpleChannelReceiverEntity64.receive();
         middleStorageObject.setBottomGuid( this.guid );
-        this.saveMate( middleStorageObject );
+        this.saveMate( middleStorageObject , receiveStorageObject.getName());
         return middleStorageObject;
     }
 
@@ -74,7 +74,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeManager, receiveStorageObject, destDirPath, channel, this );
         MiddleStorageObject middleStorageObject = titanSimpleChannelReceiverEntity64.receive(offset,endSize);
         middleStorageObject.setBottomGuid( this.guid );
-        this.saveMate( middleStorageObject );
+        this.saveMate( middleStorageObject , receiveStorageObject.getName());
         return middleStorageObject;
     }
 
@@ -101,34 +101,38 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
 
     @Override
     public boolean existStorageObject(GUID storageObject) throws SQLException {
-        GUID physicsGuid = this.volumeManager.getSQLitePhysicsVolume(this.guid);
+        GUID physicsGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.guid);
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
         String url = physicalVolume.getMountPoint().getMountPoint()+ "/" +this.guid+".db";
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-        ResultSession query = sqLiteExecutor.query(" SELECT COUNT(*) FROM `table` WHERE `storage_object_guid` = '" + storageObject + "' ");
-        ResultSet resultSet = query.getResultSet();
-        if( resultSet.next() ){
-            int count = resultSet.getInt(1);
-            return count != 0;
-        }
-        return true;
+        return this.kenVolumeFileSystem.existStorageObject( sqLiteExecutor, storageObject );
     }
 
-    private void saveMate(MiddleStorageObject middleStorageObject ) throws SQLException {
-        GUID physicsGuid = this.volumeManager.getSQLitePhysicsVolume(this.guid);
+    private void saveMate(MiddleStorageObject middleStorageObject , String storageObjectName) throws SQLException {
+        GUID physicsGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.guid);
         if( physicsGuid == null ){
             PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
-            this.volumeManager.insertSQLiteMeta( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+            this.kenVolumeFileSystem.insertKVFSDatabaseMeta( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
             String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + "/" + this.guid + ".db";
             SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-            sqLiteExecutor.execute( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36) );" );
-            sqLiteExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` ) VALUES ( '"+ middleStorageObject.getObjectGuid()+ "' )" );
+            this.kenVolumeFileSystem.createKVFSDatabase( sqLiteExecutor );
+            this.kenVolumeFileSystem.insertKVFSDatabaseMeta( middleStorageObject.getObjectGuid(), storageObjectName, sqLiteExecutor );
+            File file = new File(url);
+            VolumeCapacity64 physicalVolumeCapacity = smallestCapacityPhysicalVolume.getVolumeCapacity();
+            physicalVolumeCapacity.setUsedSize( physicalVolumeCapacity.getUsedSize() - file.getTotalSpace() );
+            this.volumeCapacity.setUsedSize( this.volumeCapacity.getUsedSize() - file.getTotalSpace() );
         }
         else {
             PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
             String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
+            File file = new File(url);
+            long totalSpace = file.getTotalSpace();
             SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-            sqLiteExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` ) VALUES ( '"+ middleStorageObject.getObjectGuid()+ "' )" );
+            this.kenVolumeFileSystem.insertKVFSDatabaseMeta( middleStorageObject.getObjectGuid(), storageObjectName, sqLiteExecutor );
+            long newTotalSpace = file.getTotalSpace();
+            VolumeCapacity64 physicalVolumeVolumeCapacity = physicalVolume.getVolumeCapacity();
+            physicalVolumeVolumeCapacity.setUsedSize( physicalVolumeVolumeCapacity.getUsedSize() - ( totalSpace - newTotalSpace ) );
+            this.volumeCapacity.setUsedSize( this.volumeCapacity.getUsedSize() - ( totalSpace - newTotalSpace ) );
         }
     }
 }

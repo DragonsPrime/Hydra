@@ -23,6 +23,13 @@ public interface PhysicalVolumeMapper extends PhysicalVolumeManipulator {
     @Select("SELECT `id` AS enumId, `guid`, `create_time` AS createTime, `update_time` AS updateTime, `name`,  `type`, `ext_config` AS extConfig FROM `hydra_uofs_volumes` WHERE `guid` = #{guid}")
     TitanLocalPhysicalVolume getPhysicalVolume0(GUID guid);
 
+    default TitanLocalPhysicalVolume getPhysicalVolumeByName( String name ){
+        TitanLocalPhysicalVolume physicalVolumeByName0 = this.getPhysicalVolumeByName0(name);
+        physicalVolumeByName0.setPhysicalVolumeManipulator( this );
+        return physicalVolumeByName0;
+    }
+    @Select("SELECT `id` AS enumId, `guid`, `create_time` AS createTime, `update_time` AS updateTime, `name`,  `type`, `ext_config` AS extConfig FROM `hydra_uofs_volumes` WHERE `name` = #{name}")
+    TitanLocalPhysicalVolume getPhysicalVolumeByName0( String name );
     default TitanLocalPhysicalVolume getSmallestCapacityPhysicalVolume(){
         TitanLocalPhysicalVolume physicalVolume0 = this.getSmallestCapacityPhysicalVolume0();
         physicalVolume0.setPhysicalVolumeManipulator( this );
