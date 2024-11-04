@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+//package rpc;
+
+option java_multiple_files = true;
+option java_package = "com.protobuf";
+
+message RpcRequest {
+  string method = 1;
+  bytes payload = 2;
+}
+
+message RpcResponse {
+  int32 code = 1;
+  string message = 2;
+  bytes payload = 3;
+}

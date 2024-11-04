@@ -18,11 +18,19 @@ public class UlfBytesPostMessage extends ArchBytesPostMessage {
         this( head, szStringBody.getBytes() );
     }
 
+    public UlfBytesPostMessage( Map<String,Object > joExHead, byte[] sBytesBody, long controlBits ) {
+        super( joExHead, sBytesBody, controlBits );
+    }
+
+    public UlfBytesPostMessage( Map<String,Object > joExHead, String szStringBody, long controlBits ) {
+        this( joExHead, szStringBody.getBytes(), controlBits );
+    }
+
     public UlfBytesPostMessage( Map<String,Object > joExHead, byte[] sBytesBody ) {
-        super( joExHead, sBytesBody );
+        this( joExHead, sBytesBody, 0 );
     }
 
     public UlfBytesPostMessage( Map<String,Object > joExHead, String szStringBody ) {
-        this( joExHead, szStringBody.getBytes() );
+        this( joExHead, szStringBody.getBytes(), 0 );
     }
 }

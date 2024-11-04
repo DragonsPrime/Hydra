@@ -64,39 +64,39 @@ class Jesus extends JesusChrist {
 
 
 
-        JSONObject jo = new JSONMaptron( "{'do': 'Morning' }" );
-        try ( ByteArrayOutputStream byteStream = new ByteArrayOutputStream(); ObjectOutputStream objectStream = new ObjectOutputStream(byteStream) ) {
-            objectStream.writeObject( jo );  // 写对象到输出流
-            byte[] bytes = byteStream.toByteArray();
-            Debug.trace( wolf.sendSyncMsg( new UlfPutMessage( bytes ) ) );
-        }
+//        JSONObject jo = new JSONMaptron( "{'do': 'Morning' }" );
+//        try ( ByteArrayOutputStream byteStream = new ByteArrayOutputStream(); ObjectOutputStream objectStream = new ObjectOutputStream(byteStream) ) {
+//            objectStream.writeObject( jo );  // 写对象到输出流
+//            byte[] bytes = byteStream.toByteArray();
+//            Debug.trace( wolf.sendSyncMsg( new UlfPutMessage( bytes, 0xAEF2048 ) ) );
+//        }
 
 
 
 
 
 
-//        Debug.trace( wolf.sendSyncMsg( new UlfPutMessage( jsonObject ) ).getHead().getExtraHead() );
-//        Debug.trace( wolf.sendSyncMsg( new UlfPutMessage( jsonObject ) ) );
-//        //wolf.sendAsynMsg( new UlfPutMessage( jsonObject ) );
-//
-//        wolf.sendAsynMsg( new UlfPutMessage(jsonObject), new UlfAsyncMsgHandleAdapter() {
-//            @Override
-//            public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
-//                Debug.trace( "Ajax" ,msg );
-//                Debug.trace( msg.getHead() );
-//            }
-//        });
-//
-//        //wolf.sendAsynMsg( new UlfMCMessage( jsonObject ) );
-//        //wolf.sendAsynMsg( new UlfMCMessage( jsonObject ) );
-//
-//        wolf.sendAsynMsg( new UlfPutMessage(jsonObject), new UlfAsyncMsgHandleAdapter() {
-//            @Override
-//            public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
-//                Debug.trace( "fuck javascript" ,msg );
-//            }
-//        });
+        Debug.trace( wolf.sendSyncMsg( new UlfPutMessage( jsonObject ) ).getHead().getExtraHead() );
+        Debug.trace( wolf.sendSyncMsg( new UlfPutMessage( jsonObject ) ) );
+        //wolf.sendAsynMsg( new UlfPutMessage( jsonObject ) );
+
+        wolf.sendAsynMsg( new UlfPutMessage(jsonObject), new UlfAsyncMsgHandleAdapter() {
+            @Override
+            public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
+                Debug.trace( "Ajax" ,msg );
+                Debug.trace( msg.getHead() );
+            }
+        });
+
+        //wolf.sendAsynMsg( new UlfMCMessage( jsonObject ) );
+        //wolf.sendAsynMsg( new UlfMCMessage( jsonObject ) );
+
+        wolf.sendAsynMsg( new UlfPutMessage(jsonObject), new UlfAsyncMsgHandleAdapter() {
+            @Override
+            public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
+                Debug.trace( "fuck javascript" ,msg );
+            }
+        });
         this.getTaskManager().add( wolf );
 
 

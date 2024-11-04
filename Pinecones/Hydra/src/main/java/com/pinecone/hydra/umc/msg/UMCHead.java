@@ -16,7 +16,8 @@ import java.util.Map;
 public class UMCHead implements Pinenut {
     public static final String     ProtocolVersion   = "1.1";
     public static final String     ProtocolSignature = "UMC/" + UMCHead.ProtocolVersion;
-    public static final int        HeadBlockSize     = UMCHead.ProtocolSignature.length() + 1 + Byte.BYTES + Integer.BYTES + Long.BYTES + Long.BYTES + Short.BYTES + Short.BYTES;
+    public static final int        StructBlockSize   = Byte.BYTES + Integer.BYTES + Long.BYTES + Long.BYTES + Short.BYTES + Byte.BYTES + Long.BYTES;
+    public static final int        HeadBlockSize     = UMCHead.ProtocolSignature.length() + 1 + UMCHead.StructBlockSize;
     public static final ByteOrder  BinByteOrder      = ByteOrder.LITTLE_ENDIAN ;// Using x86, C/C++
 
     protected String                 szSignature                                ;
@@ -25,9 +26,10 @@ public class UMCHead implements Pinenut {
     protected long                   nBodyLength       = 0                      ; // sizeof( int64 ) = 8
     protected long                   nKeepAlive        = -1                     ; // sizeof( int64 ) = 8, [-1 for forever, 0 for off, others for millis]
     protected Status                 status            = Status.OK              ; // sizeof( Status/Short ) = 2
-    protected ExtraEncode            extraEncode       = ExtraEncode.Undefined  ; // sizeof( ExtraEncode/Short ) = 2
+    protected ExtraEncode            extraEncode       = ExtraEncode.Undefined  ; // sizeof( ExtraEncode/byte ) = 1
+    protected long                   controlBits                               ; // sizeof( int64 ) = 8, Custom control bytes.
     protected byte[]                 extraHead         = {}                     ;
-    protected Object                 dyExtraHead       = new LinkedTreeMap<>()  ;
+    protected Object                 dyExtraHead                                ;
 
     protected ExtraHeadCoder         extraHeadCoder                             ;
 
@@ -40,18 +42,31 @@ public class UMCHead implements Pinenut {
         this( szSignature, UMCMethod.PUT );
     }
 
-    public UMCHead( String szSignature, UMCMethod umcMethod ) {
-        this.szSignature       = szSignature;
-        this.method            = umcMethod;
+    public UMCHead( String szSignature, long controlBits ) {
+        this( szSignature, UMCMethod.PUT, controlBits );
     }
 
-    public UMCHead( String szSignature, UMCMethod umcMethod, Object ex ) {
-        this( szSignature, umcMethod );
-        this.dyExtraHead = ex;
+    public UMCHead( String szSignature, UMCMethod umcMethod ) {
+        this( szSignature, umcMethod, 0 );
+    }
+
+    public UMCHead( String szSignature, UMCMethod umcMethod, long controlBits ) {
+        this( szSignature, umcMethod, new LinkedTreeMap<>(), controlBits );
+    }
+
+    public UMCHead( String szSignature, UMCMethod umcMethod, Object ex, long controlBits ) {
+        this.szSignature       = szSignature;
+        this.method            = umcMethod;
+        this.dyExtraHead       = ex;
+        this.controlBits      = controlBits;
+    }
+
+    UMCHead( String szSignature, UMCMethod umcMethod, Map<String,Object > joEx, long controlBits ) {
+        this( szSignature, umcMethod, (Object) joEx, controlBits );
     }
 
     UMCHead( String szSignature, UMCMethod umcMethod, Map<String,Object > joEx ) {
-        this( szSignature, umcMethod, (Object) joEx );
+        this( szSignature, umcMethod, (Object) joEx, 0 );
     }
 
 
@@ -78,6 +93,10 @@ public class UMCHead implements Pinenut {
         this.extraEncode = encode;
     }
 
+    void setControlBits      ( long controlBits       ) {
+        this.controlBits = controlBits;
+    }
+
     void setExtraHead        ( JSONObject jo          ) {
         this.dyExtraHead = jo.getMap();
     }
@@ -93,7 +112,7 @@ public class UMCHead implements Pinenut {
     void transApplyExHead    (                        ) {
         if ( this.dyExtraHead != null ) {
             this.extraHead         = this.extraHeadCoder.getEncoder().encode( this, this.dyExtraHead );
-            this.nExtraHeadLength  = this.extraHead .length;
+            this.nExtraHeadLength  = this.extraHead.length;
         }
         else {
             if( this.extraEncode == ExtraEncode.JSONString ) {
@@ -105,7 +124,7 @@ public class UMCHead implements Pinenut {
             }
         }
 
-        this.nExtraHeadLength  = this.extraHead .length;
+        this.nExtraHeadLength  = this.extraHead.length;
     }
 
     void applyExtraHeadCoder ( ExtraHeadCoder coder   ) {
@@ -155,6 +174,10 @@ public class UMCHead implements Pinenut {
 
     public ExtraEncode     getExtraEncode() {
         return this.extraEncode;
+    }
+
+    public long            getControlBits() {
+        return this.controlBits;
     }
 
     public byte[]          getExtraHeadBytes() {
@@ -236,15 +259,24 @@ public class UMCHead implements Pinenut {
 
     @Override
     public String toJSONString() {
+        Map<String, Object > joExtraHead = this.getMapExtraHead();
+        String szExtraHead;
+        if( joExtraHead == null ) {
+            szExtraHead = "[object Object]";
+        }
+        else {
+            szExtraHead = JSON.stringify( this.getMapExtraHead() );
+        }
         return JSONEncoder.stringifyMapFormat( new KeyValue[]{
-                new KeyValue<>( "Signature"      , this.getSignature()                   ),
-                new KeyValue<>( "Method"         , this.getMethod()                      ),
-                new KeyValue<>( "ExtraHeadLength", this.getExtraHeadLength()             ),
-                new KeyValue<>( "BodyLength"     , this.getBodyLength()                  ),
-                new KeyValue<>( "KeepAlive"      , this.getKeepAlive()                   ),
-                new KeyValue<>( "Status"         , this.getStatus().getName()            ),
-                new KeyValue<>( "ExtraEncode"    , this.getExtraEncode().getName()       ),
-                new KeyValue<>( "ExtraHead"      , JSON.stringify( this.getMapExtraHead() ) ),
+                new KeyValue<>( "Signature"      , this.getSignature()                                     ),
+                new KeyValue<>( "Method"         , this.getMethod()                                        ),
+                new KeyValue<>( "ExtraHeadLength", this.getExtraHeadLength()                               ),
+                new KeyValue<>( "BodyLength"     , this.getBodyLength()                                    ),
+                new KeyValue<>( "KeepAlive"      , this.getKeepAlive()                                     ),
+                new KeyValue<>( "Status"         , this.getStatus().getName()                              ),
+                new KeyValue<>( "ExtraEncode"    , this.getExtraEncode().getName()                         ),
+                new KeyValue<>( "ControlBits"    , "0x" + Long.toString( this.getControlBits(),16 )  ),
+                new KeyValue<>( "ExtraHead"      , szExtraHead                                             ),
         } );
     }
 }

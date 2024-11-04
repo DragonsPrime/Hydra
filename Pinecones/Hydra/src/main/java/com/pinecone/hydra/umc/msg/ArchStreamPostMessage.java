@@ -17,10 +17,15 @@ public class ArchStreamPostMessage extends ArchUMCMessage implements PostMessage
         this.setBody( inStream );
     }
 
-    public ArchStreamPostMessage( Map<String,Object > joExHead, InputStream inStream ) {
-        super( joExHead, UMCMethod.POST );
+    public ArchStreamPostMessage( Map<String,Object > joExHead, InputStream inStream, long controlBits ) {
+        super( joExHead, UMCMethod.POST, controlBits );
         this.setBody( inStream );
     }
+
+    public ArchStreamPostMessage( Map<String,Object > joExHead, InputStream inStream ) {
+        this( joExHead, inStream, 0 );
+    }
+
 
 
     void setBody( InputStream inStream ) {

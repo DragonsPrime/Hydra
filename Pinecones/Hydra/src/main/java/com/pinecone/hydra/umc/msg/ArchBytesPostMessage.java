@@ -18,13 +18,21 @@ public abstract class ArchBytesPostMessage extends ArchUMCMessage implements Pos
         this( head, szStringBody.getBytes() );
     }
 
-    public ArchBytesPostMessage( Map<String,Object > joExHead, byte[] sBytesBody ) {
-        super( joExHead, UMCMethod.POST );
+    public ArchBytesPostMessage( Map<String,Object > joExHead, byte[] sBytesBody, long controlBits ) {
+        super( joExHead, UMCMethod.POST, controlBits );
         this.setBody( sBytesBody );
     }
 
+    public ArchBytesPostMessage( Map<String,Object > joExHead, String szStringBody, long controlBits ) {
+        this( joExHead, szStringBody.getBytes(), controlBits );
+    }
+
+    public ArchBytesPostMessage( Map<String,Object > joExHead, byte[] sBytesBody ) {
+        this( joExHead, sBytesBody, 0 );
+    }
+
     public ArchBytesPostMessage( Map<String,Object > joExHead, String szStringBody ) {
-        this( joExHead, szStringBody.getBytes() );
+        this( joExHead, szStringBody, 0 );
     }
 
 

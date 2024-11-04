@@ -136,8 +136,11 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         byteBuffer.putShort( head.status.getShortValue() );
         nBufLength += Short.BYTES;
 
-        byteBuffer.putShort( head.extraEncode.getShortValue() );
-        nBufLength += Short.BYTES;
+        byteBuffer.put( head.extraEncode.getByteValue() );
+        nBufLength += Byte.BYTES;
+
+        byteBuffer.putLong( head.controlBits );
+        nBufLength += Long.BYTES;
 
         byteBuffer.put( head.extraHead );
         nBufLength += head.getExtraHeadLength();
@@ -175,7 +178,7 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
     }
 
     public static int basicHeadLength( String szSignature ) {
-        return szSignature.length() + 1 + Byte.BYTES + Integer.BYTES + Long.BYTES + Long.BYTES + Short.BYTES + Short.BYTES; // 1 for ' ';
+        return szSignature.length() + 1 + UMCHead.StructBlockSize; // 1 for ' ';
     }
 
     public static UMCHead onlyReadMsgBasicHead( byte[] buf, String szSignature, ExtraHeadCoder extraHeadCoder ) throws IOException {
@@ -209,8 +212,11 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         head.status            = Status.asValue( ByteBuffer.wrap( buf, nReadAt, Short.BYTES ).order( UMCHead.BinByteOrder ).getShort() );
         nReadAt += Short.BYTES;
 
-        head.extraEncode       = ExtraEncode.asValue( ByteBuffer.wrap( buf, nReadAt, Short.BYTES ).order( UMCHead.BinByteOrder ).getShort() );
-        nReadAt += Short.BYTES;
+        head.extraEncode       = ExtraEncode.asValue( ByteBuffer.wrap( buf, nReadAt, Byte.BYTES ).order( UMCHead.BinByteOrder ).get() );
+        nReadAt += Byte.BYTES;
+
+        head.controlBits      = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHead.BinByteOrder ).getLong();
+        nReadAt += Long.BYTES;
 
         return head;
     }

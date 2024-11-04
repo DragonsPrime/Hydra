@@ -15,7 +15,11 @@ public class UlfStreamPostMessage extends ArchStreamPostMessage {
         super( head, inStream );
     }
 
+    public UlfStreamPostMessage( Map<String,Object > joExHead, InputStream inStream, long controlBits ) {
+        super( joExHead, inStream, controlBits );
+    }
+
     public UlfStreamPostMessage( Map<String,Object > joExHead, InputStream inStream ) {
-        super( joExHead, inStream );
+        super( joExHead, inStream, 0 );
     }
 }

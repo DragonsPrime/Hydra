@@ -24,8 +24,8 @@ public enum ExtraEncode {
         return this.value;
     }
 
-    public short getShortValue() {
-        return (short) this.value;
+    public byte getByteValue() {
+        return (byte) this.value;
     }
 
     public static ExtraEncode asValue( int val ) {

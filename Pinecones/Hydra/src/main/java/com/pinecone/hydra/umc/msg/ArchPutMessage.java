@@ -7,6 +7,14 @@ public abstract class ArchPutMessage extends ArchUMCMessage {
         super( head );
     }
 
+    public ArchPutMessage( Map<String,Object > joExHead , long controlBits ) {
+        super( joExHead, UMCMethod.PUT, controlBits );
+    }
+
+    public ArchPutMessage( Object protoExHead, long controlBits ) {
+        super( protoExHead, UMCMethod.PUT, controlBits );
+    }
+
     public ArchPutMessage( Map<String,Object > joExHead ) {
         super( joExHead, UMCMethod.PUT );
     }

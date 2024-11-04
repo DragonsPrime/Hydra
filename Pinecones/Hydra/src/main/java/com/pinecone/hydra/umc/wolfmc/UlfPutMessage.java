@@ -10,6 +10,14 @@ public class UlfPutMessage extends ArchPutMessage {
         super(head);
     }
 
+    public UlfPutMessage( Map<String,Object > joExHead, long controlBits ) {
+        super( joExHead, controlBits );
+    }
+
+    public UlfPutMessage( Object protoExHead , long controlBits ) {
+        super( protoExHead, controlBits );
+    }
+
     public UlfPutMessage( Map<String,Object > joExHead ) {
         super( joExHead );
     }

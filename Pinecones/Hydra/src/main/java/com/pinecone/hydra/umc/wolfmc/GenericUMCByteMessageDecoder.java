@@ -34,7 +34,7 @@ public class GenericUMCByteMessageDecoder extends ByteToMessageDecoder {
                 return;
             }
 
-            byte[] buf = new byte[nBufSize];
+            byte[] buf = new byte[ nBufSize ];
             in.readBytes(buf);
 
             UMCHead head = ArchUMCProtocol.onlyReadMsgBasicHead( buf, UMCHead.ProtocolSignature, this.extraHeadCoder );
