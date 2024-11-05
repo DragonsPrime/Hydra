@@ -1,4 +1,4 @@
-package com.pinecone.hydra.storage.volume.entity.local.physical.receive;
+package com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel;
 
 import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.volume.VolumeManager;

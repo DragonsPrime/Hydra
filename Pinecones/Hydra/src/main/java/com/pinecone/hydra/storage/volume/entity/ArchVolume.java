@@ -19,7 +19,7 @@ public abstract class ArchVolume implements Volume{
     protected VolumeCapacity64        volumeCapacity;
     protected OnVolumeFileSystem      kenVolumeFileSystem;
 
-    public ArchVolume( VolumeManager volumeManager){
+    public ArchVolume( VolumeManager volumeManager ){
         this.volumeManager = volumeManager;
         this.guid = volumeManager.getGuidAllocator().nextGUID72();
         this.createTime = LocalDateTime.now();
@@ -102,5 +102,10 @@ public abstract class ArchVolume implements Volume{
     @Override
     public void setExtConfig(String extConfig) {
         this.extConfig = extConfig;
+    }
+
+    @Override
+    public void setKenVolumeFileSystem() {
+        this.kenVolumeFileSystem = new KenVolumeFileSystem( this.volumeManager );
     }
 }

@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 @Mapper
 @IbatisDataAccessObject
@@ -27,5 +28,32 @@ public interface ServiceCommonDataMapper extends CommonDataManipulator {
     @Select("SELECT `id` AS `enumId`, `guid`, `scenario`, `primary_impl_lang` AS primaryImplLang, `extra_information` AS extraInformation, `level`, `description` FROM `hydra_service_node_common_data` WHERE `guid`=#{guid}")
     GenericCommonMeta getNodeCommonData( @Param("guid") GUID guid );
 
-    void update( ServiceFamilyNode node );
+    default void update( ServiceFamilyNode node ){
+        if( node.getDescription() != null ){
+            this.updateDescription( node.getDescription(), node.getGuid() );
+        }
+        if( node.getExtraInformation() != null ){
+            this.updateExtraInformation( node.getExtraInformation(), node.getGuid() );
+        }
+        if( node.getLevel() != null ){
+            this.updateLevel( node.getLevel(), node.getGuid() );
+        }
+        if ( node.getPrimaryImplLang() != null ){
+            this.updatePrimaryImplLang( node.getPrimaryImplLang(), node.getGuid() );
+        }
+        if( node.getScenario() != null ){
+            this.updateScenario( node.getScenario(), node.getGuid());
+        }
+    }
+
+    @Update("UPDATE `hydra_service_node_common_data` SET `scenario` = #{scenario} WHERE `guid` = #{guid}")
+    void updateScenario( @Param("scenario") String scenario, @Param("guid") GUID guid );
+    @Update("UPDATE `hydra_service_node_common_data` SET `primary_impl_lang` = #{primaryImplLang} WHERE `guid` = #{guid}")
+    void updatePrimaryImplLang( @Param("primaryImpLang") String primaryImplLang, @Param("guid") GUID guid );
+    @Update("UPDATE `hydra_service_node_common_data` SET `extra_information` = #{extraInformation} WHERE `guid` = #{guid}")
+    void updateExtraInformation( @Param("extraInformation") String extraInformation, @Param("guid") GUID guid );
+    @Update("UPDATE `hydra_service_node_common_data` SET `level` = #{level} WHERE `guid` = #{guid}")
+    void updateLevel( @Param("level") String level, @Param("guid") GUID guid );
+    @Update("UPDATE `hydra_service_node_common_data` SET `description` = #{description} WHERE `guid` = #{guid}")
+    void updateDescription( @Param("description") String description, @Param("guid") GUID guid );
 }

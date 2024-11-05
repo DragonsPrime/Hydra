@@ -46,4 +46,8 @@ public interface LogicVolume extends Volume, TreeNode {
     MiddleStorageObject channelExport( ExportStorageObject exportStorageObject, FileChannel channel ) throws IOException, SQLException;
 
     boolean existStorageObject( GUID storageObject ) throws SQLException;
+
+    void build() throws SQLException;
+
+    void storageExpansion( GUID volumeGuid );
 }

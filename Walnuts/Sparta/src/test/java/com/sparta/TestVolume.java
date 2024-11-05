@@ -23,7 +23,7 @@ import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirectChannelExportEntity64;
-import com.pinecone.hydra.storage.volume.entity.local.physical.receive.TitanDirectChannelReceiveEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel.TitanDirectChannelReceiveEntity64;
 import com.pinecone.hydra.storage.volume.runtime.ArchStripedTaskThread;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJob;
@@ -31,6 +31,7 @@ import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.volume.ibatis.hydranium.VolumeMappingDriver;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
 import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.id.GuidAllocator;
 import com.sauron.radium.Radium;
 
 import java.io.File;
@@ -72,8 +73,10 @@ class Alice extends Radium {
         //this.testDirectReceive( volumeTree );
         //this.testDirectExport( volumeTree );
         //this.testSpannedChannelReceive( volumeTree );
-        //this.testSpannedChannelExport( volumeTree );
-        Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
+        this.testSpannedChannelExport( volumeTree );
+        //Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
+        //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
+
     }
 
     private void testDirectReceive(VolumeManager volumeManager) throws IOException {
@@ -119,27 +122,29 @@ class Alice extends Radium {
     }
 
     private void testSpannedChannelReceive( UniformVolumeManager volumeTree ) throws IOException, SQLException {
-        LogicVolume volume = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0006-48"));
+        GuidAllocator guidAllocator = volumeTree.getGuidAllocator();
+        LogicVolume volume = volumeTree.get(GUIDs.GUID72("05e44c4-00022b-0006-20"));
         TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
-        titanReceiveStorageObject.setName( "image" );
+        titanReceiveStorageObject.setName( "视频" );
         titanReceiveStorageObject.setSize( 85 * 1024 * 1024 );
-        File file = new File("E:\\MyFiles\\Picture\\Avatar/cat1.jpg");
+        titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
+        File file = new File("D:\\井盖视频块\\4月13日 (1).mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "s1", channel);
+        MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "文件夹", channel);
     }
 
     private void testSpannedChannelExport( UniformVolumeManager volumeTree ) throws IOException, SQLException {
-        File file = new File("E:/1.jpg");
+        File file = new File("D:\\文件系统\\大文件\\视频.mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-        LogicVolume volume = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0006-48"));
+        LogicVolume volume = volumeTree.get(GUIDs.GUID72("05e44c4-00022b-0006-20"));
         TitanExportStorageObject titanExportStorageObject = new TitanExportStorageObject();
         titanExportStorageObject.setSize( 85 * 1024 *1024 );
-        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("056b6f4-0000b1-0005-cc") );
-        titanExportStorageObject.setSourceName("E:\\fs\\cluster\\s1\\image_8e3d1dde.storage");
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("05e5206-0002de-0001-e8") );
+        titanExportStorageObject.setSourceName("D:\\文件系统\\簇1\\文件夹\\视频_4a148d14.storage");
         volume.channelExport( titanExportStorageObject, channel );
     }
 
-    private void testRaid0Insert( KOMFileSystem fileSystem, UniformVolumeManager volumeTree ){
+    private void testRaid0Insert( KOMFileSystem fileSystem, UniformVolumeManager volumeTree ) throws SQLException {
         VolumeAllotment volumeAllotment = volumeTree.getVolumeAllotment();
         VolumeCapacity64 volumeCapacity1 = volumeAllotment.newVolumeCapacity();
         volumeCapacity1.setDefinitionCapacity( 100*1024*1024 );
@@ -149,9 +154,9 @@ class Alice extends Radium {
         LocalPhysicalVolume physicalVolume1 = volumeAllotment.newLocalPhysicalVolume();
         physicalVolume1.setType("PhysicalVolume");
         physicalVolume1.setVolumeCapacity( volumeCapacity1 );
-        physicalVolume1.setName( "E" );
+        physicalVolume1.setName( "C" );
         MountPoint mountPoint1 = volumeAllotment.newMountPoint();
-        mountPoint1.setMountPoint("E:/fs/cluster");
+        mountPoint1.setMountPoint("D:\\文件系统\\簇1");
         physicalVolume1.setMountPoint( mountPoint1 );
 
         LocalPhysicalVolume physicalVolume2 = volumeAllotment.newLocalPhysicalVolume();
@@ -159,7 +164,7 @@ class Alice extends Radium {
         physicalVolume2.setVolumeCapacity( volumeCapacity2 );
         physicalVolume2.setName( "D" );
         MountPoint mountPoint2 = volumeAllotment.newMountPoint();
-        mountPoint2.setMountPoint( "E:/fs2/cluster" );
+        mountPoint2.setMountPoint( "D:\\文件系统\\簇2" );
         physicalVolume2.setMountPoint( mountPoint2 );
 
         VolumeCapacity64 logicVolumeCapacity1 = volumeAllotment.newVolumeCapacity();
@@ -184,18 +189,22 @@ class Alice extends Radium {
         spannedVolume.setVolumeCapacity( logicVolumeCapacity3 );
         spannedVolume.setType( "SpannedVolume" );
 
-        volumeTree.insertPhysicalVolume( physicalVolume1 );
-        volumeTree.insertPhysicalVolume( physicalVolume2 );
-        volumeTree.put( simpleVolume1 );
-        volumeTree.put( simpleVolume2 );
-        volumeTree.put( spannedVolume );
+//        volumeTree.insertPhysicalVolume( physicalVolume1 );
+//        volumeTree.insertPhysicalVolume( physicalVolume2 );
+//        volumeTree.put( simpleVolume1 );
+//        volumeTree.put( simpleVolume2 );
+//        volumeTree.put( spannedVolume );
+//        simpleVolume1.build();
+//        simpleVolume2.build();
+//        volumeTree.put( spannedVolume );
+//        spannedVolume.build();
     }
 
     private void TestRaid0Receive( KOMFileSystem fileSystem, UniformVolumeManager volumeTree ) throws IOException {
-        LogicVolume volume1 = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0004-48"));
-        volume1.extendLogicalVolume( GUIDs.GUID72("056b342-0001d1-0000-48") );
-        LogicVolume volume2 = volumeTree.get(GUIDs.GUID72("056b342-0001d1-0005-48"));
-        volume2.extendLogicalVolume(GUIDs.GUID72("056b342-0001d1-0002-48"));
+//        LogicVolume volume1 = volumeTree.get(GUIDs.GUID72("05e3b12-00011f-0004-b4"));
+//        volume1.extendLogicalVolume( GUIDs.GUID72("05e3b12-00011f-0000-9c") );
+//        LogicVolume volume2 = volumeTree.get(GUIDs.GUID72("05e3b12-00011f-0005-10"));
+//        volume2.extendLogicalVolume(GUIDs.GUID72("05e3b12-00011f-0002-b4"));
 
 //        LogicVolume volume3 = volumeTree.get(GUIDs.GUID72("0414fd8-00011e-0006-78"));
 //        File sourceFile = new File("D:\\井盖视频块\\4月13日 (2).mp4");

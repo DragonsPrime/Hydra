@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public interface ServiceNamespaceMapper extends ServiceNamespaceManipulator {
 
     @Select("SELECT `id` AS `enumId`, `guid`, `name`, `rules_guid` AS rulesGUID FROM `hydra_service_namespace_node` WHERE `guid`=#{guid}")
     GenericNamespace getNamespace( @Param("guid") GUID guid );
-
+    @Update("UPDATE `hydra_service_namespace_node` SET `name` = #{name} WHERE `guid` = #{guid}")
     void update( Namespace ns );
 
     @Select("SELECT `id` AS `enumId`, `guid`, `name`, `rules_guid` AS rulesGUID FROM `hydra_service_namespace_node` WHERE name=#{name}")

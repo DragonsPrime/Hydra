@@ -28,6 +28,6 @@ public interface Volume extends Pinenut {
 
     VolumeCapacity64 getVolumeCapacity();
     void setVolumeCapacity( VolumeCapacity64 volumeCapacity );
-
+    void setKenVolumeFileSystem();
 
 }

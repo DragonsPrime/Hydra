@@ -11,6 +11,9 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
+import java.time.LocalDateTime;
 
 @Mapper
 @IbatisDataAccessObject
@@ -29,6 +32,42 @@ public interface AppNodeMetaMapper extends ApplicationMetaManipulator {
         element.apply( servicesInstrument );
         return element;
     }
-
-    void update( ApplicationElement applicationElement );
+    default void update( ApplicationElement applicationElement ){
+        GenericApplicationElement element = (GenericApplicationElement) applicationElement;
+        if ( element.getName() != null ){
+            this.updateName( element.getName(),element.getGuid() );
+        }
+        if( element.getMetaType() != null ){
+            this.updateType( element.getMetaType(), element.getGuid() );
+        }
+        if ( element.getDeploymentMethod() != null ){
+            this.updateDeploymentMethod( element.getDeploymentMethod(), element.getGuid() );
+        }
+        if ( element.getAlias() != null ){
+            this.updateAlias( element.getAlias(), element.getGuid() );
+        }
+        if( element.getUpdateTime() != null ){
+            this.updateUpdateTime( element.getUpdateTime(), element.getGuid() );
+        }
+        if ( element.getPath() != null ){
+            this.updatePath( element.getPath(), element.getGuid() );
+        }
+        if ( element.getResourceType() != null ){
+            this.updateResourceType( element.getResourceType(), element.getGuid() );
+        }
+    }
+    @Update("UPDATE hydra_service_app_node_meta SET name = #{name} WHERE guid = #{guid}")
+    void updateName( String name, GUID guid );
+    @Update("UPDATE hydra_service_app_node_meta SET path = #{path} WHERE guid = #{guid}")
+    void updatePath( String path, GUID guid );
+    @Update("UPDATE hydra_service_app_node_meta SET type = #{type} WHERE guid = #{guid}")
+    void updateType( String type, GUID guid );
+    @Update("UPDATE hydra_service_app_node_meta SET alias = #{alias} WHERE guid = #{guid}")
+    void updateAlias( String alias, GUID guid );
+    @Update("UPDATE hydra_service_app_node_meta SET resource_type = #{resourceType} WHERE guid = #{guid}")
+    void updateResourceType( String resourceType, GUID guid );
+    @Update("UPDATE hydra_service_app_node_meta SET  deployment_method= #{deploymentMethod} WHERE guid = #{guid}")
+    void updateDeploymentMethod( String deploymentMethod, GUID guid );
+    @Update("UPDATE hydra_service_app_node_meta SET update_time = #{updateTime} WHERE guid = #{guid}")
+    void updateUpdateTime(LocalDateTime updateTime, GUID guid );
 }

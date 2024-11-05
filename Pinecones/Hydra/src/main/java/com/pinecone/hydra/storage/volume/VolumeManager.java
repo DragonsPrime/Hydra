@@ -26,4 +26,6 @@ public interface VolumeManager extends KOMInstrument {
     PhysicalVolume getSmallestCapacityPhysicalVolume();
 
     VolumeMasterManipulator  getMasterManipulator();
+
+    void storageExpansion( GUID parentGuid, GUID childGuid );
 }

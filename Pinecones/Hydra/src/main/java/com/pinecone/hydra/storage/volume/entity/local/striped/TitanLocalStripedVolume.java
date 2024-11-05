@@ -80,4 +80,14 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
     public boolean existStorageObject(GUID storageObject) throws SQLException {
         return false;
     }
+
+    @Override
+    public void build() throws SQLException {
+
+    }
+
+    @Override
+    public void storageExpansion(GUID volumeGuid) {
+
+    }
 }

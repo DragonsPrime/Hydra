@@ -1,15 +1,12 @@
-package com.pinecone.hydra.storage.volume.entity.local.physical.receive;
+package com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel;
 
 import com.pinecone.framework.util.Bytes;
 import com.pinecone.framework.util.Debug;
-import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.StorageNaming;
 import com.pinecone.hydra.storage.TitanMiddleStorageObject;
 import com.pinecone.hydra.storage.TitanStorageNaming;
-import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
-import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -37,17 +34,14 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
     private MiddleStorageObject receiveWithOffsetAndSize(DirectChannelReceiveEntity entity, long offset, int size) throws IOException {
         ReceiveStorageObject receiveStorageObject = entity.getReceiveStorageObject();
         String destDirPath = entity.getDestDirPath();
-        VolumeManager volumeManager = entity.getVolumeManager();
-        GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
         FileChannel channel = entity.getChannel();
 
         int parityCheck = 0;
         long checksum = 0;
         ByteBuffer buffer = ByteBuffer.allocateDirect(size);
 
-        GUID guid = guidAllocator.nextGUID72();
         TitanMiddleStorageObject titanMiddleStorageObject = new TitanMiddleStorageObject();
-        titanMiddleStorageObject.setObjectGuid(guid);
+        titanMiddleStorageObject.setObjectGuid(receiveStorageObject.getStorageObjectGuid());
 
         channel.position(offset);
         buffer.clear();

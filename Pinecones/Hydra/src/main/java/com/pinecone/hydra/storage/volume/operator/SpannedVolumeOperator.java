@@ -63,6 +63,7 @@ public class SpannedVolumeOperator extends ArchVolumeOperator  implements Volume
         VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
         spannedVolume.setVolumeCapacity( volumeCapacity );
         spannedVolume.setVolumeTree( this.volumeManager);
+        spannedVolume.setKenVolumeFileSystem();
         return spannedVolume;
     }
 

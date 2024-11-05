@@ -1,8 +1,11 @@
 package com.pinecone.hydra.storage.volume.entity;
 
+import com.pinecone.framework.util.id.GUID;
+
 public class TitanReceiveStorageObject implements ReceiveStorageObject{
     private String name;
     private Number size;
+    private GUID   storageObjectGuid;
 
     @Override
     public String getName() {
@@ -22,5 +25,15 @@ public class TitanReceiveStorageObject implements ReceiveStorageObject{
     @Override
     public void setSize(Number size) {
         this.size = size;
+    }
+
+    @Override
+    public GUID getStorageObjectGuid() {
+        return this.storageObjectGuid;
+    }
+
+    @Override
+    public void setStorageObjectGuid(GUID storageObjectGuid) {
+        this.storageObjectGuid = storageObjectGuid;
     }
 }

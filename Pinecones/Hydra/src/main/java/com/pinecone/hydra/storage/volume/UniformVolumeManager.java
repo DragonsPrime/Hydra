@@ -271,6 +271,11 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
         return this.volumeMasterManipulator;
     }
 
+    @Override
+    public void storageExpansion(GUID parentGuid, GUID childGuid) {
+
+    }
+
     private String getNodeName(DistributedTreeNode node ){
         UOI type = node.getType();
         TreeNode newInstance = (TreeNode)type.newInstance();

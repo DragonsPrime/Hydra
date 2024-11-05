@@ -15,7 +15,7 @@ import java.util.List;
 public class TitanSimpleChannelReceiver64   implements SimpleChannelReceiver64{
     private SimpleVolume            simpleVolume;
     private FileChannel             fileChannel;
-    private VolumeManager volumeManager;
+    private VolumeManager           volumeManager;
     private ReceiveStorageObject    receiveStorageObject;
     private String                  destDirPath;
 

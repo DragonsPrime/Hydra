@@ -110,29 +110,30 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
 
     private void saveMate(MiddleStorageObject middleStorageObject , String storageObjectName) throws SQLException {
         GUID physicsGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.guid);
-        if( physicsGuid == null ){
-            PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
-            this.kenVolumeFileSystem.insertKVFSDatabaseMeta( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
-            String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + "/" + this.guid + ".db";
-            SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-            this.kenVolumeFileSystem.createKVFSDatabase( sqLiteExecutor );
-            this.kenVolumeFileSystem.insertKVFSDatabaseMeta( middleStorageObject.getObjectGuid(), storageObjectName, sqLiteExecutor );
-            File file = new File(url);
-            VolumeCapacity64 physicalVolumeCapacity = smallestCapacityPhysicalVolume.getVolumeCapacity();
-            physicalVolumeCapacity.setUsedSize( physicalVolumeCapacity.getUsedSize() - file.getTotalSpace() );
-            this.volumeCapacity.setUsedSize( this.volumeCapacity.getUsedSize() - file.getTotalSpace() );
-        }
-        else {
-            PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
-            String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
-            File file = new File(url);
-            long totalSpace = file.getTotalSpace();
-            SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-            this.kenVolumeFileSystem.insertKVFSDatabaseMeta( middleStorageObject.getObjectGuid(), storageObjectName, sqLiteExecutor );
-            long newTotalSpace = file.getTotalSpace();
-            VolumeCapacity64 physicalVolumeVolumeCapacity = physicalVolume.getVolumeCapacity();
-            physicalVolumeVolumeCapacity.setUsedSize( physicalVolumeVolumeCapacity.getUsedSize() - ( totalSpace - newTotalSpace ) );
-            this.volumeCapacity.setUsedSize( this.volumeCapacity.getUsedSize() - ( totalSpace - newTotalSpace ) );
-        }
+        PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
+        String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
+        File file = new File(url);
+        long totalSpace = file.getTotalSpace();
+        SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
+        this.kenVolumeFileSystem.insertKVFSTable( middleStorageObject.getObjectGuid(), storageObjectName, sqLiteExecutor );
+//        long newTotalSpace = file.getTotalSpace();
+//        VolumeCapacity64 physicalVolumeVolumeCapacity = physicalVolume.getVolumeCapacity();
+//        physicalVolumeVolumeCapacity.setUsedSize( physicalVolumeVolumeCapacity.getUsedSize() - ( totalSpace - newTotalSpace ) );
+//        this.volumeCapacity.setUsedSize( this.volumeCapacity.getUsedSize() - ( totalSpace - newTotalSpace ) );
+    }
+
+    @Override
+    public void build() throws SQLException {
+        PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
+        String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + "/" + this.guid + ".db";
+        SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
+        this.kenVolumeFileSystem.createKVFSMetaTable( sqLiteExecutor );
+        this.volumeManager.put( this );
+        this.kenVolumeFileSystem.insertKVFSMateTable( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+    }
+
+    @Override
+    public void storageExpansion(GUID volumeGuid) {
+        this.extendLogicalVolume( volumeGuid );
     }
 }

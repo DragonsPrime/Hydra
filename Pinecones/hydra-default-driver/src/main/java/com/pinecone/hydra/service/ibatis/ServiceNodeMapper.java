@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -24,7 +25,7 @@ public interface ServiceNodeMapper extends ServiceNodeManipulator {
 
     @Select("SELECT `id` AS `enumId`, `guid`, `name` FROM `hydra_service_service_nodes` WHERE `guid`=#{guid}")
     GenericServiceElement getServiceNode(@Param("guid") GUID guid);
-
+    @Update("UPDATE `hydra_service_service_nodes` SET `name` = #{name} WHERE `guid` = #{guid}")
     void updateServiceNode(GenericServiceElement serviceNode);
 
     @Select("SELECT `id` AS `enumId`, `guid` , `name` FROM `hydra_service_service_nodes` WHERE name=#{name}")

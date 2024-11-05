@@ -63,6 +63,7 @@ public class SimpleVolumeOperator extends ArchVolumeOperator  implements VolumeO
         VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
         simpleVolume.setVolumeCapacity( volumeCapacity );
         simpleVolume.setVolumeTree( this.volumeManager);
+        simpleVolume.setKenVolumeFileSystem();
         return simpleVolume;
     }
 

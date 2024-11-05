@@ -2,11 +2,14 @@ package com.pinecone.hydra.storage.volume.entity.local.spanned;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.framework.util.sqlite.SQLiteExecutor;
+import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
+import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
@@ -95,12 +98,26 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
         return false;
     }
 
-    private boolean checkCapacity(long fileSize, VolumeCapacity64 capacity){
-        long remainingCapacity = capacity.getDefinitionCapacity() - capacity.getUsedSize();
-        return remainingCapacity > fileSize;
+    @Override
+    public void build() throws SQLException {
+        PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
+        String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + "/" + this.guid + ".db";
+        SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
+        this.kenVolumeFileSystem.creatKVFSCollisionTable( sqLiteExecutor );
+        this.kenVolumeFileSystem.creatKVFSIndexTable( sqLiteExecutor );
+        List<LogicVolume> volumes = this.getChildren();
+        int index = 0;
+        for( LogicVolume volume : volumes ){
+            this.kenVolumeFileSystem.insertKVFSIndexTable( sqLiteExecutor, index, volume.getGuid() );
+            index++;
+        }
+        this.kenVolumeFileSystem.insertKVFSMateTable( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+        //this.volumeManager.put( this );
     }
 
-    private long getFreeSpace( LogicVolume volume ){
-        return volume.getVolumeCapacity().getDefinitionCapacity() - volume.getVolumeCapacity().getUsedSize();
+    @Override
+    public void storageExpansion(GUID volumeGuid) {
+
     }
+
 }

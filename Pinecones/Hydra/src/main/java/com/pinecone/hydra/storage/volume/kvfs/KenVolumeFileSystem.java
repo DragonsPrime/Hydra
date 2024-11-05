@@ -9,6 +9,7 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.source.SQLiteVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
+import com.pinecone.ulf.util.id.GUIDs;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -31,18 +32,18 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
     }
 
     @Override
-    public void insertKVFSDatabaseMeta(GUID physicsGuid, GUID volumeGuid) {
+    public void insertKVFSMateTable(GUID physicsGuid, GUID volumeGuid) {
         this.sqLiteVolumeManipulator.insert( physicsGuid, volumeGuid );
     }
 
     @Override
-    public void createKVFSDatabase(MappedExecutor mappedExecutor) throws SQLException {
-        mappedExecutor.execute( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36) , `storage_object_guid` VARCHAR(36));", false );
+    public void createKVFSMetaTable(MappedExecutor mappedExecutor) throws SQLException {
+        mappedExecutor.execute( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36) , `storage_object_name` VARCHAR(36));", false );
     }
 
     @Override
-    public void insertKVFSDatabaseMeta(GUID storageObjectGuid, String storageObjectName, MappedExecutor mappedExecutor) throws SQLException {
-        mappedExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` , `storage_object_name` ) VALUES ( '"+ storageObjectGuid+ "', `"+storageObjectName+"` )", false );
+    public void insertKVFSTable(GUID storageObjectGuid, String storageObjectName, MappedExecutor mappedExecutor) throws SQLException {
+        mappedExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` , `storage_object_name` ) VALUES ( '"+ storageObjectGuid+ "', '"+storageObjectName+"' )", false );
     }
 
     @Override
@@ -58,6 +59,48 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
 
     @Override
     public int KVFSHash(GUID keyGuid, int volumeNum) {
-         return keyGuid.hashCode() ^ 137 % volumeNum ;
+         return ( keyGuid.hashCode() ^ 137 ) % volumeNum ;
+    }
+
+    @Override
+    public void creatKVFSIndexTable(MappedExecutor mappedExecutor) throws SQLException {
+        mappedExecutor.execute( "CREATE TABLE `index_table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `hash_key` int , `target_volume_guid` VARCHAR(36));", false );
+    }
+
+    @Override
+    public void insertKVFSIndexTable(MappedExecutor mappedExecutor, int hashKey, GUID targetVolumeGuid) throws SQLException {
+        mappedExecutor.execute( "INSERT INTO `index_table` ( `hash_key`, `target_volume_guid` ) VALUES ( "+hashKey+", '"+targetVolumeGuid+"' )", false );
+    }
+
+    @Override
+    public GUID getKVFSIndexTableTargetGuid(MappedExecutor mappedExecutor, int hashKey) throws SQLException {
+        ResultSession query = mappedExecutor.query("SELECT `target_volume_guid` FROM `index_table` WHERE `hash_key` = " + hashKey + " ");
+        ResultSet resultSet = query.getResultSet();
+        if ( resultSet.next() ){
+            String targetVolumeGuid = resultSet.getString("target_volume_guid");
+            return GUIDs.GUID72( targetVolumeGuid );
+        }
+        return null;
+    }
+
+    @Override
+    public void creatKVFSCollisionTable(MappedExecutor mappedExecutor) throws SQLException {
+        mappedExecutor.execute( "CREATE TABLE `collision_table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `hash_key` int , `key_guid` VARCHAR(36), `target_volume_guid` VARCHAR(36)) ;", false );
+    }
+
+    @Override
+    public void insertKVFSCollisionTable(MappedExecutor mappedExecutor, int hashKey, GUID keyGuid, GUID targetVolumeGuid) throws SQLException {
+        mappedExecutor.execute( "INSERT INTO `collision_table` ( `hash_key`, `key_guid`, `target_volume_guid` ) VALUES ( "+hashKey+", '"+keyGuid+"', '"+targetVolumeGuid+"' )", false );
+    }
+
+    @Override
+    public GUID getKVFSCollisionTableTargetGuid(MappedExecutor mappedExecutor, GUID keyGuid) throws SQLException {
+        ResultSession query = mappedExecutor.query("SELECT `target_volume_guid` FROM `collision_table` WHERE `key_guid` = '" + keyGuid + "' ");
+        ResultSet resultSet = query.getResultSet();
+        if ( resultSet.next() ){
+            String targetVolumeGuid = resultSet.getString("target_volume_guid");
+            return GUIDs.GUID72( targetVolumeGuid );
+        }
+        return null;
     }
 }
