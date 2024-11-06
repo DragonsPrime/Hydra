@@ -27,24 +27,8 @@ public interface ServiceCommonDataMapper extends CommonDataManipulator {
 
     @Select("SELECT `id` AS `enumId`, `guid`, `scenario`, `primary_impl_lang` AS primaryImplLang, `extra_information` AS extraInformation, `level`, `description` FROM `hydra_service_node_common_data` WHERE `guid`=#{guid}")
     GenericCommonMeta getNodeCommonData( @Param("guid") GUID guid );
-
-    default void update( ServiceFamilyNode node ){
-        if( node.getDescription() != null ){
-            this.updateDescription( node.getDescription(), node.getGuid() );
-        }
-        if( node.getExtraInformation() != null ){
-            this.updateExtraInformation( node.getExtraInformation(), node.getGuid() );
-        }
-        if( node.getLevel() != null ){
-            this.updateLevel( node.getLevel(), node.getGuid() );
-        }
-        if ( node.getPrimaryImplLang() != null ){
-            this.updatePrimaryImplLang( node.getPrimaryImplLang(), node.getGuid() );
-        }
-        if( node.getScenario() != null ){
-            this.updateScenario( node.getScenario(), node.getGuid());
-        }
-    }
+    @Update("UPDATE `hydra_service_node_common_data` SET `scenario` = #{scenario}, `primary_impl_lang` = #{primaryImplLang}, `extra_information` = #{extraInformation}, `level` = #{level}, `description` = #{description}")
+    void update( ServiceFamilyNode node );
 
     @Update("UPDATE `hydra_service_node_common_data` SET `scenario` = #{scenario} WHERE `guid` = #{guid}")
     void updateScenario( @Param("scenario") String scenario, @Param("guid") GUID guid );

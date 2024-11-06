@@ -32,30 +32,9 @@ public interface AppNodeMetaMapper extends ApplicationMetaManipulator {
         element.apply( servicesInstrument );
         return element;
     }
-    default void update( ApplicationElement applicationElement ){
-        GenericApplicationElement element = (GenericApplicationElement) applicationElement;
-        if ( element.getName() != null ){
-            this.updateName( element.getName(),element.getGuid() );
-        }
-        if( element.getMetaType() != null ){
-            this.updateType( element.getMetaType(), element.getGuid() );
-        }
-        if ( element.getDeploymentMethod() != null ){
-            this.updateDeploymentMethod( element.getDeploymentMethod(), element.getGuid() );
-        }
-        if ( element.getAlias() != null ){
-            this.updateAlias( element.getAlias(), element.getGuid() );
-        }
-        if( element.getUpdateTime() != null ){
-            this.updateUpdateTime( element.getUpdateTime(), element.getGuid() );
-        }
-        if ( element.getPath() != null ){
-            this.updatePath( element.getPath(), element.getGuid() );
-        }
-        if ( element.getResourceType() != null ){
-            this.updateResourceType( element.getResourceType(), element.getGuid() );
-        }
-    }
+    @Update("UPDATE `hydra_service_app_node_meta` SET `name` = #{name}, `path` = #{path}, `type` = #{type}, `alias` = #{alias}, `resource_type` = #{resourceType}, `deployment_method` = #{deploymentMethod}, `update_time` = #{updateTime} WHERE `guid` = #{guid}")
+     void update( ApplicationElement applicationElement );
+
     @Update("UPDATE hydra_service_app_node_meta SET name = #{name} WHERE guid = #{guid}")
     void updateName( String name, GUID guid );
     @Update("UPDATE hydra_service_app_node_meta SET path = #{path} WHERE guid = #{guid}")

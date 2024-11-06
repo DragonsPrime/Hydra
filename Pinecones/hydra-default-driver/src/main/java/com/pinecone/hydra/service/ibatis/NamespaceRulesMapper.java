@@ -20,17 +20,8 @@ public interface NamespaceRulesMapper extends NamespaceRulesManipulator {
     void remove(@Param("guid")GUID guid);
     @Select("SELECT `id` AS `enumId`, `guid`, `scope`, `name`, `description` FROM `hydra_service_namespace_rules` WHERE `guid`=#{guid}")
     GenericNamespaceRules getNamespaceRules(@Param("guid")GUID guid);
-    default void update(GenericNamespaceRules classificationRules){
-        if ( classificationRules.getName() != null ){
-            this.updateName( classificationRules.getName(), classificationRules.getGuid() );
-        }
-        if ( classificationRules.getScope() != null ){
-            this.updateScope( classificationRules.getScope(), classificationRules.getGuid() );
-        }
-        if( classificationRules.getDescription() != null ){
-            this.updateDescription( classificationRules.getDescription(), classificationRules.getGuid() );
-        }
-    }
+    @Update("UPDATE `hydra_service_namespace_rules` SET `scope` = #{scope}, `name` = #{name}, `description` = #{description} WHERE `guid` = #{guid}")
+    void update(GenericNamespaceRules classificationRules);
     @Update("UPDATE `hydra_service_namespace_rules` SET `scope` = #{scope} WHERE `guid` = #{guid}")
     void updateScope( @Param("scope") String scope, GUID guid );
     @Update("UPDATE `hydra_service_namespace_rules` SET `name` = #{name} WHERE `guid` = #{guid}")

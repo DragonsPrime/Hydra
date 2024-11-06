@@ -135,7 +135,10 @@ public class ApplicationElementOperator extends ArchElementOperator implements E
 
     @Override
     public void update( TreeNode treeNode ) {
-
+        GenericApplicationElement applicationElement = (GenericApplicationElement) treeNode;
+        this.applicationNodeManipulator.update( applicationElement );
+        this.applicationMetaManipulator.update( applicationElement );
+        this.commonDataManipulator.update( applicationElement );
     }
 
     @Override

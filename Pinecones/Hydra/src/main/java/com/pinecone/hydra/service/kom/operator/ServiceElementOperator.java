@@ -98,7 +98,10 @@ public class ServiceElementOperator extends ArchElementOperator implements Eleme
 
     @Override
     public void update( TreeNode nodeWideData ) {
-
+        GenericServiceElement serviceElement = (GenericServiceElement) nodeWideData;
+        this.serviceNodeManipulator.update( serviceElement );
+        this.serviceMetaManipulator.update( serviceElement );
+        this.commonDataManipulator.update( serviceElement );
     }
 
     @Override

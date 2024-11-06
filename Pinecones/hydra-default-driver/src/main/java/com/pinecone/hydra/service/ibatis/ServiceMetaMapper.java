@@ -26,27 +26,8 @@ public interface ServiceMetaMapper extends ServiceMetaManipulator {
 
     @Select("SELECT `id` AS `enumId`, `guid`, `name`, `path`, `type`, `alias`, `resource_type` AS resourceType, `service_type` AS serviceType, `create_time` AS createTime, `update_time` AS updateTime FROM `hydra_service_serv_node_meta` WHERE `guid`=#{guid}")
     GenericServiceElement getServiceMeta( @Param("guid") GUID guid );
-
-    default void update( ServiceElement serviceElement ){
-        if ( serviceElement.getAlias() != null ){
-            this.updateAlias( serviceElement.getAlias(), serviceElement.getGuid() );
-        }
-        if( serviceElement.getServiceType() != null ){
-            this.updateServiceType( serviceElement.getServiceType(), serviceElement.getGuid() );
-        }
-        if( serviceElement.getUpdateTime() != null ){
-            this.updateUpdateTime( serviceElement.getUpdateTime(), serviceElement.getGuid() );
-        }
-        if( serviceElement.getPath() != null ){
-            this.updatePath( serviceElement.getPath(), serviceElement.getGuid() );
-        }
-        if( serviceElement.getResourceType() != null ){
-            this.updateResourceType( serviceElement.getResourceType(), serviceElement.getGuid() );
-        }
-        if( serviceElement.getName() != null ){
-            this.updateName( serviceElement.getName(), serviceElement.getGuid() );
-        }
-    }
+    @Update("UPDATE `hydra_service_serv_node_meta` SET `name` =#{name}, `path` = #{path}, `type` = #{type}, `alias` = #{alias}, `resource_type` = #{resourceType}, `service_type` = #{serviceType}, `update_time` = #{updateTime} WHERE `guid` = #{guid}")
+    void update( ServiceElement serviceElement );
     @Update("UPDATE `hydra_service_serv_node_meta` SET `name` = #{name} WHERE `guid` = #{guid}")
     void updateName( @Param("name") String name, @Param("guid") GUID guid );
     @Update("UPDATE `hydra_service_serv_node_meta` SET `path` = #{path} WHERE `guid` = #{guid}")

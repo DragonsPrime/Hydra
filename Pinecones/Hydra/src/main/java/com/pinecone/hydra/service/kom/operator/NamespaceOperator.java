@@ -141,7 +141,11 @@ public class NamespaceOperator extends ArchElementOperator implements ElementOpe
 
     @Override
     public void update( TreeNode nodeWideData ) {
-
+        GenericNamespace ns = ( GenericNamespace ) nodeWideData;
+        this.namespaceManipulator.update( ns );
+        GenericNamespaceRules classificationRules = ns.getClassificationRules();
+        this.namespaceRulesManipulator.update( classificationRules );
+        this.commonDataManipulator.update( ns );
     }
 
     @Override

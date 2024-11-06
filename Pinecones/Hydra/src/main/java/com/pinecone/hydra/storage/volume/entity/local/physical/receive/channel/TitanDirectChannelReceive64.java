@@ -59,8 +59,9 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
         String sourceName = this.storageNaming.naming(receiveStorageObject.getName(), Long.toHexString(crc.getValue()));
         Path path = Paths.get(destDirPath, sourceName);
 
-        try (FileChannel chunkChannel = FileChannel.open(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+        try (FileChannel chunkChannel = FileChannel.open(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND)) {
             buffer.rewind();
+            chunkChannel.position(chunkChannel.size());  // 从文件末尾开始写入
             chunkChannel.write(buffer);
         }
 

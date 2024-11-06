@@ -25,8 +25,9 @@ public interface ServiceNodeMapper extends ServiceNodeManipulator {
 
     @Select("SELECT `id` AS `enumId`, `guid`, `name` FROM `hydra_service_service_nodes` WHERE `guid`=#{guid}")
     GenericServiceElement getServiceNode(@Param("guid") GUID guid);
+
     @Update("UPDATE `hydra_service_service_nodes` SET `name` = #{name} WHERE `guid` = #{guid}")
-    void updateServiceNode(GenericServiceElement serviceNode);
+    void update(GenericServiceElement serviceNode);
 
     @Select("SELECT `id` AS `enumId`, `guid` , `name` FROM `hydra_service_service_nodes` WHERE name=#{name}")
     List<GenericServiceElement> fetchServiceNodeByName(@Param("name") String name);
