@@ -92,6 +92,8 @@ public interface VolumeTreeMapper extends VolumeTreeManipulator {
     @Select( "SELECT COUNT( `guid` ) FROM hydra_uofs_volumes_tree WHERE `parent_guid` IS NULL AND guid = #{guid}" )
     boolean isRoot( GUID guid );
 
+    @Update("UPDATE hydra_uofs_volumes_tree SET parent_guid = #{parentGuid} WHERE guid = #{childGuid}")
+    void addChild( @Param("childGuid") GUID childGuid, @Param("parentGuid") GUID parentGuid );
 
 
 }

@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
+    protected Hydrarum                          hydrarum;
     protected VolumeAllotment                   volumeAllotment;
     protected MirroredVolumeManipulator         mirroredVolumeManipulator;
     protected MountPointManipulator             mountPointManipulator;
@@ -55,8 +56,9 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
 
 
     public UniformVolumeManager( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, VolumeManager parent, String name ) {
-        super( hydrarum, masterManipulator, VolumeManager.KernelVolumeConfig, parent, name );
 
+        super( hydrarum, masterManipulator, VolumeManager.KernelVolumeConfig, parent, name );
+        this.hydrarum = hydrarum;
         this.volumeMasterManipulator       =   ( VolumeMasterManipulator ) masterManipulator;
         this.pathResolver                  =   new KOPathResolver( this.kernelObjectConfig );
         this.guidAllocator                 =   GUIDs.newGuidAllocator();
@@ -273,7 +275,12 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
 
     @Override
     public void storageExpansion(GUID parentGuid, GUID childGuid) {
+        this.treeMasterManipulator.getTrieTreeManipulator().addChild( childGuid, parentGuid );
+    }
 
+    @Override
+    public Hydrarum getHydrarum() {
+        return this.hydrarum;
     }
 
     private String getNodeName(DistributedTreeNode node ){

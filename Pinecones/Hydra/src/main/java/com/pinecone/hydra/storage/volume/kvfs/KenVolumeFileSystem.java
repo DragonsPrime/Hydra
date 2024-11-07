@@ -103,4 +103,14 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
         }
         return null;
     }
+
+    @Override
+    public void createKVFSFileStripTable(MappedExecutor mappedExecutor) throws SQLException {
+        mappedExecutor.execute( "CREATE TABLE `file_strip_table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `code` int , `volume_guid` VARCHAR(36), `storage_object_guid` VARCHAR(36)) ;", false );
+    }
+
+    @Override
+    public void insertKVFSFileStripTable(MappedExecutor mappedExecutor, int code, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
+        mappedExecutor.execute( "INSERT INTO `file_strip_table` ( `code`, `volume_guid`, `storage_object_guid` ) VALUES ( "+code+", '"+volumeGuid+"', '"+storageObjectGuid+"' )", false );
+    }
 }

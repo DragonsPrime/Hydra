@@ -22,6 +22,7 @@ import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
+import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirectChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel.TitanDirectChannelReceiveEntity64;
 import com.pinecone.hydra.storage.volume.runtime.ArchStripedTaskThread;
@@ -73,9 +74,11 @@ class Alice extends Radium {
         //this.testDirectReceive( volumeTree );
         //this.testDirectExport( volumeTree );
         //this.testSpannedChannelReceive( volumeTree );
-        this.testSpannedChannelExport( volumeTree );
+        //this.testSpannedChannelExport( volumeTree );
         //Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
+        //this.testStripedInsert( volumeTree );
+        //this.testStripedReceive( volumeTree );
 
     }
 
@@ -214,6 +217,76 @@ class Alice extends Radium {
 //        fileNode.setGuid( fileSystem.getGuidAllocator().nextGUID72() );
 //        fileNode.setDefinitionSize(200*1024*1024);
         ///volume3.channelReceive( fileSystem,fileNode,FileChannel.open(path, StandardOpenOption.READ) );
+    }
+
+    private void testStripedInsert( UniformVolumeManager volumeManager ) throws SQLException {
+        VolumeAllotment volumeAllotment = volumeManager.getVolumeAllotment();
+        VolumeCapacity64 volumeCapacity1 = volumeAllotment.newVolumeCapacity();
+        volumeCapacity1.setDefinitionCapacity( 100*1024*1024 );
+        VolumeCapacity64 volumeCapacity2 = volumeAllotment.newVolumeCapacity();
+        volumeCapacity2.setDefinitionCapacity( 200*1024*1024 );
+
+        LocalPhysicalVolume physicalVolume1 = volumeAllotment.newLocalPhysicalVolume();
+        physicalVolume1.setType("PhysicalVolume");
+        physicalVolume1.setVolumeCapacity( volumeCapacity1 );
+        physicalVolume1.setName( "C" );
+        MountPoint mountPoint1 = volumeAllotment.newMountPoint();
+        mountPoint1.setMountPoint("D:\\文件系统\\簇1");
+        physicalVolume1.setMountPoint( mountPoint1 );
+
+        LocalPhysicalVolume physicalVolume2 = volumeAllotment.newLocalPhysicalVolume();
+        physicalVolume2.setType("PhysicalVolume");
+        physicalVolume2.setVolumeCapacity( volumeCapacity2 );
+        physicalVolume2.setName( "D" );
+        MountPoint mountPoint2 = volumeAllotment.newMountPoint();
+        mountPoint2.setMountPoint( "D:\\文件系统\\簇2" );
+        physicalVolume2.setMountPoint( mountPoint2 );
+
+        VolumeCapacity64 logicVolumeCapacity1 = volumeAllotment.newVolumeCapacity();
+        logicVolumeCapacity1.setDefinitionCapacity( 100*1024*1024 );
+        VolumeCapacity64 logicVolumeCapacity2 = volumeAllotment.newVolumeCapacity();
+        logicVolumeCapacity2.setDefinitionCapacity( 200*1024*1024 );
+        VolumeCapacity64 logicVolumeCapacity3 = volumeAllotment.newVolumeCapacity();
+        logicVolumeCapacity3.setDefinitionCapacity( 300*1024*1024 );
+
+        LocalSimpleVolume simpleVolume1 = volumeAllotment.newLocalSimpleVolume();
+        simpleVolume1.setName( "简单卷一" );
+        simpleVolume1.setType( "SimpleVolume" );
+        simpleVolume1.setVolumeCapacity( logicVolumeCapacity1 );
+
+        LocalSimpleVolume simpleVolume2 = volumeAllotment.newLocalSimpleVolume();
+        simpleVolume2.setName( "简单卷二" );
+        simpleVolume2.setVolumeCapacity( logicVolumeCapacity2 );
+        simpleVolume2.setType( "SimpleVolume" );
+
+        LocalStripedVolume stripedVolume = volumeAllotment.newLocalStripedVolume();
+        stripedVolume.setName( "条带卷" );
+        stripedVolume.setVolumeCapacity( logicVolumeCapacity3 );
+        stripedVolume.setType( "StripedVolume" );
+
+        volumeManager.insertPhysicalVolume( physicalVolume1 );
+        volumeManager.insertPhysicalVolume( physicalVolume2 );
+        simpleVolume1.build();
+        simpleVolume2.build();
+        stripedVolume.build();
+
+        simpleVolume1.extendLogicalVolume( physicalVolume1.getGuid() );
+        simpleVolume2.extendLogicalVolume( physicalVolume2.getGuid() );
+        stripedVolume.storageExpansion( simpleVolume1.getGuid() );
+        stripedVolume.storageExpansion( simpleVolume2.getGuid() );
+    }
+
+    void testStripedReceive( UniformVolumeManager volumeManager ) throws IOException, SQLException {
+        GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
+        LogicVolume volume = volumeManager.get(GUIDs.GUID72("063c52a-0002d7-0006-ac"));
+        TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
+        File file = new File("D:\\井盖视频块\\4月13日 (1).mp4");
+        titanReceiveStorageObject.setName( "视频" );
+        titanReceiveStorageObject.setSize( file.length() );
+        titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
+
+        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
+        MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "文件夹", channel);
     }
 
     private void testSimpleThread() throws Exception {

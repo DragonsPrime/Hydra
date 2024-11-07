@@ -62,6 +62,8 @@ public interface TrieTreeManipulator extends Pinenut {
 
     void removeInheritance( GUID childNode, GUID parentGUID );
 
+    void addChild( GUID childGuid, GUID parentGuid );
+
     void updateType       ( UOI type, GUID guid );
 
     List<GUID > fetchRoot();

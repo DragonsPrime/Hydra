@@ -32,7 +32,7 @@ public class TitanStripChannelReceiverJob implements StripChannelReceiverJob{
     }
 
     @Override
-    public void execute() throws SQLException, IOException {
+    public void execute()  {
         //每次计算要保存的部分
         long size = this.object.getSize().longValue();
         int sequenceNumber = jobCode;
@@ -41,16 +41,20 @@ public class TitanStripChannelReceiverJob implements StripChannelReceiverJob{
 
         while( true ){
             long bufferSize = stripSize;
-            if( currentPosition > size ){
+            if( currentPosition >= size ){
                 break;
             }
             if( currentPosition + bufferSize > size ){
                 bufferSize = size - currentPosition;
             }
 
-            MiddleStorageObject middleStorageObject = this.volume.channelReceive(this.object, this.destDirPath, this.fileChannel, currentPosition, bufferSize);
+            try {
+                this.volume.channelReceive(this.object, this.destDirPath, this.fileChannel, currentPosition, bufferSize);
+            } catch (IOException | SQLException e) {
+                throw new RuntimeException(e);
+            }
 
-            currentPosition += bufferSize;
+            currentPosition += bufferSize * jobNum;
         }
     }
 }

@@ -28,6 +28,7 @@ public interface OnVolumeFileSystem extends Pinenut {
     void insertKVFSCollisionTable( MappedExecutor mappedExecutor, int hashKey, GUID keyGuid, GUID targetVolumeGuid ) throws SQLException;
     GUID getKVFSCollisionTableTargetGuid( MappedExecutor mappedExecutor, GUID keyGuid ) throws SQLException;
 
-    void createKVFSFileStripTable( MappedExecutor mappedExecutor );
+    void createKVFSFileStripTable( MappedExecutor mappedExecutor ) throws SQLException;
+    void insertKVFSFileStripTable( MappedExecutor mappedExecutor, int code, GUID volumeGuid, GUID storageObjectGuid ) throws SQLException;
 
 }

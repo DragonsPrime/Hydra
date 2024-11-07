@@ -112,12 +112,12 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
             index++;
         }
         this.kenVolumeFileSystem.insertKVFSMateTable( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
-        //this.volumeManager.put( this );
+        this.volumeManager.put( this );
     }
 
     @Override
     public void storageExpansion(GUID volumeGuid) {
-
+        this.volumeManager.storageExpansion( this.getGuid(), volumeGuid );
     }
 
 }

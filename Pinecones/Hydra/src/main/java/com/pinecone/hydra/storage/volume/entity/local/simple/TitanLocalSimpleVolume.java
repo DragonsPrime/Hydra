@@ -115,7 +115,9 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         File file = new File(url);
         long totalSpace = file.getTotalSpace();
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-        this.kenVolumeFileSystem.insertKVFSTable( middleStorageObject.getObjectGuid(), storageObjectName, sqLiteExecutor );
+        if( !kenVolumeFileSystem.existStorageObject( sqLiteExecutor, middleStorageObject.getObjectGuid() ) ){
+            this.kenVolumeFileSystem.insertKVFSTable( middleStorageObject.getObjectGuid(), storageObjectName, sqLiteExecutor );
+        }
 //        long newTotalSpace = file.getTotalSpace();
 //        VolumeCapacity64 physicalVolumeVolumeCapacity = physicalVolume.getVolumeCapacity();
 //        physicalVolumeVolumeCapacity.setUsedSize( physicalVolumeVolumeCapacity.getUsedSize() - ( totalSpace - newTotalSpace ) );

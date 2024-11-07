@@ -5,7 +5,7 @@ import java.sql.SQLException;
 
 public class TitanStripChannelExportJob implements StripChannelExportJob {
     @Override
-    public void execute() throws SQLException, IOException {
+    public void execute()  {
 
     }
 }

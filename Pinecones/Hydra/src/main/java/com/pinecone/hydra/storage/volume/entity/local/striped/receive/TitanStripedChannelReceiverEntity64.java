@@ -18,6 +18,7 @@ public class TitanStripedChannelReceiverEntity64 extends ArchReceiveEntity imple
         super(volumeManager, receiveStorageObject, destDirPath);
         this.channel = channel;
         this.stripedVolume = stripedVolume;
+        this.stripedChannelReceiver64 = new TitanStripedChannelReceiver64( this );
     }
 
     @Override
@@ -37,7 +38,7 @@ public class TitanStripedChannelReceiverEntity64 extends ArchReceiveEntity imple
 
     @Override
     public MiddleStorageObject receive() throws IOException, SQLException {
-        return null;
+        return this.stripedChannelReceiver64.channelReceive();
     }
 
     @Override

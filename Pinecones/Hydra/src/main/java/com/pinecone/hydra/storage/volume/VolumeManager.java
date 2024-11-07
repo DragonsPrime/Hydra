@@ -1,9 +1,11 @@
 package com.pinecone.hydra.storage.volume;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.Hydra;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
+import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.ko.kom.KOMInstrument;
 
 public interface VolumeManager extends KOMInstrument {
@@ -28,4 +30,6 @@ public interface VolumeManager extends KOMInstrument {
     VolumeMasterManipulator  getMasterManipulator();
 
     void storageExpansion( GUID parentGuid, GUID childGuid );
+
+    Hydrarum getHydrarum();
 }
