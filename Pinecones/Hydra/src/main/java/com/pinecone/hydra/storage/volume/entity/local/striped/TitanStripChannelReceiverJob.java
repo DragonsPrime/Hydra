@@ -51,6 +51,7 @@ public class TitanStripChannelReceiverJob implements StripChannelReceiverJob{
             try {
                 this.volume.channelReceive(this.object, this.destDirPath, this.fileChannel, currentPosition, bufferSize);
             } catch (IOException | SQLException e) {
+                e.printStackTrace();
                 throw new RuntimeException(e);
             }
 

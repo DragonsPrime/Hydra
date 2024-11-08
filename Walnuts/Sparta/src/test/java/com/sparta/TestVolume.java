@@ -231,7 +231,7 @@ class Alice extends Radium {
         physicalVolume1.setVolumeCapacity( volumeCapacity1 );
         physicalVolume1.setName( "C" );
         MountPoint mountPoint1 = volumeAllotment.newMountPoint();
-        mountPoint1.setMountPoint("D:\\文件系统\\簇1");
+        mountPoint1.setMountPoint("E:/fs/s2");
         physicalVolume1.setMountPoint( mountPoint1 );
 
         LocalPhysicalVolume physicalVolume2 = volumeAllotment.newLocalPhysicalVolume();
@@ -239,7 +239,7 @@ class Alice extends Radium {
         physicalVolume2.setVolumeCapacity( volumeCapacity2 );
         physicalVolume2.setName( "D" );
         MountPoint mountPoint2 = volumeAllotment.newMountPoint();
-        mountPoint2.setMountPoint( "D:\\文件系统\\簇2" );
+        mountPoint2.setMountPoint( "E:/fs/s1" );
         physicalVolume2.setMountPoint( mountPoint2 );
 
         VolumeCapacity64 logicVolumeCapacity1 = volumeAllotment.newVolumeCapacity();
@@ -277,16 +277,44 @@ class Alice extends Radium {
     }
 
     void testStripedReceive( UniformVolumeManager volumeManager ) throws IOException, SQLException {
+        Thread thread1 = new Thread( ()->{
+            for (int i = 0; i < 1e7; i++) {
+                volumeManager.getPhysicalVolume( GUIDs.GUID72("066c2da-000112-0002-18") );
+                Debug.trace( "ssss" );
+            }
+        } );
+        Thread thread2 = new Thread( ()->{
+            for (int i = 0; i < 1e7; i++) {
+                volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
+                Debug.trace( "ssss" );
+            }
+        } );
+        Thread thread3 = new Thread( ()->{
+            for (int i = 0; i < 1e7; i++) {
+                volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
+                Debug.trace( "ssss" );
+            }
+        } );
+
+        thread1.start();
+        //volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
+        thread2.start();
+        //volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
+        thread3.start();
+        //volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
+        Debug.sleep( 10000000 );
+
+
         GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
-        LogicVolume volume = volumeManager.get(GUIDs.GUID72("066bafa-00003d-0006-0c"));
+        LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
-        File file = new File("D:\\井盖视频块\\4月13日 (1).mp4");
-        titanReceiveStorageObject.setName( "视频" );
+        File file = new File("E:/MyFiles/Picture/Avatar/cat1.jpg");
+        titanReceiveStorageObject.setName( "cat1" );
         titanReceiveStorageObject.setSize( file.length() );
         titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
 
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "文件夹", channel);
+        MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "p", channel);
     }
 
     void testStripedExport( UniformVolumeManager volumeManager ) throws SQLException, IOException {

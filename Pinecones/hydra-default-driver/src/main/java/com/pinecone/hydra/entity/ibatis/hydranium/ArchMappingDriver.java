@@ -3,6 +3,7 @@ package com.pinecone.hydra.entity.ibatis.hydranium;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.session.LocalCacheScope;
 import org.apache.ibatis.session.SqlSession;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;

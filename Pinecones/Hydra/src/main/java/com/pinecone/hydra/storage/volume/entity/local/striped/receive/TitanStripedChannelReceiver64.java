@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.receive;
 
+import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
@@ -23,6 +24,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
@@ -51,11 +53,14 @@ public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
         hydrarum.getTaskManager().add( masterVolumeGram );
         List<LogicVolume> volumes = this.stripedVolume.getChildren();
         int index = 0;
+        //ArrayList<LocalStripedTaskThread > as = new ArrayList<>();
         for( LogicVolume volume : volumes ){
             TitanStripChannelReceiverJob receiverJob = new TitanStripChannelReceiverJob( this.entity, this.fileChannel, volumes.size(), index, volume );
-            LocalStripedTaskThread taskThread = new LocalStripedTaskThread( this.stripedVolume.getName()+index,masterVolumeGram,receiverJob);
+            LocalStripedTaskThread taskThread = new LocalStripedTaskThread(  this.stripedVolume.getName() + index, masterVolumeGram, receiverJob );
             masterVolumeGram.getTaskManager().add( taskThread );
+            //as.add( taskThread );
             taskThread.start();
+
             GUID physicsVolumeGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.stripedVolume.getGuid());
             PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsVolumeGuid);
             String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.stripedVolume.getGuid()+".db";

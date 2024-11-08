@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume;
 
+import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
@@ -38,6 +39,7 @@ import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     protected Hydrarum                          hydrarum;
@@ -190,14 +192,23 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
 
     }
 
+    protected ReentrantLock reentrantLock = new ReentrantLock();
+
     @Override
     public PhysicalVolume getPhysicalVolume(GUID guid) {
-        PhysicalVolume physicalVolume = this.physicalVolumeManipulator.getPhysicalVolume(guid);
-        MountPoint mountPoint = this.mountPointManipulator.getMountPointByVolumeGuid(guid);
-        VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
-        physicalVolume.setMountPoint( mountPoint );
-        physicalVolume.setVolumeCapacity( volumeCapacity );
-        return physicalVolume;
+        this.reentrantLock.lock();
+        try{
+            Debug.trace( Thread.currentThread().getName(), Thread.currentThread().getId() );
+            PhysicalVolume physicalVolume   = this.physicalVolumeManipulator.getPhysicalVolume(guid);
+            MountPoint mountPoint           = this.mountPointManipulator.getMountPointByVolumeGuid(guid);
+            VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
+            physicalVolume.setMountPoint( mountPoint );
+            physicalVolume.setVolumeCapacity( volumeCapacity );
+            return physicalVolume;
+        }
+        finally {
+            this.reentrantLock.unlock();
+        }
     }
 
     @Override
