@@ -106,11 +106,21 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
 
     @Override
     public void createKVFSFileStripTable(MappedExecutor mappedExecutor) throws SQLException {
-        mappedExecutor.execute( "CREATE TABLE `file_strip_table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `code` int , `volume_guid` VARCHAR(36), `storage_object_guid` VARCHAR(36)) ;", false );
+        mappedExecutor.execute( "CREATE TABLE `file_strip_table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `code` int , `volume_guid` VARCHAR(36), `storage_object_guid` VARCHAR(36), `source_name` TEXT) ;", false );
     }
 
     @Override
-    public void insertKVFSFileStripTable(MappedExecutor mappedExecutor, int code, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
-        mappedExecutor.execute( "INSERT INTO `file_strip_table` ( `code`, `volume_guid`, `storage_object_guid` ) VALUES ( "+code+", '"+volumeGuid+"', '"+storageObjectGuid+"' )", false );
+    public void insertKVFSFileStripTable(MappedExecutor mappedExecutor, int code, GUID volumeGuid, GUID storageObjectGuid, String sourceName) throws SQLException {
+        mappedExecutor.execute( "INSERT INTO `file_strip_table` ( `code`, `volume_guid`, `storage_object_guid`, `source_name` ) VALUES ( "+code+", '"+volumeGuid+"', '"+storageObjectGuid+"', '"+sourceName+"' )", false );
+    }
+
+    @Override
+    public String getKVFSFileStripSourceName(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
+        ResultSession query = mappedExecutor.query("SELECT `source_name` FROM `file_strip_table` WHERE `volume_guid` = '" + volumeGuid + "' AND `storage_object_guid` = `" + storageObjectGuid + "` ");
+        ResultSet resultSet = query.getResultSet();
+        if ( resultSet.next() ){
+            return resultSet.getString("source_name");
+        }
+        return null;
     }
 }

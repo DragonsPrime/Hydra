@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMirroredVolume {
     private MirroredVolumeManipulator mirroredVolumeManipulator;
@@ -66,6 +67,11 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
 
     @Override
     public MiddleStorageObject channelExport(ExportStorageObject exportStorageObject, FileChannel channel) throws IOException {
+        return null;
+    }
+
+    @Override
+    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException, SQLException {
         return null;
     }
 

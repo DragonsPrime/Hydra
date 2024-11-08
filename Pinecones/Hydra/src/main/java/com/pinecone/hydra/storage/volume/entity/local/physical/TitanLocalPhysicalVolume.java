@@ -15,6 +15,7 @@ import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysicalVolume {
     private MountPoint                  mountPoint;
@@ -74,6 +75,14 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     public MiddleStorageObject channelExport(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel) throws IOException {
         TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, exportStorageObject,channel );
         MiddleStorageObject middleStorageObject = titanDirectChannelExportEntity64.export();
+        middleStorageObject.setBottomGuid( this.getGuid() );
+        return middleStorageObject;
+    }
+
+    @Override
+    public MiddleStorageObject channelRaid0Export(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException {
+        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, exportStorageObject,channel );
+        MiddleStorageObject middleStorageObject = titanDirectChannelExportEntity64.raid0Export(buffer, offset, endSize, jobCode, jobNum, counter);
         middleStorageObject.setBottomGuid( this.getGuid() );
         return middleStorageObject;
     }

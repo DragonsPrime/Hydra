@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimpleVolume {
     private SimpleVolumeManipulator simpleVolumeManipulator;
@@ -82,6 +83,12 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     public MiddleStorageObject channelExport(ExportStorageObject exportStorageObject, FileChannel channel) throws IOException {
         TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeManager, exportStorageObject, channel );
         return titanSimpleChannelExportEntity64.export();
+    }
+
+    @Override
+    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException, SQLException {
+        TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeManager, exportStorageObject, channel );
+        return titanSimpleChannelExportEntity64.raid0Export( buffer, offset, endSize, jobCode, jobNum, counter );
     }
 
     @Override

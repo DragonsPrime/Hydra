@@ -78,8 +78,8 @@ class Alice extends Radium {
         //Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
         //this.testStripedInsert( volumeTree );
-        //this.testStripedReceive( volumeTree );
-
+        this.testStripedReceive( volumeTree );
+        //this.testStripedExport( volumeTree );
     }
 
     private void testDirectReceive(VolumeManager volumeManager) throws IOException {
@@ -278,7 +278,7 @@ class Alice extends Radium {
 
     void testStripedReceive( UniformVolumeManager volumeManager ) throws IOException, SQLException {
         GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
-        LogicVolume volume = volumeManager.get(GUIDs.GUID72("063c52a-0002d7-0006-ac"));
+        LogicVolume volume = volumeManager.get(GUIDs.GUID72("066bafa-00003d-0006-0c"));
         TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
         File file = new File("D:\\井盖视频块\\4月13日 (1).mp4");
         titanReceiveStorageObject.setName( "视频" );
@@ -287,6 +287,17 @@ class Alice extends Radium {
 
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
         MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "文件夹", channel);
+    }
+
+    void testStripedExport( UniformVolumeManager volumeManager ) throws SQLException, IOException {
+        File file = new File("D:\\文件系统\\大文件\\视频.mp4");
+        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+        LogicVolume volume = volumeManager.get(GUIDs.GUID72("0662be4-00015f-0006-f8"));
+        TitanExportStorageObject titanExportStorageObject = new TitanExportStorageObject();
+        titanExportStorageObject.setSize( 85 * 1024 *1024 );
+        //titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0662cf6-0000cd-0001-10") );
+        titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
+        volume.channelExport( titanExportStorageObject, channel );
     }
 
     private void testSimpleThread() throws Exception {

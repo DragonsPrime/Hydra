@@ -7,6 +7,7 @@ import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanSimpleChannelExportEntity64 extends ArchExportEntity implements SimpleChannelExportEntity64{
     private FileChannel                 channel;
@@ -31,5 +32,11 @@ public class TitanSimpleChannelExportEntity64 extends ArchExportEntity implement
     @Override
     public MiddleStorageObject export() throws IOException {
         return this.simpleChannelExport64.export();
+    }
+
+    @Override
+    public MiddleStorageObject raid0Export(byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException {
+        return this.simpleChannelExport64.raid0Export( buffer, offset, endSize, jobCode, jobNum, counter );
+
     }
 }

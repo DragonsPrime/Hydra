@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpannedVolume {
     private SpannedVolumeManipulator spannedVolumeManipulator;
@@ -81,6 +82,12 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
         TitanSpannedChannelExportEntity64 titanSpannedChannelExportEntity64 = new TitanSpannedChannelExportEntity64( this.volumeManager, exportStorageObject,channel, this );
         return titanSpannedChannelExportEntity64.export();
     }
+
+    @Override
+    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException, SQLException {
+        return null;
+    }
+
 
     @Override
     public String toString() {

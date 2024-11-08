@@ -11,6 +11,7 @@ import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
+import com.pinecone.hydra.storage.volume.entity.local.striped.export.TitanStripedChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.receive.TitanStripedChannelReceiverEntity64;
 import com.pinecone.hydra.storage.volume.source.StripedVolumeManipulator;
 
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStripedVolume {
     private StripedVolumeManipulator stripedVolumeManipulator;
@@ -72,7 +74,13 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
     }
 
     @Override
-    public MiddleStorageObject channelExport(ExportStorageObject exportStorageObject, FileChannel channel) throws IOException {
+    public MiddleStorageObject channelExport(ExportStorageObject exportStorageObject, FileChannel channel) throws IOException, SQLException {
+        TitanStripedChannelExportEntity64 titanStripedChannelExportEntity64 = new TitanStripedChannelExportEntity64( this.volumeManager, exportStorageObject, channel, this );
+        return titanStripedChannelExportEntity64.export();
+    }
+
+    @Override
+    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException, SQLException {
         return null;
     }
 

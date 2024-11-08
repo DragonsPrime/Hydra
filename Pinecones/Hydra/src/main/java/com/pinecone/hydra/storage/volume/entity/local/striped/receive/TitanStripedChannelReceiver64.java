@@ -4,6 +4,7 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.MiddleStorageObject;
+import com.pinecone.hydra.storage.TitanStorageNaming;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
@@ -19,6 +20,8 @@ import com.pinecone.hydra.system.Hydrarum;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -57,7 +60,11 @@ public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
             PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsVolumeGuid);
             String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.stripedVolume.getGuid()+".db";
             SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-            this.kenVolumeFileSystem.insertKVFSFileStripTable( sqLiteExecutor, index,  volume.getGuid(), receiveStorageObject.getStorageObjectGuid() );
+            TitanStorageNaming titanStorageNaming = new TitanStorageNaming();
+            String sourceName = titanStorageNaming.naming(this.receiveStorageObject.getName(), this.receiveStorageObject.getStorageObjectGuid().toString());
+            Path path = Paths.get(this.destDirPath, sourceName);
+            String realPath = physicalVolume.getMountPoint().getMountPoint() + path.toString();
+            this.kenVolumeFileSystem.insertKVFSFileStripTable( sqLiteExecutor, index,  volume.getGuid(), receiveStorageObject.getStorageObjectGuid(), realPath );
             index ++;
         }
         return null;
