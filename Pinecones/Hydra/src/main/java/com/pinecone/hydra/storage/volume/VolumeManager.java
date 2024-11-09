@@ -19,6 +19,7 @@ public interface VolumeManager extends KOMInstrument {
 
     PhysicalVolume getPhysicalVolume( GUID guid );
 
+
     GUID insertPhysicalVolume( PhysicalVolume physicalVolume );
 
     void purgePhysicalVolume( GUID guid );

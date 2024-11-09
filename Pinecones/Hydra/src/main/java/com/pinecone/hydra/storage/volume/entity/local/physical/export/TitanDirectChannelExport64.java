@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.physical.export;
 
 import com.pinecone.framework.util.Bytes;
+import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.TitanMiddleStorageObject;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -67,6 +68,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
         File file = new File(sourceName);
 
         try (FileChannel frameChannel = FileChannel.open(file.toPath(), StandardOpenOption.READ)) {
+            long bufferSize = endSize.longValue();
             // 定位到文件的 offset 位置
             frameChannel.position(offset.longValue());
 
@@ -76,10 +78,12 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
             byteBuffer.flip();
 
             // 将读取的数据从 bufferStartPosition 开始写入到 buffer
-            if( read < endSize.intValue() ){
-                endSize = read;
+            if( read < bufferSize ){
+                bufferSize = read;
             }
-            byteBuffer.get(buffer, (int) bufferStartPosition, endSize.intValue());
+            //Debug.trace( "起始位置" + bufferStartPosition+"终止大小"+bufferSize );
+            byteBuffer.get(buffer, (int) bufferStartPosition, (int) bufferSize);
+
             counter.incrementAndGet();
             if( counter.get() == jobNum ){
                 ByteBuffer writeBuffer = ByteBuffer.wrap(buffer);

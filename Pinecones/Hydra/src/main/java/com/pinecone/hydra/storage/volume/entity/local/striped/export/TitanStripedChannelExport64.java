@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.export;
 
+import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
@@ -16,6 +17,7 @@ import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.system.Hydrarum;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
@@ -57,7 +59,10 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
         int index = 0;
         for( LogicVolume volume : volumes ){
             String sourceName = this.kenVolumeFileSystem.getKVFSFileStripSourceName(sqLiteExecutor, volume.getGuid(), this.exportStorageObject.getStorageObjectGuid());
+            File file = new File(sourceName);
             this.exportStorageObject.setSourceName( sourceName );
+            Debug.trace( file.length() );
+            this.exportStorageObject.setSize( file.length() );
             TitanStripChannelExportJob exportJob = new TitanStripChannelExportJob( this.exportStorageObject, firstBuffer, secondBuffer, jobNum, index, this.volumeManager, volume, this.channel, firstCounter, secondCounter );
             LocalStripedTaskThread taskThread = new LocalStripedTaskThread( this.stripedVolume.getName()+index,masterVolumeGram,exportJob);
             masterVolumeGram.getTaskManager().add( taskThread );

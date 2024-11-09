@@ -78,8 +78,8 @@ class Alice extends Radium {
         //Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
         //this.testStripedInsert( volumeTree );
-        this.testStripedReceive( volumeTree );
-        //this.testStripedExport( volumeTree );
+        //this.testStripedReceive( volumeTree );
+        this.testStripedExport( volumeTree );
     }
 
     private void testDirectReceive(VolumeManager volumeManager) throws IOException {
@@ -231,7 +231,7 @@ class Alice extends Radium {
         physicalVolume1.setVolumeCapacity( volumeCapacity1 );
         physicalVolume1.setName( "C" );
         MountPoint mountPoint1 = volumeAllotment.newMountPoint();
-        mountPoint1.setMountPoint("E:/fs/s2");
+        mountPoint1.setMountPoint("D:\\文件系统\\簇1");
         physicalVolume1.setMountPoint( mountPoint1 );
 
         LocalPhysicalVolume physicalVolume2 = volumeAllotment.newLocalPhysicalVolume();
@@ -239,7 +239,7 @@ class Alice extends Radium {
         physicalVolume2.setVolumeCapacity( volumeCapacity2 );
         physicalVolume2.setName( "D" );
         MountPoint mountPoint2 = volumeAllotment.newMountPoint();
-        mountPoint2.setMountPoint( "E:/fs/s1" );
+        mountPoint2.setMountPoint( "D:\\文件系统\\簇2" );
         physicalVolume2.setMountPoint( mountPoint2 );
 
         VolumeCapacity64 logicVolumeCapacity1 = volumeAllotment.newVolumeCapacity();
@@ -277,54 +277,26 @@ class Alice extends Radium {
     }
 
     void testStripedReceive( UniformVolumeManager volumeManager ) throws IOException, SQLException {
-        Thread thread1 = new Thread( ()->{
-            for (int i = 0; i < 1e7; i++) {
-                volumeManager.getPhysicalVolume( GUIDs.GUID72("066c2da-000112-0002-18") );
-                Debug.trace( "ssss" );
-            }
-        } );
-        Thread thread2 = new Thread( ()->{
-            for (int i = 0; i < 1e7; i++) {
-                volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
-                Debug.trace( "ssss" );
-            }
-        } );
-        Thread thread3 = new Thread( ()->{
-            for (int i = 0; i < 1e7; i++) {
-                volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
-                Debug.trace( "ssss" );
-            }
-        } );
-
-        thread1.start();
-        //volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
-        thread2.start();
-        //volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
-        thread3.start();
-        //volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
-        Debug.sleep( 10000000 );
-
-
         GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
-        LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
+        LogicVolume volume = volumeManager.get(GUIDs.GUID72("06878c8-000225-0006-28"));
         TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
-        File file = new File("E:/MyFiles/Picture/Avatar/cat1.jpg");
-        titanReceiveStorageObject.setName( "cat1" );
+        File file = new File("D:\\井盖视频块\\4月13日 (1).mp4");
+        titanReceiveStorageObject.setName( "视频" );
         titanReceiveStorageObject.setSize( file.length() );
         titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
 
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "p", channel);
+        MiddleStorageObject middleStorageObject = volume.channelReceive(titanReceiveStorageObject, "文件夹", channel);
     }
 
     void testStripedExport( UniformVolumeManager volumeManager ) throws SQLException, IOException {
         File file = new File("D:\\文件系统\\大文件\\视频.mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-        LogicVolume volume = volumeManager.get(GUIDs.GUID72("0662be4-00015f-0006-f8"));
+        LogicVolume volume = volumeManager.get(GUIDs.GUID72("06878c8-000225-0006-28"));
         TitanExportStorageObject titanExportStorageObject = new TitanExportStorageObject();
         titanExportStorageObject.setSize( 85 * 1024 *1024 );
-        //titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0662cf6-0000cd-0001-10") );
-        titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("06878fc-000388-0001-54") );
+        //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
         volume.channelExport( titanExportStorageObject, channel );
     }
 

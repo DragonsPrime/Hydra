@@ -31,13 +31,13 @@ public class TitanStripChannelExportJob implements StripChannelExportJob {
         this.volume = volume;
         this.channel = channel;
         this.firstCounter = firstCounter;
-        this.secondBuffer = secondBuffer;
+        this.secondCounter = secondCounter;
     }
     @Override
     public void execute()  {
         long size = this.object.getSize().longValue();
         long stripSize = this.volumeManager.getConfig().getDefaultStripSize().longValue();
-        long currentPosition = jobCode * stripSize;
+        long currentPosition = 0;
         int bufferStartPosition = (int) (jobCode * stripSize);
         int bufferEndPosition = (int) (bufferStartPosition + stripSize);
         while (true){
@@ -50,7 +50,7 @@ public class TitanStripChannelExportJob implements StripChannelExportJob {
             }
             if( check( this.firstBuffer, bufferStartPosition, bufferEndPosition ) ){
                 try {
-                    this.volume.channelRaid0Export( this.object, this.channel, this.firstBuffer, currentPosition, bufferSize, this.jobCode, this.jobNum, firstCounter );
+                    this.volume.channelRaid0Export( this.object, this.channel, this.firstBuffer, currentPosition, bufferSize, this.jobCode, this.jobNum, this.firstCounter );
                 } catch (IOException | SQLException e) {
                     throw new RuntimeException(e);
                 }
@@ -58,7 +58,7 @@ public class TitanStripChannelExportJob implements StripChannelExportJob {
                 currentPosition += bufferSize;
             } else if( check( this.secondBuffer, bufferStartPosition, bufferEndPosition ) ){
                 try {
-                    this.volume.channelRaid0Export( this.object, this.channel, this.firstBuffer, currentPosition, bufferSize, this.jobCode, this.jobNum, secondCounter );
+                    this.volume.channelRaid0Export( this.object, this.channel, this.secondBuffer, currentPosition, bufferSize, this.jobCode, this.jobNum, this.secondCounter );
                 } catch (IOException | SQLException e) {
                     throw new RuntimeException(e);
                 }

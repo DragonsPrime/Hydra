@@ -116,7 +116,7 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
 
     @Override
     public String getKVFSFileStripSourceName(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
-        ResultSession query = mappedExecutor.query("SELECT `source_name` FROM `file_strip_table` WHERE `volume_guid` = '" + volumeGuid + "' AND `storage_object_guid` = `" + storageObjectGuid + "` ");
+        ResultSession query = mappedExecutor.query("SELECT `source_name` FROM `file_strip_table` WHERE `volume_guid` = '" + volumeGuid + "' AND `storage_object_guid` = '" + storageObjectGuid + "' ");
         ResultSet resultSet = query.getResultSet();
         if ( resultSet.next() ){
             return resultSet.getString("source_name");
