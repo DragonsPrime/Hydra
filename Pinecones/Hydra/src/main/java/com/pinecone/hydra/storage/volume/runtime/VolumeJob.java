@@ -6,5 +6,5 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public interface VolumeJob extends Executor {
-    void execute();
+    void execute() throws VolumeJobCompromiseException;
 }

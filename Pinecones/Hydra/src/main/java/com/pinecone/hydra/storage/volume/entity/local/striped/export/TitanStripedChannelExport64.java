@@ -1,17 +1,14 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.export;
 
-import com.pinecone.framework.util.Debug;
-import com.pinecone.framework.util.id.GUID;
+import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
-import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
-import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
-import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripChannelExportJob;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripChannelBufferWriteJob;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripLockEntity;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
@@ -25,6 +22,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class TitanStripedChannelExport64 implements StripedChannelExport64{
     private VolumeManager           volumeManager;
@@ -54,6 +53,8 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
         AtomicInteger counter = new AtomicInteger(0);
         ArrayList<Object> lockGroup = new ArrayList<>();
 
+        Lock maoLock = new ReentrantLock();
+
         Hydrarum hydrarum = this.volumeManager.getHydrarum();
         MasterVolumeGram masterVolumeGram = new MasterVolumeGram( this.stripedVolume.getGuid().toString(), hydrarum );
         hydrarum.getTaskManager().add( masterVolumeGram );
@@ -67,14 +68,22 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
             this.exportStorageObject.setSourceName( sourceName );
             this.exportStorageObject.setSize( file.length() );
 
-            TitanStripLockEntity lockEntity = new TitanStripLockEntity( lockObject, lockGroup, currentBufferCode );
+            TitanStripLockEntity lockEntity = new TitanStripLockEntity( lockObject, lockGroup, currentBufferCode, maoLock );
 
-            TitanStripChannelExportJob exportJob = new TitanStripChannelExportJob( this, buffers, jobNum, index, lockEntity, counter, volume );
+            TitanStripChannelBufferWriteJob exportJob = new TitanStripChannelBufferWriteJob( this, buffers, jobNum, index, lockEntity, counter, volume );
             LocalStripedTaskThread taskThread = new LocalStripedTaskThread( this.stripedVolume.getName()+index,masterVolumeGram,exportJob);
             masterVolumeGram.getTaskManager().add( taskThread );
             taskThread.start();
-            index++;
+            ++index;
         }
+
+        try{
+            masterVolumeGram.getTaskManager().syncWaitingTerminated();
+        }
+        catch ( Exception e ) {
+            throw new ProxyProvokeHandleException( e );
+        }
+
         return null;
     }
 

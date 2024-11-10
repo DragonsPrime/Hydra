@@ -45,9 +45,18 @@ public class Debug {
         return Debug.console.info( Anything, objects );
     }
 
+    public synchronized static Tracer infoSyn( Object Anything, Object...objects ){
+        return Debug.console.info( Anything, objects );
+    }
+
     public static Tracer warn ( Object Anything, Object...objects ){
         return Debug.console.warn( Anything, objects );
     }
+
+    public synchronized static Tracer warnSyn( Object Anything, Object...objects ){
+        return Debug.console.warn( Anything, objects );
+    }
+
 
     public static Tracer hhf(){
         Debug.console.getOut().println();

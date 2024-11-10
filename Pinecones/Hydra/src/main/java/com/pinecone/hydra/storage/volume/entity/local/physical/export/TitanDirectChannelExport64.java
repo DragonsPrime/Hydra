@@ -25,7 +25,7 @@ import java.util.zip.CRC32;
 
 public class TitanDirectChannelExport64 implements DirectChannelExport64{
     @Override
-    public MiddleStorageObject export(DirectChannelExportEntity entity) throws IOException {
+    public MiddleStorageObject export( DirectChannelExportEntity entity ) throws IOException {
         ExportStorageObject exportStorageObject = entity.getExportStorageObject();
         String sourceName = exportStorageObject.getSourceName();
         long size = exportStorageObject.getSize().longValue();
@@ -60,13 +60,27 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
         return titanMiddleStorageObject;
     }
 
-    @Override
-    public MiddleStorageObject raid0Export(DirectChannelExportEntity entity, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity) {
-        VolumeManager volumeManager = entity.getVolumeManager();
-        FileChannel targetChannel = entity.getChannel();
+/*    public byte[] export( DirectChannelExportEntity outputEntity, Number offset, Number readSome, long bufferStartPosition ) {
+        byte[] bytes;
+        this.export(outputEntity, offset, endSize, bufferStartPosition, new ChannelBytesExportRecall() {
+            @Override
+            public void exportTo(Object toMe) {
+                ByteBuffer byteBuffer = (ByteBuffer) toMe;
+                bytes = new byte[]
+                byteBuffer.get(bytes, (int) offset.longValue(), (int) readSome.intValue());
+
+            }
+        });
+
+        return bytes;
+    }*/
+
+    public MiddleStorageObject export( DirectChannelExportEntity outputEntity, Number offset, Number endSize, long bufferStartPosition, ChannelBytesExportRecall recall ) {
+        VolumeManager volumeManager = outputEntity.getVolumeManager();
+        FileChannel targetChannel = outputEntity.getChannel();
         Number stripSize = volumeManager.getConfig().getDefaultStripSize();
-        long bufferStartPosition = stripSize.longValue() * jobCode; // 传入的 buffer 起始位置
-        ExportStorageObject exportStorageObject = entity.getExportStorageObject();
+
+        ExportStorageObject exportStorageObject = outputEntity.getExportStorageObject();
         String sourceName = exportStorageObject.getSourceName();
         TitanMiddleStorageObject titanMiddleStorageObject = new TitanMiddleStorageObject();
 
@@ -74,7 +88,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
         long checksum = 0;
         File file = new File(sourceName);
 
-        try (FileChannel frameChannel = FileChannel.open(file.toPath(), StandardOpenOption.READ)) {
+        try ( FileChannel frameChannel = FileChannel.open(file.toPath(), StandardOpenOption.READ) ) {
             long bufferSize = endSize.longValue();
             // 定位到文件的 offset 位置
             frameChannel.position(offset.longValue());
@@ -89,27 +103,99 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
                 bufferSize = read;
             }
             //Debug.trace( "起始位置" + bufferStartPosition+"终止大小"+bufferSize );
-            byteBuffer.get(buffer, (int) bufferStartPosition, (int) bufferSize);
+            //byteBuffer.get(outputTarget, (int) bufferStartPosition, (int) bufferSize);
 
-            counter.incrementAndGet();
-            if( counter.get() == jobNum ){
-                this.bufferToFile( buffer, targetChannel, volumeManager );
-                counter.getAndSet( 0 );
-                lockEntity.getCurrentBufferCode().incrementAndGet();
-                if ( lockEntity.getCurrentBufferCode().get() == jobNum ){
-                    lockEntity.getCurrentBufferCode().getAndSet( 0 );
+            recall.exportTo( byteBuffer );
+
+            //....
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return titanMiddleStorageObject;
+    }
+
+
+    @Override
+    public MiddleStorageObject raid0Export( DirectChannelExportEntity entity, byte[] outputTarget, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity ) {
+        VolumeManager volumeManager = entity.getVolumeManager();
+        FileChannel targetChannel = entity.getChannel();
+        Number stripSize = volumeManager.getConfig().getDefaultStripSize();
+        long bufferStartPosition = stripSize.longValue() * jobCode; // 传入的 buffer 起始位置
+        ExportStorageObject exportStorageObject = entity.getExportStorageObject();
+        String sourceName = exportStorageObject.getSourceName();
+        TitanMiddleStorageObject titanMiddleStorageObject = new TitanMiddleStorageObject();
+
+        long parityCheck = 0;
+        long checksum = 0;
+        File file = new File(sourceName);
+
+        try ( FileChannel frameChannel = FileChannel.open(file.toPath(), StandardOpenOption.READ) ) {
+            long bufferSize = endSize.longValue();
+            // 定位到文件的 offset 位置
+            frameChannel.position(offset.longValue());
+
+            // 读取 endSize 大小的字节
+            ByteBuffer byteBuffer = ByteBuffer.allocate(endSize.intValue());
+            int read = frameChannel.read(byteBuffer);
+            byteBuffer.flip();
+
+            // 将读取的数据从 bufferStartPosition 开始写入到 buffer
+            if( read < bufferSize ){
+                bufferSize = read;
+            }
+            //Debug.trace( "起始位置" + bufferStartPosition+"终止大小"+bufferSize );
+            byteBuffer.get(outputTarget, (int) bufferStartPosition, (int) bufferSize);
+
+            Debug.infoSyn( "155", counter.get(), counter.hashCode(), lockEntity.getLockObject().hashCode() );
+
+            // 监工形态
+            boolean bNeedUnlock = true;
+            //lockEntity.getMaoLock().lock();
+            //try{
+                counter.incrementAndGet();
+                // TODO
+//                if( counter.get() == 2 ){
+//                    this.bufferToFile( outputTarget, targetChannel, volumeManager );
+//                }
+
+                if( counter.get() == 2 ){
+                    this.bufferToFile( outputTarget, targetChannel, volumeManager );
+                    counter.getAndSet( 0 );
+                    lockEntity.getCurrentBufferCode().incrementAndGet();
+                    if ( lockEntity.getCurrentBufferCode().get() == 2 ){
+                        lockEntity.getCurrentBufferCode().getAndSet( 0 );
+                    }
+
+                    Debug.traceSyn( "miao", Thread.currentThread().getName() );
+                    lockEntity.unlockPipeStage();
                 }
-                for( Object lockObject : lockEntity.getLockGroup() ){
-                    synchronized ( lockObject ){
-                        lockObject.notify();
+                else {
+                    synchronized ( lockEntity.getLockObject() ){
+                        Debug.traceSyn( "shit" );
+                        try{
+                            //lockEntity.getMaoLock().unlock();
+                            bNeedUnlock = false;
+                            lockEntity.getLockObject().wait();
+                        }
+                        catch ( InterruptedException e ) {
+                            e.printStackTrace();
+                        }
                     }
                 }
-            }
+//            }
+//            finally {
+//                if( bNeedUnlock ) {
+//                    //lockEntity.getMaoLock().unlock();
+//                }
+//            }
+
 
             // 计算校验和和奇偶校验
             CRC32 crc = new CRC32();
             for (int i = 0; i < endSize.intValue(); i++) {
-                byte b = buffer[(int) bufferStartPosition + i];
+                byte b = outputTarget[(int) bufferStartPosition + i];
                 parityCheck += Bytes.calculateParity(b);
                 checksum += b & 0xFF;
                 crc.update(b);
@@ -118,14 +204,15 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
             titanMiddleStorageObject.setChecksum(checksum);
             titanMiddleStorageObject.setCrc32(Long.toHexString(crc.getValue()));
             titanMiddleStorageObject.setParityCheck(parityCheck);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         return titanMiddleStorageObject;
     }
 
-    private void bufferToFile( byte[] buffer, FileChannel channel, VolumeManager volumeManager ){
+    private synchronized void bufferToFile( byte[] buffer, FileChannel channel, VolumeManager volumeManager ){
         Hydrarum hydrarum = volumeManager.getHydrarum();
         GUID72 guid72 = GUIDs.Dummy72();
         MasterVolumeGram masterVolumeGram = new MasterVolumeGram( guid72.toString(), hydrarum );

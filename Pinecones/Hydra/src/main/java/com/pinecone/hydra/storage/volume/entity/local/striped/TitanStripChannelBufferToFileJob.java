@@ -11,18 +11,21 @@ public class TitanStripChannelBufferToFileJob implements StripChannelBufferToFil
     private byte[]          buffer;
     private FileChannel     channel;
 
-    public TitanStripChannelBufferToFileJob(byte[] buffer, FileChannel channel ){
+    public TitanStripChannelBufferToFileJob( byte[] buffer, FileChannel channel ){
         this.buffer = buffer;
         this.channel = channel;
     }
+
     @Override
     public void execute() {
         ByteBuffer writeBuffer = ByteBuffer.wrap(buffer);
         try {
             channel.write(writeBuffer);
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new RuntimeException(e);
         }
         Arrays.fill(buffer, (byte) 0);
+        Debug.trace( "tofile done" );
     }
 }

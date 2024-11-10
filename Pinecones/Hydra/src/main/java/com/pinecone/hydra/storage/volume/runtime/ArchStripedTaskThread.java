@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.runtime;
 
+import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.system.executum.Processum;
 
 public abstract class ArchStripedTaskThread extends ArchTaskThread implements Runnable {
@@ -15,13 +16,18 @@ public abstract class ArchStripedTaskThread extends ArchTaskThread implements Ru
         this.setName( affinityThread.getName() );
     }
 
-    protected void executeSingleJob() {
+    protected void executeSingleJob() throws VolumeJobCompromiseException {
         this.mVolumeJob.execute();
     }
 
     @Override
     public void run() {
         //switch ()
-        this.executeSingleJob();
+        try{
+            this.executeSingleJob();
+        }
+        catch ( VolumeJobCompromiseException e ) {
+            throw new ProxyProvokeHandleException( e );
+        }
     }
 }
