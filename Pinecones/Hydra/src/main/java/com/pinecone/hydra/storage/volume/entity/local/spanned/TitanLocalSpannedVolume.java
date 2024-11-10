@@ -15,6 +15,7 @@ import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.spanned.export.TitanSpannedChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.spanned.receive.TitanSpannedChannelReceiveEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
 import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
 
 import java.io.IOException;
@@ -84,7 +85,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
     }
 
     @Override
-    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException, SQLException {
+    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity) throws IOException, SQLException {
         return null;
     }
 

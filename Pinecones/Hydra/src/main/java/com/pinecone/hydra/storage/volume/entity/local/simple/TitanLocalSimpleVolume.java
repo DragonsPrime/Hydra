@@ -15,6 +15,7 @@ import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.export.TitanSimpleChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleChannelReceiverEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 
 import java.io.File;
@@ -86,9 +87,9 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     }
 
     @Override
-    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException, SQLException {
+    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity) throws IOException, SQLException {
         TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeManager, exportStorageObject, channel );
-        return titanSimpleChannelExportEntity64.raid0Export( buffer, offset, endSize, jobCode, jobNum, counter );
+        return titanSimpleChannelExportEntity64.raid0Export( buffer, offset, endSize, jobCode, jobNum, counter, lockEntity );
     }
 
     @Override

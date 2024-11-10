@@ -80,7 +80,7 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
     }
 
     @Override
-    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException, SQLException {
+    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity) throws IOException, SQLException {
         return null;
     }
 

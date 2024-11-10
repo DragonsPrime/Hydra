@@ -8,6 +8,7 @@ import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.local.LocalMirroredVolume;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
 import com.pinecone.hydra.storage.volume.source.MirroredVolumeManipulator;
 
 import java.io.IOException;
@@ -71,7 +72,7 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
     }
 
     @Override
-    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException, SQLException {
+    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity) throws IOException, SQLException {
         return null;
     }
 

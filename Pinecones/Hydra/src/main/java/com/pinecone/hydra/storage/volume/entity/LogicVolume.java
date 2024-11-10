@@ -1,8 +1,10 @@
 package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.volume.VolumeManager;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
 import java.io.IOException;
@@ -45,11 +47,13 @@ public interface LogicVolume extends Volume, TreeNode {
     MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel ) throws IOException, SQLException;
     MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel, Number offset, Number endSize ) throws IOException, SQLException;
     MiddleStorageObject channelExport( ExportStorageObject exportStorageObject, FileChannel channel ) throws IOException, SQLException;
-    MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException, SQLException;
+    MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity) throws IOException, SQLException;
 
     boolean existStorageObject( GUID storageObject ) throws SQLException;
 
     void build() throws SQLException;
 
     void storageExpansion( GUID volumeGuid );
+
+    SQLiteExecutor getSQLiteExecutor() throws SQLException;
 }

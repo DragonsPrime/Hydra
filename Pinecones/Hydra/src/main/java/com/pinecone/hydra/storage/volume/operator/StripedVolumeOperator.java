@@ -6,6 +6,7 @@ import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
+import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.source.StripedVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
 import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
@@ -63,6 +64,7 @@ public class StripedVolumeOperator extends ArchVolumeOperator  implements Volume
         VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
         stripedVolume.setVolumeCapacity( volumeCapacity );
         stripedVolume.setVolumeTree( this.volumeManager);
+        stripedVolume.setKenVolumeFileSystem();
         return stripedVolume;
     }
 

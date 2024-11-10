@@ -6,6 +6,13 @@ import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.TitanMiddleStorageObject;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
+import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripChannelBufferToFileJob;
+import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
+import com.pinecone.hydra.system.Hydrarum;
+import com.pinecone.ulf.util.id.GUID72;
+import com.pinecone.ulf.util.id.GUIDs;
 
 import java.io.File;
 import java.io.IOException;
@@ -54,7 +61,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
     }
 
     @Override
-    public MiddleStorageObject raid0Export(DirectChannelExportEntity entity, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) {
+    public MiddleStorageObject raid0Export(DirectChannelExportEntity entity, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity) {
         VolumeManager volumeManager = entity.getVolumeManager();
         FileChannel targetChannel = entity.getChannel();
         Number stripSize = volumeManager.getConfig().getDefaultStripSize();
@@ -86,11 +93,17 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
 
             counter.incrementAndGet();
             if( counter.get() == jobNum ){
-                ByteBuffer writeBuffer = ByteBuffer.wrap(buffer);
-                targetChannel.write(writeBuffer);
-                // 清空 buffer
-                Arrays.fill(buffer, (byte) 0);
-                counter.set( 0 );
+                this.bufferToFile( buffer, targetChannel, volumeManager );
+                counter.getAndSet( 0 );
+                lockEntity.getCurrentBufferCode().incrementAndGet();
+                if ( lockEntity.getCurrentBufferCode().get() == jobNum ){
+                    lockEntity.getCurrentBufferCode().getAndSet( 0 );
+                }
+                for( Object lockObject : lockEntity.getLockGroup() ){
+                    synchronized ( lockObject ){
+                        lockObject.notify();
+                    }
+                }
             }
 
             // 计算校验和和奇偶校验
@@ -110,6 +123,17 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
         }
 
         return titanMiddleStorageObject;
+    }
+
+    private void bufferToFile( byte[] buffer, FileChannel channel, VolumeManager volumeManager ){
+        Hydrarum hydrarum = volumeManager.getHydrarum();
+        GUID72 guid72 = GUIDs.Dummy72();
+        MasterVolumeGram masterVolumeGram = new MasterVolumeGram( guid72.toString(), hydrarum );
+        hydrarum.getTaskManager().add( masterVolumeGram );
+        TitanStripChannelBufferToFileJob job = new TitanStripChannelBufferToFileJob(buffer, channel);
+        LocalStripedTaskThread taskThread = new LocalStripedTaskThread( guid72.toString(),masterVolumeGram,job);
+        masterVolumeGram.getTaskManager().add( taskThread );
+        taskThread.start();
     }
 
 }

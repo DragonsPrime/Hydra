@@ -18,7 +18,7 @@ public class TitanStripedChannelExportEntity64 extends ArchExportEntity implemen
         super(volumeManager, exportStorageObject);
         this.channel = channel;
         this.stripedVolume = stripedVolume;
-        this.stripedChannelExport64 = new TitanStripedChannelExport64( this, this.stripedVolume );
+        this.stripedChannelExport64 = new TitanStripedChannelExport64( this );
     }
 
     @Override
@@ -34,5 +34,10 @@ public class TitanStripedChannelExportEntity64 extends ArchExportEntity implemen
     @Override
     public MiddleStorageObject export() throws IOException, SQLException {
         return this.stripedChannelExport64.export();
+    }
+
+    @Override
+    public StripedVolume getStripedVolume() {
+        return this.stripedVolume;
     }
 }

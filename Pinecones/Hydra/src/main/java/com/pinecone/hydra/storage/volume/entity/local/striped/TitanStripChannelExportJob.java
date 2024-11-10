@@ -3,35 +3,42 @@ package com.pinecone.hydra.storage.volume.entity.local.striped;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
+import com.pinecone.hydra.storage.volume.entity.local.striped.export.StripedChannelExport;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanStripChannelExportJob implements StripChannelExportJob {
     private VolumeManager           volumeManager;
-    private byte[]                  firstBuffer;
-    private byte[]                  secondBuffer;
+    private List< byte[] >          buffers;
     private ExportStorageObject     object;
     private int                     jobNum;
     private int                     jobCode;
     private LogicVolume             volume;
     private FileChannel             channel;
-    private AtomicInteger           firstCounter;
-    private AtomicInteger           secondCounter;
+    private AtomicInteger           currentBufferCode;
+    private AtomicInteger           counter;
+    private Object                  lockObject;
+    private List<Object>            lockGroup;
+    private StripLockEntity         lockEntity;
 
-    public TitanStripChannelExportJob(ExportStorageObject object, byte[] firstBuffer, byte[] secondBuffer, int jobNum, int jobCode, VolumeManager volumeManager, LogicVolume volume, FileChannel channel, AtomicInteger firstCounter, AtomicInteger secondCounter){
-        this.object = object;
-        this.firstBuffer = firstBuffer;
-        this.secondBuffer = secondBuffer;
-        this. jobNum = jobNum;
-        this.jobCode = jobCode;
-        this.volumeManager = volumeManager;
-        this.volume = volume;
-        this.channel = channel;
-        this.firstCounter = firstCounter;
-        this.secondCounter = secondCounter;
+
+    public TitanStripChannelExportJob(StripedChannelExport stripedChannelExport, List<byte[]> buffers, int jobNum, int jobCode, StripLockEntity lockEntity, AtomicInteger counter, LogicVolume volume){
+        this.object             =   stripedChannelExport.getExportStorageObject();
+        this. jobNum            =   jobNum;
+        this.jobCode            =   jobCode;
+        this.volumeManager      =   stripedChannelExport.getVolumeManager();
+        this.volume             =   volume;
+        this.channel            =   stripedChannelExport.getFileChannel();
+        this.buffers            =   buffers;
+        this.currentBufferCode  =   lockEntity.getCurrentBufferCode();
+        this.lockObject         =   lockEntity.getLockObject();
+        this.lockGroup          =   lockEntity.getLockGroup();
+        this.lockEntity         =   lockEntity;
+        this.counter            =   counter;
     }
     @Override
     public void execute()  {
@@ -48,32 +55,16 @@ public class TitanStripChannelExportJob implements StripChannelExportJob {
             if( currentPosition + bufferSize > size ){
                 bufferSize = size - currentPosition;
             }
-            if( check( this.firstBuffer, bufferStartPosition, bufferEndPosition ) ){
-                try {
-                    this.volume.channelRaid0Export( this.object, this.channel, this.firstBuffer, currentPosition, bufferSize, this.jobCode, this.jobNum, this.firstCounter );
-                } catch (IOException | SQLException e) {
-                    throw new RuntimeException(e);
-                }
-
+            try {
+                this.volume.channelRaid0Export( this.object, this.channel, this.buffers.get(this.currentBufferCode.get()), currentPosition, bufferSize, this.jobCode, this.jobNum, this.counter, this.lockEntity );
                 currentPosition += bufferSize;
-            } else if( check( this.secondBuffer, bufferStartPosition, bufferEndPosition ) ){
-                try {
-                    this.volume.channelRaid0Export( this.object, this.channel, this.secondBuffer, currentPosition, bufferSize, this.jobCode, this.jobNum, this.secondCounter );
-                } catch (IOException | SQLException e) {
-                    throw new RuntimeException(e);
+                synchronized ( this.lockObject ){
+                    this.lockObject.wait();
                 }
-
-                currentPosition += bufferSize;
+            } catch (IOException | SQLException | InterruptedException e) {
+                throw new RuntimeException(e);
             }
         }
     }
 
-    private boolean check( byte[] buffer, int startPosition, int endPosition ){
-        for( int i = startPosition; i < endPosition; i++ ){
-            if ( buffer[ i ] != 0 ){
-                return false;
-            }
-        }
-        return true;
-    }
 }

@@ -42,6 +42,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.sql.SQLException;
 
+
 class Alice extends Radium {
     public Alice( String[] args, CascadeSystem parent ) {
         this( args, null, parent );
@@ -78,39 +79,8 @@ class Alice extends Radium {
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
         //this.testStripedInsert( volumeTree );
         //this.testStripedReceive( volumeTree );
-        //this.testStripedExport( volumeTree );
-        this.testMultiIbatis( volumeTree );
+        this.testStripedExport( volumeTree );
     }
-
-    private void testMultiIbatis( VolumeManager volumeManager ) throws IOException {
-        Thread thread1 = new Thread( ()->{
-            for (int i = 0; i < 1e7; i++) {
-                volumeManager.getPhysicalVolume( GUIDs.GUID72("066c2da-000112-0002-18") );
-                Debug.trace( "ssss" );
-            }
-        } );
-        Thread thread2 = new Thread( ()->{
-            for (int i = 0; i < 1e7; i++) {
-                volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
-                Debug.trace( "ssss" );
-            }
-        } );
-        Thread thread3 = new Thread( ()->{
-            for (int i = 0; i < 1e7; i++) {
-                volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
-                Debug.trace( "ssss" );
-            }
-        } );
-
-        thread1.start();
-        //volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
-        thread2.start();
-        //volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
-        thread3.start();
-        //volumeManager.getPhysicalVolume(GUIDs.GUID72("066c2da-000112-0002-18") );
-        Debug.sleep( 10000000 );
-    }
-
 
     private void testDirectReceive(VolumeManager volumeManager) throws IOException {
         TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();

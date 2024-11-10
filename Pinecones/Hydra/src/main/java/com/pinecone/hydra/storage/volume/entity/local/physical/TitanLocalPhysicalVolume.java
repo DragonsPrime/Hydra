@@ -10,6 +10,7 @@ import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirectChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel.TitanDirectChannelReceiveEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
 
 import java.io.IOException;
@@ -80,9 +81,9 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     }
 
     @Override
-    public MiddleStorageObject channelRaid0Export(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter) throws IOException {
+    public MiddleStorageObject channelRaid0Export(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity) throws IOException {
         TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, exportStorageObject,channel );
-        MiddleStorageObject middleStorageObject = titanDirectChannelExportEntity64.raid0Export(buffer, offset, endSize, jobCode, jobNum, counter);
+        MiddleStorageObject middleStorageObject = titanDirectChannelExportEntity64.raid0Export(buffer, offset, endSize, jobCode, jobNum, counter, lockEntity);
         middleStorageObject.setBottomGuid( this.getGuid() );
         return middleStorageObject;
     }
