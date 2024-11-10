@@ -192,12 +192,12 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
 
     }
 
-    protected ReentrantLock reentrantLock = new ReentrantLock();
+    //protected ReentrantLock reentrantLock = new ReentrantLock();
 
     @Override
     public PhysicalVolume getPhysicalVolume(GUID guid) {
-        this.reentrantLock.lock();
-        try{
+//        this.reentrantLock.lock();
+//        try{
             Debug.trace( Thread.currentThread().getName(), Thread.currentThread().getId() );
             PhysicalVolume physicalVolume   = this.physicalVolumeManipulator.getPhysicalVolume(guid);
             MountPoint mountPoint           = this.mountPointManipulator.getMountPointByVolumeGuid(guid);
@@ -205,10 +205,10 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
             physicalVolume.setMountPoint( mountPoint );
             physicalVolume.setVolumeCapacity( volumeCapacity );
             return physicalVolume;
-        }
-        finally {
-            this.reentrantLock.unlock();
-        }
+//        }
+//        finally {
+//            this.reentrantLock.unlock();
+//        }
     }
 
     @Override

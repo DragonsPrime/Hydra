@@ -3,9 +3,6 @@ package com.pinecone.hydra.entity.ibatis.hydranium;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.session.LocalCacheScope;
-import org.apache.ibatis.session.SqlSession;
-
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.system.construction.UnifyStructureInjector;
 import com.pinecone.framework.system.homotype.StereotypicInjector;
@@ -15,7 +12,8 @@ import com.pinecone.hydra.entity.ibatis.UOITypeHandler;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.component.ResourceDispenserCenter;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
-import com.pinecone.slime.jelly.source.ibatis.AppliedMapperPool;
+import com.pinecone.slime.jelly.source.ibatis.ProxySessionMapperPool;
+import com.pinecone.slime.jelly.source.ibatis.SoloSessionMapperPool;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
 
 public abstract class ArchMappingDriver implements KOIMappingDriver {
@@ -23,7 +21,7 @@ public abstract class ArchMappingDriver implements KOIMappingDriver {
 
     protected IbatisClient         mIbatisClient;
 
-    protected SqlSession           mSqlSession;
+    //protected SqlSession           mSqlSession;
 
     protected List<Class<? > >     mMapperCandidates;
 
@@ -37,7 +35,9 @@ public abstract class ArchMappingDriver implements KOIMappingDriver {
     public ArchMappingDriver( Hydrarum system, IbatisClient ibatisClient, ResourceDispenserCenter dispenserCenter, String szPackageName ) {
         this.mSystem       = system;
         this.mIbatisClient = ibatisClient;
-        this.mSqlSession   = ibatisClient.openSession( true );
+        //this.mSqlSession   = ibatisClient.openSession( true );
+
+        //SqlSessionTemplate
 
         ibatisClient.getConfiguration().getTypeHandlerRegistry().register( GUID72TypeHandler.class );
         ibatisClient.getConfiguration().getTypeHandlerRegistry().register( GUIDTypeHandler.class );
@@ -48,7 +48,8 @@ public abstract class ArchMappingDriver implements KOIMappingDriver {
         for( Class<? > mapperClass : this.mMapperCandidates ) {
             dispenserCenter.getInstanceDispenser().register(
                     mapperClass,
-                    new AppliedMapperPool( this.mSqlSession, mapperClass )
+                    //new SoloSessionMapperPool( this.mSqlSession, mapperClass )
+                    new ProxySessionMapperPool( ibatisClient, mapperClass )
             );
         }
 

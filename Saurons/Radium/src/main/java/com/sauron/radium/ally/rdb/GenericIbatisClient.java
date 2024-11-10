@@ -238,6 +238,11 @@ public class GenericIbatisClient extends ArchRelationalDatabase implements Ibati
     }
 
     @Override
+    public SqlSessionFactory getSqlSessionFactory() {
+        return this.mSqlSessionFactory;
+    }
+
+    @Override
     public SqlSession openSession() {
         SqlSession sqlSession = this.mSqlSessionFactory.openSession();
         this.mSqlSessionPool.add( sqlSession );

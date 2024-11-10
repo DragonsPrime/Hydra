@@ -5,12 +5,10 @@ import com.pinecone.framework.system.Nullable;
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 
 import com.pinecone.framework.system.construction.Structure;
-import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.config.JSONConfig;
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.framework.util.json.hometype.JSONGet;
-import com.pinecone.hydra.auto.Instructation;
-import com.pinecone.slime.jelly.source.ibatis.AppliedMapperPool;
+import com.pinecone.slime.jelly.source.ibatis.SoloSessionMapperPool;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
 import com.sauron.radium.heistron.CascadeHeist;
 import com.sauron.radium.heistron.Crew;
@@ -18,7 +16,6 @@ import com.sauron.radium.heistron.HTTPHeist;
 import com.sauron.radium.heistron.Heistgram;
 import com.sauron.radium.heistron.chronic.PeriodicHeistRehearsal;
 import com.sauron.radium.heistron.orchestration.Heistlet;
-import com.sauron.shadow.chronicle.Newstron.ZhihuClerk;
 import com.sauron.shadow.chronicle.dao.BasicChronicleManipulator;
 import org.apache.ibatis.session.SqlSession;
 
@@ -83,7 +80,7 @@ public class ChronicleHeist extends HTTPHeist implements Chronicle {
 
         this.getSystem().getDispenserCenter().getInstanceDispenser().register(
                 BasicChronicleManipulator.class,
-                new AppliedMapperPool( this.mPrimarySharedSqlSession, BasicChronicleManipulator.class )
+                new SoloSessionMapperPool( this.mPrimarySharedSqlSession, BasicChronicleManipulator.class )
         );
         //this.mBasicChronicleManipulator = this.mPrimarySharedSqlSession.getMapper( BasicChronicleManipulator.class );
     }

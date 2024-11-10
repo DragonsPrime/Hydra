@@ -269,6 +269,12 @@ public final class ReflectionUtils {
 
     }
 
+    public static <T> Constructor<T> accessibleConstructor(Class<T> clazz, Class... parameterTypes) throws NoSuchMethodException {
+        Constructor<T> ctor = clazz.getDeclaredConstructor(parameterTypes);
+        ReflectionUtils.makeAccessible(ctor);
+        return ctor;
+    }
+
     public static void doWithMethods(Class<?> clazz, ReflectionUtils.MethodCallback mc) throws IllegalArgumentException {
         doWithMethods(clazz, mc, (ReflectionUtils.MethodFilter)null);
     }

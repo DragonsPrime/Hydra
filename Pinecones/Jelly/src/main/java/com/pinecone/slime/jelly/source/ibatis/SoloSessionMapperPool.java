@@ -3,11 +3,11 @@ package com.pinecone.slime.jelly.source.ibatis;
 import com.pinecone.framework.system.construction.InstancePool;
 import org.apache.ibatis.session.SqlSession;
 
-public class AppliedMapperPool implements InstancePool {
+public class SoloSessionMapperPool implements InstancePool {
     protected SqlSession        mSqlSession;
     protected Class<? >         mType;
 
-    public AppliedMapperPool ( SqlSession sqlSession, Class<? > type ) {
+    public SoloSessionMapperPool(SqlSession sqlSession, Class<? > type ) {
         this.mSqlSession = sqlSession;
         this.mType       = type;
     }

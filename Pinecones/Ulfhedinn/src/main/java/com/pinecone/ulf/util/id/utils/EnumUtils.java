@@ -15,7 +15,8 @@
  */
 package com.pinecone.ulf.util.id.utils;
 
-import org.springframework.util.Assert;
+
+import com.pinecone.framework.util.Assert;
 
 /**
  * EnumUtils provides the operations for {@link ValuedEnum} such as Parse, value of...
