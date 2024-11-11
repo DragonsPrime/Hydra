@@ -8,9 +8,11 @@ import com.pinecone.hydra.storage.volume.entity.local.striped.export.StripedChan
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -101,6 +103,56 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
             try {
                 this.volume.channelRaid0Export( this.object, this.channel, this.buffers.get(this.currentBufferCode.get()), currentPosition, bufferSize, this.jobCode, this.jobNum, this.counter, this.lockEntity, terminalStateRecordGroup);
                 currentPosition += bufferSize;
+
+
+
+//                while (true) {
+//                    // 使用 compareAndSet 实现安全增量
+//                    int currentCount = counter.get();
+//                    if (currentCount < 2 && counter.compareAndSet(currentCount, currentCount + 1)) {
+//                        if (counter.get() == 2) {
+////                            if (isLast) {
+////                                int temporaryCurrentPosition = 0;
+////                                terminalStateRecordGroup.sort(Comparator.comparing(TerminalStateRecord::getSequentialNumbering));
+////                                int totalSize = terminalStateRecordGroup.stream()
+////                                        .mapToInt(stateRecord -> stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue())
+////                                        .sum();
+////                                byte[] temporaryBuffer = new byte[totalSize];
+////                                for (TerminalStateRecord stateRecord : terminalStateRecordGroup) {
+////                                    int length = stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue();
+////                                    ByteBuffer buffer = ByteBuffer.wrap(outputTarget, stateRecord.getValidByteStart().intValue(), length);
+////                                    buffer.get(temporaryBuffer, temporaryCurrentPosition, length);
+////                                    temporaryCurrentPosition += length;
+////                                }
+////                                outputTarget = temporaryBuffer;
+////                            }
+//
+//                            counter.set(0);  // 重置 counter
+//
+//                            // 更新 buffer code 安全递增和重置
+//                            if (lockEntity.getCurrentBufferCode().incrementAndGet() == 2) {
+//                                lockEntity.getCurrentBufferCode().set(0);
+//                            }
+//
+//                            lockEntity.unlockPipeStage();
+//                            break;
+//                        }
+//                    }
+//                    else {
+//                        synchronized (lockEntity.getLockObject()) {
+//                            try {
+//                                lockEntity.getLockObject().wait();
+//                                break;
+//                            }
+//                            catch (InterruptedException e) {
+//                                Thread.currentThread().interrupt();  // 重设线程的中断状态
+//                                e.printStackTrace();
+//                            }
+//                        }
+//                    }
+//                }
+
+
 
 
 //                // 监工形态

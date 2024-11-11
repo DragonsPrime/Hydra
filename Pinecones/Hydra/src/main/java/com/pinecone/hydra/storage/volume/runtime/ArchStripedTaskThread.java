@@ -17,7 +17,7 @@ public abstract class ArchStripedTaskThread extends ArchTaskThread implements Ru
     }
 
 
-    protected void executeSingleJob() throws VolumeJobCompromiseException, InterruptedException {
+    protected void executeSingleJob() throws VolumeJobCompromiseException {
         this.mVolumeJob.execute();
     }
 
@@ -29,8 +29,6 @@ public abstract class ArchStripedTaskThread extends ArchTaskThread implements Ru
         }
         catch ( VolumeJobCompromiseException e ) {
             throw new ProxyProvokeHandleException( e );
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
         }
     }
 }

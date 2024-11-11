@@ -24,6 +24,7 @@ import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -70,12 +71,13 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
         TitanStripLockEntity bufferToFileLockEntity = new TitanStripLockEntity( bufferToFileLock, lockGroup, currentBufferCode, maoLock);
         TitanStripChannelBufferToFileJob bufferToFileJob = new TitanStripChannelBufferToFileJob( buffers,this.channel, currentBufferCode, bufferToFileLockEntity, bufferToFileSize );
         LocalStripedTaskThread bufferToFileThread = new LocalStripedTaskThread( "bufferToFile", masterVolumeGram,bufferToFileJob );
-        masterVolumeGram.getTaskManager().add( bufferToFileThread );
-        bufferToFileThread.start();
+//        masterVolumeGram.getTaskManager().add( bufferToFileThread );
+//        bufferToFileThread.start();
 
         int index = 0;
         for( LogicVolume volume : volumes ){
-            Object lockObject = new Object();
+            //Object lockObject = new Object();
+            Object lockObject = new Semaphore(0);
             lockGroup.add( lockObject );
 
             String sourceName = this.kenVolumeFileSystem.getKVFSFileStripSourceName(sqLiteExecutor, volume.getGuid(), this.exportStorageObject.getStorageObjectGuid());

@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
+import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -25,11 +26,18 @@ public class TitanStripChannelBufferToFileJob implements StripChannelBufferToFil
     }
 
     @Override
-    public void execute() throws InterruptedException {
+    public void execute() throws VolumeJobCompromiseException {
         while( true ){
             synchronized ( this.lockEntity.getLockObject() ){
-                this.lockEntity.getLockObject().wait();
+                try{
+                    Debug.trace("摸鱼罗");
+                    this.lockEntity.getLockObject().wait();
+                }
+                catch ( InterruptedException e ) {
+                    Thread.currentThread().interrupt();
+                }
             }
+
             Debug.trace("开锁，执行写入");
             //todo 后面要实现跳出机制
             byte[] buffer = this.bufferGroup.get( this.currentBufferCode.get() );
@@ -43,6 +51,7 @@ public class TitanStripChannelBufferToFileJob implements StripChannelBufferToFil
             Arrays.fill(buffer, (byte) 0);
         }
 
+        //Debug.warnSyn( "wangwang" );
     }
 
 }

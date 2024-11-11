@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
@@ -59,9 +60,20 @@ public class TitanStripLockEntity implements StripLockEntity{
 
     @Override
     public void unlockPipeStage() {
+//        for( final Object lockObject : this.getLockGroup() ){
+//            synchronized ( lockObject ){
+//                lockObject.notify();
+//            }
+//        }
+
         for( final Object lockObject : this.getLockGroup() ){
-            synchronized ( lockObject ){
-                lockObject.notify();
+            if( lockObject instanceof Semaphore ) {
+                ( (Semaphore) lockObject ).release();
+            }
+            else {
+                synchronized ( lockObject ){
+                    lockObject.notify();
+                }
             }
         }
     }

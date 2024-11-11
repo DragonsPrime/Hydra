@@ -24,6 +24,7 @@ import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.CRC32;
 
@@ -161,44 +162,108 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
             //Debug.trace( "起始位置" + bufferStartPosition+"终止大小"+bufferSize );
             byteBuffer.get(outputTarget, (int) bufferStartPosition, (int) bufferSize);
 
+
             // 监工形态
-                counter.incrementAndGet();
-
-                if( counter.get() == 2 ){
-                    if( isLast ){
-                        int temporaryCurrentPosition = 0;
-                        terminalStateRecordGroup.sort(Comparator.comparing( TerminalStateRecord :: getSequentialNumbering ));
-                        int totalSize = terminalStateRecordGroup.stream()
-                                .mapToInt(stateRecord -> stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue())
-                                .sum();
-                        byte[] temporaryBuffer = new byte[ totalSize ];
-                        for( TerminalStateRecord stateRecord : terminalStateRecordGroup ){
-                            int length = stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue();
-                            ByteBuffer buffer = ByteBuffer.wrap(outputTarget, stateRecord.getValidByteStart().intValue(), length);
-                            buffer.get( temporaryBuffer,temporaryCurrentPosition, length  );
-                            temporaryCurrentPosition += length;
+            while (true) {
+                // 使用 compareAndSet 实现安全增量
+                int currentCount = counter.get();
+                if (currentCount < 2 && counter.compareAndSet(currentCount, currentCount + 1)) {
+                    if (counter.get() == 2) {
+                        if (isLast) {
+                            int temporaryCurrentPosition = 0;
+                            terminalStateRecordGroup.sort(Comparator.comparing(TerminalStateRecord::getSequentialNumbering));
+                            int totalSize = terminalStateRecordGroup.stream()
+                                    .mapToInt(stateRecord -> stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue())
+                                    .sum();
+                            byte[] temporaryBuffer = new byte[totalSize];
+                            for (TerminalStateRecord stateRecord : terminalStateRecordGroup) {
+                                int length = stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue();
+                                ByteBuffer buffer = ByteBuffer.wrap(outputTarget, stateRecord.getValidByteStart().intValue(), length);
+                                buffer.get(temporaryBuffer, temporaryCurrentPosition, length);
+                                temporaryCurrentPosition += length;
+                            }
+                            outputTarget = temporaryBuffer;
                         }
-                        outputTarget = temporaryBuffer;
-                    }
-                    //this.bufferToFile( outputTarget, targetChannel, volumeManager );
-                    counter.getAndSet( 0 );
-                    lockEntity.getCurrentBufferCode().incrementAndGet();
-                    if ( lockEntity.getCurrentBufferCode().get() == 2 ){
-                        lockEntity.getCurrentBufferCode().getAndSet( 0 );
-                    }
 
-                    lockEntity.unlockPipeStage();
+                        counter.set(0);  // 重置 counter
+
+                        // 更新 buffer code 安全递增和重置
+                        if (lockEntity.getCurrentBufferCode().incrementAndGet() == 2) {
+                            lockEntity.getCurrentBufferCode().set(0);
+                        }
+
+                        lockEntity.unlockPipeStage();
+                        Debug.warnSyn( "sss" );
+                        break;
+                    }
+                    Debug.warnSyn( "a1" );
                 }
                 else {
-                    synchronized ( lockEntity.getLockObject() ){
-                        try{
-                            lockEntity.getLockObject().wait();
-                        }
-                        catch ( InterruptedException e ) {
-                            e.printStackTrace();
-                        }
+                    try {
+                        ( (Semaphore) lockEntity.getLockObject() ).acquire();
+                        break;
                     }
+                    catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        e.printStackTrace();
+                    }
+
+//                    synchronized (lockEntity.getLockObject()) {
+//                        try {
+//                            lockEntity.getLockObject().wait();
+//                            break;
+//                        }
+//                        catch (InterruptedException e) {
+//                            Thread.currentThread().interrupt();  // 重设线程的中断状态
+//                            e.printStackTrace();
+//                        }
+//                    }
                 }
+            }
+
+
+//                if( counter.incrementAndGet() == 2 ){
+//                        if( isLast ){
+//                            int temporaryCurrentPosition = 0;
+//                            terminalStateRecordGroup.sort(Comparator.comparing( TerminalStateRecord :: getSequentialNumbering ));
+//                            int totalSize = terminalStateRecordGroup.stream()
+//                                    .mapToInt(stateRecord -> stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue())
+//                                    .sum();
+//                            byte[] temporaryBuffer = new byte[ totalSize ];
+//                            for( TerminalStateRecord stateRecord : terminalStateRecordGroup ){
+//                                int length = stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue();
+//                                ByteBuffer buffer = ByteBuffer.wrap(outputTarget, stateRecord.getValidByteStart().intValue(), length);
+//                                buffer.get( temporaryBuffer,temporaryCurrentPosition, length  );
+//                                temporaryCurrentPosition += length;
+//                            }
+//                            outputTarget = temporaryBuffer;
+//                        }
+//                        //this.bufferToFile( outputTarget, targetChannel, volumeManager );
+//                        counter.getAndSet( 0 );
+//                        if ( lockEntity.getCurrentBufferCode().incrementAndGet() == 2 ){
+//                            lockEntity.getCurrentBufferCode().getAndSet( 0 );
+//                        }
+//
+//                        lockEntity.unlockPipeStage();
+//                }
+//                else {
+//                    try {
+//                        ( (Semaphore) lockEntity.getLockObject() ).acquire();
+//                    }
+//                    catch (InterruptedException e) {
+//                        Thread.currentThread().interrupt();
+//                        e.printStackTrace();
+//                    }
+////                    synchronized (lockEntity.getLockObject()) {
+////                        try {
+////                            lockEntity.getLockObject().wait();
+////                        }
+////                        catch (InterruptedException e) {
+////                            Thread.currentThread().interrupt();
+////                            e.printStackTrace();
+////                        }
+////                    }
+//                }
 
 
             // 计算校验和和奇偶校验
@@ -217,6 +282,8 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
         catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+
 
         return titanMiddleStorageObject;
     }
