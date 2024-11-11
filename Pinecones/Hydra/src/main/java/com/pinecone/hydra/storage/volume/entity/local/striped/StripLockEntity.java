@@ -22,4 +22,5 @@ public interface StripLockEntity extends Pinenut {
     void unlockPipeStage();
 
     Lock getMaoLock() ;
+
 }

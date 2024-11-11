@@ -11,11 +11,13 @@ import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirectChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel.TitanDirectChannelReceiveEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TerminalStateRecord;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysicalVolume {
@@ -81,9 +83,9 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     }
 
     @Override
-    public MiddleStorageObject channelRaid0Export(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity) throws IOException {
+    public MiddleStorageObject channelRaid0Export(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity, ArrayList<TerminalStateRecord> terminalStateRecordGroup) throws IOException {
         TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, exportStorageObject,channel );
-        MiddleStorageObject middleStorageObject = titanDirectChannelExportEntity64.raid0Export(buffer, offset, endSize, jobCode, jobNum, counter, lockEntity);
+        MiddleStorageObject middleStorageObject = titanDirectChannelExportEntity64.raid0Export(buffer, offset, endSize, jobCode, jobNum, counter, lockEntity, terminalStateRecordGroup);
         middleStorageObject.setBottomGuid( this.getGuid() );
         return middleStorageObject;
     }

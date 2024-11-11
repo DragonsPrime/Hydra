@@ -8,6 +8,8 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
 import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripTerminalStateRecord;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TerminalStateRecord;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripChannelBufferToFileJob;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.system.Hydrarum;
@@ -19,7 +21,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.CRC32;
 
@@ -118,7 +122,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
 
 
     @Override
-    public MiddleStorageObject raid0Export( DirectChannelExportEntity entity, byte[] outputTarget, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity ) {
+    public MiddleStorageObject raid0Export( DirectChannelExportEntity entity, byte[] outputTarget, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity, ArrayList<TerminalStateRecord> terminalStateRecordGroup ) {
         VolumeManager volumeManager = entity.getVolumeManager();
         FileChannel targetChannel = entity.getChannel();
         Number stripSize = volumeManager.getConfig().getDefaultStripSize();
@@ -126,6 +130,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
         ExportStorageObject exportStorageObject = entity.getExportStorageObject();
         String sourceName = exportStorageObject.getSourceName();
         TitanMiddleStorageObject titanMiddleStorageObject = new TitanMiddleStorageObject();
+        boolean isLast = false;
 
         long parityCheck = 0;
         long checksum = 0;
@@ -139,44 +144,54 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
             // 读取 endSize 大小的字节
             ByteBuffer byteBuffer = ByteBuffer.allocate(endSize.intValue());
             int read = frameChannel.read(byteBuffer);
+            if( read == -1 ){
+                return null;
+            }
             byteBuffer.flip();
 
             // 将读取的数据从 bufferStartPosition 开始写入到 buffer
             if( read < bufferSize ){
+                isLast = true;
+                StripTerminalStateRecord stateRecord = new StripTerminalStateRecord();
+                stateRecord.setValidByteStart( bufferStartPosition );
+                stateRecord.setValidByteEnd( bufferStartPosition + read );
+                stateRecord.setSequentialNumbering( jobCode );
                 bufferSize = read;
             }
             //Debug.trace( "起始位置" + bufferStartPosition+"终止大小"+bufferSize );
             byteBuffer.get(outputTarget, (int) bufferStartPosition, (int) bufferSize);
 
-            Debug.infoSyn( "155", counter.get(), counter.hashCode(), lockEntity.getLockObject().hashCode() );
-
             // 监工形态
-            boolean bNeedUnlock = true;
-            //lockEntity.getMaoLock().lock();
-            //try{
                 counter.incrementAndGet();
-                // TODO
-//                if( counter.get() == 2 ){
-//                    this.bufferToFile( outputTarget, targetChannel, volumeManager );
-//                }
 
                 if( counter.get() == 2 ){
-                    this.bufferToFile( outputTarget, targetChannel, volumeManager );
+                    if( isLast ){
+                        int temporaryCurrentPosition = 0;
+                        terminalStateRecordGroup.sort(Comparator.comparing( TerminalStateRecord :: getSequentialNumbering ));
+                        int totalSize = terminalStateRecordGroup.stream()
+                                .mapToInt(stateRecord -> stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue())
+                                .sum();
+                        byte[] temporaryBuffer = new byte[ totalSize ];
+                        for( TerminalStateRecord stateRecord : terminalStateRecordGroup ){
+                            int length = stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue();
+                            ByteBuffer buffer = ByteBuffer.wrap(outputTarget, stateRecord.getValidByteStart().intValue(), length);
+                            buffer.get( temporaryBuffer,temporaryCurrentPosition, length  );
+                            temporaryCurrentPosition += length;
+                        }
+                        outputTarget = temporaryBuffer;
+                    }
+                    //this.bufferToFile( outputTarget, targetChannel, volumeManager );
                     counter.getAndSet( 0 );
                     lockEntity.getCurrentBufferCode().incrementAndGet();
                     if ( lockEntity.getCurrentBufferCode().get() == 2 ){
                         lockEntity.getCurrentBufferCode().getAndSet( 0 );
                     }
 
-                    Debug.traceSyn( "miao", Thread.currentThread().getName() );
                     lockEntity.unlockPipeStage();
                 }
                 else {
                     synchronized ( lockEntity.getLockObject() ){
-                        Debug.traceSyn( "shit" );
                         try{
-                            //lockEntity.getMaoLock().unlock();
-                            bNeedUnlock = false;
                             lockEntity.getLockObject().wait();
                         }
                         catch ( InterruptedException e ) {
@@ -184,12 +199,6 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
                         }
                     }
                 }
-//            }
-//            finally {
-//                if( bNeedUnlock ) {
-//                    //lockEntity.getMaoLock().unlock();
-//                }
-//            }
 
 
             // 计算校验和和奇偶校验
@@ -212,15 +221,15 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
         return titanMiddleStorageObject;
     }
 
-    private synchronized void bufferToFile( byte[] buffer, FileChannel channel, VolumeManager volumeManager ){
-        Hydrarum hydrarum = volumeManager.getHydrarum();
-        GUID72 guid72 = GUIDs.Dummy72();
-        MasterVolumeGram masterVolumeGram = new MasterVolumeGram( guid72.toString(), hydrarum );
-        hydrarum.getTaskManager().add( masterVolumeGram );
-        TitanStripChannelBufferToFileJob job = new TitanStripChannelBufferToFileJob(buffer, channel);
-        LocalStripedTaskThread taskThread = new LocalStripedTaskThread( guid72.toString(),masterVolumeGram,job);
-        masterVolumeGram.getTaskManager().add( taskThread );
-        taskThread.start();
-    }
+//    private synchronized void bufferToFile( byte[] buffer, FileChannel channel, VolumeManager volumeManager ){
+//        Hydrarum hydrarum = volumeManager.getHydrarum();
+//        GUID72 guid72 = GUIDs.Dummy72();
+//        MasterVolumeGram masterVolumeGram = new MasterVolumeGram( guid72.toString(), hydrarum );
+//        hydrarum.getTaskManager().add( masterVolumeGram );
+//        TitanStripChannelBufferToFileJob job = new TitanStripChannelBufferToFileJob(buffer, channel);
+//        LocalStripedTaskThread taskThread = new LocalStripedTaskThread( guid72.toString(),masterVolumeGram,job);
+//        masterVolumeGram.getTaskManager().add( taskThread );
+//        taskThread.start();
+//    }
 
 }

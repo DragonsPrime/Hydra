@@ -16,7 +16,8 @@ public abstract class ArchStripedTaskThread extends ArchTaskThread implements Ru
         this.setName( affinityThread.getName() );
     }
 
-    protected void executeSingleJob() throws VolumeJobCompromiseException {
+
+    protected void executeSingleJob() throws VolumeJobCompromiseException, InterruptedException {
         this.mVolumeJob.execute();
     }
 
@@ -28,6 +29,8 @@ public abstract class ArchStripedTaskThread extends ArchTaskThread implements Ru
         }
         catch ( VolumeJobCompromiseException e ) {
             throw new ProxyProvokeHandleException( e );
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
         }
     }
 }

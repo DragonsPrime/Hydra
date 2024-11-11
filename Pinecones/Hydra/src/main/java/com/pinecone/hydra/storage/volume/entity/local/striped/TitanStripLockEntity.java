@@ -31,13 +31,6 @@ public class TitanStripLockEntity implements StripLockEntity{
         this.lockObject = lockObject;
     }
 
-    public Lock getMaoLock() {
-        return maoLock;
-    }
-
-    public void setMaoLock(Lock maoLock) {
-        this.maoLock = maoLock;
-    }
 
     @Override
     public List<Object> getLockGroup() {
@@ -57,6 +50,11 @@ public class TitanStripLockEntity implements StripLockEntity{
     @Override
     public void setCurrentBufferCode(AtomicInteger currentBufferCode) {
         this.currentBufferCode = currentBufferCode;
+    }
+
+    @Override
+    public Lock getMaoLock() {
+        return this.maoLock;
     }
 
     @Override

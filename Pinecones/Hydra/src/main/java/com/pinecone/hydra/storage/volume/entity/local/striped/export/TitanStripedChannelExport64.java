@@ -8,6 +8,9 @@ import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TerminalStateRecord;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TitanLocalStripedVolume;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripChannelBufferToFileJob;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripChannelBufferWriteJob;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripLockEntity;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
@@ -52,12 +55,24 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
         AtomicInteger currentBufferCode = new AtomicInteger(0);
         AtomicInteger counter = new AtomicInteger(0);
         ArrayList<Object> lockGroup = new ArrayList<>();
+        ArrayList<TerminalStateRecord> terminalStateRecordGroup = new ArrayList<>();
 
         Lock maoLock = new ReentrantLock();
 
         Hydrarum hydrarum = this.volumeManager.getHydrarum();
         MasterVolumeGram masterVolumeGram = new MasterVolumeGram( this.stripedVolume.getGuid().toString(), hydrarum );
         hydrarum.getTaskManager().add( masterVolumeGram );
+
+        //创建写入文件的线程
+        Number bufferToFileSize = jobNum * stripSize.intValue();
+        Object bufferToFileLock = new Object();
+        lockGroup.add( bufferToFileLock );
+        TitanStripLockEntity bufferToFileLockEntity = new TitanStripLockEntity( bufferToFileLock, lockGroup, currentBufferCode, maoLock);
+        TitanStripChannelBufferToFileJob bufferToFileJob = new TitanStripChannelBufferToFileJob( buffers,this.channel, currentBufferCode, bufferToFileLockEntity, bufferToFileSize );
+        LocalStripedTaskThread bufferToFileThread = new LocalStripedTaskThread( "bufferToFile", masterVolumeGram,bufferToFileJob );
+        masterVolumeGram.getTaskManager().add( bufferToFileThread );
+        bufferToFileThread.start();
+
         int index = 0;
         for( LogicVolume volume : volumes ){
             Object lockObject = new Object();
@@ -70,7 +85,7 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
 
             TitanStripLockEntity lockEntity = new TitanStripLockEntity( lockObject, lockGroup, currentBufferCode, maoLock );
 
-            TitanStripChannelBufferWriteJob exportJob = new TitanStripChannelBufferWriteJob( this, buffers, jobNum, index, lockEntity, counter, volume );
+            TitanStripChannelBufferWriteJob exportJob = new TitanStripChannelBufferWriteJob( this, buffers, jobNum, index, lockEntity, counter, volume, terminalStateRecordGroup,bufferToFileSize );
             LocalStripedTaskThread taskThread = new LocalStripedTaskThread( this.stripedVolume.getName()+index,masterVolumeGram,exportJob);
             masterVolumeGram.getTaskManager().add( taskThread );
             taskThread.start();

@@ -8,4 +8,5 @@ public class LocalStripedTaskThread extends ArchStripedTaskThread {
     public LocalStripedTaskThread ( String szName, Processum parent, VolumeJob volumeJob ) {
         super( szName, parent, volumeJob );
     }
+
 }

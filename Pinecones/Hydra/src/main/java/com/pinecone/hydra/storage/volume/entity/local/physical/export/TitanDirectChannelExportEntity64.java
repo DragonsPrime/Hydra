@@ -5,9 +5,11 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchExportEntity;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TerminalStateRecord;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanDirectChannelExportEntity64 extends ArchExportEntity implements DirectChannelExportEntity64{
@@ -38,8 +40,8 @@ public class TitanDirectChannelExportEntity64 extends ArchExportEntity implement
     }
 
     @Override
-    public MiddleStorageObject raid0Export(byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity) {
-        return this.channelExporter.raid0Export( this, buffer, offset, endSize, jobCode, jobNum, counter, lockEntity );
+    public MiddleStorageObject raid0Export(byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity, ArrayList<TerminalStateRecord> terminalStateRecordGroup) {
+        return this.channelExporter.raid0Export( this, buffer, offset, endSize, jobCode, jobNum, counter, lockEntity, terminalStateRecordGroup );
     }
 
 }
