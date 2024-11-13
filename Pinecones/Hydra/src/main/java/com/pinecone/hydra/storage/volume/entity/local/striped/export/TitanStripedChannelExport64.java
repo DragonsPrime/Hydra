@@ -119,6 +119,7 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
 
     private void createAndStartVolumeThreads(List<LogicVolume> volumes, SQLiteExecutor sqLiteExecutor, ArrayList<Object> lockGroup, AtomicInteger currentCacheBlockNumber,  int jobNum, MasterVolumeGram masterVolumeGram, Semaphore bufferToFileLock) throws SQLException {
         int index = 0;
+
         for (LogicVolume volume : volumes) {
             Object lockObject = new Semaphore(0);
             lockGroup.add(lockObject);
@@ -138,6 +139,7 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
 
             ++index;
         }
+
     }
 
     private void waitForTaskCompletion(MasterVolumeGram masterVolumeGram) throws ProxyProvokeHandleException {

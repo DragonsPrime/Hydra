@@ -20,14 +20,20 @@ public class TitanStripChannelBufferToFileJob implements StripChannelBufferToFil
     private BufferToFileStatus  status;
     private List< CacheBlock >  cacheBlocksGroup;
     private AtomicInteger       currentPosition;
+    protected LocalStripedTaskThread taskThread;
 
-    public TitanStripChannelBufferToFileJob( VolumeManager volumeManager, FileChannel channel, StripExportFlyweightEntity flyweightEntity, List< CacheBlock > cacheBlockGroup ){
+
+    public TitanStripChannelBufferToFileJob( VolumeManager volumeManager, FileChannel channel, StripExportFlyweightEntity flyweightEntity, List< CacheBlock > cacheBlockGroup){
         this.volumeManager     = volumeManager;
         this.channel           = channel;
         this.lockEntity        = flyweightEntity.getLockEntity();
         this.jobNum            = flyweightEntity.getJobNum();
         this.currentPosition.getAndSet( 0 );
         this.cacheBlocksGroup  = cacheBlockGroup;
+    }
+
+    public void applyTaskThread( LocalStripedTaskThread taskThread ) {
+        this.taskThread = taskThread;
     }
 
     protected void setWritingStatus() {

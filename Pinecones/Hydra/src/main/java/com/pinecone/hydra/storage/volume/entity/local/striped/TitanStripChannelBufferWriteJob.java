@@ -5,6 +5,7 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.export.StripedChannelExport;
+import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJob {
     protected VolumeManager                 volumeManager;
@@ -31,9 +33,10 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
 
     protected StripExportFlyweightEntity    flyweightEntity;
     protected List< CacheBlock >            cacheBlockGroup;
+    protected LocalStripedTaskThread        parentThread;
 
 
-    public TitanStripChannelBufferWriteJob(StripedChannelExport stripedChannelExport, StripExportFlyweightEntity flyweightEntity, LogicVolume volume ){
+    public TitanStripChannelBufferWriteJob( StripedChannelExport stripedChannelExport, StripExportFlyweightEntity flyweightEntity, LogicVolume volume ){
         this.lockEntity                 = flyweightEntity.getLockEntity();
         this.object                     = stripedChannelExport.getExportStorageObject();
         this.jobNum                     = flyweightEntity.getJobNum();
@@ -41,12 +44,16 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
         this.volumeManager              = stripedChannelExport.getVolumeManager();
         this.volume                     = volume;
         this.channel                    = stripedChannelExport.getFileChannel();
-        this.currentCacheBlockNumber = lockEntity.getCurrentBufferCode();
+        this.currentCacheBlockNumber    = lockEntity.getCurrentBufferCode();
         this.pipelineLock               = lockEntity.getLockObject();
         this.lockGroup                  = lockEntity.getLockGroup();
         this.flyweightEntity            = flyweightEntity;
 
         this.setWritingStatus();
+    }
+
+    public void applyTaskThread( LocalStripedTaskThread taskThread ) {
+        this.parentThread = taskThread;
     }
 
     @Override
@@ -71,44 +78,51 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
     }
 
 
+    protected ReentrantLock reentrantLock = new ReentrantLock();
+
+
     @Override
     public void execute() throws VolumeJobCompromiseException {
         long size = this.object.getSize().longValue();
         long stripSize = this.volumeManager.getConfig().getDefaultStripSize().longValue();
         long currentPosition    = 0;
 
-        while ( true ){
-            if( this.cacheBlockGroup.get( currentCacheBlockNumber.get()).getStatus() == CacheBlockStatus.free ){
-                long bufferSize = stripSize;
-                if( currentPosition >= size ){
-                    this.setExitingStatus();
-                    break;
-                }
-                if( currentPosition + bufferSize > size ){
-                    bufferSize = size - currentPosition;
-                }
-                try {
-                    this.volume.channelRaid0Export( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.flyweightEntity);
-                    currentPosition += bufferSize;
-                    //唤醒文件线程
-                    this.lockEntity.unlockBufferToFileLock();
-                    /**
-                     * 切换缓存块
-                     */
-                    this.currentCacheBlockNumber.addAndGet(this.jobNum);
-                    if( this.currentCacheBlockNumber.get() > cacheBlockGroup.size() - 1 ){
-                        this.currentCacheBlockNumber.getAndSet( jobCode );
-                    }
-                    if( this.cacheBlockGroup.get( this.currentCacheBlockNumber.get() ).getStatus() == CacheBlockStatus.full ){
-                        try {
-                            ((Semaphore) this.lockEntity.getLockObject()).acquire();
-                        }
-                        catch ( InterruptedException e ){
-                            Thread.currentThread().interrupt();
-                            e.printStackTrace();
-                        }
 
+        MasterVolumeGram parentProcess = (MasterVolumeGram)this.parentThread.parentExecutum();
+        while ( true ){
+//            parentProcess.getMajorStatusIO().lock();
+//            try{
+                if( this.cacheBlockGroup.get( currentCacheBlockNumber.get()).getStatus() == CacheBlockStatus.free ){
+                    long bufferSize = stripSize;
+                    if( currentPosition >= size ){
+                        this.setExitingStatus();
+                        break;
                     }
+                    if( currentPosition + bufferSize > size ){
+                        bufferSize = size - currentPosition;
+                    }
+                    try {
+                        this.volume.channelRaid0Export( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.flyweightEntity);
+                        currentPosition += bufferSize;
+                        //唤醒文件线程
+                        this.lockEntity.unlockBufferToFileLock();
+                        /**
+                         * 切换缓存块
+                         */
+                        this.currentCacheBlockNumber.addAndGet(this.jobNum);
+                        if( this.currentCacheBlockNumber.get() > cacheBlockGroup.size() - 1 ){
+                            this.currentCacheBlockNumber.getAndSet( jobCode );
+                        }
+                        if( this.cacheBlockGroup.get( this.currentCacheBlockNumber.get() ).getStatus() == CacheBlockStatus.full ){
+                            try {
+                                ((Semaphore) this.lockEntity.getLockObject()).acquire();
+                            }
+                            catch ( InterruptedException e ){
+                                Thread.currentThread().interrupt();
+                                e.printStackTrace();
+                            }
+
+                        }
 
 
 
@@ -167,7 +181,7 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
 //                try{
 //                counter.incrementAndGet();
 //
-//                if( counter.get() == 2 ){
+//                if( counter.incrementAndGet() == 2 ){
 //                    counter.getAndSet( 0 );
 //                    lockEntity.getCurrentBufferCode().incrementAndGet();
 //                    if ( lockEntity.getCurrentBufferCode().get() == 2 ){
@@ -198,15 +212,18 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
 //            }
 
 
-                    this.setWritingStatus();
+                        this.setWritingStatus();
 
-                }
-                catch ( IOException | SQLException e ) {
-                    throw new VolumeJobCompromiseException( e );
+                    }
+                    catch ( IOException | SQLException e ) {
+                        throw new VolumeJobCompromiseException( e );
+                    }
                 }
             }
-
-        }
+//            finally {
+//                parentProcess.getMajorStatusIO().unlock();
+//            }
+//        }
         Debug.trace("我是线程"+jobCode+"我已经完成任务");
     }
 
