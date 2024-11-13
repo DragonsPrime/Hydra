@@ -1,11 +1,15 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
+import com.pinecone.framework.system.ProxyProvokeHandleException;
+import com.pinecone.framework.util.rdb.MappedExecutor;
 import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.file.transmit.receiver.channel.ChannelReceiverEntity;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
+import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
+import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,15 +24,20 @@ public class TitanStripChannelReceiverJob implements StripChannelReceiverJob{
     private ReceiveStorageObject    object;
     private String                  destDirPath;
     private FileChannel             fileChannel;
+    private OnVolumeFileSystem      kenVolumeFileSystem;
+    private MappedExecutor          executor;
+    private MiddleStorageObject     middleStorageObject;
 
-    public  TitanStripChannelReceiverJob(ReceiveEntity entity, FileChannel channel, int jobNum, int jobCode, LogicVolume volume){
-        this.volumeManager      =   entity.getVolumeManager();
-        this.object             =    entity.getReceiveStorageObject();
-        this.destDirPath        =   entity.getDestDirPath();
-        this.fileChannel        =   channel;
-        this.jobNum             =   jobNum;
-        this.jobCode            =   jobCode;
-        this.volume             =   volume;
+
+    public  TitanStripChannelReceiverJob(ReceiveEntity entity, FileChannel channel, int jobNum, int jobCode, LogicVolume volume, MappedExecutor executor ){
+        this.volumeManager          = entity.getVolumeManager();
+        this.object                 = entity.getReceiveStorageObject();
+        this.fileChannel            = channel;
+        this.jobNum                 = jobNum;
+        this.jobCode                = jobCode;
+        this.volume                 = volume;
+        this.kenVolumeFileSystem    = new KenVolumeFileSystem( this.volumeManager );
+        this.executor               = executor;
     }
 
     @Override
@@ -49,13 +58,19 @@ public class TitanStripChannelReceiverJob implements StripChannelReceiverJob{
             }
 
             try {
-                this.volume.channelReceive(this.object, this.destDirPath, this.fileChannel, currentPosition, bufferSize);
+                this.middleStorageObject = this.volume.channelReceive(this.object, this.fileChannel, currentPosition, bufferSize);
+
             } catch (IOException | SQLException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
             }
 
             currentPosition += bufferSize * jobNum;
+        }
+        try {
+            this.kenVolumeFileSystem.insertKVFSFileStripTable( executor, jobCode,  volume.getGuid(), this.object.getStorageObjectGuid(), middleStorageObject.getSourceName() );
+        } catch (SQLException e) {
+            throw new ProxyProvokeHandleException(e);
         }
     }
 }

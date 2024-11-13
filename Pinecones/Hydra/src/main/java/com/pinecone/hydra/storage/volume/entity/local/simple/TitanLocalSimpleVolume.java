@@ -15,6 +15,8 @@ import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.export.TitanSimpleChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleChannelReceiverEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripExportFlyweightEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TerminalStateRecord;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
@@ -65,8 +67,8 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
 
 
     @Override
-    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject,String destDirPath, FileChannel channel) throws IOException, SQLException {
-        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeManager, receiveStorageObject, destDirPath, channel, this );
+    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject, FileChannel channel) throws IOException, SQLException {
+        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeManager, receiveStorageObject, channel, this );
         MiddleStorageObject middleStorageObject = titanSimpleChannelReceiverEntity64.receive();
         middleStorageObject.setBottomGuid( this.guid );
         this.saveMate( middleStorageObject , receiveStorageObject.getName());
@@ -74,8 +76,8 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     }
 
     @Override
-    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel, Number offset, Number endSize) throws IOException, SQLException {
-        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeManager, receiveStorageObject, destDirPath, channel, this );
+    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject, FileChannel channel, Number offset, Number endSize) throws IOException, SQLException {
+        TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeManager, receiveStorageObject, channel, this );
         MiddleStorageObject middleStorageObject = titanSimpleChannelReceiverEntity64.receive(offset,endSize);
         middleStorageObject.setBottomGuid( this.guid );
         this.saveMate( middleStorageObject , receiveStorageObject.getName());
@@ -89,9 +91,9 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     }
 
     @Override
-    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity, ArrayList<TerminalStateRecord> terminalStateRecordGroup) throws IOException, SQLException {
+    public MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity) throws IOException, SQLException {
         TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeManager, exportStorageObject, channel );
-        return titanSimpleChannelExportEntity64.raid0Export( buffer, offset, endSize, jobCode, jobNum, counter, lockEntity, terminalStateRecordGroup );
+        return titanSimpleChannelExportEntity64.raid0Export( cacheBlock, offset, endSize, flyweightEntity );
     }
 
     @Override

@@ -4,6 +4,8 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.volume.VolumeManager;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripExportFlyweightEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TerminalStateRecord;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
@@ -46,10 +48,10 @@ public interface LogicVolume extends Volume, TreeNode {
     void setVolumeTree( VolumeManager volumeManager);
 
 
-    MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel ) throws IOException, SQLException;
-    MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel, Number offset, Number endSize ) throws IOException, SQLException;
+    MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, FileChannel channel ) throws IOException, SQLException;
+    MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, FileChannel channel, Number offset, Number endSize ) throws IOException, SQLException;
     MiddleStorageObject channelExport( ExportStorageObject exportStorageObject, FileChannel channel ) throws IOException, SQLException;
-    MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity, ArrayList<TerminalStateRecord> terminalStateRecordGroup) throws IOException, SQLException;
+    MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity) throws IOException, SQLException;
 
     boolean existStorageObject( GUID storageObject ) throws SQLException;
 

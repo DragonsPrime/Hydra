@@ -7,4 +7,7 @@ import java.nio.channels.FileChannel;
 public interface DirectChannelReceiveEntity extends DirectReceiveEntity {
     FileChannel getChannel();
     void setChannel( FileChannel channel );
+
+    String getDestDirPath();
+    void setDestDirPath( String destDirPath );
 }

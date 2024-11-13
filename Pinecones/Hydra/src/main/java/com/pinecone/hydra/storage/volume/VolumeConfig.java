@@ -12,4 +12,6 @@ public interface VolumeConfig extends KernelObjectConfig {
     Number getMegaFileStripSizing() ;
 
     Number getDefaultStripSize() ;
+
+    int getSuperResolutionRatio();
 }

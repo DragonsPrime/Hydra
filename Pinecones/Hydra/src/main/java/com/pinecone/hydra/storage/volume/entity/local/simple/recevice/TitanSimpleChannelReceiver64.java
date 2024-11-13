@@ -17,27 +17,25 @@ public class TitanSimpleChannelReceiver64   implements SimpleChannelReceiver64{
     private FileChannel             fileChannel;
     private VolumeManager           volumeManager;
     private ReceiveStorageObject    receiveStorageObject;
-    private String                  destDirPath;
 
     public TitanSimpleChannelReceiver64( SimpleChannelReceiverEntity entity ){
         this.volumeManager = entity.getVolumeManager();
         this.simpleVolume = entity.getSimpleVolume();
         this.fileChannel = entity.getChannel();
         this.receiveStorageObject = entity.getReceiveStorageObject();
-        this.destDirPath = entity.getDestDirPath();
     }
     @Override
     public MiddleStorageObject channelReceive() throws IOException, SQLException {
         List<GUID> guids = simpleVolume.listPhysicalVolume();
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(guids.get(0));
 
-        return physicalVolume.channelReceive( this.volumeManager,this.receiveStorageObject,this.fileChannel, this.destDirPath );
+        return physicalVolume.channelReceive( this.volumeManager,this.receiveStorageObject,this.fileChannel );
     }
 
     @Override
     public MiddleStorageObject channelReceive(Number offset, Number endSize) throws IOException {
         List<GUID> guids = simpleVolume.listPhysicalVolume();
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(guids.get(0));
-        return physicalVolume.channelReceive( this.volumeManager,this.receiveStorageObject,this.fileChannel, this.destDirPath, offset,endSize );
+        return physicalVolume.channelReceive( this.volumeManager,this.receiveStorageObject,this.fileChannel, offset,endSize );
     }
 }

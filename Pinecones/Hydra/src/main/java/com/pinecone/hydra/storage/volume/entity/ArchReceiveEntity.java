@@ -7,12 +7,10 @@ public abstract class ArchReceiveEntity implements ReceiveEntity{
 
     protected ReceiveStorageObject receiveStorageObject;
 
-    protected String     destDirPath;
 
-    public ArchReceiveEntity(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, String destDirPath ){
+    public ArchReceiveEntity(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject ){
         this.volumeManager = volumeManager;
         this.receiveStorageObject = receiveStorageObject;
-        this.destDirPath = destDirPath;
     }
 
 
@@ -36,13 +34,4 @@ public abstract class ArchReceiveEntity implements ReceiveEntity{
         this.receiveStorageObject = receiveStorageObject;
     }
 
-    @Override
-    public String getDestDirPath() {
-        return this.destDirPath;
-    }
-
-    @Override
-    public void setDestDirPath(String destDirPath) {
-        this.destDirPath = destDirPath;
-    }
 }

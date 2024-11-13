@@ -10,8 +10,7 @@ public interface ChannelReceiverEntity extends ReceiveEntity {
     FileChannel getChannel();
     void setChannel( FileChannel channel );
 
-    void receive( )throws IOException;
+    void receive()throws IOException;
     void receive( Number offset, Number endSize )throws IOException;
-    void receive(GUID frameGuid, int threadId, int threadNum) throws IOException;
 
 }

@@ -11,15 +11,15 @@ public class TitanStripLockEntity implements StripLockEntity{
     private Object        lockObject;
     private List< Object> lockGroup;
     private AtomicInteger currentBufferCode;
-    private Lock          maoLock;
+    private Semaphore     bufferToFileLock;
 
     public TitanStripLockEntity(){}
 
-    public TitanStripLockEntity( Object lockObject, List<Object> lockGroup, AtomicInteger currentBufferCode, Lock maoLock ){
+    public TitanStripLockEntity( Object lockObject, List<Object> lockGroup, AtomicInteger currentBufferCode, Semaphore bufferToFileLock ){
         this.lockObject = lockObject;
         this.lockGroup = lockGroup;
         this.currentBufferCode = currentBufferCode;
-        this.maoLock = maoLock;
+        this.bufferToFileLock  = bufferToFileLock;
     }
 
     @Override
@@ -54,17 +54,17 @@ public class TitanStripLockEntity implements StripLockEntity{
     }
 
     @Override
-    public Lock getMaoLock() {
-        return this.maoLock;
+    public Semaphore getBufferToFileLock() {
+        return this.bufferToFileLock;
+    }
+
+    @Override
+    public void unlockBufferToFileLock() {
+        this.bufferToFileLock.release();
     }
 
     @Override
     public void unlockPipeStage() {
-//        for( final Object lockObject : this.getLockGroup() ){
-//            synchronized ( lockObject ){
-//                lockObject.notify();
-//            }
-//        }
 
         for( final Object lockObject : this.getLockGroup() ){
             if( lockObject instanceof Semaphore ) {

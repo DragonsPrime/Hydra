@@ -28,6 +28,6 @@ public class GenericStreamReceiverEntity extends ArchReceiveEntity implements St
 
     @Override
     public void receive() throws IOException {
-        this.streamReceiver.receive(this);
+        //this.streamReceiver.receive(this);
     }
 }

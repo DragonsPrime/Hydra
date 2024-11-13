@@ -4,6 +4,8 @@ import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchExportEntity;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripExportFlyweightEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TerminalStateRecord;
 
@@ -40,8 +42,8 @@ public class TitanDirectChannelExportEntity64 extends ArchExportEntity implement
     }
 
     @Override
-    public MiddleStorageObject raid0Export(byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity, ArrayList<TerminalStateRecord> terminalStateRecordGroup) {
-        return this.channelExporter.raid0Export( this, buffer, offset, endSize, jobCode, jobNum, counter, lockEntity, terminalStateRecordGroup );
+    public MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity) {
+        return this.channelExporter.raid0Export( this, cacheBlock, offset, endSize, flyweightEntity );
     }
 
 }

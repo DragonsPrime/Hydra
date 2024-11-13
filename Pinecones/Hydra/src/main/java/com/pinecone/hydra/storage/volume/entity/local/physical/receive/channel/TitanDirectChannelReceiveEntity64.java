@@ -10,10 +10,12 @@ import java.nio.channels.FileChannel;
 
 public class TitanDirectChannelReceiveEntity64 extends ArchReceiveEntity implements DirectChannelReceiveEntity64{
     private FileChannel channel;
+    private String      destDirPath;
 
     public TitanDirectChannelReceiveEntity64(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel) {
-        super(volumeManager, receiveStorageObject, destDirPath);
+        super(volumeManager, receiveStorageObject);
         this.channel = channel;
+        this.destDirPath = destDirPath;
     }
 
 
@@ -37,5 +39,15 @@ public class TitanDirectChannelReceiveEntity64 extends ArchReceiveEntity impleme
     @Override
     public void setChannel(FileChannel channel) {
         this.channel = channel;
+    }
+
+    @Override
+    public String getDestDirPath() {
+        return this.destDirPath;
+    }
+
+    @Override
+    public void setDestDirPath(String destDirPath) {
+        this.destDirPath = destDirPath;
     }
 }

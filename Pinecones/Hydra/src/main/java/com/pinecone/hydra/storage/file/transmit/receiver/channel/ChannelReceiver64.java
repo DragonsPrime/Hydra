@@ -2,6 +2,7 @@ package com.pinecone.hydra.storage.file.transmit.receiver.channel;
 
 import com.pinecone.framework.util.Bytes;
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.storage.MiddleStorageObject;
 import com.pinecone.hydra.storage.file.FileSystemConfig;
 import com.pinecone.hydra.storage.file.FrameSegmentNaming;
 import com.pinecone.hydra.storage.file.KOFSFrameSegmentNaming;
@@ -14,6 +15,9 @@ import com.pinecone.hydra.storage.file.entity.Strip;
 import com.pinecone.hydra.storage.file.transmit.receiver.ArchReceiver;
 import com.pinecone.hydra.storage.file.transmit.receiver.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.VolumeConfig;
+import com.pinecone.hydra.storage.volume.entity.LogicVolume;
+import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
+import com.pinecone.hydra.storage.volume.entity.TitanReceiveStorageObject;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
@@ -23,6 +27,7 @@ import java.nio.channels.FileChannel;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.sql.SQLException;
 import java.util.zip.CRC32;
 
 public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
@@ -109,116 +114,60 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
     }
 
     @Override
-    public void receive( ReceiveEntity entity ) throws IOException {
+    public void receive(ReceiveEntity entity, LogicVolume volume) throws IOException, SQLException {
         ChannelReceiverEntity channelReceiverEntity = entity.evinceChannelReceiverEntity();
         FileChannel fileChannel = channelReceiverEntity.getChannel();
         String destDirPath = channelReceiverEntity.getDestDirPath();
         FileNode file = channelReceiverEntity.getFile();
         KOMFileSystem fileSystem = channelReceiverEntity.getFileSystem();
         long frameSize = this.mKOMFileSystem.getConfig().getFrameSize().longValue();;
+
         int parityCheck = 0;
         long checksum = 0;
         long crc32Xor = 0;
-        ByteBuffer buffer = ByteBuffer.allocate((int) frameSize);
+
         FSNodeAllotment allotment = fileSystem.getFSNodeAllotment();
-        GuidAllocator guidAllocator = fileSystem.getGuidAllocator();
-        long bytesRead = 0;
         long segId = 0;
-
+        long currentPosition = 0;
+        long endSize = frameSize;
         while (true) {
-            buffer.clear();
-            int read = 0;
+            if( currentPosition > file.getDefinitionSize() ){
+                break;
+            }
 
-                read = fileChannel.read(buffer);
-                if (read == -1) {
-                    break;
-                }
-                buffer.flip();
+            if( currentPosition + endSize > file.getDefinitionSize() ){
+                endSize = file.getDefinitionSize() - currentPosition;
+            }
 
-                CRC32 crc = new CRC32();
-                while ( buffer.hasRemaining() ) {
-                    byte b = buffer.get();
-                    parityCheck += Bytes.calculateParity( b );
-                    checksum += b & 0xFF;
-                    crc.update(b);
-                }
-                if( segId == 0 ){
-                    crc32Xor = crc.getValue();
-                }
-                else {
-                    crc32Xor = crc32Xor^crc.getValue();
-                }
-                String sourceName = this.mFrameSegmentNaming.naming( file.getName(),segId,Long.toHexString(crc.getValue()) );
-                Path chunkFile = Paths.get(destDirPath, sourceName);
-                LocalFrame localFrame = allotment.newLocalFrame( file.getGuid(),(int) segId,chunkFile.toString(),Long.toHexString(crc.getValue()),read,0 );
-                RemoteFrame remoteFrame = allotment.newRemoteFrame( file.getGuid(),(int)segId,Long.toHexString(crc.getValue()), read);
-                remoteFrame.setDeviceGuid(this.mKOMFileSystem.getConfig().getLocalhostGUID());
-                remoteFrame.setSegGuid( localFrame.getSegGuid() );
-                try ( FileChannel chunkChannel = FileChannel.open(chunkFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE) ) {
-                    buffer.rewind();
-                    int write = chunkChannel.write(buffer);
-                    localFrame.setFileStartOffset( write );
-                }
+            LocalFrame localFrame = allotment.newLocalFrame();
+            RemoteFrame remoteFrame = allotment.newRemoteFrame( file.getGuid(),(int)segId );
+            remoteFrame.setDeviceGuid(this.mKOMFileSystem.getConfig().getLocalhostGUID());
+            remoteFrame.setSegGuid( localFrame.getSegGuid() );
 
-                segId++;
-                bytesRead += read;
-                localFrame.save();
-                remoteFrame.save();
+            ReceiveStorageObject receiveStorageObject = new TitanReceiveStorageObject();
+            receiveStorageObject.setSize( file.getDefinitionSize() );
+            receiveStorageObject.setName( file.getName() );
+            receiveStorageObject.setStorageObjectGuid( localFrame.getSegGuid() );
+            MiddleStorageObject middleStorageObject = volume.channelReceive(receiveStorageObject, fileChannel, (Number) currentPosition, (Number) endSize);
+
+            localFrame.setSize( endSize );
+            localFrame.setSourceName( middleStorageObject.getSourceName() );
+            localFrame.setCrc32( middleStorageObject.getCre32() );
+            localFrame.setFileGuid( file.getGuid() );
+            localFrame.setSegId( segId );
+
+            segId++;
+            localFrame.save();
+            remoteFrame.save();
         }
-        file.setPhysicalSize( bytesRead );
-        file.setLogicSize( bytesRead );
+        file.setPhysicalSize( currentPosition );
+        file.setLogicSize( currentPosition );
         file.setChecksum( checksum );
         file.setParityCheck( parityCheck );
         file.setCrc32Xor( Long.toHexString(crc32Xor) );
         fileSystem.put( file );
     }
 
-    @Override
-    public void receive( ReceiveEntity entity, GUID frameGuid, int threadId, int threadNum ) throws IOException {
-        ChannelReceiverEntity channelReceiverEntity = entity.evinceChannelReceiverEntity();
-        FileChannel fileChannel = channelReceiverEntity.getChannel();
-        String destDirPath = channelReceiverEntity.getDestDirPath();
-        FileNode file = channelReceiverEntity.getFile();
-        KOMFileSystem fileSystem = channelReceiverEntity.getFileSystem();
-        long tinyFileStripSizing = fileSystem.getConfig().getTinyFileStripSizing().longValue();
-
-        long offset = tinyFileStripSizing * threadId;
-        long stripId = threadId;
-        ByteBuffer buffer = ByteBuffer.allocate((int) tinyFileStripSizing);
-        FSNodeAllotment allotment = fileSystem.getFSNodeAllotment();
-        long bytesRead = 0;
-
-        String sourceName = this.mFrameSegmentNaming.naming( file.getName(),frameGuid, threadId );
-        Path stripFile = Paths.get(destDirPath, sourceName);
-        while( true ){
-            buffer.clear();
-            int read = 0;
-            fileChannel.position( offset );
-            read = fileChannel.read( buffer );
-            if( read == -1 ){
-                break;
-            }
-
-            buffer.flip();
-            Strip strip = allotment.newStrip();
-            strip.setSegGuid( frameGuid );
-            strip.setSize( read );
-            strip.setDefinitionSize( read );
-            strip.setSourceName( stripFile.toString() );
-            strip.setStripId( stripId );
-
-            try ( FileChannel chunkChannel = FileChannel.open(stripFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE) ) {
-                buffer.rewind();
-                chunkChannel.position(chunkChannel.size());
-                chunkChannel.write(buffer);
-            }
-            strip.setFileStartOffset( offset );
-            offset += tinyFileStripSizing * threadNum;
-            stripId += threadNum;
-            strip.save();
-        }
-
-    }
 
     @Override
     public void resumableReceive(ReceiveEntity entity ) throws IOException {

@@ -8,54 +8,43 @@ import com.pinecone.hydra.storage.volume.entity.local.striped.export.StripedChan
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJob {
-    protected VolumeManager            volumeManager;
-    protected List< byte[] >           buffers;
+    protected VolumeManager                 volumeManager;
 
-    protected ExportStorageObject      object;
+    protected ExportStorageObject           object;
+    protected int                           jobNum;
+    protected int                           jobCode;
+    protected LogicVolume                   volume;
+    protected FileChannel                   channel;
+    protected AtomicInteger                 currentCacheBlockNumber;
+    protected final Object                  pipelineLock;
+    protected List<Object>                  lockGroup;
+    protected StripLockEntity               lockEntity;
 
-    protected int                      jobNum;
+    protected BufferWriteStatus             status;
 
-    protected int                      jobCode;
+    protected StripExportFlyweightEntity    flyweightEntity;
+    protected List< CacheBlock >            cacheBlockGroup;
 
-    protected LogicVolume              volume;
 
-    protected FileChannel              channel;
-    protected AtomicInteger            currentBufferCode;
-
-    protected AtomicInteger            counter;
-    protected final Object             pipelineLock;
-    protected List<Object>             lockGroup;
-
-    protected StripLockEntity          lockEntity;
-
-    protected BufferWriteStatus        status;
-    ArrayList<TerminalStateRecord>     terminalStateRecordGroup;
-    Number                             bufferToFileSize;
-
-    public TitanStripChannelBufferWriteJob(StripedChannelExport stripedChannelExport, List<byte[]> buffers, int jobNum, int jobCode, StripLockEntity lockEntity, AtomicInteger counter, LogicVolume volume, ArrayList<TerminalStateRecord> terminalStateRecordGroup, Number bufferToFileSize  ){
+    public TitanStripChannelBufferWriteJob(StripedChannelExport stripedChannelExport, StripExportFlyweightEntity flyweightEntity, LogicVolume volume ){
+        this.lockEntity                 = flyweightEntity.getLockEntity();
         this.object                     = stripedChannelExport.getExportStorageObject();
-        this.jobNum                     = jobNum;
-        this.jobCode                    = jobCode;
+        this.jobNum                     = flyweightEntity.getJobNum();
+        this.jobCode                    = flyweightEntity.getJobCode();
         this.volumeManager              = stripedChannelExport.getVolumeManager();
         this.volume                     = volume;
         this.channel                    = stripedChannelExport.getFileChannel();
-        this.buffers                    = buffers;
-        this.currentBufferCode          = lockEntity.getCurrentBufferCode();
+        this.currentCacheBlockNumber = lockEntity.getCurrentBufferCode();
         this.pipelineLock               = lockEntity.getLockObject();
         this.lockGroup                  = lockEntity.getLockGroup();
-        this.lockEntity                 = lockEntity;
-        this.counter                    = counter;
-        this.terminalStateRecordGroup   = terminalStateRecordGroup;
-        this.bufferToFileSize           = bufferToFileSize;
+        this.flyweightEntity            = flyweightEntity;
 
         this.setWritingStatus();
     }
@@ -84,25 +73,42 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
 
     @Override
     public void execute() throws VolumeJobCompromiseException {
-        int num = 0;
         long size = this.object.getSize().longValue();
         long stripSize = this.volumeManager.getConfig().getDefaultStripSize().longValue();
         long currentPosition    = 0;
-        int bufferStartPosition = (int) (jobCode * stripSize);
-        int bufferEndPosition   = (int) (bufferStartPosition + stripSize);
 
         while ( true ){
-            long bufferSize = stripSize;
-            if( currentPosition >= size ){
-                this.setExitingStatus();
-                break;
-            }
-            if( currentPosition + bufferSize > size ){
-                bufferSize = size - currentPosition;
-            }
-            try {
-                this.volume.channelRaid0Export( this.object, this.channel, this.buffers.get(this.currentBufferCode.get()), currentPosition, bufferSize, this.jobCode, this.jobNum, this.counter, this.lockEntity, terminalStateRecordGroup);
-                currentPosition += bufferSize;
+            if( this.cacheBlockGroup.get( currentCacheBlockNumber.get()).getStatus() == CacheBlockStatus.free ){
+                long bufferSize = stripSize;
+                if( currentPosition >= size ){
+                    this.setExitingStatus();
+                    break;
+                }
+                if( currentPosition + bufferSize > size ){
+                    bufferSize = size - currentPosition;
+                }
+                try {
+                    this.volume.channelRaid0Export( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.flyweightEntity);
+                    currentPosition += bufferSize;
+                    //唤醒文件线程
+                    this.lockEntity.unlockBufferToFileLock();
+                    /**
+                     * 切换缓存块
+                     */
+                    this.currentCacheBlockNumber.addAndGet(this.jobNum);
+                    if( this.currentCacheBlockNumber.get() > cacheBlockGroup.size() - 1 ){
+                        this.currentCacheBlockNumber.getAndSet( jobCode );
+                    }
+                    if( this.cacheBlockGroup.get( this.currentCacheBlockNumber.get() ).getStatus() == CacheBlockStatus.full ){
+                        try {
+                            ((Semaphore) this.lockEntity.getLockObject()).acquire();
+                        }
+                        catch ( InterruptedException e ){
+                            Thread.currentThread().interrupt();
+                            e.printStackTrace();
+                        }
+
+                    }
 
 
 
@@ -111,21 +117,21 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
 //                    int currentCount = counter.get();
 //                    if (currentCount < 2 && counter.compareAndSet(currentCount, currentCount + 1)) {
 //                        if (counter.get() == 2) {
-////                            if (isLast) {
-////                                int temporaryCurrentPosition = 0;
-////                                terminalStateRecordGroup.sort(Comparator.comparing(TerminalStateRecord::getSequentialNumbering));
-////                                int totalSize = terminalStateRecordGroup.stream()
-////                                        .mapToInt(stateRecord -> stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue())
-////                                        .sum();
-////                                byte[] temporaryBuffer = new byte[totalSize];
-////                                for (TerminalStateRecord stateRecord : terminalStateRecordGroup) {
-////                                    int length = stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue();
-////                                    ByteBuffer buffer = ByteBuffer.wrap(outputTarget, stateRecord.getValidByteStart().intValue(), length);
-////                                    buffer.get(temporaryBuffer, temporaryCurrentPosition, length);
-////                                    temporaryCurrentPosition += length;
-////                                }
-////                                outputTarget = temporaryBuffer;
-////                            }
+//                            if (isLast) {
+//                            int temporaryCurrentPosition = 0;
+//                            int totalSize = flyweightEntity.getTerminalStateRecordGroup().stream()
+//                                    .mapToInt(stateRecord -> stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue())
+//                                    .sum();
+//                            byte[] temporaryBuffer = new byte[totalSize];
+//                            for (TerminalStateRecord stateRecord : flyweightEntity.getTerminalStateRecordGroup()) {
+//                                int length = stateRecord.getValidByteEnd().intValue() - stateRecord.getValidByteStart().intValue();
+//                                ByteBuffer buffer = ByteBuffer.wrap(this.buffers.get(this.currentBufferCode.get()), stateRecord.getValidByteStart().intValue(), length);
+//                                buffer.get(temporaryBuffer, temporaryCurrentPosition, length);
+//                                temporaryCurrentPosition += length;
+//                            }
+//                            System.arraycopy( temporaryBuffer, 0, this.buffers.get(this.currentBufferCode.get()), 0, totalSize );
+//                            flyweightEntity.setBufferToFileSize( totalSize );
+//                        }
 //
 //                            counter.set(0);  // 重置 counter
 //
@@ -192,12 +198,14 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
 //            }
 
 
-                this.setWritingStatus();
+                    this.setWritingStatus();
 
+                }
+                catch ( IOException | SQLException e ) {
+                    throw new VolumeJobCompromiseException( e );
+                }
             }
-            catch ( IOException | SQLException e ) {
-                throw new VolumeJobCompromiseException( e );
-            }
+
         }
         Debug.trace("我是线程"+jobCode+"我已经完成任务");
     }

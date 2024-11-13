@@ -12,6 +12,7 @@ import com.pinecone.hydra.storage.file.entity.LocalFrame;
 import com.pinecone.hydra.storage.file.entity.RemoteFrame;
 import com.pinecone.hydra.storage.file.transmit.receiver.ArchReceiver;
 import com.pinecone.hydra.storage.file.transmit.receiver.ReceiveEntity;
+import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.ulf.util.id.GUIDs;
 
 import java.io.FileOutputStream;
@@ -32,7 +33,7 @@ public class StreamReceiver64 extends ArchReceiver implements StreamReceiver {
     }
 
     @Override
-    public void receive(ReceiveEntity entity) throws IOException {
+    public void receive(ReceiveEntity entity, LogicVolume volume) throws IOException {
         StreamReceiverEntity streamReceiverEntity = entity.evinceStreamReceiverEntity();
         String destDirPath = streamReceiverEntity.getDestDirPath();
         FileNode file = streamReceiverEntity.getFile();
@@ -102,10 +103,6 @@ public class StreamReceiver64 extends ArchReceiver implements StreamReceiver {
 
     }
 
-    @Override
-    public void receive(ReceiveEntity entity, GUID frameGuid, int threadId, int threadNum) throws IOException {
-
-    }
 
     @Override
     public void resumableReceive(ReceiveEntity entity) throws IOException {

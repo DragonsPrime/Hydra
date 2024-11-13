@@ -24,7 +24,6 @@ public class TitanSpannedChannelReceive64 implements SpannedChannelReceive64{
     private FileChannel             channel;
     private VolumeManager           volumeManager;
     private ReceiveStorageObject    receiveStorageObject;
-    private String                  destDirPath;
     private OnVolumeFileSystem      kenVolumeFileSystem;
 
     public TitanSpannedChannelReceive64( SpannedChannelReceiveEntity entity ){
@@ -32,7 +31,6 @@ public class TitanSpannedChannelReceive64 implements SpannedChannelReceive64{
         this.spannedVolume = entity.getSpannedVolume();
         this.channel = entity.getChannel();
         this.receiveStorageObject = entity.getReceiveStorageObject();
-        this.destDirPath = entity.getDestDirPath();
         this.kenVolumeFileSystem = new KenVolumeFileSystem( this.volumeManager );
     }
     @Override
@@ -72,14 +70,14 @@ public class TitanSpannedChannelReceive64 implements SpannedChannelReceive64{
                 if (this.freeSpace(volume) > receiveStorageObject.getSize().longValue()) {
                     this.kenVolumeFileSystem.insertKVFSCollisionTable(sqLiteExecutor, idx, receiveStorageObject.getStorageObjectGuid(), volume.getGuid());
                     return offset == null && endSize == null
-                            ? volume.channelReceive(this.receiveStorageObject, this.destDirPath, this.channel)
-                            : volume.channelReceive(this.receiveStorageObject, this.destDirPath, this.channel, offset, endSize);
+                            ? volume.channelReceive(this.receiveStorageObject, this.channel)
+                            : volume.channelReceive(this.receiveStorageObject,  this.channel, offset, endSize);
                 }
             }
         } else {
             return offset == null && endSize == null
-                    ? targetVolume.channelReceive(this.receiveStorageObject, this.destDirPath, this.channel)
-                    : targetVolume.channelReceive(this.receiveStorageObject, this.destDirPath, this.channel, offset, endSize);
+                    ? targetVolume.channelReceive(this.receiveStorageObject,  this.channel)
+                    : targetVolume.channelReceive(this.receiveStorageObject,  this.channel, offset, endSize);
         }
 
         return null;

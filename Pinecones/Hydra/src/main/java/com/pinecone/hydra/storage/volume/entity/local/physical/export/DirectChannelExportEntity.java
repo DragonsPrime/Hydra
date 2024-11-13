@@ -1,6 +1,8 @@
 package com.pinecone.hydra.storage.volume.entity.local.physical.export;
 
 import com.pinecone.hydra.storage.MiddleStorageObject;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripExportFlyweightEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TerminalStateRecord;
 
@@ -15,5 +17,5 @@ public interface DirectChannelExportEntity extends DirectExportEntity{
     void setChannel( FileChannel channel );
 
     MiddleStorageObject export() throws IOException;
-    MiddleStorageObject raid0Export(byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity, ArrayList<TerminalStateRecord> terminalStateRecordGroup);
+    MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity);
 }

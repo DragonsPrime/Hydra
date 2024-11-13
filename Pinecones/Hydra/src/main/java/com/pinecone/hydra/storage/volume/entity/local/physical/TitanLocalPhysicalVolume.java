@@ -10,6 +10,8 @@ import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirectChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel.TitanDirectChannelReceiveEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripExportFlyweightEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TerminalStateRecord;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
@@ -58,8 +60,8 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
 
 
     @Override
-    public MiddleStorageObject channelReceive(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, FileChannel channel, String destDirPath) throws IOException, SQLException {
-        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager, receiveStorageObject, this.mountPoint.getMountPoint()+"\\"+destDirPath, channel);
+    public MiddleStorageObject channelReceive(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, FileChannel channel) throws IOException, SQLException {
+        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager, receiveStorageObject, this.mountPoint.getMountPoint(), channel);
         MiddleStorageObject middleStorageObject = titanDirectChannelReceiveEntity64.receive();
         middleStorageObject.setBottomGuid( this.guid );
 
@@ -67,8 +69,8 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     }
 
     @Override
-    public MiddleStorageObject channelReceive(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, FileChannel channel, String destDirPath, Number offset, Number endSize) throws IOException {
-        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager, receiveStorageObject, this.mountPoint.getMountPoint()+"\\"+destDirPath, channel);
+    public MiddleStorageObject channelReceive(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, FileChannel channel, Number offset, Number endSize) throws IOException {
+        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager, receiveStorageObject, this.mountPoint.getMountPoint(), channel);
         MiddleStorageObject middleStorageObject = titanDirectChannelReceiveEntity64.receive(offset, endSize);
         middleStorageObject.setBottomGuid( this.getGuid() );
         return middleStorageObject;
@@ -83,9 +85,9 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     }
 
     @Override
-    public MiddleStorageObject channelRaid0Export(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel, byte[] buffer, Number offset, Number endSize, int jobCode, int jobNum, AtomicInteger counter, StripLockEntity lockEntity, ArrayList<TerminalStateRecord> terminalStateRecordGroup) throws IOException {
+    public MiddleStorageObject channelRaid0Export(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity) throws IOException {
         TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, exportStorageObject,channel );
-        MiddleStorageObject middleStorageObject = titanDirectChannelExportEntity64.raid0Export(buffer, offset, endSize, jobCode, jobNum, counter, lockEntity, terminalStateRecordGroup);
+        MiddleStorageObject middleStorageObject = titanDirectChannelExportEntity64.raid0Export(cacheBlock, offset, endSize, flyweightEntity);
         middleStorageObject.setBottomGuid( this.getGuid() );
         return middleStorageObject;
     }

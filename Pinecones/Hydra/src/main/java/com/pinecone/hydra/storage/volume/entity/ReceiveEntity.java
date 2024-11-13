@@ -10,7 +10,5 @@ public interface ReceiveEntity extends Pinenut {
     ReceiveStorageObject getReceiveStorageObject();
     void setReceiveStorageObject( ReceiveStorageObject receiveStorageObject );
 
-    String getDestDirPath();
-    void setDestDirPath( String destDirPath );
 
 }

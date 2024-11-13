@@ -10,6 +10,7 @@ public class KernelVolumeConfig extends ArchKernelObjectConfig implements Volume
     protected Number mnSmallFileStripSizing = VolumeConstants.SmallFileStripSizing ;
     protected Number mnMegaFileStripSizing  = VolumeConstants.MegaFileStripSizing  ;
     protected Number mnDefaultStripSize     = VolumeConstants.DefaultStripSize     ;
+    protected int    superResolutionRatio   = VolumeConstants.superResolutionRatio;
 
 
     @Override
@@ -36,5 +37,10 @@ public class KernelVolumeConfig extends ArchKernelObjectConfig implements Volume
     @Override
     public Number getDefaultStripSize() {
         return this.mnDefaultStripSize;
+    }
+
+    @Override
+    public int getSuperResolutionRatio() {
+        return this.superResolutionRatio;
     }
 }
