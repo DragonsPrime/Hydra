@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
+import java.util.concurrent.Semaphore;
 
 public class TitanStripChannelReceiverJob implements StripChannelReceiverJob{
     private LogicVolume             volume;
@@ -72,5 +73,25 @@ public class TitanStripChannelReceiverJob implements StripChannelReceiverJob{
         } catch (SQLException e) {
             throw new ProxyProvokeHandleException(e);
         }
+    }
+
+    @Override
+    public void applyThread(LocalStripedTaskThread thread) {
+
+    }
+
+    @Override
+    public StripBufferStatus getStatus() {
+        return null;
+    }
+
+    @Override
+    public Semaphore getPipelineLock() {
+        return null;
+    }
+
+    @Override
+    public void setStatus(StripBufferStatus status) {
+
     }
 }

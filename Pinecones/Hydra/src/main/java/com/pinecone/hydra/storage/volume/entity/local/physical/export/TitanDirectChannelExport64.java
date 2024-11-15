@@ -7,6 +7,7 @@ import com.pinecone.hydra.storage.TitanMiddleStorageObject;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlockStatus;
 import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
 import com.pinecone.hydra.storage.volume.entity.local.striped.StripExportFlyweightEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.StripLockEntity;
@@ -131,7 +132,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
         ExportStorageObject exportStorageObject = entity.getExportStorageObject();
         String sourceName = exportStorageObject.getSourceName();
         TitanMiddleStorageObject titanMiddleStorageObject = new TitanMiddleStorageObject();
-        byte[] outputTarget = cacheBlock.getCache();
+        byte[] outputTarget = flyweightEntity.getBuffer();
 
         long parityCheck = 0;
         long checksum = 0;
@@ -146,23 +147,21 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
             ByteBuffer byteBuffer = ByteBuffer.allocate(endSize.intValue());
             int read = frameChannel.read(byteBuffer);
             byteBuffer.flip();
-            if (read == -1) {
-                return null;
-            }
 
             // 将读取的数据从 bufferStartPosition 开始写入到 buffer
             if( read < bufferSize ){
                 bufferSize = read;
             }
-            //Debug.trace( "起始位置" + bufferStartPosition+"终止大小"+bufferSize );
-            byteBuffer.get(outputTarget, 0, (int) bufferSize);
-            cacheBlock.setValidByteStart( 0 );
-            cacheBlock.setValidByteEnd( bufferSize );
+            //Debug.trace( "起始位置" + offset.longValue()+"终止大小"+bufferSize+"缓存大小"+endSize.intValue() );
+            byteBuffer.get(outputTarget, cacheBlock.getByteStart().intValue(), (int) bufferSize);
+            cacheBlock.setStatus( CacheBlockStatus.Full );
+            cacheBlock.setValidByteStart( cacheBlock.getByteStart().intValue() );
+            cacheBlock.setValidByteEnd( cacheBlock.getByteStart().intValue()+bufferSize );
 
             // 计算校验和和奇偶校验
             CRC32 crc = new CRC32();
             for (int i = 0; i < endSize.intValue(); i++) {
-                byte b = outputTarget[i];
+                byte b = outputTarget[cacheBlock.getByteStart().intValue()+i];
                 parityCheck += Bytes.calculateParity(b);
                 checksum += b & 0xFF;
                 crc.update(b);

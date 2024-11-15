@@ -1,8 +1,8 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
-public enum BufferWriteStatus {
+public enum BufferWriteStatus implements StripBufferStatus{
     Writing                  ,
     Suspended                ,
-    Mastering                ,
+    Synchronization          ,
     Exiting                  ;
 }

@@ -1,27 +1,21 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 public class StripCacheBlock implements CacheBlock{
-    private byte[]              cache;
-    private CacheBlockStatus    status;
-    private Number              validByteStart;
-    private Number              validByteEnd;
-    private int                 cacheBlockNumber;
+    protected CacheBlockStatus    status;
+    protected Number              validByteStart;
+    protected Number              validByteEnd;
+    protected int                 cacheBlockNumber;
+    protected Number              byteStart;
+    protected Number              byteEnd;
+    protected int                 bufferWriteThreadId;
 
-    public StripCacheBlock( Number cacheSize, int cacheBlockNumber ){
-        this.cache = new byte[cacheSize.intValue()];
-        this.status = CacheBlockStatus.free;
+    public StripCacheBlock( int cacheBlockNumber, Number byteStart, Number byteEnd ){
+        this.status = CacheBlockStatus.Free;
+        this.byteStart = byteStart;
+        this.byteEnd = byteEnd;
         this.cacheBlockNumber = cacheBlockNumber;
     }
 
-    @Override
-    public byte[] getCache() {
-        return cache;
-    }
-
-    @Override
-    public void setCache(byte[] cache) {
-        this.cache = cache;
-    }
 
     @Override
     public CacheBlockStatus getStatus() {
@@ -54,6 +48,26 @@ public class StripCacheBlock implements CacheBlock{
     }
 
     @Override
+    public Number getByteStart() {
+        return this.byteStart;
+    }
+
+    @Override
+    public void setByteStart(Number byteStart) {
+        this.byteStart = byteStart;
+    }
+
+    @Override
+    public Number getByteEnd() {
+        return this.byteEnd;
+    }
+
+    @Override
+    public void setByteEnd(Number byteEnd) {
+        this.byteEnd = byteEnd;
+    }
+
+    @Override
     public int getCacheBlockNumber() {
         return this.cacheBlockNumber;
     }
@@ -61,5 +75,15 @@ public class StripCacheBlock implements CacheBlock{
     @Override
     public void setCacheBlockNumber(int cacheBlockNumber) {
         this.cacheBlockNumber = cacheBlockNumber;
+    }
+
+    @Override
+    public int getBufferWriteThreadId() {
+        return this.bufferWriteThreadId;
+    }
+
+    @Override
+    public void setBufferWriteThreadId(int bufferWriteThreadId) {
+        this.bufferWriteThreadId = bufferWriteThreadId;
     }
 }

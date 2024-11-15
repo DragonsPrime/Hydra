@@ -2,9 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 
-public interface CacheBlock extends Pinenut {
-    byte[] getCache();
-    void setCache( byte[] cache );
+public interface CacheBlock extends Pinenut { ;
 
     CacheBlockStatus getStatus();
     void setStatus( CacheBlockStatus status );
@@ -15,6 +13,15 @@ public interface CacheBlock extends Pinenut {
     Number getValidByteEnd();
     void setValidByteEnd( Number validByteEnd );
 
+    Number getByteStart();
+    void setByteStart( Number byteStart );
+
+    Number getByteEnd();
+    void setByteEnd( Number byteEnd );
+
     int getCacheBlockNumber();
     void setCacheBlockNumber( int cacheBlockNumber );
+
+    int getBufferWriteThreadId();
+    void setBufferWriteThreadId( int bufferWriteThreadId );
 }

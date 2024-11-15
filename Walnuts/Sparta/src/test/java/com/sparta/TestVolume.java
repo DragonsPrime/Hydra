@@ -322,11 +322,12 @@ class Alice extends Radium {
 
     void testStripedExport( UniformVolumeManager volumeManager ) throws SQLException, IOException {
         File file = new File("D:\\文件系统\\大文件\\视频.mp4");
+        File originalFile = new File( "D:/井盖视频块/4月13日 (1).mp4" );
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanExportStorageObject titanExportStorageObject = new TitanExportStorageObject();
-        titanExportStorageObject.setSize( file.length() );
-        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0713794-00034e-0000-d0") );
+        titanExportStorageObject.setSize( originalFile.length() );
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("07884d2-00003d-0001-c0") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
         volume.channelExport( titanExportStorageObject, channel );
     }
@@ -335,16 +336,16 @@ class Alice extends Radium {
         MasterVolumeGram gram = new MasterVolumeGram( "volume_master", this );
         this.getTaskManager().add( gram );
 
-        PoopyButtholeThread poopyButthole = new PoopyButtholeThread( gram, new PoopJob( 1234 ) );
-        gram.getTaskManager().add( poopyButthole );
+//        PoopyButtholeThread poopyButthole = new PoopyButtholeThread( gram, new PoopJob( 1234 ) );
+//        gram.getTaskManager().add( poopyButthole );
+//
+//
+//        PoopyButtholeThread poopy1 = new PoopyButtholeThread( gram, new EatJob( "shit" ) );
+//        gram.getTaskManager().add( poopy1 );
 
 
-        PoopyButtholeThread poopy1 = new PoopyButtholeThread( gram, new EatJob( "shit" ) );
-        gram.getTaskManager().add( poopy1 );
-
-
-        poopy1.start();
-        poopyButthole.start();
+//        poopy1.start();
+//        poopyButthole.start();
 
 
         gram.getTaskManager().syncWaitingTerminated();
@@ -364,33 +365,33 @@ public class TestVolume {
 }
 
 
-class PoopJob implements VolumeJob {
-    int id ;
-    public PoopJob( int id ) {
-        this.id = id;
-    }
-
-    @Override
-    public void execute() {
-        Debug.trace( "I am pooping." + this.id );
-        Debug.sleep( 5000 );
-        Debug.trace( "done" );
-    }
-}
-
-class EatJob implements VolumeJob {
-    String name ;
-    public EatJob( String name ) {
-        this.name = name;
-    }
-
-    @Override
-    public void execute() {
-        Debug.trace( "I am eating." + this.name );
-        Debug.sleep( 5000 );
-        Debug.trace( "done" );
-    }
-}
+//class PoopJob implements VolumeJob {
+//    int id ;
+//    public PoopJob( int id ) {
+//        this.id = id;
+//    }
+//
+//    @Override
+//    public void execute() {
+//        Debug.trace( "I am pooping." + this.id );
+//        Debug.sleep( 5000 );
+//        Debug.trace( "done" );
+//    }
+//}
+//
+//class EatJob implements VolumeJob {
+//    String name ;
+//    public EatJob( String name ) {
+//        this.name = name;
+//    }
+//
+//    @Override
+//    public void execute() {
+//        Debug.trace( "I am eating." + this.name );
+//        Debug.sleep( 5000 );
+//        Debug.trace( "done" );
+//    }
+//}
 
 class PoopyButtholeThread extends ArchStripedTaskThread {
     public PoopyButtholeThread ( Processum parent, VolumeJob job ) {

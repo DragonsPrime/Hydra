@@ -4,16 +4,23 @@ import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.hydra.storage.volume.runtime.ArchStripedTaskThread;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJob;
 
+import java.util.concurrent.Semaphore;
+
 public class LocalStripedTaskThread extends ArchStripedTaskThread {
     public LocalStripedTaskThread ( String szName, Processum parent, VolumeJob volumeJob ) {
         super( szName, parent, volumeJob );
 
-        if( volumeJob instanceof TitanStripChannelBufferToFileJob ) {
-            ( (TitanStripChannelBufferToFileJob)volumeJob ).applyTaskThread( this );
-        }
-        else if( volumeJob instanceof TitanStripChannelBufferWriteJob ) {
-            ( (TitanStripChannelBufferWriteJob)volumeJob ).applyTaskThread( this );
-        }
+        volumeJob.applyThread( this );
     }
 
+    StripBufferStatus getJobStatus(){
+        return this.mVolumeJob.getStatus();
+    }
+    void setJobStatus( StripBufferStatus status ){
+        this.mVolumeJob.setStatus( status );
+    }
+
+    Semaphore getJobLock(){
+        return this.mVolumeJob.getPipelineLock();
+    }
 }

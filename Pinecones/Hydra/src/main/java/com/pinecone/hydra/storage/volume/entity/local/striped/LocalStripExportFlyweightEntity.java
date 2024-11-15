@@ -7,7 +7,9 @@ public class LocalStripExportFlyweightEntity implements StripExportFlyweightEnti
     private int                         jobNum;
     private int                         jobCode;
     private StripLockEntity             lockEntity;
-
+    private byte[]                      buffer;
+    private List<CacheBlock>            cacheBlockGroup;
+    private int                         bufferToFileThreadId;
 
     public LocalStripExportFlyweightEntity(){}
     public LocalStripExportFlyweightEntity( int jobNum, int jobCode, StripLockEntity lockEntity ){
@@ -51,4 +53,33 @@ public class LocalStripExportFlyweightEntity implements StripExportFlyweightEnti
         this.lockEntity = lockEntity;
     }
 
+    @Override
+    public byte[] getBuffer() {
+        return this.buffer;
+    }
+
+    @Override
+    public void setBuffer(byte[] buffer) {
+        this.buffer = buffer;
+    }
+
+    @Override
+    public List<CacheBlock> getCacheBlockGroup() {
+        return this.cacheBlockGroup;
+    }
+
+    @Override
+    public void setCacheBlockGroup(List<CacheBlock> cacheBlockGroup) {
+        this.cacheBlockGroup = cacheBlockGroup;
+    }
+
+    @Override
+    public int getBufferToFileThreadId() {
+        return this.bufferToFileThreadId;
+    }
+
+    @Override
+    public void setBufferToFileThreadId(int bufferToFileThreadId) {
+        this.bufferToFileThreadId = bufferToFileThreadId;
+    }
 }
