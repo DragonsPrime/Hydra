@@ -55,6 +55,7 @@ public class TitanStripChannelBufferToFileJob implements StripChannelBufferToFil
     protected void setWritingStatus() {
         this.status = BufferToFileStatus.Writing;
     }
+
     protected void setSuspendedStatus() {
         this.status = BufferToFileStatus.Suspended;
     }
@@ -86,15 +87,17 @@ public class TitanStripChannelBufferToFileJob implements StripChannelBufferToFil
                 Debug.trace("执行写入");
 
                 byte[] buffer = this.mergeArrays( writableCacheBlocks );
-                ByteBuffer writeBuffer = ByteBuffer.wrap(buffer, 0, buffer.length );
+                ByteBuffer writeBuffer = ByteBuffer.wrap(buffer, 0, buffer.length ); //!!!!
                 exportSize += buffer.length;
+
+
                 try {
                     channel.write(writeBuffer);
                 }
                 catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                Arrays.fill(this.mBuffer, (byte) 0);
+                //Arrays.fill(this.mBuffer, (byte) 0);
                 this.updateCurrentPosition( writableCacheBlocks.size() );
 
 
@@ -150,6 +153,8 @@ public class TitanStripChannelBufferToFileJob implements StripChannelBufferToFil
         }
         return length;
     }
+
+    //hold
     private byte[] mergeArrays( List< CacheBlock > writableCacheBlocks ){
         int totalLength = 0;
         for( CacheBlock cacheBlock : writableCacheBlocks ){
@@ -162,6 +167,8 @@ public class TitanStripChannelBufferToFileJob implements StripChannelBufferToFil
             System.arraycopy( this.mBuffer, cacheBlock.getValidByteStart().intValue(),buffer,(int)currentSize, bufferSize  );
             cacheBlock.setStatus( CacheBlockStatus.Free );
             currentSize += bufferSize;
+
+            //Debug.infoSyn(cacheBlock.getCacheBlockNumber());
         }
         return buffer;
     }

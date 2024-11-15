@@ -1,14 +1,13 @@
 package com.pinecone.hydra.storage.volume.runtime;
 
-import java.util.concurrent.locks.ReentrantLock;
-
 import com.pinecone.framework.system.GenericMasterTaskManager;
 import com.pinecone.framework.system.executum.ArchProcessum;
 import com.pinecone.framework.system.executum.Processum;
+import com.pinecone.framework.util.lock.SpinLock;
 import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
 
 public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
-    protected ReentrantLock mMajorStatusIO = new ReentrantLock();
+    protected SpinLock mMajorStatusIO = new SpinLock();
 
     public MasterVolumeGram( String szName, Processum parent ) {
         super( szName, parent );
@@ -16,7 +15,7 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
         this.mTaskManager      = new GenericMasterTaskManager( this );
     }
 
-    public ReentrantLock getMajorStatusIO() {
+    public SpinLock getMajorStatusIO() {
         return this.mMajorStatusIO;
     }
 

@@ -1,6 +1,9 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
+import com.pinecone.framework.util.io.FileUtils;
+import com.pinecone.framework.util.lock.ReentrantSpinLock;
+import com.pinecone.framework.util.lock.SpinLock;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
@@ -8,6 +11,8 @@ import com.pinecone.hydra.storage.volume.entity.local.striped.export.StripedChan
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
@@ -35,8 +40,11 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
     protected List< CacheBlock >            cacheBlockGroup;
     protected LocalStripedTaskThread        parentThread;
     protected byte[]                        buffer;
-    protected ReentrantLock                 majorStatusIO;
+    protected SpinLock                      majorStatusIO;
 
+
+    protected static AtomicInteger ACC = new AtomicInteger();
+    protected static AtomicInteger GCC = new AtomicInteger();
 
     public TitanStripChannelBufferWriteJob( StripedChannelExport stripedChannelExport, StripExportFlyweightEntity flyweightEntity, LogicVolume volume, ExportStorageObject object ){
         this.lockEntity                   = flyweightEntity.getLockEntity();
@@ -108,8 +116,26 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
                         bufferSize = size - currentPosition;
                     }
                     try {
-                        Debug.trace("线程"+this.parentThread.getName()+"这次读取的数据为"+currentPosition+","+bufferSize);
+                        //Debug.trace("线程"+this.parentThread.getName()+"这次读取的数据为"+currentPosition+","+bufferSize);
+                        Debug.infoSyn( this.jobCode, this.currentCacheBlockNumber, currentPosition );
+
                         this.volume.channelRaid0Export( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.flyweightEntity);
+//                        File file = new File("E:/" + ACC.getAndIncrement());
+//
+//                        try(FileOutputStream ofs = new FileOutputStream(file)) {
+//                            ofs.write(this.buffer,
+//                                    this.cacheBlockGroup.get( currentCacheBlockNumber.get()).getValidByteStart().intValue(),
+//                                    this.cacheBlockGroup.get( currentCacheBlockNumber.get()).getValidByteEnd().intValue() - this.cacheBlockGroup.get( currentCacheBlockNumber.get()).getValidByteStart().intValue()
+//                            );
+//                        }
+//
+//
+//
+//                        File f2 = new File("E:/GCC" + GCC.getAndIncrement());
+//
+//                        try(FileOutputStream ofs = new FileOutputStream(f2)) {
+//                            ofs.write(this.buffer,0, this.buffer.length);
+//                        }
                         currentPosition += bufferSize;
                         this.wakeUpBufferToFileThread();
                         /**
@@ -267,7 +293,8 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
                 bufferToFileThread.setJobStatus( BufferToFileStatus.Writing );
                 this.lockEntity.unlockBufferToFileLock();
             }
-        }finally {
+        }
+        finally {
             this.majorStatusIO.unlock();
         }
 

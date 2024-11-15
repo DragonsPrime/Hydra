@@ -135,6 +135,8 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
             titanExportStorageObject.setSourceName(sourceName);
             titanExportStorageObject.setSize(file.length());
 
+            Debug.warnSyn( sourceName, index );
+
             TitanStripLockEntity lockEntity = new TitanStripLockEntity(lockObject, lockGroup, currentCacheBlockNumber, bufferToFileLock);
             StripExportFlyweightEntity flyweightEntity = new LocalStripExportFlyweightEntity( jobNum, index, lockEntity);
             flyweightEntity.setBuffer( buffer );
