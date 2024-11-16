@@ -1,5 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
+import java.nio.ByteBuffer;
+
 public class StripCacheBlock implements CacheBlock{
     protected CacheBlockStatus    status;
     protected Number              validByteStart;

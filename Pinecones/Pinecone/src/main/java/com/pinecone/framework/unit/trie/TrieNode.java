@@ -5,9 +5,15 @@ import com.pinecone.framework.system.prototype.Pinenut;
 public interface TrieNode<V > extends Pinenut {
     boolean isLeaf();
 
-    TrieNode parent();
+    TrieNode<V > parent();
 
     TrieMap<String, V> getTrieMap();
+
+    String getNodeName();
+
+    String getFullName();
+
+    String getNamespace();
 
     default DirectoryNode<V > evinceDirectory() {
         return null;
@@ -17,7 +23,9 @@ public interface TrieNode<V > extends Pinenut {
         return null;
     }
 
-    default GenericReparseNode evinceReparse() {
+    default ReparseNode<V > evinceReparse() {
         return null;
     }
+
+    String getTypeName();
 }

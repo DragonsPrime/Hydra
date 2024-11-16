@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class LocalStripExportFlyweightEntity implements StripExportFlyweightEntity {
-    private int                         jobNum;
+    private int                         jobCount;
     private int                         jobCode;
     private StripLockEntity             lockEntity;
     private byte[]                      buffer;
@@ -13,8 +13,8 @@ public class LocalStripExportFlyweightEntity implements StripExportFlyweightEnti
     private int                         bufferToFileThreadId;
 
     public LocalStripExportFlyweightEntity(){}
-    public LocalStripExportFlyweightEntity( int jobNum, int jobCode, StripLockEntity lockEntity ){
-        this.jobNum                     = jobNum;
+    public LocalStripExportFlyweightEntity( int jobCount, int jobCode, StripLockEntity lockEntity ){
+        this.jobCount                     = jobCount;
         this.jobCode                    = jobCode;
         this.lockEntity                 = lockEntity;
     }
@@ -25,13 +25,13 @@ public class LocalStripExportFlyweightEntity implements StripExportFlyweightEnti
 
 
     @Override
-    public int getJobNum() {
-        return this.jobNum;
+    public int getJobCount() {
+        return this.jobCount;
     }
 
     @Override
-    public void setJobNum(int jobNum) {
-        this.jobNum = jobNum;
+    public void setJobCount(int jobCount) {
+        this.jobCount = jobCount;
     }
 
     @Override

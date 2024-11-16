@@ -1,9 +1,9 @@
 package com.sauron.radium.messagron;
 
-import com.pinecone.hydra.messagram.ArchMessagram;
-import com.pinecone.hydra.messagram.MessagePackage;
-import com.pinecone.hydra.messagram.MessageletMsgDeliver;
-import com.pinecone.hydra.messagram.ArchMessagelet;
+import com.pinecone.hydra.umct.ArchMessagram;
+import com.pinecone.hydra.umct.MessagePackage;
+import com.pinecone.hydra.umct.MessageletMsgDeliver;
+import com.pinecone.hydra.umct.ArchMessagelet;
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.hydra.umc.msg.UMCMessage;

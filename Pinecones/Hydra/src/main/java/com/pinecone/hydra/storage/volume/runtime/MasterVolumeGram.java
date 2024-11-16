@@ -1,6 +1,9 @@
 package com.pinecone.hydra.storage.volume.runtime;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.pinecone.framework.system.GenericMasterTaskManager;
@@ -11,9 +14,11 @@ import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
 
 public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
-    protected SpinLock mMajorStatusIO = new SpinLock();
-    protected int                   jobNum;
-    protected List<Object>          lockGroup;
+    protected Lock                  mMajorStatusIO = new SpinLock();
+    protected int                   jobCount;
+    
+    
+    
     protected List<CacheBlock>      cacheGroup;
     protected byte[]                buffer;
 
@@ -22,16 +27,15 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
         this.mTaskManager      = new GenericMasterTaskManager( this );
     }
 
-    public MasterVolumeGram( String szName, Processum parent, int jobNum, List<Object> lockGroup, List<CacheBlock> cacheGroup, byte[] buffer ){
+    public MasterVolumeGram( String szName, Processum parent, int jobCount, List<CacheBlock> cacheGroup, byte[] buffer ){
         super( szName, parent );
         this.mTaskManager   = new GenericMasterTaskManager( this );
-        this.jobNum         = jobNum;
-        this.lockGroup      = lockGroup;
+        this.jobCount         = jobCount;
         this.cacheGroup     = cacheGroup;
         this.buffer         = buffer;
     }
 
-    public SpinLock getMajorStatusIO() {
+    public Lock getMajorStatusIO() {
         return this.mMajorStatusIO;
     }
 
@@ -41,23 +45,13 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
 
 
     @Override
-    public int getJobNum() {
-        return this.jobNum;
+    public int getJobCount() {
+        return this.jobCount;
     }
 
     @Override
-    public void setJobNum(int jobNum) {
-        this.jobNum = jobNum;
-    }
-
-    @Override
-    public List<Object> getLockGroup() {
-        return this.lockGroup;
-    }
-
-    @Override
-    public void setLockGroup(List<Object> lockGroup) {
-        this.lockGroup = lockGroup;
+    public void setJobCount(int jobCount) {
+        this.jobCount = jobCount;
     }
 
     @Override

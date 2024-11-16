@@ -8,17 +8,15 @@ import java.util.concurrent.locks.Lock;
 import com.pinecone.framework.util.Debug;
 
 public class TitanStripLockEntity implements StripLockEntity{
-    private Object        lockObject;
-    private List< Object> lockGroup;
-    private AtomicInteger currentBufferCode;
     private Semaphore     bufferToFileLock;
+
+    private Object        lockObject;
+
 
     public TitanStripLockEntity(){}
 
-    public TitanStripLockEntity( Object lockObject, List<Object> lockGroup, AtomicInteger currentBufferCode, Semaphore bufferToFileLock ){
+    public TitanStripLockEntity( Object lockObject, Semaphore bufferToFileLock ){
         this.lockObject = lockObject;
-        this.lockGroup = lockGroup;
-        this.currentBufferCode = currentBufferCode;
         this.bufferToFileLock  = bufferToFileLock;
     }
 
@@ -34,26 +32,6 @@ public class TitanStripLockEntity implements StripLockEntity{
 
 
     @Override
-    public List<Object> getLockGroup() {
-        return this.lockGroup;
-    }
-
-    @Override
-    public void setLockGroup(List<Object> lockGroup) {
-        this.lockGroup = lockGroup;
-    }
-
-    @Override
-    public AtomicInteger getCurrentBufferCode() {
-        return this.currentBufferCode;
-    }
-
-    @Override
-    public void setCurrentBufferCode(AtomicInteger currentBufferCode) {
-        this.currentBufferCode = currentBufferCode;
-    }
-
-    @Override
     public Semaphore getBufferToFileLock() {
         return this.bufferToFileLock;
     }
@@ -61,20 +39,5 @@ public class TitanStripLockEntity implements StripLockEntity{
     @Override
     public void unlockBufferToFileLock() {
         this.bufferToFileLock.release();
-    }
-
-    @Override
-    public void unlockPipeStage() {
-
-        for( final Object lockObject : this.getLockGroup() ){
-            if( lockObject instanceof Semaphore ) {
-                ( (Semaphore) lockObject ).release();
-            }
-            else {
-                synchronized ( lockObject ){
-                    lockObject.notify();
-                }
-            }
-        }
     }
 }

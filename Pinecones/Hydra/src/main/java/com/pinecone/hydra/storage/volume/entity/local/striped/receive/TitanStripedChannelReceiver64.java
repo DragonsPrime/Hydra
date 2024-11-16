@@ -1,13 +1,10 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.receive;
 
-import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.rdb.MappedExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.MiddleStorageObject;
-import com.pinecone.hydra.storage.TitanMiddleStorageObject;
-import com.pinecone.hydra.storage.TitanStorageNaming;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
@@ -15,7 +12,7 @@ import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
-import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripChannelReceiverJob;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripReceiverJob;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
@@ -23,10 +20,7 @@ import com.pinecone.hydra.system.Hydrarum;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
@@ -57,7 +51,7 @@ public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
 
         int index = 0;
         for( LogicVolume volume : volumes ){
-            TitanStripChannelReceiverJob receiverJob = new TitanStripChannelReceiverJob( this.entity, this.fileChannel, volumes.size(), index, volume, sqLiteExecutor );
+            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob( this.entity, this.fileChannel, volumes.size(), index, volume, sqLiteExecutor );
             LocalStripedTaskThread taskThread = new LocalStripedTaskThread(  this.stripedVolume.getName() + index, masterVolumeGram, receiverJob );
             masterVolumeGram.getTaskManager().add( taskThread );
             taskThread.start();

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.pinecone.framework.system.stereotype.JavaBeans;
+import com.pinecone.framework.util.json.JSONArray;
 
 public class MapStructuresEvaluator implements ObjectiveEvaluator {
     @Override
@@ -268,7 +269,14 @@ public class MapStructuresEvaluator implements ObjectiveEvaluator {
         else if ( that instanceof List ) {
             try {
                 int index = Integer.parseInt( key );
-                Object value = ((List<?>) that).get( index );
+                Object value ;
+                if( that instanceof JSONArray ) {
+                    value = ((JSONArray) that).opt( index );
+                }
+                else {
+                    value = ((List<?>) that).get( index );
+                }
+
                 return value != null ? value.getClass() : Object.class;
             }
             catch ( NumberFormatException | IndexOutOfBoundsException e ) {

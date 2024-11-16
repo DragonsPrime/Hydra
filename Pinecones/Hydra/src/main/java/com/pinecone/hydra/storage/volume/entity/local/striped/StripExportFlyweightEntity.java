@@ -8,8 +8,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public interface StripExportFlyweightEntity extends Pinenut {
 
-    int getJobNum();
-    void setJobNum( int jobNum );
+    int getJobCount();
+    void setJobCount( int jobCount );
 
     int getJobCode();
     void setJobCode( int jobCode );
@@ -18,12 +18,15 @@ public interface StripExportFlyweightEntity extends Pinenut {
     void setLockEntity( StripLockEntity lockEntity );
 
     byte[] getBuffer();
+
     void setBuffer( byte[] buffer );
 
     List< CacheBlock> getCacheBlockGroup();
+
     void setCacheBlockGroup( List< CacheBlock> cacheBlockGroup );
 
     int getBufferToFileThreadId();
+
     void setBufferToFileThreadId( int bufferToFileThreadId );
 
 }

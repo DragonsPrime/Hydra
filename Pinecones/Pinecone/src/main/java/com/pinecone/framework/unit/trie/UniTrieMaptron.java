@@ -52,7 +52,7 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
         this( mapSupplier, TrieSegmentor.DefaultSegmentor );
     }
 
-    public UniTrieMaptron( TrieSegmentor segmentor) {
+    public UniTrieMaptron( TrieSegmentor segmentor ) {
         this( TreeMap::new, segmentor );
     }
 
@@ -83,16 +83,15 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
 
     @Override
     public V put( K key, V value ) {
-        return this.putReference( key, value );
+        return this.putEntity( key, value );
     }
 
-    public V reference ( K key, K target ) {
-        ReparseNode<V> p = new GenericReparseNode<>( null, target,this );
-        this.putReference( key, p );
-        return this.get( target );
+    public V makeSymbolic ( K key, K target ) {
+        ReparseNode<V> p = new GenericReparseNode<>( null, null, target,this );
+        return this.putEntity( key, p );
     }
 
-    public V putReference( K key, Object value ) {
+    public V putEntity( K key, Object value ) {
         if ( key == null ) {
             throw new IllegalArgumentException( "Key cannot be null." );
         }
@@ -101,13 +100,14 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
         DirectoryNode<V> dir      = this.mRoot;
         TrieNode<V> parent        = this.mRoot;
 
+        String szLeafKey          = null;
         for ( int i = 0; i < segments.length; ++i ) {
             String segment = segments[ i ];
 
             if ( i < segments.length - 1 ) {
                 node = dir.get( segment );
                 if( node == null ) {
-                    DirectoryNode<V> neo = new GenericDirectoryNode<>( this.mMapSupplier.get() ,parent, this );
+                    DirectoryNode<V> neo = new GenericDirectoryNode<>( segment, this.mMapSupplier.get() ,parent, this );
                     dir.put( segment, neo );
                     node = neo;
                     dir  = neo;
@@ -120,26 +120,26 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
                 }
             }
             else { // Leaf Node
+                szLeafKey = segment;
                 node = dir.get( segment );
                 if( node == null ) {
                     TrieNode<V> neo;
-                    if ( value instanceof GenericReparseNode ) {
-                        neo = (GenericReparseNode) value;
+                    if ( value instanceof ReparseNode ) {
+                        ReparseNode dummy = (ReparseNode) value;
+                        neo = new GenericReparseNode<>( segment, dir, dummy.getReparsePointer(),this );
                     }
                     else {
-                        neo = new GenericValueNode<>( this.convertValue( value ), parent, this );
+                        neo = new GenericValueNode<>( segment, this.convertValue( value ), parent, this );
                     }
                     dir.put( segment, neo );
-                    node = neo;
+                    ++this.mnSize;
+                    return null; // Insertion
                 }
             }
             parent = node;
         }
 
-        if ( node.isLeaf() ) {
-            ++this.mnSize;
-        }
-
+        // Modification
         ValueNode<V > vn = node.evinceValue();
         if( vn != null ) {
             V legacyValue = vn.getValue();
@@ -148,7 +148,32 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
             return legacyValue;
         }
 
-        return null; //TODO Reparse
+        ReparseNode<V > rn = node.evinceReparse();
+        if( rn != null ) {
+            TrieNode<V > revealed = rn.reparse();
+            if( revealed != null ) {
+                vn = revealed.evinceValue();
+                if( vn != null ) {
+                    V legacyValue = vn.getValue();
+                    vn.setValue( this.convertValue( value ) );
+
+                    return legacyValue;
+                }
+            }
+        }
+
+        DirectoryNode<V > dn = node.evinceDirectory();
+        if( dn != null ) {
+            TrieNode<V>       pp = dn.parent();
+            if( pp == null ) {
+                pp = this.mRoot;
+            }
+            DirectoryNode<V > pd = pp.evinceDirectory();
+            pd.remove( szLeafKey );
+            pd.put( szLeafKey, new GenericValueNode<>( dn.getNodeName(), this.convertValue( value ), pp, this ) );
+        }
+
+        return null;
     }
 
     @Override
@@ -161,12 +186,22 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
         }
 
         ValueNode<V > vn = node.evinceValue();
-        if ( node.evinceValue() == null ){
-            return null;
+        if ( vn != null ){
+            return vn.getValue();
         }
 
-        //TODO Reparse
-        return vn.getValue();
+        ReparseNode<V > rp = node.evinceReparse();
+        if ( rp != null ){
+            TrieNode<V > revealed = rp.reparse();
+            if( revealed != null ) {
+                vn = revealed.evinceValue();
+                if( vn != null ) {
+                    return vn.getValue();
+                }
+            }
+        }
+
+        return null;
     }
 
     @Override
@@ -200,7 +235,16 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
                 return vn.getValue().equals( value );
             }
 
-            //TODO Reparse
+            ReparseNode<V > rp = node.evinceReparse();
+            if ( rp != null ){
+                TrieNode<V > revealed = rp.reparse();
+                if( revealed != null ) {
+                    vn = revealed.evinceValue();
+                    if( vn != null ) {
+                        return vn.getValue().equals( value );
+                    }
+                }
+            }
         }
 
         return false;
@@ -328,10 +372,10 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
 
     @Override
     public Collection<V> values() {
-        Collection<V> vs = mValues;
+        Collection<V> vs = this.mValues;
         if (vs == null) {
             vs = new Values();
-            mValues = vs;
+            this.mValues = vs;
         }
         return vs;
     }
@@ -405,6 +449,7 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
             this.advance();
         }
 
+        @SuppressWarnings( "unchecked" )
         private void advance() {
             this.nextEntry = null;
 
@@ -451,7 +496,13 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
                         this.stack.push( this.dummyTerminationMap.entrySet().iterator() );
                     }
 
-                    break;//TODO Reparse
+                    ReparseNode<V> rn = node.evinceReparse();
+                    if( rn != null ) {
+                        this.nextEntry = new AbstractMap.SimpleEntry( this.currentPath.toString(), rn );
+                        this.stack.push( this.dummyTerminationMap.entrySet().iterator() );
+                    }
+
+                    break;
                 }
             }
         }
@@ -547,16 +598,6 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
         }
     }
 
-
-//    private TrieNode evalReparsedTarget(GenericReparseNode reparseNode){
-//        TrieNode node = this.queryNode(reparseNode.getPath());
-//        while (node.nodeType == TrieNode.NodeType.Reparse){
-//            GenericReparseNode temporaryReparseNode = (GenericReparseNode) node.value;
-//            node = this.queryNode( reparseNode.getPath() );
-//        }
-//        return node;
-//    }
-
     @Override
     public TrieMap<K, V> clone() {
         try {
@@ -583,7 +624,7 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
         }
 
         Map<String, TrieNode<V>> clonedChildren = this.mMapSupplier.get();
-        DirectoryNode<V > neo = new GenericDirectoryNode<>( clonedChildren, parent, pm );
+        DirectoryNode<V > neo = new GenericDirectoryNode<>( original.getNodeName(), clonedChildren, parent, pm );
         for ( Map.Entry<String, TrieNode<V>> entry : original.children().entrySet() ) {
             TrieNode<V> clonedChild = this.cloneTrieNode( entry.getValue(), pm, neo );
             clonedChildren.put( entry.getKey(), clonedChild );
@@ -604,7 +645,12 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
 
         ValueNode<V> valueNode = original.evinceValue();
         if ( valueNode != null ) {
-            return new GenericValueNode<>( valueNode.getValue(), parent, pm );
+            return new GenericValueNode<>( original.getNodeName(), valueNode.getValue(), parent, pm );
+        }
+
+        ReparseNode<V > rp = original.evinceReparse();
+        if ( rp != null ){
+            return new GenericReparseNode<>( original.getNodeName(), parent, rp.getReparsePointer(), pm );
         }
 
         return null;

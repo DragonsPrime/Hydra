@@ -72,4 +72,9 @@ public interface DirectoryNode<V > extends TrieNode<V > {
     default DirectoryNode<V > evinceDirectory() {
         return this;
     }
+
+    @Override
+    default String getTypeName() {
+        return DirectoryNode.class.getSimpleName();
+    }
 }

@@ -28,14 +28,14 @@ public final class JSON {
         return JSON.decode( that, new JSONMarshal( bOnlyMarshalAnnotated ) );
     }
 
-    public static Object unmarshal ( String szJsonString, Class<? > classType ) {
+    public static <T> T unmarshal ( String szJsonString, Class<T > classType ) {
         ObjectJSONCursorUnmarshal unmarshal = new ObjectJSONCursorUnmarshal( szJsonString, classType );
-        return unmarshal.nextValue();
+        return classType.cast( unmarshal.nextValue() ) ;
     }
 
-    public static Object unmarshal ( Reader reader, Class<? > classType ) {
+    public static <T> T unmarshal ( Reader reader, Class<T > classType ) {
         ObjectJSONCursorUnmarshal unmarshal = new ObjectJSONCursorUnmarshal( reader, classType );
-        return unmarshal.nextValue();
+        return classType.cast( unmarshal.nextValue() ) ;
     }
 
     public static String decode    ( Object that, JSONEncoder encoder ) {

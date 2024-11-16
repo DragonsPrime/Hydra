@@ -1,43 +1,66 @@
 package com.pinecone.framework.unit.trie;
 
-import com.pinecone.framework.system.prototype.Pinenut;
+import com.pinecone.framework.unit.KeyValue;
+import com.pinecone.framework.util.json.JSONEncoder;
 
 public class GenericReparseNode<V> extends ArchTrieNode<V > implements ReparseNode<V > {
-    protected TrieNode              target  ;
-    protected String                path    ;
+    protected String                mszReparsePointer    ;
 
-    public <K extends String > GenericReparseNode( TrieNode<V> parent, String path, AbstractTrieMap<K, V> trieMap ) {
-        super( parent, trieMap );
-        TrieNode node = this.getTrieMap().queryNode(path);
-//        if ( node != null && node.isEnd ) {
-//            this.target = node;
-//        }
-//        else {
-//            throw new RuntimeException("Target node does not exist or is not a leaf node.");
-//        }
-        this.target = node;
-        this.path = path;
+    public <K extends String > GenericReparseNode( String szKey, TrieNode<V> parent, String szReparsePointer, TrieMap<K, V> trieMap ) {
+        super( szKey, parent, trieMap );
+        this.mszReparsePointer = szReparsePointer;
     }
 
-
-    public TrieNode getTarget() {
-        return this.target;
+    @Override
+    public String getReparsePointer() {
+        return mszReparsePointer;
     }
 
-    public void setTarget( TrieNode target ) {
-        this.target = target;
+    @Override
+    public void setReparsePointer( String path ) {
+        this.mszReparsePointer = path;
     }
 
-    public String getPath() {
-        return path;
-    }
+    @Override
+    public TrieNode<V > reparse() {
+        String szReparsePointer = this.mszReparsePointer;
+        while ( true ) {
+            TrieNode<V >    revealed = this.getTrieMap().queryNode( szReparsePointer );
+            if( revealed != null ) {
+                ReparseNode<V > reparsed = revealed.evinceReparse();
+                if( reparsed != null ) {
+                    szReparsePointer = reparsed.getReparsePointer();
+                    continue;
+                }
 
-    public void setPath( String path ) {
-        this.path = path;
+                return revealed;
+            }
+            else {
+                return null;
+            }
+        }
     }
 
     @Override
     public boolean isLeaf() {
         return true;
+    }
+
+    @Override
+    public String toString() {
+        TrieNode<V > revealed = this.reparse();
+        if( revealed != null ) {
+            return revealed.toString();
+        }
+        return null;
+    }
+
+    @Override
+    public String toJSONString() {
+        return JSONEncoder.stringifyMapFormat( new KeyValue[]{
+                new KeyValue<>( "FullName"      , this.getFullName()                ),
+                new KeyValue<>( "Type"          , ReparseNode.class.getSimpleName() ),
+                new KeyValue<>( "ReparsePoint"  , this.getReparsePointer()          )
+        } );
     }
 }

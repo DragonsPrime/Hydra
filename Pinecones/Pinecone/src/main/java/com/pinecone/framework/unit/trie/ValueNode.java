@@ -9,4 +9,9 @@ public interface ValueNode<V > extends TrieNode<V > {
     default ValueNode<V > evinceValue() {
         return this;
     }
+
+    @Override
+    default String getTypeName() {
+        return ValueNode.class.getSimpleName();
+    }
 }

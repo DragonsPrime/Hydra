@@ -179,6 +179,7 @@ public class TestUnits {
     }
 
     public static void testTrieMap() {
+
         UniTrieMaptron<String, String> trieMap = new UniTrieMaptron<>();
 
         trieMap.put("a1/b1/c1", "T1");
@@ -189,11 +190,21 @@ public class TestUnits {
         trieMap.put("a1/b1/c2", "T6");
         trieMap.put("a1/b1/c3", "T7");
 
-        //trieMap.reference( "a1/b1/rc5", "a3/b3/c3" );
+        trieMap.makeSymbolic( "a1/b1/rc5", "a3/b3/c3" );
 
         TrieNode node = trieMap.queryNode("a1/b1");
         //node.put("c4","T8",trieMap);
         Debug.trace(trieMap.get("a1/b1/rc5"));
+
+        //trieMap.makeSymbolic( "a1/b1/rc2", "a3" );
+        trieMap.makeSymbolic( "a1/b1/rc2", "a1/b1/rc5" );
+        TrieNode<String > rc6 = trieMap.queryNode( "a1/b1/rc2" );
+        Debug.trace( rc6.evinceReparse().reparse() );
+        Debug.trace( trieMap.queryNode( "a1" ).getFullName() );
+
+        Debug.trace( trieMap, trieMap.size() );
+        trieMap.put("a3/b4", "RRR");
+        Debug.greenf( trieMap, trieMap.size() );
 
         trieMap.remove( "a3" );
 
@@ -202,6 +213,11 @@ public class TestUnits {
         Debug.trace( trieMap.keySet() );
 
         Debug.trace( trieMap.values() );
+
+
+
+
+
         TrieMap clone = trieMap.clone();
 
         Debug.trace(clone,clone.size());

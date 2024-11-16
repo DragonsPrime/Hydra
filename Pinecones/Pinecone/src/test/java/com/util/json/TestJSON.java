@@ -178,8 +178,9 @@ public class TestJSON {
     }
 
     public static void testMarshal() {
-        Object j = JSON.unmarshal( "{ name:Slave, length:1234, parasite:{ name: parasite, length:20241102 }, atts: { key:val }, li:[1,2,3, 'ssss']  }", Slave.class );
-        Debug.trace( j );
+        Slave j = JSON.unmarshal( "{ /*name:Slave, length:1234, parasite:{ name: parasite, length:20241102 }, atts: { key:val }, li:[1,2,3, 'ssss'],*/" +
+                "children: [{ name:Slave, length:1234, parasite:{ name: parasitec, length:20241117 }  } ] }", Slave.class );
+        Debug.trace( 2, j );
     }
 
 

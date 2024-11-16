@@ -323,7 +323,7 @@ public abstract class ArchCursorParser implements CursorParser {
     }
 
     @Override
-    public Object nextValue( Object indexKey, Object parent ) throws JSONParseException {
+    public Object nextValue( Object indexKey, Object parent, Object[] args ) throws JSONParseException {
         char c = this.nextClean();
         switch(c) {
             case '"':
@@ -332,11 +332,11 @@ public abstract class ArchCursorParser implements CursorParser {
             }
             case '[': {
                 this.back();
-                return this.newJSONArray( indexKey, this, parent );
+                return this.newJSONArray( indexKey, this, parent, args );
             }
             case '{': {
                 this.back();
-                return this.newJSONObject( indexKey, this, parent );
+                return this.newJSONObject( indexKey, this, parent, args );
             }
             default: {
                 StringBuilder sb = this.eval_next_string( c );
@@ -347,7 +347,7 @@ public abstract class ArchCursorParser implements CursorParser {
 
     @Override
     public Object nextValue() throws JSONParseException {
-        return this.nextValue( null, null );
+        return this.nextValue( null, null, null );
     }
 
     public char skipTo( char to ) throws JSONParseException {
@@ -392,7 +392,7 @@ public abstract class ArchCursorParser implements CursorParser {
 
 
 
-    protected abstract Object newJSONArray( Object indexKey, ArchCursorParser parser, Object parent );
+    protected abstract Object newJSONArray( Object indexKey, ArchCursorParser parser, Object parent, Object[] args );
 
-    protected abstract Object newJSONObject( Object indexKey, ArchCursorParser parser, Object parent );
+    protected abstract Object newJSONObject( Object indexKey, ArchCursorParser parser, Object parent, Object[] args );
 }

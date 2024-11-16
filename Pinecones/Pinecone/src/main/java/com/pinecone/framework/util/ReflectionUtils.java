@@ -484,4 +484,17 @@ public final class ReflectionUtils {
         }
     }
 
+    /**
+     * e.g. java.util.List<com.util.json.Test>
+     */
+    public static String extractSoloGenericClassName( String input ) {
+        int startIndex = input.indexOf('<');
+        int endIndex   = input.lastIndexOf('>');
+
+        if ( startIndex != -1 && endIndex != -1 && endIndex > startIndex ) {
+            return input.substring(startIndex + 1, endIndex).trim();
+        }
+        return null;
+    }
+
 }

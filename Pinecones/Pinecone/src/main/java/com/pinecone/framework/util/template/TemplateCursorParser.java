@@ -31,7 +31,7 @@ public class TemplateCursorParser implements CursorParser {
     }
 
     @Override
-    public Object nextValue( Object indexKey, Object parent ) throws ParseException {
+    public Object nextValue( Object indexKey, Object parent, Object[] args ) throws ParseException {
         return this.nextValue();
     }
 }

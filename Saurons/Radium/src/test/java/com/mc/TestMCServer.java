@@ -1,6 +1,6 @@
 package com.mc;
 
-import com.pinecone.hydra.messagram.WolfMCExpress;
+import com.pinecone.hydra.umct.WolfMCExpress;
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
 import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.UMCMessage;

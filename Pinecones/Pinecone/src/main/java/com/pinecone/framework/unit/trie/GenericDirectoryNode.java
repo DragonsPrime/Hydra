@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.pinecone.framework.unit.KeyValue;
+import com.pinecone.framework.util.json.JSONEncoder;
+
 public class GenericDirectoryNode<V > extends ArchTrieNode<V > implements DirectoryNode<V > {
     protected Map<String, TrieNode<V > > mChildren;
 
@@ -13,11 +16,11 @@ public class GenericDirectoryNode<V > extends ArchTrieNode<V > implements Direct
      * Root constructor.
      */
     public <K extends String > GenericDirectoryNode( Map<String, TrieNode<V > > children, TrieMap<K, V > map ) {
-        this( children, null, map );
+        this( null, children, null, map );
     }
 
-    public <K extends String > GenericDirectoryNode( Map<String, TrieNode<V > > children, TrieNode<V> parent, TrieMap<K, V > map ) {
-        super( parent, map );
+    public <K extends String > GenericDirectoryNode( String szKey, Map<String, TrieNode<V > > children, TrieNode<V> parent, TrieMap<K, V > map ) {
+        super( szKey, parent, map );
         this.mChildren = children;
     }
 
@@ -136,5 +139,14 @@ public class GenericDirectoryNode<V > extends ArchTrieNode<V > implements Direct
             }
         }
         return list;
+    }
+
+    @Override
+    public String toJSONString() {
+        return JSONEncoder.stringifyMapFormat( new KeyValue[]{
+                new KeyValue<>( "FullName"      , this.getFullName()                ),
+                new KeyValue<>( "Type"          , ReparseNode.class.getSimpleName() ),
+                new KeyValue<>( "ChildrenSize"  , this.size()                       )
+        } );
     }
 }

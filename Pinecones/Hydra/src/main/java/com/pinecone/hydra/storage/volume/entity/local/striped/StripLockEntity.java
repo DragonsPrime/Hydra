@@ -12,15 +12,6 @@ public interface StripLockEntity extends Pinenut {
 
     void setLockObject( Object lockObject );
 
-    List<Object> getLockGroup();
-
-    void setLockGroup( List<Object> lockGroup );
-
-    AtomicInteger getCurrentBufferCode();
-
-    void setCurrentBufferCode( AtomicInteger currentBufferCode );
-
-    void unlockPipeStage();
     void unlockBufferToFileLock();
 
     Semaphore getBufferToFileLock();

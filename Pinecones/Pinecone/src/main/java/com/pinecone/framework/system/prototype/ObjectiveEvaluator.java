@@ -1,6 +1,8 @@
 package com.pinecone.framework.system.prototype;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 
 public interface ObjectiveEvaluator extends Pinenut {
     ObjectiveEvaluator MapStructures = new MapStructuresEvaluator();
@@ -88,4 +90,18 @@ public interface ObjectiveEvaluator extends Pinenut {
         return this.classGetType( that, key.toString() );
     }
 
+    default Type getFieldGenericType( Object obj, String fieldName ) {
+        Type fieldGenericType = null;
+        try{
+            if( obj != null ) {
+                Field field      = obj.getClass().getDeclaredField( fieldName );
+                fieldGenericType = field.getGenericType();
+            }
+        }
+        catch ( NoSuchFieldException | SecurityException e ) {
+            fieldGenericType = null;
+        }
+
+        return fieldGenericType;
+    }
 }

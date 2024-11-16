@@ -9,7 +9,7 @@ import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.UMCMessage;
-import com.pinecone.hydra.messagram.WolfMCExpress;
+import com.pinecone.hydra.umct.WolfMCExpress;
 import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
 
 import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
@@ -38,7 +38,7 @@ class Jesus extends JesusChrist {
                 "\n" +
                 "  \"Expresses\"         : {\n" +
                 "    \"WolfMCExpress\": {\n" +
-                "      \"Engine\": \"com.pinecone.hydra.messagram.WolfMCExpress\"\n" +
+                "      \"Engine\": \"com.pinecone.hydra.umct.WolfMCExpress\"\n" +
                 "    }\n" +
                 "  }\n" +
                 "}" ) );

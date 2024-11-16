@@ -1,10 +1,12 @@
 package com.pinecone.hydra.storage.volume.runtime;
 
+import java.util.concurrent.Semaphore;
+
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.system.executum.Processum;
 
 public abstract class ArchStripedTaskThread extends ArchTaskThread implements Runnable {
-    protected VolumeJob mVolumeJob;
+    protected VolumeJob    mVolumeJob;
 
     protected ArchStripedTaskThread ( String szName, Processum parent, VolumeJob volumeJob ) {
         super( szName, parent );

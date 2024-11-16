@@ -15,6 +15,6 @@ public interface VolumeJob extends Executor {
 
     StripBufferStatus getStatus();
 
-    Semaphore getPipelineLock();
+    Semaphore getBlockerLatch();
     void setStatus( StripBufferStatus status );
 }

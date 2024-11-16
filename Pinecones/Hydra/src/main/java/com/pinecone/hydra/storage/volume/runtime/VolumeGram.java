@@ -6,11 +6,8 @@ import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import java.util.List;
 
 public interface VolumeGram extends Processum {
-    int getJobNum();
-    void setJobNum( int jobNum );
-
-    List<Object> getLockGroup();
-    void setLockGroup( List<Object> lockGroup );
+    int getJobCount();
+    void setJobCount( int jobCount );
 
     List<CacheBlock> getCacheGroup();
     void setCacheGroup( List<CacheBlock> cacheGroup );

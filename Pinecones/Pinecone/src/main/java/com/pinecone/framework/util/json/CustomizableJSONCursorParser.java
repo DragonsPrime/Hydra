@@ -30,7 +30,7 @@ public class CustomizableJSONCursorParser extends ArchCursorParser {
     }
 
     @Override
-    protected JSONArray newJSONArray( Object indexKey, ArchCursorParser parser, Object parent ) {
+    protected JSONArray newJSONArray( Object indexKey, ArchCursorParser parser, Object parent, Object[] args ) {
         try {
             return this.mJSONArrayClass.getDeclaredConstructor().newInstance();
         }
@@ -40,7 +40,7 @@ public class CustomizableJSONCursorParser extends ArchCursorParser {
     }
 
     @Override
-    protected JSONObject newJSONObject( Object indexKey, ArchCursorParser parser, Object parent ) {
+    protected JSONObject newJSONObject( Object indexKey, ArchCursorParser parser, Object parent, Object[] args ) {
         try {
             return this.mJSONObjectClass.getDeclaredConstructor().newInstance();
         }

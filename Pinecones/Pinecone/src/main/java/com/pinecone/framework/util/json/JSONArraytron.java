@@ -85,7 +85,7 @@ public class JSONArraytron extends ArchJSONArray implements JSONArray {
 
     @Override
     protected void jsonDecode0( ArchCursorParser x ) throws JSONException {
-        JSONArrayDecoder.INNER_JSON_ARRAY_DECODER.decode( this, null, null, x );
+        JSONArrayDecoder.INNER_JSON_ARRAY_DECODER.decode( this, null, null, x, null );
     }
 
     @Override

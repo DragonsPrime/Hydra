@@ -324,7 +324,7 @@ class Alice extends Radium {
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanExportStorageObject titanExportStorageObject = new TitanExportStorageObject();
         titanExportStorageObject.setSize( 116296678 );
-        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("06ba6a6-00017d-0001-48") );
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("07b730c-000000-0001-7c") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
         volume.channelExport( titanExportStorageObject, channel );
     }

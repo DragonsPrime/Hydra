@@ -5,8 +5,10 @@ import com.pinecone.hydra.storage.volume.runtime.ArchStripedTaskThread;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJob;
 
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class LocalStripedTaskThread extends ArchStripedTaskThread {
+
     public LocalStripedTaskThread ( String szName, Processum parent, VolumeJob volumeJob ) {
         super( szName, parent, volumeJob );
 
@@ -16,11 +18,12 @@ public class LocalStripedTaskThread extends ArchStripedTaskThread {
     StripBufferStatus getJobStatus(){
         return this.mVolumeJob.getStatus();
     }
+
     void setJobStatus( StripBufferStatus status ){
         this.mVolumeJob.setStatus( status );
     }
 
-    Semaphore getJobLock(){
-        return this.mVolumeJob.getPipelineLock();
+    Semaphore getBlockerLatch(){
+        return this.mVolumeJob.getBlockerLatch();
     }
 }
