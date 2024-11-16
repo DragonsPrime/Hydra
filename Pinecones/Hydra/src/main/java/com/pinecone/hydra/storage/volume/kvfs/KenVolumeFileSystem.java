@@ -123,4 +123,14 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
         }
         return null;
     }
+
+    @Override
+    public int getKVFSFileStripCode(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
+        ResultSession query = mappedExecutor.query("SELECT `code` FROM `file_strip_table` WHERE `volume_guid` = '" + volumeGuid + "' AND `storage_object_guid` = '" + storageObjectGuid + "' ");
+        ResultSet resultSet = query.getResultSet();
+        if ( resultSet.next() ){
+            return resultSet.getInt("code");
+        }
+        return 0;
+    }
 }

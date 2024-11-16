@@ -28,7 +28,7 @@ public class UniTrieMaptronTest {
     @Test
     public void testPutReference() {
         trieMap.put("a/b/c", "value1");
-        trieMap.putReference("ref1", new GenericReparseNode<>("a/b/c",trieMap));
+        //trieMap.putReference("ref1", new GenericReparseNode<>("a/b/c",trieMap));
 
 
         assertEquals("value1", trieMap.get("ref1"));

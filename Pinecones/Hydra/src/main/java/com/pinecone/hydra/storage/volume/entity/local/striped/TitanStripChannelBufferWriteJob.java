@@ -14,6 +14,7 @@ import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
@@ -117,8 +118,6 @@ public class TitanStripChannelBufferWriteJob implements StripChannelBufferWriteJ
                     }
                     try {
                         //Debug.trace("线程"+this.parentThread.getName()+"这次读取的数据为"+currentPosition+","+bufferSize);
-                        Debug.infoSyn( this.jobCode, this.currentCacheBlockNumber, currentPosition );
-
                         this.volume.channelRaid0Export( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.flyweightEntity);
 //                        File file = new File("E:/" + ACC.getAndIncrement());
 //

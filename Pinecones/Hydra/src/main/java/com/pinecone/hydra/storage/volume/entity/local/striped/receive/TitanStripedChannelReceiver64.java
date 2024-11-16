@@ -57,7 +57,6 @@ public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
 
         int index = 0;
         for( LogicVolume volume : volumes ){
-
             TitanStripChannelReceiverJob receiverJob = new TitanStripChannelReceiverJob( this.entity, this.fileChannel, volumes.size(), index, volume, sqLiteExecutor );
             LocalStripedTaskThread taskThread = new LocalStripedTaskThread(  this.stripedVolume.getName() + index, masterVolumeGram, receiverJob );
             masterVolumeGram.getTaskManager().add( taskThread );
