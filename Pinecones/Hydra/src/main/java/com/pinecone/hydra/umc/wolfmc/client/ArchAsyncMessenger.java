@@ -18,11 +18,15 @@ public abstract class ArchAsyncMessenger extends WolfMCNode implements AsyncMess
     protected ProactiveParallelFairChannelPool<ChannelId >     mChannelPool     ;
     //protected BlockingDeque<UMCMessage>                        mSyncRetMsgQueue = new LinkedBlockingDeque<>();
 
-    public ArchAsyncMessenger( String szName, Hydrarum parent, JSONObject joConf, ExtraHeadCoder extraHeadCoder ) {
-        super( szName, parent, joConf, extraHeadCoder );
+    public ArchAsyncMessenger( String szName, Hydrarum system, UlfMessageNode parent, JSONObject joConf, ExtraHeadCoder extraHeadCoder ) {
+        super( szName, system, parent, joConf, extraHeadCoder );
 
         this.mChannelPool   = new ProactiveParallelFairChannelPool<>( this, new UlfIdleFirstBalanceStrategy() ); //TODO
         //this.makeNameAndId();
+    }
+
+    public ArchAsyncMessenger( String szName, Hydrarum system, JSONObject joConf, ExtraHeadCoder extraHeadCoder ) {
+        this( szName, system, null, joConf, extraHeadCoder );
     }
 
 

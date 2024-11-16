@@ -12,7 +12,7 @@ public class SpartaBoot {
 //            ShadowBoot.shadow.vitalize();
 //        }
 //        catch ( Exception e ) {
-//            ShadowBoot.shadow.console().cerr( e.getMessage() );
+//            ShadowBoot.shadow.console().error( e.getMessage() );
 //        }
 //    }
 //    public static void main(String[] args) {

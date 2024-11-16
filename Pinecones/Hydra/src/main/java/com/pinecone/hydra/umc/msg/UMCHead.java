@@ -35,15 +35,15 @@ public class UMCHead implements Pinenut {
 
 
     public UMCHead(  ) {
-        this( UMCHead.ProtocolSignature, UMCMethod.PUT );
+        this( UMCHead.ProtocolSignature, UMCMethod.INFORM );
     }
 
     public UMCHead( String szSignature ) {
-        this( szSignature, UMCMethod.PUT );
+        this( szSignature, UMCMethod.INFORM );
     }
 
     public UMCHead( String szSignature, long controlBits ) {
-        this( szSignature, UMCMethod.PUT, controlBits );
+        this( szSignature, UMCMethod.INFORM, controlBits );
     }
 
     public UMCHead( String szSignature, UMCMethod umcMethod ) {
@@ -84,7 +84,7 @@ public class UMCHead implements Pinenut {
 
     void setMethod           ( UMCMethod umcMethod    ) {
         this.method = umcMethod;
-        if ( this.method == UMCMethod.PUT ) {
+        if ( this.method == UMCMethod.INFORM ) {
             this.nBodyLength = 0;
         }
     }

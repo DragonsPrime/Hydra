@@ -37,19 +37,19 @@ public abstract class ArchUMCMessage implements UMCMessage {
     }
 
     public ArchUMCMessage( Map<String,Object > joExHead, long controlBits ) {
-        this( joExHead, UMCMethod.PUT, controlBits );
+        this( joExHead, UMCMethod.INFORM, controlBits );
     }
 
     public ArchUMCMessage( Object protoExHead, long controlBits ) {
-        this( protoExHead, UMCMethod.PUT, controlBits );
+        this( protoExHead, UMCMethod.INFORM, controlBits );
     }
 
     public ArchUMCMessage( Map<String,Object > joExHead ) {
-        this( joExHead, UMCMethod.PUT );
+        this( joExHead, UMCMethod.INFORM );
     }
 
     public ArchUMCMessage( Object protoExHead ) {
-        this( protoExHead, UMCMethod.PUT );
+        this( protoExHead, UMCMethod.INFORM );
     }
 
     @Override

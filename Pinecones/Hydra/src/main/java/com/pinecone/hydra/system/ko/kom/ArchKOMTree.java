@@ -57,7 +57,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
         this.hydrarum                      = hydrarum;
         this.dynamicFactory                = new GenericDynamicFactory( hydrarum.getTaskManager().getClassLoader() );
         this.mParentInstrument             = parent;
-        this.setName( name );
+        this.setTargetingName( name );
     }
 
     //************************************** CascadeInstrument **************************************
@@ -72,12 +72,12 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
     }
 
     @Override
-    public Namespace getName() {
+    public Namespace getTargetingName() {
         return this.mThisNamespace;
     }
 
     @Override
-    public void setName( Namespace name ) {
+    public void setTargetingName( Namespace name ) {
         this.mThisNamespace = name;
     }
 

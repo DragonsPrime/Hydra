@@ -4,25 +4,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 
-public class ArchStreamPostMessage extends ArchUMCMessage implements PostMessage {
+public class ArchStreamTransferMessage extends ArchUMCMessage implements TransferMessage {
     protected InputStream    mIStreamBody  = null ;
 
-    public ArchStreamPostMessage( UMCHead head ) {
+    public ArchStreamTransferMessage( UMCHead head ) {
         super( head );
-        head.setMethod( UMCMethod.POST );
+        head.setMethod( UMCMethod.TRANSFER );
     }
 
-    public ArchStreamPostMessage( UMCHead head, InputStream inStream ) {
+    public ArchStreamTransferMessage( UMCHead head, InputStream inStream ) {
         this( head );
         this.setBody( inStream );
     }
 
-    public ArchStreamPostMessage( Map<String,Object > joExHead, InputStream inStream, long controlBits ) {
-        super( joExHead, UMCMethod.POST, controlBits );
+    public ArchStreamTransferMessage( Map<String,Object > joExHead, InputStream inStream, long controlBits ) {
+        super( joExHead, UMCMethod.TRANSFER, controlBits );
         this.setBody( inStream );
     }
 
-    public ArchStreamPostMessage( Map<String,Object > joExHead, InputStream inStream ) {
+    public ArchStreamTransferMessage( Map<String,Object > joExHead, InputStream inStream ) {
         this( joExHead, inStream, 0 );
     }
 

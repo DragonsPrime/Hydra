@@ -46,7 +46,7 @@ public class ConfigScope extends ArchSystemCascadeComponent implements Saunut, H
     public ConfigScope( String name, Hydrarum system, HyComponent parent, JSONConfig config ) {
         this( system, parent, config );
 
-        this.setName( name );
+        this.setTargetingName( name );
     }
 
     public ConfigScope( String name, Hydrarum system, JSONConfig config ) {

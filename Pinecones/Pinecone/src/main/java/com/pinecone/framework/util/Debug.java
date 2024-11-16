@@ -57,6 +57,34 @@ public class Debug {
         return Debug.console.warn( Anything, objects );
     }
 
+    public static Tracer colorf( int colorCode, Object Anything, Object...objects ){
+        return Debug.console.colorf( colorCode, Anything, objects );
+    }
+
+    public static Tracer purplef( Object Anything, Object...objects ){
+        return Debug.console.colorf( 35, Anything, objects );
+    }
+
+    public synchronized static Tracer purplefs( Object Anything, Object...objects ){
+        return Debug.purplef( Anything, objects );
+    }
+
+    public static Tracer greenf( Object Anything, Object...objects ){
+        return Debug.console.colorf( 32, Anything, objects );
+    }
+
+    public synchronized static Tracer greenfs( Object Anything, Object...objects ){
+        return Debug.greenf( Anything, objects );
+    }
+
+    public static Tracer whitef( Object Anything, Object...objects ){
+        return Debug.console.colorf( 30, Anything, objects );
+    }
+
+    public synchronized static Tracer whitefs( Object Anything, Object...objects ){
+        return Debug.whitef( Anything, objects );
+    }
+
 
     public static Tracer hhf(){
         Debug.console.getOut().println();
@@ -64,11 +92,15 @@ public class Debug {
     }
 
 
-    public static Tracer echo(Object data, Object...objects ) {
+    public static Tracer echo( Object data, Object...objects ) {
         return Debug.console.echo( data, objects );
     }
 
-    public static Tracer cerr(Object data, Object...objects ) {
+    public static Tracer cerr( Object data, Object...objects ) {
+        return Debug.console.cerr( data, objects );
+    }
+
+    public synchronized static Tracer cerrSyn( Object data, Object...objects ) {
         return Debug.console.cerr( data, objects );
     }
 

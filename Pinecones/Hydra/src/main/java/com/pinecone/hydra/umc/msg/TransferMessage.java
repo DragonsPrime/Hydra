@@ -1,8 +1,8 @@
 package com.pinecone.hydra.umc.msg;
 
-public interface PostMessage extends UMCMessage {
+public interface TransferMessage extends UMCMessage {
     @Override
-    default PostMessage evincePostMessage() {
+    default TransferMessage evinceTransferMessage() {
         return this;
     }
 

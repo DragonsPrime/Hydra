@@ -2,7 +2,7 @@ package com.pinecone.hydra.umc.wolfmc;
 
 import com.pinecone.hydra.umc.msg.ArchUMCReceiver;
 import com.pinecone.hydra.umc.msg.Medium;
-import com.pinecone.hydra.umc.msg.PostMessage;
+import com.pinecone.hydra.umc.msg.TransferMessage;
 import com.pinecone.hydra.umc.msg.UMCHead;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 
@@ -13,28 +13,28 @@ public class UlfMCReceiver extends ArchUMCReceiver {
         super( messageSource );
     }
 
-    public UMCMessage readPostMsg( boolean bAllBytes ) throws IOException {
-        UMCHead head = this.readPostHead();
+    public UMCMessage readTransferMsg( boolean bAllBytes ) throws IOException {
+        UMCHead head = this.readTransferHead();
 
-        PostMessage message;
+        TransferMessage message;
         if( bAllBytes ) {
-            message = new UlfBytesPostMessage( head );
+            message = new UlfBytesTransferMessage( head );
         }
         else {
-            message = new UlfStreamPostMessage( head );
+            message = new UlfStreamTransferMessage( head );
         }
-        this.onlyReadPostBody( message, bAllBytes );
+        this.onlyReadTransferBody( message, bAllBytes );
         return message;
     }
 
     @Override
-    public UMCMessage readPostMsg() throws IOException {
-        return this.readPostMsg( false );
+    public UMCMessage readTransferMsg() throws IOException {
+        return this.readTransferMsg( false );
     }
 
     @Override
-    public UMCMessage readPostMsgBytes() throws IOException {
-        return this.readPostMsg( true );
+    public UMCMessage readTransferMsgBytes() throws IOException {
+        return this.readTransferMsg( true );
     }
 
     @Override

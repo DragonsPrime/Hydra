@@ -68,7 +68,7 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
         UMCMessage msg            = msgPackage.getMessage();
 
         if( this.sift( that ) ) {
-            msgPackage.getTransmit().sendPutMsg(
+            msgPackage.getTransmit().sendInformMsg(
                     (new JSONMaptron()).put( "What", "Illegal message." ), Status.IllegalMessage
             );
             return;
@@ -90,8 +90,8 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
 //            }
 //        }
         Debug.trace( msg.getExHead() );
-        if( msg.evincePostMessage() != null ) {
-            InputStream is = (InputStream)msg.evincePostMessage().getBody();
+        if( msg.evinceTransferMessage() != null ) {
+            InputStream is = (InputStream)msg.evinceTransferMessage().getBody();
             Debug.trace( msg.getExHead(), new String( is.readAllBytes() ) );
         }
 
@@ -117,7 +117,7 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
                         this.doMessagelet( szServiceKey, that );
                     }
                     catch ( IllegalArgumentException e ) {
-                        msgPackage.getTransmit().sendPutMsg(
+                        msgPackage.getTransmit().sendInformMsg(
                                 (new JSONMaptron()).put( "What", "Messagelet not found." ), Status.MappingNotFound
                         );
                     }

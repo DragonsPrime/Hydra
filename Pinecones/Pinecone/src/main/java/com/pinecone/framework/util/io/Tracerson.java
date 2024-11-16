@@ -211,4 +211,18 @@ public class Tracerson implements Tracer {
         return this;
     }
 
+    @Override
+    public Tracer colorf( int colorCode, Object that ){
+        this.out.print( "\u001B[" + colorCode + "m" );
+        this.out.print( this.stringify( that ) );
+        this.printlnColorfulEnd();
+        return this;
+    }
+
+    @Override
+    public Tracer colorf( int colorCode, Object Anything, Object...objects ){
+        this.printlnColorful( "\u001B[" + colorCode + "m", Anything, objects );
+        return this;
+    }
+
 }

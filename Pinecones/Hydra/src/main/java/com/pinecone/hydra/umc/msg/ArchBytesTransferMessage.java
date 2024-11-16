@@ -2,36 +2,36 @@ package com.pinecone.hydra.umc.msg;
 
 import java.util.Map;
 
-public abstract class ArchBytesPostMessage extends ArchUMCMessage implements PostMessage {
+public abstract class ArchBytesTransferMessage extends ArchUMCMessage implements TransferMessage {
     protected byte[]         msBytesBody   = null ;
 
-    public ArchBytesPostMessage( UMCHead head ) {
+    public ArchBytesTransferMessage( UMCHead head ) {
         super( head );
     }
 
-    public ArchBytesPostMessage( UMCHead head, byte[] sBytesBody   ) {
+    public ArchBytesTransferMessage( UMCHead head, byte[] sBytesBody   ) {
         this( head );
         this.setBody( sBytesBody );
     }
 
-    public ArchBytesPostMessage( UMCHead head, String szStringBody ) {
+    public ArchBytesTransferMessage( UMCHead head, String szStringBody ) {
         this( head, szStringBody.getBytes() );
     }
 
-    public ArchBytesPostMessage( Map<String,Object > joExHead, byte[] sBytesBody, long controlBits ) {
-        super( joExHead, UMCMethod.POST, controlBits );
+    public ArchBytesTransferMessage( Map<String,Object > joExHead, byte[] sBytesBody, long controlBits ) {
+        super( joExHead, UMCMethod.TRANSFER, controlBits );
         this.setBody( sBytesBody );
     }
 
-    public ArchBytesPostMessage( Map<String,Object > joExHead, String szStringBody, long controlBits ) {
+    public ArchBytesTransferMessage( Map<String,Object > joExHead, String szStringBody, long controlBits ) {
         this( joExHead, szStringBody.getBytes(), controlBits );
     }
 
-    public ArchBytesPostMessage( Map<String,Object > joExHead, byte[] sBytesBody ) {
+    public ArchBytesTransferMessage( Map<String,Object > joExHead, byte[] sBytesBody ) {
         this( joExHead, sBytesBody, 0 );
     }
 
-    public ArchBytesPostMessage( Map<String,Object > joExHead, String szStringBody ) {
+    public ArchBytesTransferMessage( Map<String,Object > joExHead, String szStringBody ) {
         this( joExHead, szStringBody, 0 );
     }
 

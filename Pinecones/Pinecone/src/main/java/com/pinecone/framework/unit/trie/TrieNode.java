@@ -1,39 +1,23 @@
 package com.pinecone.framework.unit.trie;
 
-import java.util.Map;
-
 import com.pinecone.framework.system.prototype.Pinenut;
 
-public class TrieNode implements Pinenut {
-    TrieNode               parent;
-    Map<String, TrieNode > children;
-    Object  value       = null;
-    boolean isEnd       = false;
-    String  path;
-    NodeType nodeType;
-    enum NodeType {
-        Dir,
-        Value,
-        Reparse
+public interface TrieNode<V > extends Pinenut {
+    boolean isLeaf();
+
+    TrieNode parent();
+
+    TrieMap<String, V> getTrieMap();
+
+    default DirectoryNode<V > evinceDirectory() {
+        return null;
     }
 
-    TrieNode( Map<String, TrieNode > map ,NodeType nodeType,String path,TrieNode parent) {
-        this.children = map;
-        this.nodeType = nodeType;
-        this.path = path;
-        this.parent = parent;
+    default ValueNode<V > evinceValue() {
+        return null;
     }
 
-    public String put( String key, Object value,TrieMap trieMap ){
-        if ( this.nodeType == NodeType.Dir ){
-            String childPath = this.path + trieMap.getSeparator() + key;
-            trieMap.put( childPath,value );
-            return childPath;
-        }
-        else {
-            throw new RuntimeException("illegal node！！！");
-        }
+    default GenericReparseNode evinceReparse() {
+        return null;
     }
-
-
 }

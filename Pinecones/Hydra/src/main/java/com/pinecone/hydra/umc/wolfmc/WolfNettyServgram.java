@@ -18,8 +18,8 @@ public abstract class WolfNettyServgram extends ArchServgramium {
     protected ReentrantLock             mStateMutex                     = new ReentrantLock();
     protected boolean                   mShutdown                       = true ;
 
-    public WolfNettyServgram( String szName, Hydrarum parent, Map<String, Object> joConf ) {
-        super( szName, parent );
+    public WolfNettyServgram( String szName, Hydrarum system, Map<String, Object> joConf ) {
+        super( szName, system );
 
         if( joConf instanceof JSONObject ) {
             this.mjoSectionConf = (JSONObject) joConf;

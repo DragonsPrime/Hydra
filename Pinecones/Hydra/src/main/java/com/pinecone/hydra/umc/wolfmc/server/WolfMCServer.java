@@ -59,14 +59,23 @@ public class WolfMCServer extends WolfMCNode implements Recipient {
 
     private final ReentrantLock                               mSynRequestLock      = new ReentrantLock(); // For inner purposes.
 
-    public WolfMCServer( String szName, Hydrarum parent, JSONObject joConf ) {
-        this( szName, parent, joConf, null );
-    }
-
-    public WolfMCServer( String szName, Hydrarum parent, JSONObject joConf, ExtraHeadCoder extraHeadCoder ) {
-        super( szName, parent, joConf, extraHeadCoder );
+    public WolfMCServer( String szName, Hydrarum system, UlfMessageNode parent, JSONObject joConf, ExtraHeadCoder extraHeadCoder ) {
+        super( szName, system, parent, joConf, extraHeadCoder );
         this.apply( joConf );
     }
+
+    public WolfMCServer( String szName, Hydrarum system, JSONObject joConf, ExtraHeadCoder extraHeadCoder ) {
+        this( szName, system, null, joConf, extraHeadCoder );
+    }
+
+    public WolfMCServer( String szName, Hydrarum system, UlfMessageNode parent, JSONObject joConf ) {
+        this( szName, system, parent, joConf, null );
+    }
+
+    public WolfMCServer( String szName, Hydrarum system, JSONObject joConf ) {
+        this( szName, system, null, joConf );
+    }
+
 
     @Override
     public WolfMCServer apply( JSONObject joConf ) {

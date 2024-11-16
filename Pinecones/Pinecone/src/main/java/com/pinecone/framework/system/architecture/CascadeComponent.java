@@ -1,11 +1,11 @@
 package com.pinecone.framework.system.architecture;
 
-import com.pinecone.framework.system.skeleton.CascadeBone;
+import com.pinecone.framework.system.regimentation.CascadeNodus;
 import com.pinecone.framework.util.name.Namespace;
 
 import java.util.Collection;
 
-public interface CascadeComponent extends Component, CascadeBone {
+public interface CascadeComponent extends Component, CascadeNodus {
     @Override
     CascadeComponent parent();
 
@@ -18,30 +18,30 @@ public interface CascadeComponent extends Component, CascadeBone {
 
     @Override
     default CascadeComponent root() {
-        return (CascadeComponent) CascadeBone.super.root();
+        return (CascadeComponent) CascadeNodus.super.root();
     }
 
     Collection<Component > children();
 
     @Override
-    Namespace getName();
+    Namespace getTargetingName();
 
     @Override
-    void setName( Namespace name );
+    void setTargetingName( Namespace name );
 
     @Override
-    default void setName( String name ) {
-        CascadeBone.super.setName( name );
+    default void setTargetingName( String name ) {
+        CascadeNodus.super.setTargetingName( name );
     }
 
     @Override
     default String getSimpleName() {
-        return this.getName().getSimpleName();
+        return this.getTargetingName().getSimpleName();
     }
 
     @Override
     default String getFullName() {
-        return this.getName().getFullName();
+        return this.getTargetingName().getFullName();
     }
 
     CascadeComponentManager getComponentManager();

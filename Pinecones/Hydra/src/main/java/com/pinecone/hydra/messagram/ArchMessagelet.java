@@ -60,7 +60,7 @@ public abstract class ArchMessagelet implements Messagelet {
     protected void sendDefaultConfirmResponse() throws IOException {
         JSONObject jo = new JSONMaptron();
         jo.put( "Messagelet", "ReceiveConfirm" );
-        this.getTransmit().sendPutMsg( jo );
+        this.getTransmit().sendInformMsg( jo );
     }
 
     @Override

@@ -55,17 +55,25 @@ public class WolfMCClient extends ArchAsyncMessenger {
     protected MCSecurityAuthentication             mSecurityAuthentication; //TODO
 
     protected UlfAsyncMsgHandleAdapter             mPrimeAsyncMessageHandler = new UnsetUlfAsyncMsgHandleAdapter( this ); // For all channels.
-;
 
-    public WolfMCClient( String szName, Hydrarum parent, JSONObject joConf, ExtraHeadCoder extraHeadCoder ){
-        super( szName, parent, joConf, extraHeadCoder );
+    public WolfMCClient( String szName, Hydrarum system, UlfMessageNode parent, JSONObject joConf, ExtraHeadCoder extraHeadCoder ){
+        super( szName, system, parent, joConf, extraHeadCoder );
 
         this.apply( joConf );
     }
 
-    public WolfMCClient( String szName, Hydrarum parent, JSONObject joConf ){
-        this( szName, parent, joConf, null );
+    public WolfMCClient( String szName, Hydrarum system, JSONObject joConf, ExtraHeadCoder extraHeadCoder ){
+        this( szName, system, null, joConf, extraHeadCoder );
     }
+
+    public WolfMCClient( String szName, Hydrarum system, JSONObject joConf ){
+        this( szName, system, joConf, null );
+    }
+
+    public WolfMCClient( String szName, UlfMessageNode parent, Hydrarum system, JSONObject joConf ){
+        this( szName, system, parent, joConf, null );
+    }
+
 
     @Override
     public WolfMCClient                   apply( JSONObject joConf ) {

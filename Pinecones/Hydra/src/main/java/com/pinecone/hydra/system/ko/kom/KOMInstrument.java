@@ -12,8 +12,8 @@ public interface KOMInstrument extends CascadeInstrument {
     KOMInstrument parent();
 
     @Override
-    default void setName( String name ) {
-        CascadeInstrument.super.setName( name );
+    default void setTargetingName( String name ) {
+        CascadeInstrument.super.setTargetingName( name );
     }
 
     String getPath( GUID guid );

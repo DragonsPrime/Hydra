@@ -1,6 +1,6 @@
-import com.pinecone.framework.unit.trie.TrieReparseNode;
+import com.pinecone.framework.unit.trie.GenericReparseNode;
 import com.pinecone.framework.unit.trie.UniTrieMaptron;
-import com.pinecone.framework.util.Debug;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import java.util.Map;
@@ -28,7 +28,7 @@ public class UniTrieMaptronTest {
     @Test
     public void testPutReference() {
         trieMap.put("a/b/c", "value1");
-        trieMap.putReference("ref1", new TrieReparseNode<>("a/b/c",trieMap));
+        trieMap.putReference("ref1", new GenericReparseNode<>("a/b/c",trieMap));
 
 
         assertEquals("value1", trieMap.get("ref1"));

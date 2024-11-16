@@ -5,9 +5,9 @@ import com.pinecone.hydra.umc.msg.MessageStereotypes;
 public class UlfMessageStereotypes implements MessageStereotypes {
     public static final MessageStereotypes Default = new UlfMessageStereotypes();
 
-    protected Class<? > putType        = UlfPutMessage.class;
-    protected Class<? > postBytesType  = UlfBytesPostMessage.class;
-    protected Class<? > postStreamType = UlfStreamPostMessage.class;
+    protected Class<? > putType        = UlfInformMessage.class;
+    protected Class<? > postBytesType  = UlfBytesTransferMessage.class;
+    protected Class<? > postStreamType = UlfStreamTransferMessage.class;
 
     @Override
     public Class<? > putType() {

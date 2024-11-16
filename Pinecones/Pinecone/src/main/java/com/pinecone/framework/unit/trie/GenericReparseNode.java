@@ -2,14 +2,13 @@ package com.pinecone.framework.unit.trie;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 
-public class TrieReparseNode<K, V> implements Pinenut {
-    protected AbstractTrieMap<K, V> trieMap ;
+public class GenericReparseNode<V> extends ArchTrieNode<V > implements ReparseNode<V > {
     protected TrieNode              target  ;
     protected String                path    ;
 
-    public TrieReparseNode( String path, AbstractTrieMap<K, V> trieMap ) {
-        this.trieMap = trieMap;
-        TrieNode node = this.trieMap.getNode(path);
+    public <K extends String > GenericReparseNode( TrieNode<V> parent, String path, AbstractTrieMap<K, V> trieMap ) {
+        super( parent, trieMap );
+        TrieNode node = this.getTrieMap().queryNode(path);
 //        if ( node != null && node.isEnd ) {
 //            this.target = node;
 //        }
@@ -20,13 +19,6 @@ public class TrieReparseNode<K, V> implements Pinenut {
         this.path = path;
     }
 
-    public TrieMap<K, V> getTrieMap() {
-        return trieMap;
-    }
-
-    public void setTrieMap( AbstractTrieMap<K, V> trieMap ) {
-        this.trieMap = trieMap;
-    }
 
     public TrieNode getTarget() {
         return this.target;
@@ -44,7 +36,8 @@ public class TrieReparseNode<K, V> implements Pinenut {
         this.path = path;
     }
 
-    public String toString() {
-        return "TrieReferenceNode{trieMap=" + trieMap + ", target=" + target + ", path='" + path + "'}";
+    @Override
+    public boolean isLeaf() {
+        return true;
     }
 }

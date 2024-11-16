@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.util.Map;
 
 public interface UMCReceiver extends UMCProtocol{
-    Object readPutMsg() throws IOException;
+    Object readInformMsg() throws IOException;
 
-    UMCMessage readPostMsg() throws IOException;
+    UMCMessage readTransferMsg() throws IOException;
 
-    UMCMessage readPostMsgBytes() throws IOException;
+    UMCMessage readTransferMsgBytes() throws IOException;
 
     UMCMessage readMsg() throws IOException;
 

@@ -5,7 +5,7 @@ import com.pinecone.hydra.umc.msg.ChannelControlBlock;
 import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
-import com.pinecone.hydra.umc.wolfmc.UlfPutMessage;
+import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
 import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
@@ -14,7 +14,6 @@ import com.pinecone.framework.util.json.JSONMaptron;
 import com.sauron.radium.messagron.Messagron;
 
 import java.util.Map;
-import java.util.Set;
 
 import io.netty.channel.ChannelHandlerContext;
 
@@ -65,7 +64,7 @@ class Christ extends JesusChrist {
 
         wolf.apply( new UlfAsyncMsgHandleAdapter() {
             public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
-                UlfPutMessage mc = (UlfPutMessage) rawMsg;
+                UlfInformMessage mc = (UlfInformMessage) rawMsg;
                 Map<String,Object > jo = mc.getHead().getMapExtraHead();
                 String dos = jo.get( "do" ).toString();
                 if( dos.equals( "queryHeistConfTPL" ) ) {
