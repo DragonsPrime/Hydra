@@ -42,8 +42,8 @@ public class TitanDirectChannelExportEntity64 extends ArchExportEntity implement
     }
 
     @Override
-    public MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity) {
-        return this.channelExporter.raid0Export( this, cacheBlock, offset, endSize, flyweightEntity );
+    public MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) {
+        return this.channelExporter.raid0Export( this, cacheBlock, offset, endSize, buffer );
     }
 
 }

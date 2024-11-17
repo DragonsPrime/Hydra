@@ -51,7 +51,7 @@ public interface LogicVolume extends Volume, TreeNode {
     MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, FileChannel channel ) throws IOException, SQLException;
     MiddleStorageObject channelReceive( ReceiveStorageObject receiveStorageObject, FileChannel channel, Number offset, Number endSize ) throws IOException, SQLException;
     MiddleStorageObject channelExport( ExportStorageObject exportStorageObject, FileChannel channel ) throws IOException, SQLException;
-    MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity) throws IOException, SQLException;
+    MiddleStorageObject channelRaid0Export(ExportStorageObject exportStorageObject, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException;
 
     boolean existStorageObject( GUID storageObject ) throws SQLException;
 

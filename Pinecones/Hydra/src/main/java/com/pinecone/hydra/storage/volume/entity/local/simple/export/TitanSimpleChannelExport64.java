@@ -31,8 +31,8 @@ public class TitanSimpleChannelExport64 implements SimpleChannelExport64{
     }
 
     @Override
-    public MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity) throws IOException {
+    public MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
         TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(this.volumeManager, this.exportStorageObject,this.channel);
-        return titanDirectChannelExportEntity64.raid0Export( cacheBlock, offset, endSize, flyweightEntity );
+        return titanDirectChannelExportEntity64.raid0Export( cacheBlock, offset, endSize, buffer );
     }
 }

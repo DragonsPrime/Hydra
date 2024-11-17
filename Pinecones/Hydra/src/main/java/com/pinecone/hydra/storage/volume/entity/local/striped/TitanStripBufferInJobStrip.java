@@ -16,7 +16,7 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 
-public class TitanStripBufferInJob implements StripBufferOutJob {
+public class TitanStripBufferInJobStrip implements StripBufferOutJobStrip {
     protected VolumeManager                 volumeManager;
 
     protected ExportStorageObject           object;
@@ -25,30 +25,28 @@ public class TitanStripBufferInJob implements StripBufferOutJob {
     protected LogicVolume                   volume;
     protected FileChannel                   channel;
     protected AtomicInteger                 currentCacheBlockNumber;
-    protected final Semaphore               pipelineLock;
-    protected StripLockEntity               lockEntity;
+    protected final Semaphore               blockerLatch;
 
     protected StripBufferStatus             status;
 
-    protected StripExportFlyweightEntity    flyweightEntity;
     protected List< CacheBlock >            cacheBlockGroup;
     protected LocalStripedTaskThread        parentThread;
     protected byte[]                        buffer;
     protected Lock                          majorStatusIO;
+    protected MasterVolumeGram              masterVolumeGram;
 
-    public TitanStripBufferInJob(StripedChannelExport stripedChannelExport, StripExportFlyweightEntity flyweightEntity, LogicVolume volume, ExportStorageObject object ){
-        this.lockEntity                   = flyweightEntity.getLockEntity();
+    public TitanStripBufferInJobStrip( MasterVolumeGram masterVolumeGram,StripedChannelExport stripedChannelExport, LogicVolume volume, ExportStorageObject object, int jobCode ){
+        this.masterVolumeGram             = masterVolumeGram;
         this.object                       = object;
-        this.jobCount                       = flyweightEntity.getJobCount();
-        this.jobCode                      = flyweightEntity.getJobCode();
+        this.jobCount                     = this.masterVolumeGram.getJobCount();
+        this.jobCode                      = jobCode;
         this.volumeManager                = stripedChannelExport.getVolumeManager();
         this.volume                       = volume;
         this.channel                      = stripedChannelExport.getFileChannel();
         this.currentCacheBlockNumber      = new AtomicInteger( jobCode );
-        this.pipelineLock                 = (Semaphore)lockEntity.getLockObject();
-        this.flyweightEntity              = flyweightEntity;
-        this.buffer                       = flyweightEntity.getBuffer();
-        this.cacheBlockGroup              = flyweightEntity.getCacheBlockGroup();
+        this.blockerLatch                 = new Semaphore(0);
+        this.buffer                       = masterVolumeGram.getBuffer();
+        this.cacheBlockGroup              = masterVolumeGram.getCacheGroup();
 
         this.intoWritingStatus();
     }
@@ -56,8 +54,8 @@ public class TitanStripBufferInJob implements StripBufferOutJob {
     @Override
     public void applyThread( LocalStripedTaskThread taskThread ) {
         this.parentThread = taskThread;
-        MasterVolumeGram masterVolumeGram = (MasterVolumeGram) this.parentThread.parentExecutum();
-        this.majorStatusIO                = masterVolumeGram.getMajorStatusIO();
+         this.masterVolumeGram = (MasterVolumeGram) this.parentThread.parentExecutum();
+        this.majorStatusIO                = this.masterVolumeGram.getMajorStatusIO();
     }
 
     @Override
@@ -105,7 +103,7 @@ public class TitanStripBufferInJob implements StripBufferOutJob {
                 }
 
                 try {
-                    this.volume.channelRaid0Export( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.flyweightEntity);
+                    this.volume.channelRaid0Export( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.buffer);
 
                     currentPosition += bufferSize;
                     this.wakeUpBufferToFileThread();
@@ -120,7 +118,7 @@ public class TitanStripBufferInJob implements StripBufferOutJob {
                         try {
                             this.intoSuspendedStatus();
                             Debug.trace("线程"+this.parentThread.getName()+":"+"我摸鱼了，没得写了");
-                            ((Semaphore) this.lockEntity.getLockObject()).acquire();
+                             this.blockerLatch.acquire();
                         }
                         catch ( InterruptedException e ){
                             Thread.currentThread().interrupt();
@@ -140,7 +138,7 @@ public class TitanStripBufferInJob implements StripBufferOutJob {
                     this.intoSuspendedStatus();
                     Debug.trace("我摸鱼了，没得写了");
                     this.wakeUpBufferToFileThread();
-                    ((Semaphore) this.lockEntity.getLockObject()).acquire();
+                   this.blockerLatch.acquire();
                 }
                 catch ( InterruptedException e ){
                     Thread.currentThread().interrupt();
@@ -154,7 +152,7 @@ public class TitanStripBufferInJob implements StripBufferOutJob {
 
     @Override
     public Semaphore getBlockerLatch() {
-        return this.pipelineLock;
+        return this.blockerLatch;
     }
 
     @Override
@@ -166,11 +164,11 @@ public class TitanStripBufferInJob implements StripBufferOutJob {
         this.majorStatusIO.lock();
         try {
             MasterVolumeGram masterVolumeGram = (MasterVolumeGram) this.parentThread.parentExecutum();
-            LocalStripedTaskThread bufferToFileThread = masterVolumeGram.getChildThread( this.flyweightEntity.getBufferToFileThreadId() );
-            if( bufferToFileThread.getJobStatus() == BufferToFileStatus.Suspended ){
+            LocalStripedTaskThread bufferToFileThread = masterVolumeGram.getChildThread( this.masterVolumeGram.getBufferOutThreadId() );
+            if( bufferToFileThread.getJobStatus() == BufferOutStatus.Suspended ){
                 Debug.trace("线程"+bufferToFileThread.getName()+"被唤醒");
-                bufferToFileThread.setJobStatus( BufferToFileStatus.Writing );
-                this.lockEntity.unlockBufferToFileLock();
+                bufferToFileThread.setJobStatus( BufferOutStatus.Writing );
+                this.masterVolumeGram.getBufferOutBlockerLatch().release();
             }
         }
         finally {

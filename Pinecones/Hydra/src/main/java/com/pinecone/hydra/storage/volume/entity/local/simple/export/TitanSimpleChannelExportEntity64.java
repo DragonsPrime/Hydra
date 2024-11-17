@@ -40,8 +40,8 @@ public class TitanSimpleChannelExportEntity64 extends ArchExportEntity implement
     }
 
     @Override
-    public MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity) throws IOException {
-        return this.simpleChannelExport64.raid0Export( cacheBlock, offset, endSize, flyweightEntity );
+    public MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
+        return this.simpleChannelExport64.raid0Export( cacheBlock, offset, endSize, buffer );
 
     }
 }

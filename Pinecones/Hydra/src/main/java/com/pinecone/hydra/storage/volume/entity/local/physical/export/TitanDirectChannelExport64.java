@@ -111,12 +111,11 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
 
 
     @Override
-    public MiddleStorageObject raid0Export(DirectChannelExportEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity ) {
+    public MiddleStorageObject raid0Export(DirectChannelExportEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) {
         VolumeManager volumeManager = entity.getVolumeManager();
         ExportStorageObject exportStorageObject = entity.getExportStorageObject();
         String sourceName = exportStorageObject.getSourceName();
         TitanMiddleStorageObject titanMiddleStorageObject = new TitanMiddleStorageObject();
-        byte[] outputTarget = flyweightEntity.getBuffer();
 
         long parityCheck = 0;
         long checksum = 0;
@@ -137,7 +136,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
                 bufferSize = read;
             }
             //Debug.trace( "起始位置" + offset.longValue()+"终止大小"+bufferSize+"缓存大小"+endSize.intValue() );
-            byteBuffer.get(outputTarget, cacheBlock.getByteStart().intValue(), (int) bufferSize);
+            byteBuffer.get(buffer, cacheBlock.getByteStart().intValue(), (int) bufferSize);
             cacheBlock.setStatus( CacheBlockStatus.Full );
             cacheBlock.setValidByteStart( cacheBlock.getByteStart().intValue() );
             cacheBlock.setValidByteEnd( cacheBlock.getByteStart().intValue()+bufferSize );
@@ -145,7 +144,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
             // 计算校验和和奇偶校验
             CRC32 crc = new CRC32();
             for (int i = 0; i < endSize.intValue(); i++) {
-                byte b = outputTarget[cacheBlock.getByteStart().intValue()+i];
+                byte b = buffer[cacheBlock.getByteStart().intValue()+i];
                 parityCheck += Bytes.calculateParity(b);
                 checksum += b & 0xFF;
                 crc.update(b);

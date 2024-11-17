@@ -15,5 +15,5 @@ public interface SimpleChannelExportEntity extends SimpleExporterEntity{
     FileChannel getChannel();
     void setChannel( FileChannel channel );
     MiddleStorageObject export( ) throws IOException;
-    MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity) throws IOException;
+    MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException;
 }

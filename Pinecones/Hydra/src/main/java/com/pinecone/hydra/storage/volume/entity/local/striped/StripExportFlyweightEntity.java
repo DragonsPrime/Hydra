@@ -25,8 +25,8 @@ public interface StripExportFlyweightEntity extends Pinenut {
 
     void setCacheBlockGroup( List< CacheBlock> cacheBlockGroup );
 
-    int getBufferToFileThreadId();
+    int getBufferOutThreadId();
 
-    void setBufferToFileThreadId( int bufferToFileThreadId );
+    void setBufferOutThreadId(int bufferOutThreadId);
 
 }

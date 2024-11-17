@@ -17,5 +17,5 @@ public interface DirectChannelExportEntity extends DirectExportEntity{
     void setChannel( FileChannel channel );
 
     MiddleStorageObject export() throws IOException;
-    MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity);
+    MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer);
 }

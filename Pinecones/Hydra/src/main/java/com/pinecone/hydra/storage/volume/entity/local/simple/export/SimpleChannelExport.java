@@ -13,5 +13,5 @@ import java.util.concurrent.atomic.AtomicInteger;
 public interface SimpleChannelExport extends SimpleExporter{
 
     MiddleStorageObject export() throws IOException;
-    MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity ) throws IOException;
+    MiddleStorageObject raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException;
 }

@@ -5,7 +5,6 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -14,10 +13,9 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class TitanStripBufferOutJob implements StripBufferInJob {
+public class TitanStripBufferOutJobStrip implements StripBufferInJobStrip {
     protected VolumeManager             volumeManager;
     protected FileChannel               channel;
-    protected StripLockEntity           lockEntity;
     protected int                       jobCount;
     protected StripBufferStatus         status;
     protected List< CacheBlock >        cacheBlocksGroup;
@@ -27,17 +25,19 @@ public class TitanStripBufferOutJob implements StripBufferInJob {
     protected long                      totalSize;
     protected long                      exportSize;
     protected final Semaphore           mBlockerLatch;
+    protected MasterVolumeGram          masterVolumeGram;
 
-    public TitanStripBufferOutJob(VolumeManager volumeManager, FileChannel channel, StripExportFlyweightEntity flyweightEntity, long totalSize){
+    public TitanStripBufferOutJobStrip(MasterVolumeGram masterVolumeGram,VolumeManager volumeManager, FileChannel channel, long totalSize, Semaphore blockerLatch){
+        this.masterVolumeGram  = masterVolumeGram;
         this.volumeManager     = volumeManager;
         this.channel           = channel;
-        this.lockEntity        = flyweightEntity.getLockEntity();
-        this.jobCount            = flyweightEntity.getJobCount();
+        this.jobCount          = masterVolumeGram.getJobCount();
         this.currentPosition   = new AtomicInteger(0);
-        this.cacheBlocksGroup  = flyweightEntity.getCacheBlockGroup();
-        this.mBuffer           = flyweightEntity.getBuffer();
+        this.cacheBlocksGroup  = masterVolumeGram.getCacheGroup();
+        this.mBuffer           = masterVolumeGram.getBuffer();
         this.totalSize         = totalSize;
-        this.mBlockerLatch           = (Semaphore) this.lockEntity.getLockObject();
+        this.mBlockerLatch     = blockerLatch;
+//        this.masterVolumeGram.applyBufferOutBlockerLatch( this.mBlockerLatch );
     }
 
     @Override
@@ -51,15 +51,15 @@ public class TitanStripBufferOutJob implements StripBufferInJob {
     }
 
     protected void setWritingStatus() {
-        this.status = BufferToFileStatus.Writing;
+        this.status = BufferOutStatus.Writing;
     }
 
     protected void setSuspendedStatus() {
-        this.status = BufferToFileStatus.Suspended;
+        this.status = BufferOutStatus.Suspended;
     }
 
     protected void setExitingStatus() {
-        this.status = BufferToFileStatus.Exiting;
+        this.status = BufferOutStatus.Exiting;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class TitanStripBufferOutJob implements StripBufferInJob {
                 try{
                     Debug.trace("摸鱼罗");
                     this.setSuspendedStatus();
-                    ((Semaphore) this.lockEntity.getLockObject()).acquire();
+                    this.mBlockerLatch.acquire();
                 }
                 catch ( InterruptedException e ) {
                     Thread.currentThread().interrupt();

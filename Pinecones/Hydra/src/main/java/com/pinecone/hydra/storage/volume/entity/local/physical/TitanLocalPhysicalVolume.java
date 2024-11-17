@@ -85,9 +85,9 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     }
 
     @Override
-    public MiddleStorageObject channelRaid0Export(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity) throws IOException {
+    public MiddleStorageObject channelRaid0Export(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
         TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, exportStorageObject,channel );
-        MiddleStorageObject middleStorageObject = titanDirectChannelExportEntity64.raid0Export(cacheBlock, offset, endSize, flyweightEntity);
+        MiddleStorageObject middleStorageObject = titanDirectChannelExportEntity64.raid0Export(cacheBlock, offset, endSize, buffer);
         middleStorageObject.setBottomGuid( this.getGuid() );
         return middleStorageObject;
     }

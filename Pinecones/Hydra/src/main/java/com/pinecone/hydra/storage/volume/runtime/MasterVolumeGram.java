@@ -12,11 +12,13 @@ import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.lock.SpinLock;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
+import com.pinecone.hydra.storage.volume.entity.local.striped.StripCacheBlock;
 
 public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
     protected Lock                  mMajorStatusIO = new SpinLock();
     protected int                   jobCount;
-    
+    protected int                   bufferOutThreadId;
+    protected Semaphore             bufferOutBlockerLatch;
     
     
     protected List<CacheBlock>      cacheGroup;
@@ -27,12 +29,12 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
         this.mTaskManager      = new GenericMasterTaskManager( this );
     }
 
-    public MasterVolumeGram( String szName, Processum parent, int jobCount, List<CacheBlock> cacheGroup, byte[] buffer ){
+    public MasterVolumeGram( String szName, Processum parent, int jobCount, int superResolutionRatio, int stripSize ){
         super( szName, parent );
         this.mTaskManager   = new GenericMasterTaskManager( this );
-        this.jobCount         = jobCount;
-        this.cacheGroup     = cacheGroup;
-        this.buffer         = buffer;
+        this.jobCount       = jobCount;
+        this.cacheGroup     = this.initializeCacheGroup( jobCount, superResolutionRatio, stripSize );
+        this.buffer         = new byte[ jobCount * stripSize * superResolutionRatio ];
     }
 
     public Lock getMajorStatusIO() {
@@ -72,5 +74,36 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
     @Override
     public void setBuffer(byte[] buffer) {
         this.buffer = buffer;
+    }
+
+    @Override
+    public int getBufferOutThreadId() {
+        return this.bufferOutThreadId;
+    }
+
+    @Override
+    public void applyBufferOutThreadId(int bufferOutThreadId) {
+        this.bufferOutThreadId = bufferOutThreadId;
+    }
+
+    @Override
+    public void applyBufferOutBlockerLatch(Semaphore bufferOutBlockerLatch) {
+        this.bufferOutBlockerLatch = bufferOutBlockerLatch;
+    }
+
+    @Override
+    public Semaphore getBufferOutBlockerLatch() {
+        return this.bufferOutBlockerLatch;
+    }
+
+    private List< CacheBlock > initializeCacheGroup(int jobCount, int superResolutionRatio, Number stripSize ){
+        ArrayList<CacheBlock> cacheGroup = new ArrayList<>();
+        Number currentPosition = 0;
+        for( int i = 0; i < jobCount * superResolutionRatio; i++ ){
+            StripCacheBlock stripCacheBlock = new StripCacheBlock( i, currentPosition, currentPosition.intValue() + stripSize.intValue() );
+            cacheGroup.add( stripCacheBlock );
+            currentPosition = currentPosition.intValue() + stripSize.intValue();
+        }
+        return  cacheGroup;
     }
 }

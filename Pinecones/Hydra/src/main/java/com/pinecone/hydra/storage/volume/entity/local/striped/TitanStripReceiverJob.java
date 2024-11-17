@@ -94,4 +94,5 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
     public void setStatus(StripBufferStatus status) {
 
     }
+
 }

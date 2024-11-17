@@ -1,8 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
-import java.nio.ByteBuffer;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class LocalStripExportFlyweightEntity implements StripExportFlyweightEntity {
     private int                         jobCount;
@@ -10,7 +8,7 @@ public class LocalStripExportFlyweightEntity implements StripExportFlyweightEnti
     private StripLockEntity             lockEntity;
     private byte[]                      buffer;
     private List<CacheBlock>            cacheBlockGroup;
-    private int                         bufferToFileThreadId;
+    private int                         bufferOutThreadId;
 
     public LocalStripExportFlyweightEntity(){}
     public LocalStripExportFlyweightEntity( int jobCount, int jobCode, StripLockEntity lockEntity ){
@@ -75,12 +73,12 @@ public class LocalStripExportFlyweightEntity implements StripExportFlyweightEnti
     }
 
     @Override
-    public int getBufferToFileThreadId() {
-        return this.bufferToFileThreadId;
+    public int getBufferOutThreadId() {
+        return this.bufferOutThreadId;
     }
 
     @Override
-    public void setBufferToFileThreadId(int bufferToFileThreadId) {
-        this.bufferToFileThreadId = bufferToFileThreadId;
+    public void setBufferOutThreadId(int bufferOutThreadId) {
+        this.bufferOutThreadId = bufferOutThreadId;
     }
 }
