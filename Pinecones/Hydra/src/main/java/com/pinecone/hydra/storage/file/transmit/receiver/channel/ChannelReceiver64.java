@@ -1,9 +1,7 @@
 package com.pinecone.hydra.storage.file.transmit.receiver.channel;
 
 import com.pinecone.framework.util.Bytes;
-import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.MiddleStorageObject;
-import com.pinecone.hydra.storage.file.FileSystemConfig;
+import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.file.FrameSegmentNaming;
 import com.pinecone.hydra.storage.file.KOFSFrameSegmentNaming;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
@@ -11,14 +9,11 @@ import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.LocalFrame;
 import com.pinecone.hydra.storage.file.entity.RemoteFrame;
-import com.pinecone.hydra.storage.file.entity.Strip;
 import com.pinecone.hydra.storage.file.transmit.receiver.ArchReceiver;
 import com.pinecone.hydra.storage.file.transmit.receiver.ReceiveEntity;
-import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.entity.TitanReceiveStorageObject;
-import com.pinecone.ulf.util.id.GUIDs;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.io.IOException;
@@ -148,11 +143,11 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
             receiveStorageObject.setSize( file.getDefinitionSize() );
             receiveStorageObject.setName( file.getName() );
             receiveStorageObject.setStorageObjectGuid( localFrame.getSegGuid() );
-            MiddleStorageObject middleStorageObject = volume.channelReceive(receiveStorageObject, fileChannel, (Number) currentPosition, (Number) endSize);
+            StorageIOResponse storageIOResponse = volume.channelReceive(receiveStorageObject, fileChannel, (Number) currentPosition, (Number) endSize);
 
             localFrame.setSize( endSize );
-            localFrame.setSourceName( middleStorageObject.getSourceName() );
-            localFrame.setCrc32( middleStorageObject.getCre32() );
+            localFrame.setSourceName( storageIOResponse.getSourceName() );
+            localFrame.setCrc32( storageIOResponse.getCre32() );
             localFrame.setFileGuid( file.getGuid() );
             localFrame.setSegId( segId );
 

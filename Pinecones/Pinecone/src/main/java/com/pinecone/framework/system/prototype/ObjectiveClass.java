@@ -7,8 +7,7 @@ import java.util.Map;
 
 import com.pinecone.framework.unit.Units;
 import com.pinecone.framework.util.ReflectionUtils;
-import com.pinecone.framework.util.json.hometype.DirectJSONInjector;
-import com.pinecone.framework.util.json.hometype.StructJSONEncoder;
+import com.pinecone.framework.util.json.homotype.StructJSONEncoder;
 
 public class ObjectiveClass implements Objectom {
     protected Object    mObj;

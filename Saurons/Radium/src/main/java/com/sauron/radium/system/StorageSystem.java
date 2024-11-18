@@ -1,7 +1,7 @@
 package com.sauron.radium.system;
 
 import com.pinecone.framework.util.StringUtils;
-import com.pinecone.framework.util.json.hometype.JSONGet;
+import com.pinecone.framework.util.json.homotype.JSONGet;
 import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.lang.GenericDynamicFactory;
 import com.pinecone.framework.util.name.Namespace;

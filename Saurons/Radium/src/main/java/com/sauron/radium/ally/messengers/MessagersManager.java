@@ -8,7 +8,7 @@ import com.pinecone.framework.unit.LinkedTreeMap;
 import com.pinecone.framework.util.StringUtils;
 import com.pinecone.framework.util.config.JSONConfig;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.JSONGet;
+import com.pinecone.framework.util.json.homotype.JSONGet;
 import com.pinecone.framework.util.name.Namespace;
 import com.pinecone.hydra.umct.MessageExpress;
 import com.pinecone.hydra.umct.Messagram;

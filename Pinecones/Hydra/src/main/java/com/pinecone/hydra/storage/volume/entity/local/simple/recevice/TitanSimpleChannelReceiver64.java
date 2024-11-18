@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.simple.recevice;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.MiddleStorageObject;
+import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
@@ -25,7 +25,7 @@ public class TitanSimpleChannelReceiver64   implements SimpleChannelReceiver64{
         this.receiveStorageObject = entity.getReceiveStorageObject();
     }
     @Override
-    public MiddleStorageObject channelReceive() throws IOException, SQLException {
+    public StorageIOResponse channelReceive() throws IOException, SQLException {
         List<GUID> guids = simpleVolume.listPhysicalVolume();
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(guids.get(0));
 
@@ -33,7 +33,7 @@ public class TitanSimpleChannelReceiver64   implements SimpleChannelReceiver64{
     }
 
     @Override
-    public MiddleStorageObject channelReceive(Number offset, Number endSize) throws IOException {
+    public StorageIOResponse channelReceive(Number offset, Number endSize) throws IOException {
         List<GUID> guids = simpleVolume.listPhysicalVolume();
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(guids.get(0));
         return physicalVolume.channelReceive( this.volumeManager,this.receiveStorageObject,this.fileChannel, offset,endSize );

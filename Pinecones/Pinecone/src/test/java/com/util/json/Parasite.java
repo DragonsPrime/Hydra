@@ -1,6 +1,6 @@
 package com.util.json;
 
-import com.pinecone.framework.util.json.hometype.DirectJSONInjector;
+import com.pinecone.framework.util.json.homotype.DirectJSONInjector;
 
 public class Parasite {
     public String    name  ;

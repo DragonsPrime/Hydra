@@ -5,18 +5,17 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.Array;
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import com.pinecone.framework.system.prototype.ObjectiveEvaluator;
-import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.ReflectionUtils;
 import com.pinecone.framework.util.UnitHelper;
 
@@ -63,16 +62,24 @@ public class ObjectJSONCursorUnmarshal extends ArchCursorParser {
     protected Object newJSONArray( Object indexKey, ArchCursorParser parser, Object parent, Object[] args ) {
         try{
             Class<? > thisType    = this.mClassType;
-            Type fieldGenericType = null;
+            Type elemGenericType = null;
             if( parent != null ){
-                fieldGenericType = ObjectiveEvaluator.MapStructures.getFieldGenericType( parent, indexKey.toString() );
+                elemGenericType = ObjectiveEvaluator.MapStructures.getElementGenericType( parent, indexKey.toString() );
                 thisType = ObjectiveEvaluator.MapStructures.getType( parent, indexKey );
+            }
+
+            Object    self;
+
+            if( thisType == null ) {
+                self = new Object(); // Dummy
+                ObjectJSONCursorUnmarshal.INNER_ARRAY_DECODER.decode( self, parent, indexKey,this, elemGenericType );
+                return self;
             }
 
             if( thisType.equals( List.class ) || thisType.equals( Void.class ) || thisType.equals( Object.class ) ) {
                 thisType = JSONArraytron.class;
-                if( fieldGenericType != null ) {
-                    String genericTypeName = fieldGenericType.getTypeName();
+                if( elemGenericType != null ) {
+                    String genericTypeName = elemGenericType.getTypeName();
                     if( !genericTypeName.equals( "?" ) && !genericTypeName.equals( Object.class.getSimpleName() ) ) {
                         thisType = ArrayList.class;
                     }
@@ -82,15 +89,22 @@ public class ObjectJSONCursorUnmarshal extends ArchCursorParser {
                 thisType = LinkedHashSet.class;
             }
 
-            Object    self;
             if( thisType.isArray() ) {
-                self = new Object[]{ new Object[ 0 ] };  // Object[]*, ptr -> Object[]
+                Class<?> innerType = thisType.getComponentType();
+                if( innerType.equals( Object.class ) ) {
+                    self = new Object[]{ new Object[ 0 ] };  // Object[]*, ptr -> Object[]
+                }
+                else {
+                    elemGenericType   = innerType;
+                    self = new Object[]{ Array.newInstance( innerType, 0 ) };
+                    // Object[]*, ptr -> Object[]
+                }
             }
             else {
                 self = thisType.getConstructor().newInstance();
             }
 
-            ObjectJSONCursorUnmarshal.INNER_ARRAY_DECODER.decode( self, parent, indexKey,this, fieldGenericType );
+            ObjectJSONCursorUnmarshal.INNER_ARRAY_DECODER.decode( self, parent, indexKey,this, elemGenericType );
             if( self.getClass().isArray() ) {
                 return Array.get( self, 0 );
             }
@@ -104,38 +118,82 @@ public class ObjectJSONCursorUnmarshal extends ArchCursorParser {
         }
     }
 
+    protected Class<?> findDirectJSONObjectAssignableType( Class<? > thisType ) {
+        if( thisType == null || thisType.equals( Map.class ) || thisType.equals( Void.class ) || thisType.equals( Object.class ) ) {
+            thisType = JSONMaptron.class;
+        }
+        else if( thisType.isInterface() &&  Map.class.isAssignableFrom( thisType ) ) {
+            thisType = JSONMaptron.class;
+        }
+        else if( thisType.isInterface() &&  JSONObject.class.isAssignableFrom( thisType ) ) {
+            thisType = JSONMaptron.class;
+        }
+
+        return thisType;
+    }
+
     @Override
     protected Object newJSONObject( Object indexKey, ArchCursorParser parser, Object parent, Object[] args ) {
         try{
             Class<? > thisType    = this.mClassType;
-            Type fieldGenericType = null;
+            Type elemGenericType = null;
             if( parent != null ){
                 thisType = ObjectiveEvaluator.MapStructures.getType( parent, indexKey );
-                fieldGenericType = ObjectiveEvaluator.MapStructures.getFieldGenericType( parent, indexKey.toString() );
+                elemGenericType = ObjectiveEvaluator.MapStructures.getFieldGenericType( parent, indexKey.toString() );
             }
 
-            if( thisType == null || thisType.equals( Map.class ) || thisType.equals( Void.class ) || thisType.equals( Object.class ) ) {
-                thisType = JSONMaptron.class;
+            thisType = this.findDirectJSONObjectAssignableType( thisType );
+            if( elemGenericType != null ) {
+                String genericTypeName = elemGenericType.getTypeName();
+                if( genericTypeName.contains( "<" )  && genericTypeName.contains( ">" ) ) {
+                    thisType = LinkedHashMap.class;
+                }
+            }
+
+            Object    self;
+
+            if( thisType == null ) {
+                self = new Object(); // Dummy
+                ObjectJSONCursorUnmarshal.INNER_OBJECT_DECODER.decode( self, parent, indexKey,this, elemGenericType );
+                return self;
             }
 
             if( args != null && args.length > 0 ) {
                 Object dyType = args[ 0 ];
                 Type eleType  = (Type) dyType;
                 if( eleType != null ) {
-                    String genericTypeName = ReflectionUtils.extractSoloGenericClassName( eleType.getTypeName() );
-                    if( genericTypeName != null && !genericTypeName.equals( "?" ) && !genericTypeName.equals( Object.class.getSimpleName() ) ) {
-                        try{
-                            thisType = this.getClass().getClassLoader().loadClass( genericTypeName );
+                    if( parent != null && parent.getClass().isArray() ) {
+                        if( !dyType.equals( Object[].class ) && !dyType.equals( Object.class ) && !dyType.equals( Map.class ) ) {
+                            thisType = (Class<?>) eleType;
                         }
-                        catch ( ClassNotFoundException e ) {
-                            thisType = JSONMaptron.class;
+                    }
+                    else {
+                        String[] genericTypeNames = ReflectionUtils.extractGenericClassNames( eleType.getTypeName() );
+                        if( genericTypeNames != null && genericTypeNames.length > 0 ) {
+                            String genericTypeName;
+                            if( genericTypeNames.length > 1 ) {
+                                genericTypeName = genericTypeNames[ 1 ]; // Map value.
+                            }
+                            else {
+                                genericTypeName = genericTypeNames[ 0 ]; // Collection value.
+                            }
+
+                            if( !genericTypeName.equals( "?" ) && !genericTypeName.equals( Object.class.getSimpleName() ) ) {
+                                try{
+                                    thisType = this.getClass().getClassLoader().loadClass( genericTypeName );
+                                    thisType = this.findDirectJSONObjectAssignableType( thisType );
+                                }
+                                catch ( ClassNotFoundException e ) {
+                                    thisType = JSONMaptron.class;
+                                }
+                            }
                         }
                     }
                 }
             }
-            Object    self     = thisType.getConstructor().newInstance();
+            self     = thisType.getConstructor().newInstance();
 
-            ObjectJSONCursorUnmarshal.INNER_OBJECT_DECODER.decode( self, parent, indexKey, this, fieldGenericType );
+            ObjectJSONCursorUnmarshal.INNER_OBJECT_DECODER.decode( self, parent, indexKey, this, elemGenericType );
             return self;
         }
         catch ( NoSuchMethodException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e ) {

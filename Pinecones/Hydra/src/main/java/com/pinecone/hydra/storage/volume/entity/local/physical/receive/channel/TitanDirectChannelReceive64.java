@@ -1,10 +1,9 @@
 package com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel;
 
 import com.pinecone.framework.util.Bytes;
-import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.storage.MiddleStorageObject;
+import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageNaming;
-import com.pinecone.hydra.storage.TitanMiddleStorageObject;
+import com.pinecone.hydra.storage.TitanStorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageNaming;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 
@@ -22,16 +21,16 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
         this.storageNaming = new TitanStorageNaming();
     }
     @Override
-    public MiddleStorageObject receive(DirectChannelReceiveEntity entity) throws IOException {
+    public StorageIOResponse receive(DirectChannelReceiveEntity entity) throws IOException {
         return receiveWithOffsetAndSize(entity, 0, entity.getReceiveStorageObject().getSize().intValue());
     }
 
     @Override
-    public MiddleStorageObject receive(DirectChannelReceiveEntity entity, Number offset, Number endSize) throws IOException {
+    public StorageIOResponse receive(DirectChannelReceiveEntity entity, Number offset, Number endSize) throws IOException {
         return receiveWithOffsetAndSize(entity, offset.longValue(), endSize.intValue());
     }
 
-    private MiddleStorageObject receiveWithOffsetAndSize(DirectChannelReceiveEntity entity, long offset, int size) throws IOException {
+    private StorageIOResponse receiveWithOffsetAndSize(DirectChannelReceiveEntity entity, long offset, int size) throws IOException {
         ReceiveStorageObject receiveStorageObject = entity.getReceiveStorageObject();
         String destDirPath = entity.getDestDirPath();
         FileChannel channel = entity.getChannel();
@@ -40,7 +39,7 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
         long checksum = 0;
         ByteBuffer buffer = ByteBuffer.allocateDirect(size);
 
-        TitanMiddleStorageObject titanMiddleStorageObject = new TitanMiddleStorageObject();
+        TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
         titanMiddleStorageObject.setObjectGuid(receiveStorageObject.getStorageObjectGuid());
 
         channel.position(offset);

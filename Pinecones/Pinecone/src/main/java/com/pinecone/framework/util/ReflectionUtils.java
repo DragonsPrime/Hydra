@@ -486,13 +486,18 @@ public final class ReflectionUtils {
 
     /**
      * e.g. java.util.List<com.util.json.Test>
+     * e.g. java.util.Map<java.lang.String, com.util.json.Slave>
      */
-    public static String extractSoloGenericClassName( String input ) {
+    public static String[] extractGenericClassNames( String input ) {
         int startIndex = input.indexOf('<');
         int endIndex   = input.lastIndexOf('>');
 
         if ( startIndex != -1 && endIndex != -1 && endIndex > startIndex ) {
-            return input.substring(startIndex + 1, endIndex).trim();
+            String types = input.substring( startIndex + 1, endIndex ).trim();
+            if( types.indexOf( ", " ) > 0 ) {
+                return types.split( ", " );
+            }
+            return types.split( "," );
         }
         return null;
     }

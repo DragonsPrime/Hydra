@@ -1,7 +1,7 @@
 package com.sauron.shadow.chronicle;
 
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.JSONGet;
+import com.pinecone.framework.util.json.homotype.JSONGet;
 import com.pinecone.hydra.auto.Instructation;
 import com.sauron.radium.heistron.HTTPCrew;
 import com.sauron.radium.heistron.HTTPHeist;

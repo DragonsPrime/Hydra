@@ -7,7 +7,7 @@ import com.pinecone.framework.unit.MultiScopeMap;
 import com.pinecone.framework.unit.MultiScopeMaptron;
 import com.pinecone.framework.util.config.JSONConfig;
 import com.pinecone.framework.util.json.JSONMaptron;
-import com.pinecone.framework.util.json.hometype.AnnotatedObjectInjector;
+import com.pinecone.framework.util.json.homotype.AnnotatedObjectInjector;
 import com.pinecone.framework.util.name.Namespace;
 import com.pinecone.hydra.config.MapConfigReinterpreter;
 import com.pinecone.hydra.config.ScopedMapConfigReinterpreter;

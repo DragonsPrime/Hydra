@@ -1,13 +1,12 @@
 package com.pinecone.hydra.storage.volume.entity.local.physical.export;
 
 import com.pinecone.framework.util.Bytes;
-import com.pinecone.hydra.storage.MiddleStorageObject;
-import com.pinecone.hydra.storage.TitanMiddleStorageObject;
+import com.pinecone.hydra.storage.StorageIOResponse;
+import com.pinecone.hydra.storage.TitanStorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
-import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
+import com.pinecone.hydra.storage.StorageIORequest;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlockStatus;
-import com.pinecone.hydra.storage.volume.entity.local.striped.StripExportFlyweightEntity;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,12 +17,12 @@ import java.util.zip.CRC32;
 
 public class TitanDirectChannelExport64 implements DirectChannelExport64{
     @Override
-    public MiddleStorageObject export( DirectChannelExportEntity entity ) throws IOException {
-        ExportStorageObject exportStorageObject = entity.getExportStorageObject();
-        String sourceName = exportStorageObject.getSourceName();
-        long size = exportStorageObject.getSize().longValue();
+    public StorageIOResponse export(DirectChannelExportEntity entity ) throws IOException {
+        StorageIORequest storageIORequest = entity.getStorageIORequest();
+        String sourceName = storageIORequest.getSourceName();
+        long size = storageIORequest.getSize().longValue();
         FileChannel channel = entity.getChannel();
-        TitanMiddleStorageObject titanMiddleStorageObject = new TitanMiddleStorageObject();
+        TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
 
         long parityCheck = 0;
         long checksum = 0;
@@ -68,14 +67,14 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
         return bytes;
     }*/
 
-    public MiddleStorageObject export( DirectChannelExportEntity outputEntity, Number offset, Number endSize, long bufferStartPosition, ChannelBytesExportRecall recall ) {
+    public StorageIOResponse export(DirectChannelExportEntity outputEntity, Number offset, Number endSize, long bufferStartPosition, ChannelBytesExportRecall recall ) {
         VolumeManager volumeManager = outputEntity.getVolumeManager();
         FileChannel targetChannel = outputEntity.getChannel();
         Number stripSize = volumeManager.getConfig().getDefaultStripSize();
 
-        ExportStorageObject exportStorageObject = outputEntity.getExportStorageObject();
-        String sourceName = exportStorageObject.getSourceName();
-        TitanMiddleStorageObject titanMiddleStorageObject = new TitanMiddleStorageObject();
+        StorageIORequest storageIORequest = outputEntity.getStorageIORequest();
+        String sourceName = storageIORequest.getSourceName();
+        TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
 
         long parityCheck = 0;
         long checksum = 0;
@@ -111,11 +110,11 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
 
 
     @Override
-    public MiddleStorageObject raid0Export(DirectChannelExportEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) {
+    public StorageIOResponse raid0Export(DirectChannelExportEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) {
         VolumeManager volumeManager = entity.getVolumeManager();
-        ExportStorageObject exportStorageObject = entity.getExportStorageObject();
-        String sourceName = exportStorageObject.getSourceName();
-        TitanMiddleStorageObject titanMiddleStorageObject = new TitanMiddleStorageObject();
+        StorageIORequest storageIORequest = entity.getStorageIORequest();
+        String sourceName = storageIORequest.getSourceName();
+        TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
 
         long parityCheck = 0;
         long checksum = 0;

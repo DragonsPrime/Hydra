@@ -2,8 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.rdb.MappedExecutor;
-import com.pinecone.hydra.storage.MiddleStorageObject;
-import com.pinecone.hydra.storage.file.transmit.receiver.channel.ChannelReceiverEntity;
+import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
@@ -11,7 +10,6 @@ import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
@@ -27,7 +25,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
     private FileChannel             fileChannel;
     private OnVolumeFileSystem      kenVolumeFileSystem;
     private MappedExecutor          executor;
-    private MiddleStorageObject     middleStorageObject;
+    private StorageIOResponse storageIOResponse;
 
 
     public TitanStripReceiverJob(ReceiveEntity entity, FileChannel channel, int jobCount, int jobCode, LogicVolume volume, MappedExecutor executor ){
@@ -59,7 +57,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
             }
 
             try {
-                this.middleStorageObject = this.volume.channelReceive(this.object, this.fileChannel, currentPosition, bufferSize);
+                this.storageIOResponse = this.volume.channelReceive(this.object, this.fileChannel, currentPosition, bufferSize);
 
             } catch (IOException | SQLException e) {
                 e.printStackTrace();
@@ -69,7 +67,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
             currentPosition += bufferSize * jobCount;
         }
         try {
-            this.kenVolumeFileSystem.insertKVFSFileStripTable( executor, jobCode,  volume.getGuid(), this.object.getStorageObjectGuid(), middleStorageObject.getSourceName() );
+            this.kenVolumeFileSystem.insertKVFSFileStripTable( executor, jobCode,  volume.getGuid(), this.object.getStorageObjectGuid(), storageIOResponse.getSourceName() );
         } catch (SQLException e) {
             throw new ProxyProvokeHandleException(e);
         }

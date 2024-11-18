@@ -1,7 +1,7 @@
 package com.pinecone.hydra.registry.entity;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 
 import java.time.LocalDateTime;
 

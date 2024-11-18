@@ -3,7 +3,7 @@ package com.sauron.shadow.chronicle.Newstron;
 import com.pinecone.framework.util.StringUtils;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.JSONGet;
+import com.pinecone.framework.util.json.homotype.JSONGet;
 import com.sauron.radium.heistron.HTTPHeist;
 import com.sauron.shadow.chronicle.ArchClerk;
 import com.sauron.shadow.chronicle.Clerk;

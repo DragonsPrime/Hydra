@@ -2,7 +2,10 @@ package com.pinecone.framework.system.prototype;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+
+import com.pinecone.framework.system.stereotype.JavaBeans;
 
 public interface ObjectiveEvaluator extends Pinenut {
     ObjectiveEvaluator MapStructures = new MapStructuresEvaluator();
@@ -103,5 +106,51 @@ public interface ObjectiveEvaluator extends Pinenut {
         }
 
         return fieldGenericType;
+    }
+
+    default Type getGetterGenericType( Object that, String key ) {
+        Type genericType = null;
+        try{
+            if( that != null ) {
+                String getterName = JavaBeans.MethodMajorKeyGet + Character.toUpperCase( key.charAt(0) ) + key.substring( 1 );
+                Method getter     = that.getClass().getMethod( getterName );
+                genericType       = getter.getGenericReturnType();
+            }
+        }
+        catch ( NoSuchMethodException | SecurityException e ) {
+            genericType = null;
+        }
+
+        return genericType;
+    }
+
+    default Type getSetterGenericType( Object that, String key ) {
+        Type genericType = null;
+        if( that != null ) {
+            String getterName = JavaBeans.MethodMajorKeySet + Character.toUpperCase( key.charAt(0) ) + key.substring( 1 );
+            Method[] methods  = that.getClass().getMethods();
+            for( Method method : methods ) {
+                if( method.getName().equals( getterName ) && method.getParameterCount() == 1 ) {
+                    Type[] pars = method.getGenericParameterTypes();
+                    genericType = pars[ 0 ];
+                    break;
+                }
+            }
+        }
+
+        return genericType;
+    }
+
+    default Type getElementGenericType( Object that, String key ) {
+        Type t = this.getSetterGenericType( that, key );
+        if( t == null ) {
+            t = this.getGetterGenericType( that, key );
+        }
+
+        if( t == null ) {
+            t = this.getFieldGenericType( that, key );
+        }
+
+        return t;
     }
 }

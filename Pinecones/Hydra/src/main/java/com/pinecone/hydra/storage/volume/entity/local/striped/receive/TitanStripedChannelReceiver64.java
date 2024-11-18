@@ -4,7 +4,7 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.rdb.MappedExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
-import com.pinecone.hydra.storage.MiddleStorageObject;
+import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
@@ -41,7 +41,7 @@ public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
     }
 
     @Override
-    public MiddleStorageObject channelReceive() throws IOException, SQLException {
+    public StorageIOResponse channelReceive() throws IOException, SQLException {
         Hydrarum hydrarum = this.volumeManager.getHydrarum();
         MasterVolumeGram masterVolumeGram = new MasterVolumeGram( this.stripedVolume.getGuid().toString(), hydrarum );
         hydrarum.getTaskManager().add( masterVolumeGram );
@@ -62,7 +62,7 @@ public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
     }
 
     @Override
-    public MiddleStorageObject channelReceive(Number offset, Number endSize) throws IOException {
+    public StorageIOResponse channelReceive(Number offset, Number endSize) throws IOException {
         return null;
     }
 

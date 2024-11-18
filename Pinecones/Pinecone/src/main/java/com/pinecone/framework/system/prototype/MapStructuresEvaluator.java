@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.pinecone.framework.system.stereotype.JavaBeans;
+import com.pinecone.framework.util.ClassUtils;
 import com.pinecone.framework.util.json.JSONArray;
 
 public class MapStructuresEvaluator implements ObjectiveEvaluator {
@@ -52,7 +53,26 @@ public class MapStructuresEvaluator implements ObjectiveEvaluator {
             setter = that.getClass().getMethod( setterName );
         }
         else {
-            setter = that.getClass().getMethod( setterName, val.getClass() );
+            try{
+                setter = that.getClass().getMethod( setterName, val.getClass() );
+            }
+            catch ( NoSuchMethodException e ) {
+                setter = null;
+                Method[] candidates = that.getClass().getMethods();
+                for( Method candidate : candidates ) {
+                    Class<?>[] pars = candidate.getParameterTypes();
+                    if( candidate.getName().equals( setterName ) && pars.length == 1 ) {
+                        if( ClassUtils.isAssignable( pars[0], val.getClass() ) ){
+                            setter = candidate;
+                            break;
+                        }
+                    }
+                }
+
+                if( setter == null ) {
+                    throw e;
+                }
+            }
         }
 
         setter.setAccessible( true );

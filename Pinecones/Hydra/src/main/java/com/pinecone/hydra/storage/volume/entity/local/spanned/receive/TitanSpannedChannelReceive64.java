@@ -3,7 +3,7 @@ package com.pinecone.hydra.storage.volume.entity.local.spanned.receive;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
-import com.pinecone.hydra.storage.MiddleStorageObject;
+import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
@@ -34,12 +34,12 @@ public class TitanSpannedChannelReceive64 implements SpannedChannelReceive64{
         this.kenVolumeFileSystem = new KenVolumeFileSystem( this.volumeManager );
     }
     @Override
-    public MiddleStorageObject receive() throws IOException, SQLException {
+    public StorageIOResponse receive() throws IOException, SQLException {
         return this.receiveInternal(null, null);
     }
 
     @Override
-    public MiddleStorageObject receive(Number offset, Number endSize) throws IOException, SQLException {
+    public StorageIOResponse receive(Number offset, Number endSize) throws IOException, SQLException {
         return this.receiveInternal(offset, endSize);
     }
 
@@ -54,7 +54,7 @@ public class TitanSpannedChannelReceive64 implements SpannedChannelReceive64{
         return new SQLiteExecutor( new SQLiteHost(url) );
     }
 
-    private MiddleStorageObject receiveInternal(Number offset, Number endSize) throws IOException, SQLException {
+    private StorageIOResponse receiveInternal(Number offset, Number endSize) throws IOException, SQLException {
         List<LogicVolume> volumes = this.spannedVolume.getChildren();
         GUID physicsGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume( this.spannedVolume.getGuid() );
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);

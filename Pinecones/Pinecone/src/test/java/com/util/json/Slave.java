@@ -3,11 +3,7 @@ package com.util.json;
 import java.util.List;
 import java.util.Map;
 
-import com.pinecone.framework.system.prototype.ObjectiveClass;
-import com.pinecone.framework.util.Debug;
-import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
-import com.pinecone.framework.util.json.hometype.DirectJSONInjector;
-import com.pinecone.framework.util.json.hometype.StructJSONEncoder;
+import com.pinecone.framework.util.json.homotype.StructJSONEncoder;
 
 public class Slave {
     public String    name  ;
@@ -19,6 +15,16 @@ public class Slave {
 
     //public Slave     child;
     public List<Slave>    children;
+    //public Slave[]    children2;
+    //public Object[]    children;
+    //public Map[]    children;
+    //public List<JSONObject>    children;
+    //public List<Map>    children;
+    //public List<TreeMap>    children;
+    //public List<Object>    children;
+
+
+    public Map<String, Slave > ms;
 
     public Slave() {
 
@@ -44,9 +50,13 @@ public class Slave {
         this.parasite = parasite;
     }
 
-    public List<Slave> getChildren() {
-        return this.children;
-    }
+//    public void setChildren( List<Slave> slaves ) {
+//        this.children = slaves;
+//    }
+
+//    public List<Slave> getChildren() {
+//        return this.children;
+//    }
 
     public String toJSONString() {
         return StructJSONEncoder.BasicEncoder.encode( this );

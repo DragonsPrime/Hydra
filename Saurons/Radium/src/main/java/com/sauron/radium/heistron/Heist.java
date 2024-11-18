@@ -23,7 +23,7 @@ import com.sauron.radium.heistron.orchestration.Hierarchy;
 import com.sauron.radium.heistron.scheduler.RangedTaskPage;
 import com.pinecone.framework.util.config.JSONConfig;
 import com.sauron.radium.util.ConfigHelper;
-import com.pinecone.framework.util.json.hometype.DirectObjectInjector;
+import com.pinecone.framework.util.json.homotype.DirectObjectInjector;
 import com.pinecone.slime.chunk.RangedPage;
 
 

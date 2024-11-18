@@ -1,14 +1,15 @@
 package com.pinecone.hydra.storage.volume.entity;
 
+import com.pinecone.hydra.storage.StorageIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 
 public abstract  class ArchExportEntity implements ExporterEntity{
     protected VolumeManager volumeManager;
-    protected ExportStorageObject   exportStorageObject;
+    protected StorageIORequest storageIORequest;
 
-    public ArchExportEntity(VolumeManager volumeManager, ExportStorageObject exportStorageObject ){
+    public ArchExportEntity(VolumeManager volumeManager, StorageIORequest storageIORequest){
         this.volumeManager = volumeManager;
-        this.exportStorageObject = exportStorageObject;
+        this.storageIORequest = storageIORequest;
 
     }
     @Override
@@ -22,12 +23,12 @@ public abstract  class ArchExportEntity implements ExporterEntity{
     }
 
     @Override
-    public ExportStorageObject getExportStorageObject() {
-        return this.exportStorageObject;
+    public StorageIORequest getStorageIORequest() {
+        return this.storageIORequest;
     }
 
     @Override
-    public void setExportStorageObject(ExportStorageObject exportStorageObject) {
-        this.exportStorageObject = exportStorageObject;
+    public void setStorageIORequest(StorageIORequest storageIORequest) {
+        this.storageIORequest = storageIORequest;
     }
 }

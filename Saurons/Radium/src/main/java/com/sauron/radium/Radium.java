@@ -16,7 +16,7 @@ import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.kanina.RabbitMQClient;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.io.Tracerson;
-import com.pinecone.framework.util.json.hometype.DirectObjectInjector;
+import com.pinecone.framework.util.json.homotype.DirectObjectInjector;
 import com.pinecone.Pinecone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

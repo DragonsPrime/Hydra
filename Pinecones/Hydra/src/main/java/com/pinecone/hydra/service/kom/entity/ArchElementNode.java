@@ -6,9 +6,9 @@ import java.util.Map;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.BeanColonist;
-import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
-import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.framework.util.json.homotype.BeanColonist;
+import com.pinecone.framework.util.json.homotype.BeanMapDecoder;
+import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.hydra.service.ArchServiceFamilyMeta;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
 import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
@@ -26,13 +26,13 @@ public abstract class ArchElementNode extends ArchServiceFamilyMeta implements E
 
     public ArchElementNode( Map<String, Object > joEntity ) {
         super( joEntity );
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public ArchElementNode( Map<String, Object > joEntity, ServicesInstrument servicesInstrument ) {
         super( joEntity );
         this.apply( servicesInstrument );
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public ArchElementNode( ServicesInstrument servicesInstrument ) {
@@ -48,7 +48,7 @@ public abstract class ArchElementNode extends ArchServiceFamilyMeta implements E
     @Override
     public ArchElementNode apply( Map<String, Object > joEntity ) {
         super.apply( joEntity );
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
 
         return this;
     }

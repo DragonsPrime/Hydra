@@ -1,9 +1,9 @@
 package com.pinecone.hydra.storage.volume.entity.local.spanned.export;
 
-import com.pinecone.hydra.storage.MiddleStorageObject;
+import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchExportEntity;
-import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
+import com.pinecone.hydra.storage.StorageIORequest;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
 
 import java.io.IOException;
@@ -13,8 +13,8 @@ import java.sql.SQLException;
 public class TitanSpannedChannelExportEntity64 extends ArchExportEntity implements SpannedChannelExportEntity64{
     private FileChannel                 channel;
     private SpannedChannelExport64      spannedChannelExport64;
-    public TitanSpannedChannelExportEntity64(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel, SpannedVolume spannedVolume) {
-        super(volumeManager, exportStorageObject);
+    public TitanSpannedChannelExportEntity64(VolumeManager volumeManager, StorageIORequest storageIORequest, FileChannel channel, SpannedVolume spannedVolume) {
+        super(volumeManager, storageIORequest);
         this.channel = channel;
         this.spannedChannelExport64 = new TitanSpannedChannelExport64( this, spannedVolume );
     }
@@ -30,7 +30,7 @@ public class TitanSpannedChannelExportEntity64 extends ArchExportEntity implemen
     }
 
     @Override
-    public MiddleStorageObject export() throws IOException, SQLException {
+    public StorageIOResponse export() throws IOException, SQLException {
         return this.spannedChannelExport64.export();
     }
 }

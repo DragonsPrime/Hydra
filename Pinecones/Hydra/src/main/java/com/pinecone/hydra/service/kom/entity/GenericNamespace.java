@@ -8,8 +8,8 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.JSONEncoder;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.BeanColonist;
-import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
+import com.pinecone.framework.util.json.homotype.BeanColonist;
+import com.pinecone.framework.util.json.homotype.BeanMapDecoder;
 import com.pinecone.hydra.service.kom.GenericNamespaceRules;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
 import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
@@ -33,12 +33,12 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
 
     public GenericNamespace( Map<String, Object > joEntity ) {
         super( joEntity );
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public GenericNamespace( Map<String, Object > joEntity, ServicesInstrument servicesInstrument ) {
         super( joEntity, servicesInstrument );
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public GenericNamespace( ServicesInstrument servicesInstrument ) {

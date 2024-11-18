@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.simple.recevice;
 
-import com.pinecone.hydra.storage.MiddleStorageObject;
+import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
@@ -41,12 +41,12 @@ public class TitanSimpleChannelReceiverEntity64 extends ArchReceiveEntity implem
 
 
     @Override
-    public MiddleStorageObject receive() throws IOException, SQLException {
+    public StorageIOResponse receive() throws IOException, SQLException {
         return this.titanSimpleChannelReceiver64.channelReceive();
     }
 
     @Override
-    public MiddleStorageObject receive(Number offset, Number endSize) throws IOException {
+    public StorageIOResponse receive(Number offset, Number endSize) throws IOException {
         return this.titanSimpleChannelReceiver64.channelReceive( offset, endSize );
     }
 }

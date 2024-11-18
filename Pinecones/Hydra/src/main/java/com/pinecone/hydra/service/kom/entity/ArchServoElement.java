@@ -2,13 +2,11 @@ package com.pinecone.hydra.service.kom.entity;
 
 import java.time.LocalDateTime;
 import java.util.Map;
-import java.util.Set;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
-import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.framework.util.json.homotype.BeanMapDecoder;
+import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
-import com.pinecone.ulf.util.id.GuidAllocator;
 
 public abstract class ArchServoElement extends ArchElementNode implements ServoElement {
     protected GUID                       metaGuid;
@@ -30,7 +28,7 @@ public abstract class ArchServoElement extends ArchElementNode implements ServoE
         super( joEntity );
         this.createTime = LocalDateTime.now();
         this.updateTime = LocalDateTime.now();
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public ArchServoElement( Map<String, Object > joEntity, ServicesInstrument servicesInstrument ) {
@@ -47,7 +45,7 @@ public abstract class ArchServoElement extends ArchElementNode implements ServoE
         super.apply( joEntity );
         this.createTime = LocalDateTime.now();
         this.updateTime = LocalDateTime.now();
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
 
         return this;
     }

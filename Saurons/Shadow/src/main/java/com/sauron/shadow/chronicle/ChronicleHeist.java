@@ -7,7 +7,7 @@ import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.system.construction.Structure;
 import com.pinecone.framework.util.config.JSONConfig;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.JSONGet;
+import com.pinecone.framework.util.json.homotype.JSONGet;
 import com.pinecone.slime.jelly.source.ibatis.SoloSessionMapperPool;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
 import com.sauron.radium.heistron.CascadeHeist;

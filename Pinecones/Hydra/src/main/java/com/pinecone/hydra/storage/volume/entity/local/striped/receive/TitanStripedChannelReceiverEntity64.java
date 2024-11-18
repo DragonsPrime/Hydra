@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.receive;
 
-import com.pinecone.hydra.storage.MiddleStorageObject;
+import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
@@ -37,12 +37,12 @@ public class TitanStripedChannelReceiverEntity64 extends ArchReceiveEntity imple
     }
 
     @Override
-    public MiddleStorageObject receive() throws IOException, SQLException {
+    public StorageIOResponse receive() throws IOException, SQLException {
         return this.stripedChannelReceiver64.channelReceive();
     }
 
     @Override
-    public MiddleStorageObject receive(Number offset, Number endSize) throws IOException {
+    public StorageIOResponse receive(Number offset, Number endSize) throws IOException {
         return null;
     }
 }

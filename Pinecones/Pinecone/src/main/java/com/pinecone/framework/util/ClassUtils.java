@@ -26,10 +26,10 @@ public abstract class ClassUtils {
     private static final char INNER_CLASS_SEPARATOR = '$';
     public static final String CGLIB_CLASS_SEPARATOR = "$$";
     public static final String CLASS_FILE_SUFFIX = ".class";
-    private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new HashMap(8);
-    private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap = new HashMap(8);
-    private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap(32);
-    private static final Map<String, Class<?>> commonClassCache = new HashMap(32);
+    private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new HashMap<>(8);
+    private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap = new HashMap<>(8);
+    private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<>(32);
+    private static final Map<String, Class<?>> commonClassCache = new HashMap<>(32);
 
     public ClassUtils() {
     }
@@ -505,21 +505,23 @@ public abstract class ClassUtils {
         return clazz.isPrimitive() && clazz != Void.TYPE ? (Class)primitiveTypeToWrapperMap.get(clazz) : clazz;
     }
 
-    public static boolean isAssignable(Class<?> lhsType, Class<?> rhsType) {
+    public static boolean isAssignable( Class<?> lhsType, Class<?> rhsType ) {
         Assert.notNull(lhsType, "Left-hand side type must not be null");
         Assert.notNull(rhsType, "Right-hand side type must not be null");
-        if (lhsType.isAssignableFrom(rhsType)) {
+        if ( lhsType.isAssignableFrom(rhsType) ) {
             return true;
-        } else {
+        }
+        else {
             Class resolvedPrimitive;
-            if (lhsType.isPrimitive()) {
-                resolvedPrimitive = (Class)primitiveWrapperTypeMap.get(rhsType);
-                if (resolvedPrimitive != null && lhsType.equals(resolvedPrimitive)) {
+            if ( lhsType.isPrimitive() ) {
+                resolvedPrimitive = (Class)primitiveWrapperTypeMap.get( rhsType );
+                if ( lhsType.equals( resolvedPrimitive ) ) {
                     return true;
                 }
-            } else {
-                resolvedPrimitive = (Class)primitiveTypeToWrapperMap.get(rhsType);
-                if (resolvedPrimitive != null && lhsType.isAssignableFrom(resolvedPrimitive)) {
+            }
+            else {
+                resolvedPrimitive = (Class)primitiveTypeToWrapperMap.get( rhsType );
+                if ( resolvedPrimitive != null && lhsType.isAssignableFrom( resolvedPrimitive ) ) {
                     return true;
                 }
             }
@@ -706,7 +708,7 @@ public abstract class ClassUtils {
             registerCommonClasses((Class)entry.getKey());
         }
 
-        Set<Class<?>> primitiveTypes = new HashSet(32);
+        Set<Class<?>> primitiveTypes = new HashSet<>(32);
         primitiveTypes.addAll(primitiveWrapperTypeMap.values());
         primitiveTypes.addAll(Arrays.asList(boolean[].class, byte[].class, char[].class, double[].class, float[].class, int[].class, long[].class, short[].class));
         primitiveTypes.add(Void.TYPE);

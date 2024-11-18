@@ -6,9 +6,9 @@ import com.pinecone.framework.system.prototype.ObjectiveMap;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.DirectJSONInjector;
-import com.pinecone.framework.util.json.hometype.JSONGet;
-import com.pinecone.framework.util.json.hometype.MapStructure;
+import com.pinecone.framework.util.json.homotype.DirectJSONInjector;
+import com.pinecone.framework.util.json.homotype.JSONGet;
+import com.pinecone.framework.util.json.homotype.MapStructure;
 import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.lang.GenericDynamicFactory;
 

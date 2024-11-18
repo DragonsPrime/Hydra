@@ -1,7 +1,7 @@
 package com.pinecone.framework.util.json;
 
 import com.pinecone.framework.util.ReflectionUtils;
-import com.pinecone.framework.util.json.hometype.AnnotatedJSONInjector;
+import com.pinecone.framework.util.json.homotype.AnnotatedJSONInjector;
 
 import java.io.IOException;
 import java.io.Writer;
