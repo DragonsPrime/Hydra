@@ -9,11 +9,12 @@ import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.LocalFrame;
 import com.pinecone.hydra.storage.file.entity.RemoteFrame;
+import com.pinecone.hydra.storage.file.transmit.SourceJson;
 import com.pinecone.hydra.storage.file.transmit.receiver.ArchReceiver;
 import com.pinecone.hydra.storage.file.transmit.receiver.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
-import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
-import com.pinecone.hydra.storage.volume.entity.TitanReceiveStorageObject;
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
+import com.pinecone.hydra.storage.TitanStorageReceiveIORequest;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.io.IOException;
@@ -112,10 +113,10 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
     public void receive(ReceiveEntity entity, LogicVolume volume) throws IOException, SQLException {
         ChannelReceiverEntity channelReceiverEntity = entity.evinceChannelReceiverEntity();
         FileChannel fileChannel = channelReceiverEntity.getChannel();
-        String destDirPath = channelReceiverEntity.getDestDirPath();
         FileNode file = channelReceiverEntity.getFile();
         KOMFileSystem fileSystem = channelReceiverEntity.getFileSystem();
-        long frameSize = this.mKOMFileSystem.getConfig().getFrameSize().longValue();;
+        long frameSize = this.mKOMFileSystem.getConfig().getFrameSize().longValue();
+        file.setGuid( fileSystem.queryGUIDByPath( entity.getDestDirPath() ) );
 
         int parityCheck = 0;
         long checksum = 0;
@@ -126,7 +127,7 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
         long currentPosition = 0;
         long endSize = frameSize;
         while (true) {
-            if( currentPosition > file.getDefinitionSize() ){
+            if( currentPosition >= file.getDefinitionSize() ){
                 break;
             }
 
@@ -139,14 +140,17 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
             remoteFrame.setDeviceGuid(this.mKOMFileSystem.getConfig().getLocalhostGUID());
             remoteFrame.setSegGuid( localFrame.getSegGuid() );
 
-            ReceiveStorageObject receiveStorageObject = new TitanReceiveStorageObject();
-            receiveStorageObject.setSize( file.getDefinitionSize() );
-            receiveStorageObject.setName( file.getName() );
-            receiveStorageObject.setStorageObjectGuid( localFrame.getSegGuid() );
-            StorageIOResponse storageIOResponse = volume.channelReceive(receiveStorageObject, fileChannel, (Number) currentPosition, (Number) endSize);
+            StorageReceiveIORequest storageReceiveIORequest = new TitanStorageReceiveIORequest();
+            storageReceiveIORequest.setSize( file.getDefinitionSize() );
+            storageReceiveIORequest.setName( file.getName() );
+            storageReceiveIORequest.setStorageObjectGuid( localFrame.getSegGuid() );
+            StorageIOResponse storageIOResponse = volume.channelReceive(storageReceiveIORequest, fileChannel, currentPosition, endSize);
 
+            SourceJson sourceJson = new SourceJson();
+            sourceJson.setSourceName( storageIOResponse.getSourceName() );
+            sourceJson.setVolumeGuid( volume.getGuid().toString() );
             localFrame.setSize( endSize );
-            localFrame.setSourceName( storageIOResponse.getSourceName() );
+            localFrame.setSourceName( sourceJson.toJSONString() );
             localFrame.setCrc32( storageIOResponse.getCre32() );
             localFrame.setFileGuid( file.getGuid() );
             localFrame.setSegId( segId );
@@ -154,13 +158,14 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
             segId++;
             localFrame.save();
             remoteFrame.save();
+            currentPosition += endSize;
         }
         file.setPhysicalSize( currentPosition );
         file.setLogicSize( currentPosition );
         file.setChecksum( checksum );
         file.setParityCheck( parityCheck );
         file.setCrc32Xor( Long.toHexString(crc32Xor) );
-        fileSystem.put( file );
+        fileSystem.update( file );
     }
 
 

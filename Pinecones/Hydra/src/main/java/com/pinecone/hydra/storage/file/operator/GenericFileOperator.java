@@ -116,7 +116,7 @@ public class GenericFileOperator extends ArchFileSystemOperator{
 
     @Override
     public void update(TreeNode treeNode) {
-
+        this.fileManipulator.update( (FileNode) treeNode );
     }
 
     @Override

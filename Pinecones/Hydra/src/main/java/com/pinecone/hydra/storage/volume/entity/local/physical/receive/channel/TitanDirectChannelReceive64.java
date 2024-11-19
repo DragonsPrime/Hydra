@@ -5,7 +5,7 @@ import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageNaming;
 import com.pinecone.hydra.storage.TitanStorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageNaming;
-import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -31,7 +31,7 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
     }
 
     private StorageIOResponse receiveWithOffsetAndSize(DirectChannelReceiveEntity entity, long offset, int size) throws IOException {
-        ReceiveStorageObject receiveStorageObject = entity.getReceiveStorageObject();
+        StorageReceiveIORequest storageReceiveIORequest = entity.getReceiveStorageObject();
         String destDirPath = entity.getDestDirPath();
         FileChannel channel = entity.getChannel();
 
@@ -40,7 +40,7 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
         ByteBuffer buffer = ByteBuffer.allocateDirect(size);
 
         TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
-        titanMiddleStorageObject.setObjectGuid(receiveStorageObject.getStorageObjectGuid());
+        titanMiddleStorageObject.setObjectGuid(storageReceiveIORequest.getStorageObjectGuid());
 
         channel.position(offset);
         buffer.clear();
@@ -54,7 +54,7 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
             checksum += b & 0xFF;
             crc.update(b);
         }
-        String sourceName = this.storageNaming.naming(receiveStorageObject.getName(), receiveStorageObject.getStorageObjectGuid().toString());
+        String sourceName = this.storageNaming.naming(storageReceiveIORequest.getName(), storageReceiveIORequest.getStorageObjectGuid().toString());
         Path path = Paths.get(destDirPath, sourceName);
 
         try (FileChannel chunkChannel = FileChannel.open(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND)) {

@@ -6,6 +6,8 @@ import com.pinecone.hydra.storage.file.entity.Frame;
 import com.pinecone.hydra.storage.file.entity.LocalFrame;
 import com.pinecone.hydra.storage.file.transmit.exporter.ArchExporter;
 import com.pinecone.hydra.storage.file.transmit.exporter.ExporterEntity;
+import com.pinecone.hydra.storage.volume.UniformVolumeManager;
+import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,7 +19,7 @@ import java.util.zip.CRC32;
 
 public class GenericStreamExporter extends ArchExporter implements StreamExporter {
     @Override
-    public void export(ExporterEntity entity) throws IOException {
+    public void export(ExporterEntity entity, UniformVolumeManager volumeManager) throws IOException {
         StreamExporterEntity exporter = entity.evinceStreamExporterEntity();
         try (OutputStream outputStream = exporter.getOutputStream()) {
             FileNode file = exporter.getFile();

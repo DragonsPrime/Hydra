@@ -4,7 +4,7 @@ import com.pinecone.framework.util.Bytes;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
-import com.pinecone.hydra.storage.StorageIORequest;
+import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlockStatus;
 
@@ -18,9 +18,9 @@ import java.util.zip.CRC32;
 public class TitanDirectChannelExport64 implements DirectChannelExport64{
     @Override
     public StorageIOResponse export(DirectChannelExportEntity entity ) throws IOException {
-        StorageIORequest storageIORequest = entity.getStorageIORequest();
-        String sourceName = storageIORequest.getSourceName();
-        long size = storageIORequest.getSize().longValue();
+        StorageExportIORequest storageExportIORequest = entity.getStorageIORequest();
+        String sourceName = storageExportIORequest.getSourceName();
+        long size = storageExportIORequest.getSize().longValue();
         FileChannel channel = entity.getChannel();
         TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
 
@@ -72,8 +72,8 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
         FileChannel targetChannel = outputEntity.getChannel();
         Number stripSize = volumeManager.getConfig().getDefaultStripSize();
 
-        StorageIORequest storageIORequest = outputEntity.getStorageIORequest();
-        String sourceName = storageIORequest.getSourceName();
+        StorageExportIORequest storageExportIORequest = outputEntity.getStorageIORequest();
+        String sourceName = storageExportIORequest.getSourceName();
         TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
 
         long parityCheck = 0;
@@ -112,8 +112,8 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
     @Override
     public StorageIOResponse raid0Export(DirectChannelExportEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) {
         VolumeManager volumeManager = entity.getVolumeManager();
-        StorageIORequest storageIORequest = entity.getStorageIORequest();
-        String sourceName = storageIORequest.getSourceName();
+        StorageExportIORequest storageExportIORequest = entity.getStorageIORequest();
+        String sourceName = storageExportIORequest.getSourceName();
         TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
 
         long parityCheck = 0;

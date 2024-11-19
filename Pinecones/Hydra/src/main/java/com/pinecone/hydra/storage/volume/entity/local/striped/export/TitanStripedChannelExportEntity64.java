@@ -3,7 +3,7 @@ package com.pinecone.hydra.storage.volume.entity.local.striped.export;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchExportEntity;
-import com.pinecone.hydra.storage.StorageIORequest;
+import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 
 import java.io.IOException;
@@ -14,8 +14,8 @@ public class TitanStripedChannelExportEntity64 extends ArchExportEntity implemen
     private FileChannel                 channel;
     private StripedChannelExport64      stripedChannelExport64;
     private StripedVolume               stripedVolume;
-    public TitanStripedChannelExportEntity64(VolumeManager volumeManager, StorageIORequest storageIORequest, FileChannel channel, StripedVolume stripedVolume) {
-        super(volumeManager, storageIORequest);
+    public TitanStripedChannelExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, FileChannel channel, StripedVolume stripedVolume) {
+        super(volumeManager, storageExportIORequest);
         this.channel = channel;
         this.stripedVolume = stripedVolume;
         this.stripedChannelExport64 = new TitanStripedChannelExport64( this );

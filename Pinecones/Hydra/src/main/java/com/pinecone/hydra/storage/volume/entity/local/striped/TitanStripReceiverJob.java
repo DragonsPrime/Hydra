@@ -6,7 +6,7 @@ import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
-import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
@@ -20,7 +20,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
     private int                     jobCount;
     private int                     jobCode;
     private VolumeManager           volumeManager;
-    private ReceiveStorageObject    object;
+    private StorageReceiveIORequest object;
     private String                  destDirPath;
     private FileChannel             fileChannel;
     private OnVolumeFileSystem      kenVolumeFileSystem;

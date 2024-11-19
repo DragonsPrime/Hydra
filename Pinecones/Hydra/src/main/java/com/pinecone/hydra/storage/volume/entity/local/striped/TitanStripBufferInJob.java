@@ -2,7 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.storage.volume.VolumeManager;
-import com.pinecone.hydra.storage.StorageIORequest;
+import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.export.StripedChannelExport;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
@@ -19,7 +19,7 @@ import java.util.concurrent.locks.Lock;
 public class TitanStripBufferInJob implements StripBufferInJob {
     protected VolumeManager                 volumeManager;
 
-    protected StorageIORequest              object;
+    protected StorageExportIORequest object;
     protected int                           jobCount;
     protected int                           jobCode;
     protected LogicVolume                   volume;
@@ -35,7 +35,7 @@ public class TitanStripBufferInJob implements StripBufferInJob {
     protected Lock                          majorStatusIO;
     protected MasterVolumeGram              masterVolumeGram;
 
-    public TitanStripBufferInJob( MasterVolumeGram masterVolumeGram, StripedChannelExport stripedChannelExport, LogicVolume volume, StorageIORequest object, int jobCode ){
+    public TitanStripBufferInJob(MasterVolumeGram masterVolumeGram, StripedChannelExport stripedChannelExport, LogicVolume volume, StorageExportIORequest object, int jobCode ){
         this.masterVolumeGram             = masterVolumeGram;
         this.object                       = object;
         this.jobCount                     = this.masterVolumeGram.getJobCount();

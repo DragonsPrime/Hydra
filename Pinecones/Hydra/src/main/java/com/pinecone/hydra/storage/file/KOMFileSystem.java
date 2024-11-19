@@ -7,11 +7,16 @@ import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.file.entity.Folder;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
 import com.pinecone.hydra.storage.file.entity.Frame;
+import com.pinecone.hydra.storage.file.transmit.receiver.channel.ChannelReceiver;
+import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.system.ko.kom.ReparseKOMTree;
 import com.pinecone.hydra.unit.udtt.entity.EntityNode;
 import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -32,6 +37,8 @@ public interface KOMFileSystem extends ReparseKOMTree {
 
     @Override
     FileTreeNode get( GUID guid, int depth );
+
+    void update( FileTreeNode node);
 
     @Override
     FileTreeNode getSelf( GUID guid );
@@ -160,4 +167,6 @@ public interface KOMFileSystem extends ReparseKOMTree {
 
     void upload( FileNode file, String destDirPath );
     Frame getLastFrame( GUID guid );
+
+    void channelReceiveFile(LogicVolume volume, String destDirPath, FileNode fileNode, FileChannel channel) throws SQLException, IOException;
 }

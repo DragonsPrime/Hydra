@@ -14,8 +14,8 @@ import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
-import com.pinecone.hydra.storage.TitanStorageIORequest;
-import com.pinecone.hydra.storage.volume.entity.TitanReceiveStorageObject;
+import com.pinecone.hydra.storage.TitanStorageExportExportIORequest;
+import com.pinecone.hydra.storage.TitanStorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
@@ -78,7 +78,7 @@ class Alice extends Radium {
     }
 
     private void testDirectReceive(VolumeManager volumeManager) throws IOException {
-        TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
+        TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
         titanReceiveStorageObject.setName("视频");
         titanReceiveStorageObject.setSize(201*1024*1024);
         String destDirPath = "D:\\文件系统\\大文件";
@@ -92,7 +92,7 @@ class Alice extends Radium {
     private void testDirectExport( VolumeManager volumeManager) throws IOException {
         File file = new File("D:\\文件系统\\大文件\\视频.mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-        TitanStorageIORequest titanExportStorageObject = new TitanStorageIORequest();
+        TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
         titanExportStorageObject.setSize( 201*1024*1024 );
         titanExportStorageObject.setSourceName("D:\\文件系统\\大文件\\视频_d95a91f4.storage");
         TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, titanExportStorageObject,channel);
@@ -122,7 +122,7 @@ class Alice extends Radium {
     private void testSpannedChannelReceive( UniformVolumeManager volumeTree ) throws IOException, SQLException {
         GuidAllocator guidAllocator = volumeTree.getGuidAllocator();
         LogicVolume volume = volumeTree.get(GUIDs.GUID72("05e44c4-00022b-0006-20"));
-        TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
+        TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
         titanReceiveStorageObject.setName( "视频" );
         titanReceiveStorageObject.setSize( 85 * 1024 * 1024 );
         titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
@@ -135,7 +135,7 @@ class Alice extends Radium {
         File file = new File("D:\\文件系统\\大文件\\视频.mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
         LogicVolume volume = volumeTree.get(GUIDs.GUID72("05e44c4-00022b-0006-20"));
-        TitanStorageIORequest titanExportStorageObject = new TitanStorageIORequest();
+        TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
         titanExportStorageObject.setSize( 85 * 1024 *1024 );
         titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("05e5206-0002de-0001-e8") );
         titanExportStorageObject.setSourceName("D:\\文件系统\\簇1\\文件夹\\视频_4a148d14.storage");
@@ -302,7 +302,7 @@ class Alice extends Radium {
 
         GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
-        TitanReceiveStorageObject titanReceiveStorageObject = new TitanReceiveStorageObject();
+        TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
         File file = new File("K:/undefined/Video/Rick.and.Morty/R&M S3/瑞克和莫蒂第三季-07.mp4");
         titanReceiveStorageObject.setName( "ram" );
         titanReceiveStorageObject.setSize( file.length() );
@@ -316,7 +316,7 @@ class Alice extends Radium {
         File file = new File("E:/ram.mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
-        TitanStorageIORequest titanExportStorageObject = new TitanStorageIORequest();
+        TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
         titanExportStorageObject.setSize( 116296678 );
         titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("07b730c-000000-0001-7c") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");

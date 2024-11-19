@@ -7,7 +7,7 @@ import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
-import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.Volume;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
@@ -23,14 +23,14 @@ public class TitanSpannedChannelReceive64 implements SpannedChannelReceive64{
     private SpannedVolume           spannedVolume;
     private FileChannel             channel;
     private VolumeManager           volumeManager;
-    private ReceiveStorageObject    receiveStorageObject;
+    private StorageReceiveIORequest storageReceiveIORequest;
     private OnVolumeFileSystem      kenVolumeFileSystem;
 
     public TitanSpannedChannelReceive64( SpannedChannelReceiveEntity entity ){
         this.volumeManager = entity.getVolumeManager();
         this.spannedVolume = entity.getSpannedVolume();
         this.channel = entity.getChannel();
-        this.receiveStorageObject = entity.getReceiveStorageObject();
+        this.storageReceiveIORequest = entity.getReceiveStorageObject();
         this.kenVolumeFileSystem = new KenVolumeFileSystem( this.volumeManager );
     }
     @Override
@@ -59,25 +59,25 @@ public class TitanSpannedChannelReceive64 implements SpannedChannelReceive64{
         GUID physicsGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume( this.spannedVolume.getGuid() );
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
         SQLiteExecutor sqLiteExecutor = this.getSQLiteExecutor(physicalVolume);
-        int idx = this.kenVolumeFileSystem.KVFSHash(this.receiveStorageObject.getStorageObjectGuid(), volumes.size());
+        int idx = this.kenVolumeFileSystem.KVFSHash(this.storageReceiveIORequest.getStorageObjectGuid(), volumes.size());
         GUID volumeGuid = this.kenVolumeFileSystem.getKVFSIndexTableTargetGuid(sqLiteExecutor, idx);
         LogicVolume targetVolume = this.volumeManager.get(volumeGuid);
 
 
-        if (this.freeSpace(targetVolume) < receiveStorageObject.getSize().longValue()) {
+        if (this.freeSpace(targetVolume) < storageReceiveIORequest.getSize().longValue()) {
 
             for (LogicVolume volume : volumes) {
-                if (this.freeSpace(volume) > receiveStorageObject.getSize().longValue()) {
-                    this.kenVolumeFileSystem.insertKVFSCollisionTable(sqLiteExecutor, idx, receiveStorageObject.getStorageObjectGuid(), volume.getGuid());
+                if (this.freeSpace(volume) > storageReceiveIORequest.getSize().longValue()) {
+                    this.kenVolumeFileSystem.insertKVFSCollisionTable(sqLiteExecutor, idx, storageReceiveIORequest.getStorageObjectGuid(), volume.getGuid());
                     return offset == null && endSize == null
-                            ? volume.channelReceive(this.receiveStorageObject, this.channel)
-                            : volume.channelReceive(this.receiveStorageObject,  this.channel, offset, endSize);
+                            ? volume.channelReceive(this.storageReceiveIORequest, this.channel)
+                            : volume.channelReceive(this.storageReceiveIORequest,  this.channel, offset, endSize);
                 }
             }
         } else {
             return offset == null && endSize == null
-                    ? targetVolume.channelReceive(this.receiveStorageObject,  this.channel)
-                    : targetVolume.channelReceive(this.receiveStorageObject,  this.channel, offset, endSize);
+                    ? targetVolume.channelReceive(this.storageReceiveIORequest,  this.channel)
+                    : targetVolume.channelReceive(this.storageReceiveIORequest,  this.channel, offset, endSize);
         }
 
         return null;

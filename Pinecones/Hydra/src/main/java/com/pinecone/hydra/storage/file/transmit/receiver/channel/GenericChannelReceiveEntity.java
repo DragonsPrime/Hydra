@@ -4,9 +4,11 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.transmit.receiver.ArchReceiveEntity;
+import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 
 public class GenericChannelReceiveEntity extends ArchReceiveEntity implements ChannelReceiverEntity{
     private FileChannel     channel;
@@ -34,12 +36,14 @@ public class GenericChannelReceiveEntity extends ArchReceiveEntity implements Ch
     }
 
     @Override
-    public void receive() throws IOException {
-        //this.channelReceiver.receive(this);
+    public void receive(LogicVolume volume) throws IOException, SQLException {
+        this.fileSystem.affirmFileNode( this.destDirPath );
+        this.channelReceiver.receive(this, volume);
     }
 
     @Override
     public void receive(Number offset, Number endSize) throws IOException {
+        this.fileSystem.affirmFileNode( this.destDirPath );
         this.channelReceiver.receive( this, offset, endSize );
     }
 

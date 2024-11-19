@@ -3,7 +3,8 @@ package com.pinecone.hydra.storage.volume.entity;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.hydra.storage.StorageIOResponse;
-import com.pinecone.hydra.storage.StorageIORequest;
+import com.pinecone.hydra.storage.StorageExportIORequest;
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
@@ -44,10 +45,10 @@ public interface LogicVolume extends Volume, TreeNode {
     void setVolumeTree( VolumeManager volumeManager);
 
 
-    StorageIOResponse channelReceive     ( ReceiveStorageObject receiveStorageObject, FileChannel channel ) throws IOException, SQLException;
-    StorageIOResponse channelReceive     ( ReceiveStorageObject receiveStorageObject, FileChannel channel, Number offset, Number endSize ) throws IOException, SQLException;
-    StorageIOResponse channelExport      ( StorageIORequest storageIORequest, FileChannel channel ) throws IOException, SQLException;
-    StorageIOResponse channelRaid0Export ( StorageIORequest storageIORequest, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException, SQLException;
+    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, FileChannel channel ) throws IOException, SQLException;
+    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, FileChannel channel, Number offset, Number endSize ) throws IOException, SQLException;
+    StorageIOResponse channelExport      (StorageExportIORequest storageExportIORequest, FileChannel channel ) throws IOException, SQLException;
+    StorageIOResponse channelRaid0Export (StorageExportIORequest storageExportIORequest, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException, SQLException;
 
     boolean existStorageObject( GUID storageObject ) throws SQLException;
 

@@ -9,7 +9,7 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
-import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripReceiverJob;
@@ -26,7 +26,7 @@ import java.util.List;
 public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
     private FileChannel                 fileChannel;
     private VolumeManager               volumeManager;
-    private ReceiveStorageObject        receiveStorageObject;
+    private StorageReceiveIORequest storageReceiveIORequest;
     private StripedVolume               stripedVolume;
     private ReceiveEntity               entity;
     private OnVolumeFileSystem          kenVolumeFileSystem;
@@ -35,7 +35,7 @@ public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
         this.entity = entity;
         this.fileChannel   = entity.getChannel();
         this.volumeManager = entity.getVolumeManager();
-        this.receiveStorageObject = entity.getReceiveStorageObject();
+        this.storageReceiveIORequest = entity.getReceiveStorageObject();
         this.stripedVolume = entity.getStripedVolume();
         this.kenVolumeFileSystem = new KenVolumeFileSystem( this.volumeManager );
     }

@@ -3,7 +3,7 @@ package com.pinecone.hydra.storage.volume.entity.local.striped.receive;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchReceiveEntity;
-import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 
 import java.io.IOException;
@@ -14,8 +14,8 @@ public class TitanStripedChannelReceiverEntity64 extends ArchReceiveEntity imple
     private FileChannel channel;
     private StripedVolume stripedVolume;
     private StripedChannelReceiver64 stripedChannelReceiver64;
-    public TitanStripedChannelReceiverEntity64(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, FileChannel channel, StripedVolume stripedVolume) {
-        super(volumeManager, receiveStorageObject);
+    public TitanStripedChannelReceiverEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, FileChannel channel, StripedVolume stripedVolume) {
+        super(volumeManager, storageReceiveIORequest);
         this.channel = channel;
         this.stripedVolume = stripedVolume;
         this.stripedChannelReceiver64 = new TitanStripedChannelReceiver64( this );

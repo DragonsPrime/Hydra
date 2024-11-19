@@ -1,8 +1,8 @@
-package com.pinecone.hydra.storage.volume.entity;
+package com.pinecone.hydra.storage;
 
 import com.pinecone.framework.util.id.GUID;
 
-public class TitanReceiveStorageObject implements ReceiveStorageObject{
+public class TitanStorageReceiveIORequest implements StorageReceiveIORequest {
     private String name;
     private Number size;
     private GUID   storageObjectGuid;

@@ -5,7 +5,7 @@ import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
-import com.pinecone.hydra.storage.StorageIORequest;
+import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
@@ -19,14 +19,14 @@ import java.util.List;
 
 public class TitanSpannedChannelExport64 implements SpannedChannelExport64{
     private VolumeManager           volumeManager;
-    private StorageIORequest storageIORequest;
+    private StorageExportIORequest storageExportIORequest;
     private FileChannel             channel;
     private SpannedVolume           spannedVolume;
     private OnVolumeFileSystem      kenVolumeFileSystem;
 
     public TitanSpannedChannelExport64(SpannedChannelExportEntity entity , SpannedVolume spannedVolume){
         this.volumeManager =  entity.getVolumeManager();
-        this.storageIORequest =  entity.getStorageIORequest();
+        this.storageExportIORequest =  entity.getStorageIORequest();
         this.channel             =  entity.getChannel();
         this.spannedVolume       =  spannedVolume;
         this.kenVolumeFileSystem =  new KenVolumeFileSystem( this.volumeManager );
@@ -39,16 +39,16 @@ public class TitanSpannedChannelExport64 implements SpannedChannelExport64{
         GUID physicsVolumeGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.spannedVolume.getGuid());
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsVolumeGuid);
         SQLiteExecutor sqLiteExecutor = this.getSQLiteExecutor(physicalVolume);
-        GUID targetGuid = this.kenVolumeFileSystem.getKVFSCollisionTableTargetGuid(sqLiteExecutor, storageIORequest.getStorageObjectGuid());
+        GUID targetGuid = this.kenVolumeFileSystem.getKVFSCollisionTableTargetGuid(sqLiteExecutor, storageExportIORequest.getStorageObjectGuid());
         if ( targetGuid == null ){
-            int idx = this.kenVolumeFileSystem.KVFSHash(storageIORequest.getStorageObjectGuid(), volumes.size());
+            int idx = this.kenVolumeFileSystem.KVFSHash(storageExportIORequest.getStorageObjectGuid(), volumes.size());
             GUID tableTargetGuid = this.kenVolumeFileSystem.getKVFSIndexTableTargetGuid(sqLiteExecutor, idx);
             PhysicalVolume volume = this.volumeManager.getPhysicalVolume(tableTargetGuid);
-            return  volume.channelExport( this.volumeManager, storageIORequest, channel );
+            return  volume.channelExport( this.volumeManager, storageExportIORequest, channel );
         }
         else {
             PhysicalVolume volume = this.volumeManager.getPhysicalVolume(targetGuid);
-            return volume.channelExport( this.volumeManager, storageIORequest, channel );
+            return volume.channelExport( this.volumeManager, storageExportIORequest, channel );
         }
 
     }

@@ -3,9 +3,12 @@ package com.pinecone.hydra.storage.file.transmit.exporter.channel;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.transmit.exporter.ArchExporterEntity;
+import com.pinecone.hydra.storage.volume.UniformVolumeManager;
+import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 
 public class GenericChannelExporterEntity extends ArchExporterEntity implements ChannelExporterEntity{
     private FileChannel         channel;
@@ -28,7 +31,7 @@ public class GenericChannelExporterEntity extends ArchExporterEntity implements 
     }
 
     @Override
-    public void export() throws IOException {
-        this.channelExporter.export(this);
+    public void export( UniformVolumeManager volumeManager ) throws IOException, SQLException {
+        this.channelExporter.export(this, volumeManager);
     }
 }

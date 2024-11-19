@@ -25,6 +25,8 @@ import com.pinecone.hydra.storage.file.source.RemoteFrameManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicMetaManipulator;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
+import com.pinecone.hydra.storage.file.transmit.receiver.channel.GenericChannelReceiveEntity;
+import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
@@ -38,6 +40,9 @@ import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
 import com.pinecone.ulf.util.id.GUIDs;
 
+import java.io.IOException;
+import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -136,6 +141,12 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     @Override
     public FileTreeNode get( GUID guid ) {
         return (FileTreeNode) super.get( guid );
+    }
+
+    @Override
+    public void update(FileTreeNode node) {
+        TreeNodeOperator operator = this.operatorFactory.getOperator(node.getMetaType());
+        operator.update( node );
     }
 
     @Override
@@ -423,6 +434,12 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
             long segId = longFrameEntry.getValue().getSegId();
             //this.upload0(file, destDirPath, segId);
         }
+    }
+
+    @Override
+    public void channelReceiveFile(LogicVolume volume, String destDirPath, FileNode fileNode, FileChannel channel) throws SQLException, IOException {
+        GenericChannelReceiveEntity receiveEntity = new GenericChannelReceiveEntity(this, destDirPath, fileNode, channel);
+        receiveEntity.receive( volume );
     }
 
     private String getNodeName(DistributedTreeNode node ){

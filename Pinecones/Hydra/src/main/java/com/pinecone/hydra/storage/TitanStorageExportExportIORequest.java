@@ -2,7 +2,7 @@ package com.pinecone.hydra.storage;
 
 import com.pinecone.framework.util.id.GUID;
 
-public class TitanStorageIORequest implements StorageIORequest {
+public class TitanStorageExportExportIORequest implements StorageExportIORequest {
     private String sourceName;
     private String crc32;
     private Number size;

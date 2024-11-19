@@ -4,9 +4,9 @@ import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 
 public abstract class ArchReceiveEntity implements ReceiveEntity{
-    private KOMFileSystem fileSystem;
-    private String        destDirPath;
-    private FileNode file;
+    protected KOMFileSystem fileSystem;
+    protected String        destDirPath;
+    protected FileNode      file;
 
     public ArchReceiveEntity( KOMFileSystem fileSystem,String destDirPath,FileNode file ){
         this.fileSystem = fileSystem;

@@ -1,16 +1,17 @@
 package com.pinecone.hydra.storage.volume.entity;
 
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 
 public abstract class ArchReceiveEntity implements ReceiveEntity{
     protected VolumeManager volumeManager;
 
-    protected ReceiveStorageObject receiveStorageObject;
+    protected StorageReceiveIORequest storageReceiveIORequest;
 
 
-    public ArchReceiveEntity(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject ){
+    public ArchReceiveEntity(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest){
         this.volumeManager = volumeManager;
-        this.receiveStorageObject = receiveStorageObject;
+        this.storageReceiveIORequest = storageReceiveIORequest;
     }
 
 
@@ -25,13 +26,13 @@ public abstract class ArchReceiveEntity implements ReceiveEntity{
     }
 
     @Override
-    public ReceiveStorageObject getReceiveStorageObject() {
-        return this.receiveStorageObject;
+    public StorageReceiveIORequest getReceiveStorageObject() {
+        return this.storageReceiveIORequest;
     }
 
     @Override
-    public void setReceiveStorageObject(ReceiveStorageObject receiveStorageObject) {
-        this.receiveStorageObject = receiveStorageObject;
+    public void setReceiveStorageObject(StorageReceiveIORequest storageReceiveIORequest) {
+        this.storageReceiveIORequest = storageReceiveIORequest;
     }
 
 }

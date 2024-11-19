@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
 public class RabbitMQClient implements Pinenut {
-    protected Hydrarum mSystem;
+    protected Hydrarum       mSystem;
     protected JSONObject     mjoSectionConf;
     protected String         mszHost;
     protected short          mnPort;

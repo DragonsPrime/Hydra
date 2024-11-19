@@ -3,7 +3,7 @@ package com.pinecone.hydra.storage.volume.entity.local.simple.recevice;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchReceiveEntity;
-import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 
 import java.io.IOException;
@@ -16,8 +16,8 @@ public class TitanSimpleChannelReceiverEntity64 extends ArchReceiveEntity implem
     private SimpleVolume simpleVolume;
     private SimpleChannelReceiver64 titanSimpleChannelReceiver64;
 
-    public TitanSimpleChannelReceiverEntity64(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, FileChannel channel, SimpleVolume simpleVolume) {
-        super(volumeManager, receiveStorageObject);
+    public TitanSimpleChannelReceiverEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, FileChannel channel, SimpleVolume simpleVolume) {
+        super(volumeManager, storageReceiveIORequest);
         this.channel = channel;
         this.simpleVolume = simpleVolume;
         this.titanSimpleChannelReceiver64 = new TitanSimpleChannelReceiver64( this );

@@ -2,7 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.striped.export;
 
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
-import com.pinecone.hydra.storage.StorageIORequest;
+import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 
 import java.io.IOException;
@@ -14,7 +14,7 @@ public interface StripedChannelExport extends StripedExport{
 
     VolumeManager getVolumeManager();
 
-    StorageIORequest getStorageIORequest();
+    StorageExportIORequest getStorageIORequest();
 
     FileChannel getFileChannel();
 
