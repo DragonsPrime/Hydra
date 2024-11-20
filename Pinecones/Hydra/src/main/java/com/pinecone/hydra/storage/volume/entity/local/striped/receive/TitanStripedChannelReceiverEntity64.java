@@ -11,8 +11,8 @@ import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 
 public class TitanStripedChannelReceiverEntity64 extends ArchReceiveEntity implements StripedChannelReceiverEntity64{
-    private FileChannel channel;
-    private StripedVolume stripedVolume;
+    private FileChannel              channel;
+    private StripedVolume            stripedVolume;
     private StripedChannelReceiver64 stripedChannelReceiver64;
     public TitanStripedChannelReceiverEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, FileChannel channel, StripedVolume stripedVolume) {
         super(volumeManager, storageReceiveIORequest);
@@ -43,6 +43,6 @@ public class TitanStripedChannelReceiverEntity64 extends ArchReceiveEntity imple
 
     @Override
     public StorageIOResponse receive(Number offset, Number endSize) throws IOException {
-        return null;
+        return this.stripedChannelReceiver64.channelReceive( offset, endSize );
     }
 }

@@ -9,12 +9,13 @@ import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.LocalFrame;
 import com.pinecone.hydra.storage.file.entity.RemoteFrame;
-import com.pinecone.hydra.storage.file.transmit.SourceJson;
+import com.pinecone.hydra.storage.file.transmit.UniformSourceLocator;
 import com.pinecone.hydra.storage.file.transmit.receiver.ArchReceiver;
 import com.pinecone.hydra.storage.file.transmit.receiver.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.TitanStorageReceiveIORequest;
+import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.io.IOException;
@@ -144,14 +145,24 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
             storageReceiveIORequest.setSize( file.getDefinitionSize() );
             storageReceiveIORequest.setName( file.getName() );
             storageReceiveIORequest.setStorageObjectGuid( localFrame.getSegGuid() );
-            StorageIOResponse storageIOResponse = volume.channelReceive(storageReceiveIORequest, fileChannel, currentPosition, endSize);
+            StorageIOResponse storageIOResponse = null;
+            if( volume instanceof StripedVolume){
+                 storageIOResponse = volume.channelReceive(storageReceiveIORequest, fileChannel);
+                 endSize = file.getDefinitionSize();
+            }
+            else {
+                 storageIOResponse = volume.channelReceive(storageReceiveIORequest, fileChannel, currentPosition, endSize);
+            }
 
-            SourceJson sourceJson = new SourceJson();
-            sourceJson.setSourceName( storageIOResponse.getSourceName() );
-            sourceJson.setVolumeGuid( volume.getGuid().toString() );
+
+            UniformSourceLocator uniformSourceLocator = new UniformSourceLocator();
+            if( storageIOResponse != null ){
+                uniformSourceLocator.setSourceName( storageIOResponse.getSourceName() );
+                localFrame.setCrc32( storageIOResponse.getCre32() );
+            }
+            uniformSourceLocator.setVolumeGuid( volume.getGuid().toString() );
             localFrame.setSize( endSize );
-            localFrame.setSourceName( sourceJson.toJSONString() );
-            localFrame.setCrc32( storageIOResponse.getCre32() );
+            localFrame.setSourceName( uniformSourceLocator.toJSONString() );
             localFrame.setFileGuid( file.getGuid() );
             localFrame.setSegId( segId );
 

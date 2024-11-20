@@ -4,6 +4,7 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
+import com.pinecone.hydra.storage.InputChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
@@ -88,6 +89,12 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     public StorageIOResponse channelRaid0Export(StorageExportIORequest storageExportIORequest, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException, SQLException {
         TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeManager, storageExportIORequest, channel );
         return titanSimpleChannelExportEntity64.raid0Export( cacheBlock, offset, endSize, buffer );
+    }
+
+    @Override
+    public StorageIOResponse receive(InputChannel inputChannel) {
+
+        return null;
     }
 
     @Override

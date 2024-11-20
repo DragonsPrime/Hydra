@@ -38,7 +38,7 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
 
     @Override
     public void createKVFSMetaTable(MappedExecutor mappedExecutor) throws SQLException {
-        mappedExecutor.execute( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36) , `storage_object_name` VARCHAR(36));", false );
+        mappedExecutor.execute( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36) , `storage_object_name` VARCHAR(36), `source_name` VARCHAR(330) );", false );
     }
 
     @Override
@@ -59,7 +59,9 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
 
     @Override
     public int KVFSHash(GUID keyGuid, int volumeNum) {
-         return ( keyGuid.hashCode() ^ 137 ) % volumeNum ;
+        int hash = (keyGuid.hashCode() ^ 137) % volumeNum;
+        hash = (hash ^ (hash >> 31)) - (hash >> 31);
+        return hash;
     }
 
     @Override

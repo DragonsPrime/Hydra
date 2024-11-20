@@ -2,6 +2,7 @@ package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
+import com.pinecone.hydra.storage.InputChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
@@ -49,6 +50,8 @@ public interface LogicVolume extends Volume, TreeNode {
     StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, FileChannel channel, Number offset, Number endSize ) throws IOException, SQLException;
     StorageIOResponse channelExport      (StorageExportIORequest storageExportIORequest, FileChannel channel ) throws IOException, SQLException;
     StorageIOResponse channelRaid0Export (StorageExportIORequest storageExportIORequest, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException, SQLException;
+
+    StorageIOResponse receive( InputChannel inputChannel );
 
     boolean existStorageObject( GUID storageObject ) throws SQLException;
 

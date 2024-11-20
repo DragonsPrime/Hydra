@@ -26,7 +26,7 @@ import java.util.List;
 public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
     private FileChannel                 fileChannel;
     private VolumeManager               volumeManager;
-    private StorageReceiveIORequest storageReceiveIORequest;
+    private StorageReceiveIORequest     storageReceiveIORequest;
     private StripedVolume               stripedVolume;
     private ReceiveEntity               entity;
     private OnVolumeFileSystem          kenVolumeFileSystem;

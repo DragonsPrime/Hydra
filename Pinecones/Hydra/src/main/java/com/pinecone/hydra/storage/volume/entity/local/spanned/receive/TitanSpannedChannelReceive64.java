@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.spanned.receive;
 
+import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
@@ -60,7 +61,9 @@ public class TitanSpannedChannelReceive64 implements SpannedChannelReceive64{
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
         SQLiteExecutor sqLiteExecutor = this.getSQLiteExecutor(physicalVolume);
         int idx = this.kenVolumeFileSystem.KVFSHash(this.storageReceiveIORequest.getStorageObjectGuid(), volumes.size());
+        Debug.trace("存储的GUID是："+storageReceiveIORequest.getStorageObjectGuid());
         GUID volumeGuid = this.kenVolumeFileSystem.getKVFSIndexTableTargetGuid(sqLiteExecutor, idx);
+        Debug.trace( volumeGuid );
         LogicVolume targetVolume = this.volumeManager.get(volumeGuid);
 
 

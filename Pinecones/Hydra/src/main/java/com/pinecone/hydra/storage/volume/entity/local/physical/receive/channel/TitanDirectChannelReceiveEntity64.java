@@ -9,8 +9,8 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 
 public class TitanDirectChannelReceiveEntity64 extends ArchReceiveEntity implements DirectChannelReceiveEntity64{
-    private FileChannel channel;
-    private String      destDirPath;
+    private FileChannel     channel;
+    private String          destDirPath;
 
     public TitanDirectChannelReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, String destDirPath, FileChannel channel) {
         super(volumeManager, storageReceiveIORequest);

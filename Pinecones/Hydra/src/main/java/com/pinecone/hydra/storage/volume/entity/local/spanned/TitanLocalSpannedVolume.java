@@ -72,7 +72,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
     public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, FileChannel channel, Number offset, Number endSize) throws IOException, SQLException {
         TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeManager, storageReceiveIORequest,channel,this );
         StorageIOResponse storageIOResponse = titanSpannedChannelReceiveEntity64.receive( offset, endSize );
-        storageIOResponse.setBottomGuid( this.guid );
+        //storageIOResponse.setBottomGuid( this.guid );
         return storageIOResponse;
     }
 

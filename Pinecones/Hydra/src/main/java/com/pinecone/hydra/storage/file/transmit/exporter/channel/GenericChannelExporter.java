@@ -6,7 +6,7 @@ import com.pinecone.hydra.storage.TitanStorageExportExportIORequest;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.Frame;
 import com.pinecone.hydra.storage.file.entity.LocalFrame;
-import com.pinecone.hydra.storage.file.transmit.SourceJson;
+import com.pinecone.hydra.storage.file.transmit.UniformSourceLocator;
 import com.pinecone.hydra.storage.file.transmit.exporter.ArchExporter;
 import com.pinecone.hydra.storage.file.transmit.exporter.ExporterEntity;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
@@ -33,9 +33,9 @@ public class GenericChannelExporter extends ArchExporter implements ChannelExpor
             titanExportStorageObject.setSize( frame.getSize() );
             titanExportStorageObject.setStorageObjectGuid( frame.getSegGuid() );
             String sourceName = frame.getSourceName();
-            SourceJson sourceJson = JSON.unmarshal(sourceName, SourceJson.class);
-            titanExportStorageObject.setSourceName( sourceJson.getSourceName() );
-            LogicVolume volume = volumeManager.get(GUIDs.GUID72(sourceJson.getVolumeGuid()));
+            UniformSourceLocator uniformSourceLocator = JSON.unmarshal(sourceName, UniformSourceLocator.class);
+            titanExportStorageObject.setSourceName( uniformSourceLocator.getSourceName() );
+            LogicVolume volume = volumeManager.get(GUIDs.GUID72(uniformSourceLocator.getVolumeGuid()));
             volume.channelExport( titanExportStorageObject, fileChannel );
         }
     }

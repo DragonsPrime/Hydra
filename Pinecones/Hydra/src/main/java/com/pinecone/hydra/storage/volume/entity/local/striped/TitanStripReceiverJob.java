@@ -21,11 +21,10 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
     private int                     jobCode;
     private VolumeManager           volumeManager;
     private StorageReceiveIORequest object;
-    private String                  destDirPath;
     private FileChannel             fileChannel;
     private OnVolumeFileSystem      kenVolumeFileSystem;
     private MappedExecutor          executor;
-    private StorageIOResponse storageIOResponse;
+    private StorageIOResponse       storageIOResponse;
 
 
     public TitanStripReceiverJob(ReceiveEntity entity, FileChannel channel, int jobCount, int jobCode, LogicVolume volume, MappedExecutor executor ){
@@ -43,7 +42,6 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
     public void execute()  {
         //每次计算要保存的部分
         long size = this.object.getSize().longValue();
-        int sequenceNumber = jobCode;
         long stripSize = this.volumeManager.getConfig().getDefaultStripSize().longValue();
         long currentPosition = jobCode * stripSize;
 
