@@ -4,6 +4,7 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
+import com.pinecone.hydra.storage.InputChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
@@ -106,5 +107,10 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
     @Override
     public void storageExpansion(GUID volumeGuid) {
         this.volumeManager.storageExpansion( this.getGuid(), volumeGuid );
+    }
+
+    @Override
+    public StorageIOResponse receive(InputChannel inputChannel) {
+        return null;
     }
 }

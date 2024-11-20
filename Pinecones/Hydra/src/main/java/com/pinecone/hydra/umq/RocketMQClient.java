@@ -1,4 +1,4 @@
-package com.pinecone.hydra.kanina;
+package com.pinecone.hydra.umq;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 import org.apache.rocketmq.client.exception.MQClientException;

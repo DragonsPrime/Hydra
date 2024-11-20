@@ -10,6 +10,8 @@ import com.google.protobuf.DynamicMessage;
 import com.pinecone.framework.system.prototype.Pinenut;
 
 public interface BeanProtobufEncoder extends Pinenut {
+    BeanProtobufEncoder DefaultEncoder = new GenericBeanProtobufEncoder();
+
     Descriptors.Descriptor transform( Object dynamicObject, Set<String > exceptedKeys, Options options );
 
     Descriptors.Descriptor transform( Map dynamicObject, Set<String > exceptedKeys, Options options );
@@ -23,7 +25,19 @@ public interface BeanProtobufEncoder extends Pinenut {
     Descriptors.Descriptor transform( Class<?> clazz, Object dynamicObject, Set<String > exceptedKeys, Options options );
 
     default Descriptors.Descriptor transform( Class<?> clazz, Object dynamicObject, Set<String > exceptedKeys ) {
+        Descriptors.Descriptor primitiveDesc = this.transformPrimitive( clazz, dynamicObject );
+        if( primitiveDesc != null ) {
+            return primitiveDesc;
+        }
         return this.transform( clazz, dynamicObject, exceptedKeys, Options.DefaultOptions );
+    }
+
+    default Descriptors.Descriptor transformPrimitive( Class<?> clazz, Object dynamicObject ) {
+        if( PrimitiveWrapper.isSupportedPrimitive( clazz ) ) {
+            return PrimitiveWrapper.transform( dynamicObject );
+        }
+
+        return null;
     }
 
     DescriptorProtos.FieldDescriptorProto.Type reinterpret( Class<?> type );

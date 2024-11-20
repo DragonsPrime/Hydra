@@ -2,6 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.mirrored;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
+import com.pinecone.hydra.storage.InputChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
@@ -38,6 +39,10 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
         return this.toJSONString();
     }
 
+    @Override
+    public StorageIOResponse receive(InputChannel inputChannel) {
+        return null;
+    }
 
     @Override
     public void extendLogicalVolume(GUID physicalGuid) {

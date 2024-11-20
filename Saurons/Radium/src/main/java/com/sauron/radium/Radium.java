@@ -13,7 +13,7 @@ import com.sauron.radium.system.*;
 import com.pinecone.framework.unit.MultiScopeMap;
 import com.pinecone.framework.util.config.JSONSystemConfig;
 import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.kanina.RabbitMQClient;
+import com.pinecone.hydra.umq.RabbitMQClient;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.io.Tracerson;
 import com.pinecone.framework.util.json.homotype.DirectObjectInjector;

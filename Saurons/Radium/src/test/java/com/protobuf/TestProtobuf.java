@@ -92,6 +92,8 @@ class Appleby extends JesusChrist {
         //this.testDynamic();
 
         this.testDynamicUMCT();
+
+        //this.testElementRroto();
     }
 
     private void testDynamic() throws Exception {
@@ -194,6 +196,22 @@ class Appleby extends JesusChrist {
 //        Debug.trace( message.getField( descriptor.findFieldByName( "values" )  ) );
 
 
+    }
+
+    private void testElementRroto() throws Exception {
+        String sz = "miaomiao";
+
+        GenericBeanProtobufEncoder encoder = new GenericBeanProtobufEncoder();
+        Descriptors.Descriptor descriptor = encoder.transform( String.class, sz, Set.of() );
+        Debug.trace( descriptor.getFields() );
+
+        Options options = new Options();
+        DynamicMessage message = encoder.encode( descriptor, sz, Set.of(), options );
+        Debug.trace( message.getAllFields() );
+
+        GenericBeanProtobufDecoder decoder = new GenericBeanProtobufDecoder();
+        var dm = decoder.decode( String.class, descriptor, message, Set.of(), options );
+        Debug.purplef( dm );
     }
 
 }

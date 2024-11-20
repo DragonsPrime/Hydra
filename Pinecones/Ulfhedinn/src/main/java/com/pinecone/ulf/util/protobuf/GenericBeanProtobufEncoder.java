@@ -315,7 +315,10 @@ public class GenericBeanProtobufEncoder implements BeanProtobufEncoder {
 
     @Override
     public DynamicMessage encode( Descriptors.Descriptor descriptor, Object dynamicObject, Set<String> exceptedKeys, Options options ) {
-        if( dynamicObject instanceof Map ) {
+        if( PrimitiveWrapper.isSupportedPrimitive( dynamicObject.getClass() ) ) {
+            dynamicObject = PrimitiveWrapper.wrap( dynamicObject );
+        }
+        else if( dynamicObject instanceof Map ) {
             return this.encode( descriptor, (Map) dynamicObject, exceptedKeys, options );
         }
 

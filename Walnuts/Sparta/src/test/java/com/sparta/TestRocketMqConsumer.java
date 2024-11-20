@@ -1,6 +1,6 @@
 package com.sparta;
 
-import com.pinecone.hydra.kanina.RocketMQConsumer;
+import com.pinecone.hydra.umq.RocketMQConsumer;
 
 public class TestRocketMqConsumer {
     public static void main(String[] args) {

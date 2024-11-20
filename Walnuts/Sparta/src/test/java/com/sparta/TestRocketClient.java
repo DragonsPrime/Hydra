@@ -1,6 +1,6 @@
 package com.sparta;
 
-import com.pinecone.hydra.kanina.RocketMQClient;
+import com.pinecone.hydra.umq.RocketMQClient;
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.remoting.common.RemotingHelper;
 

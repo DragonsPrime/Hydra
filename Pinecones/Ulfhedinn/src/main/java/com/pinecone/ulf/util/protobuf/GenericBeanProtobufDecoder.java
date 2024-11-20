@@ -16,7 +16,10 @@ import com.pinecone.framework.unit.Units;
 public class GenericBeanProtobufDecoder implements BeanProtobufDecoder {
     @Override
     public <T> T decode( Class<T> clazz, Descriptors.Descriptor descriptor, DynamicMessage dynamicMessage, Set<String> exceptedKeys, Options options ) {
-        if( Map.class.isAssignableFrom( clazz ) ) {
+        if( PrimitiveWrapper.isSupportedPrimitive( clazz ) ) {
+            return clazz.cast( dynamicMessage.getField( descriptor.findFieldByName( PrimitiveWrapper.FieldName ) ) );
+        }
+        else if( Map.class.isAssignableFrom( clazz ) ) {
             if( clazz.isInterface() && Map.class.isAssignableFrom( clazz ) ) {
                 clazz = options.getDefaultMapType();
             }
