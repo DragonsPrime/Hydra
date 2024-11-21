@@ -30,6 +30,67 @@ public class GenericBeanProtobufEncoder implements BeanProtobufEncoder {
         return this.transform( dynamicObject.getClass(), dynamicObject, exceptedKeys, options );
     }
 
+    protected DescriptorProtos.FieldDescriptorProto.Builder transformEntry(
+            String key, Object value, int fieldNumber, List<Descriptors.FileDescriptor> dependencies,
+            Set<String> exceptedKeys, Options options, String thisKey
+    ) {
+        DescriptorProtos.FieldDescriptorProto.Type fieldType = value == null
+                ? DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING // Default for null values
+                : this.reinterpret( value.getClass() );
+
+
+        DescriptorProtos.FieldDescriptorProto.Builder fieldBuilder;
+        if( value != null ) {
+            Class<?> elemType = value.getClass();
+            if( Collection.class.isAssignableFrom( elemType ) ) {
+                Collection co = (Collection) value;
+                if( co.isEmpty() ) {
+                    fieldType = DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING;
+                }
+                else {
+                    fieldType = this.reinterpret( co.iterator().next().getClass() );
+                }
+
+                fieldBuilder = DescriptorProtos.FieldDescriptorProto.newBuilder()
+                        .setName( key )
+                        .setNumber( fieldNumber )
+                        .setType( fieldType )
+                        .setLabel( DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED );
+            }
+            else if( elemType.isArray() ) {
+                fieldType = this.reinterpret( elemType.getComponentType() );
+
+                fieldBuilder = DescriptorProtos.FieldDescriptorProto.newBuilder()
+                        .setName( key )
+                        .setNumber( fieldNumber )
+                        .setType( this.reinterpret( elemType.getComponentType() ) )
+                        .setLabel( DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED );
+            }
+            else {
+                fieldBuilder = DescriptorProtos.FieldDescriptorProto.newBuilder()
+                        .setName( key )
+                        .setNumber( fieldNumber )
+                        .setType( fieldType );
+            }
+        }
+        else {
+            fieldBuilder = DescriptorProtos.FieldDescriptorProto.newBuilder()
+                    .setName( key )
+                    .setNumber( fieldNumber )
+                    .setType( fieldType );
+        }
+
+        if ( fieldType == DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE ) {
+            Descriptors.Descriptor nestedDescriptor = this.transform0( value.getClass(), thisKey, value, exceptedKeys, options );
+            if ( nestedDescriptor != null ) {
+                fieldBuilder.setTypeName( nestedDescriptor.getFullName() );
+                dependencies.add( nestedDescriptor.getFile() );
+            }
+        }
+
+        return fieldBuilder;
+    }
+
     protected Descriptors.Descriptor transform0( Map dynamicObject, String thisKey, Set<String> exceptedKeys, Options options ) {
         if ( dynamicObject == null ) {
             return null;
@@ -49,79 +110,36 @@ public class GenericBeanProtobufEncoder implements BeanProtobufEncoder {
                     continue;
                 }
 
-                Object value = entry.getValue();
-                DescriptorProtos.FieldDescriptorProto.Type fieldType = value == null
-                        ? DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING // Default for null values
-                        : this.reinterpret( value.getClass() );
+                DescriptorProtos.FieldDescriptorProto.Builder fieldBuilder = this.transformEntry(
+                        key, entry.getValue(), fieldNumber, dependencies, exceptedKeys, options, szEntityName + "_" + key
+                );
 
-
-                DescriptorProtos.FieldDescriptorProto.Builder fieldBuilder;
-                if( value != null ) {
-                    Class<?> elemType = value.getClass();
-                    if( Collection.class.isAssignableFrom( elemType ) ) {
-                        Collection co = (Collection) value;
-                        if( co.isEmpty() ) {
-                            fieldType = DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING;
-                        }
-                        else {
-                            fieldType = this.reinterpret( co.iterator().next().getClass() );
-                        }
-
-                        fieldBuilder = DescriptorProtos.FieldDescriptorProto.newBuilder()
-                                .setName( key )
-                                .setNumber( fieldNumber )
-                                .setType( fieldType )
-                                .setLabel( DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED );
-                    }
-                    else if( elemType.isArray() ) {
-                        fieldType = this.reinterpret( elemType.getComponentType() );
-
-                        fieldBuilder = DescriptorProtos.FieldDescriptorProto.newBuilder()
-                                .setName( key )
-                                .setNumber( fieldNumber )
-                                .setType( this.reinterpret( elemType.getComponentType() ) )
-                                .setLabel( DescriptorProtos.FieldDescriptorProto.Label.LABEL_REPEATED );
-                    }
-                    else {
-                        fieldBuilder = DescriptorProtos.FieldDescriptorProto.newBuilder()
-                                .setName( key )
-                                .setNumber( fieldNumber )
-                                .setType( fieldType );
-                    }
-                }
-                else {
-                    fieldBuilder = DescriptorProtos.FieldDescriptorProto.newBuilder()
-                            .setName( key )
-                            .setNumber( fieldNumber )
-                            .setType( fieldType );
-                }
-
-                fieldNumber++;
-                if ( fieldType == DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE ) {
-                    Descriptors.Descriptor nestedDescriptor = this.transform0( value.getClass(), szEntityName + "_" + key, value, exceptedKeys, options );
-                    if ( nestedDescriptor != null ) {
-                        fieldBuilder.setTypeName( nestedDescriptor.getFullName() );
-                        dependencies.add( nestedDescriptor.getFile() );
-                    }
-                }
                 descriptorBuilder.addField( fieldBuilder );
+                ++fieldNumber;
             }
 
             descriptorBuilder.setName( szEntityName );
-            Descriptors.FileDescriptor[] dependencyArray = dependencies.toArray( new Descriptors.FileDescriptor[0] );
-            Descriptors.FileDescriptor fileDescriptor = Descriptors.FileDescriptor.buildFrom(
-                    DescriptorProtos.FileDescriptorProto.newBuilder()
-                            .setName( szEntityName + options.getDescriptorFileExtend() )
-                            .addMessageType( descriptorBuilder.build() )
-                            .build(),
-                    dependencyArray);
-
+            Descriptors.FileDescriptor fileDescriptor = this.evalMessageType( dependencies, descriptorBuilder, szEntityName, options );
             return fileDescriptor.findMessageTypeByName( szEntityName );
         }
         catch ( Descriptors.DescriptorValidationException e ) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    protected Descriptors.FileDescriptor evalMessageType (
+            List<Descriptors.FileDescriptor> dependencies, DescriptorProtos.DescriptorProto.Builder descriptorBuilder, String szEntityName, Options options
+    ) throws Descriptors.DescriptorValidationException {
+        Descriptors.FileDescriptor[] dependencyArray = dependencies.toArray( new Descriptors.FileDescriptor[0] );
+        Descriptors.FileDescriptor fileDescriptor = Descriptors.FileDescriptor.buildFrom(
+                DescriptorProtos.FileDescriptorProto.newBuilder()
+                        .setName( szEntityName + options.getDescriptorFileExtend() )
+                        .addMessageType( descriptorBuilder.build() )
+                        .build(),
+                dependencyArray);
+
+        return fileDescriptor;
     }
 
     @Override
@@ -245,14 +263,7 @@ public class GenericBeanProtobufEncoder implements BeanProtobufEncoder {
                 }
             }
 
-            Descriptors.FileDescriptor[] dependencyArray = dependencies.toArray( new Descriptors.FileDescriptor[0] );
-            Descriptors.FileDescriptor fileDescriptor = Descriptors.FileDescriptor.buildFrom(
-                    DescriptorProtos.FileDescriptorProto.newBuilder()
-                            .setName( szEntityName + options.getDescriptorFileExtend() )
-                            .addMessageType( descriptorBuilder.build() )
-                            .build(),
-                    dependencyArray );
-
+            Descriptors.FileDescriptor fileDescriptor = this.evalMessageType( dependencies, descriptorBuilder, szEntityName, options );
             return fileDescriptor.findMessageTypeByName( szEntityName );
         }
         catch ( Descriptors.DescriptorValidationException e ) {
@@ -406,42 +417,7 @@ public class GenericBeanProtobufEncoder implements BeanProtobufEncoder {
             for ( Object em : dynamicObject.entrySet() ) {
                 Map.Entry entry = (Map.Entry) em;
 
-                String key = entry.getKey().toString();
-                if ( exceptedKeys != null && exceptedKeys.contains( key ) ) {
-                    continue;
-                }
-
-                Descriptors.FieldDescriptor fieldDescriptor = descriptor.findFieldByName( key );
-                if ( fieldDescriptor == null ) {
-                    continue;
-                }
-
-                Object value = entry.getValue();
-                if ( value == null ) {
-                    if ( fieldDescriptor.isRepeated() ) {
-                        messageBuilder.setField( fieldDescriptor, new ArrayList<>() );
-                    }
-                    else {
-                        messageBuilder.clearField( fieldDescriptor );
-                    }
-                }
-                else if ( fieldDescriptor.isRepeated() ) {
-                    List<Object> values = new ArrayList<>();
-                    if ( value instanceof Collection ) {
-                        for ( Object item : (Collection<?>) value ) {
-                            values.add( this.reinterpretFieldValue( item, fieldDescriptor.getType() ) );
-                        }
-                    }
-                    else if ( value.getClass().isArray() ) {
-                        for ( int i = 0; i < Array.getLength( value ); i++ ) {
-                            values.add( this.reinterpretFieldValue( Array.get( value, i ), fieldDescriptor.getType() ) );
-                        }
-                    }
-                    messageBuilder.setField( fieldDescriptor, values );
-                }
-                else {
-                    this.encodeElement( fieldDescriptor, messageBuilder, value, exceptedKeys, options );
-                }
+                this.encodeEntry( descriptor, entry.getKey().toString(), entry.getValue(), messageBuilder, exceptedKeys, options );
             }
 
             return messageBuilder.build();
@@ -449,6 +425,43 @@ public class GenericBeanProtobufEncoder implements BeanProtobufEncoder {
         catch ( Exception e ) {
             e.printStackTrace();
             return null;
+        }
+    }
+
+    public void encodeEntry( Descriptors.Descriptor descriptor, String key, Object value, DynamicMessage.Builder messageBuilder, Set<String> exceptedKeys, Options options ) {
+        if ( exceptedKeys != null && exceptedKeys.contains( key ) ) {
+            return;
+        }
+
+        Descriptors.FieldDescriptor fieldDescriptor = descriptor.findFieldByName( key );
+        if ( fieldDescriptor == null ) {
+            return;
+        }
+
+        if ( value == null ) {
+            if ( fieldDescriptor.isRepeated() ) {
+                messageBuilder.setField( fieldDescriptor, new ArrayList<>() );
+            }
+            else {
+                messageBuilder.clearField( fieldDescriptor );
+            }
+        }
+        else if ( fieldDescriptor.isRepeated() ) {
+            List<Object> values = new ArrayList<>();
+            if ( value instanceof Collection ) {
+                for ( Object item : (Collection<?>) value ) {
+                    values.add( this.reinterpretFieldValue( item, fieldDescriptor.getType() ) );
+                }
+            }
+            else if ( value.getClass().isArray() ) {
+                for ( int i = 0; i < Array.getLength( value ); i++ ) {
+                    values.add( this.reinterpretFieldValue( Array.get( value, i ), fieldDescriptor.getType() ) );
+                }
+            }
+            messageBuilder.setField( fieldDescriptor, values );
+        }
+        else {
+            this.encodeElement( fieldDescriptor, messageBuilder, value, exceptedKeys, options );
         }
     }
 

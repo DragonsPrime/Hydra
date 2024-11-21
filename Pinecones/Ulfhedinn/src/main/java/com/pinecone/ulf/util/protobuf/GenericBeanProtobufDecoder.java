@@ -138,7 +138,15 @@ public class GenericBeanProtobufDecoder implements BeanProtobufDecoder {
                             Descriptors.Descriptor nestedDescriptor = fieldDescriptor.getMessageType();
                             Class<?>[] pars = setter.getParameterTypes();
                             if( pars.length > 0 ) {
-                                Object nestedBean = this.decode( pars[ 0 ], nestedDescriptor, (DynamicMessage) value, exceptedKeys, options );
+                                Object nestedBean;
+                                Class<?> nestedType = pars[ 0 ];
+                                if( nestedType.equals( Map.class ) ) {
+                                    nestedBean = this.decodeMap( nestedType, nestedDescriptor, (DynamicMessage) value, exceptedKeys, options );
+                                }
+                                else {
+                                    nestedBean = this.decode( nestedType, nestedDescriptor, (DynamicMessage) value, exceptedKeys, options );
+                                }
+
                                 setter.invoke( bean, nestedBean );
                             }
                         }

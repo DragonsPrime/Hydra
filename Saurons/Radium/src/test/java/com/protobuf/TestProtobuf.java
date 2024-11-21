@@ -1,7 +1,7 @@
 package com.protobuf;
 
 import java.io.FileOutputStream;
-import java.util.List;
+import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,11 +11,14 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.mc.JesusChrist;
 import com.pinecone.Pinecone;
+import com.pinecone.framework.lang.FieldEntity;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.JSON;
 import com.pinecone.ulf.util.protobuf.GenericBeanProtobufDecoder;
 import com.pinecone.ulf.util.protobuf.GenericBeanProtobufEncoder;
+import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
+import com.pinecone.ulf.util.protobuf.GenericFieldProtobufEncoder;
 import com.pinecone.ulf.util.protobuf.Options;
 
 class DynamicProtobufBuilder {
@@ -91,9 +94,13 @@ class Appleby extends JesusChrist {
 
         //this.testDynamic();
 
-        this.testDynamicUMCT();
+        //this.testDynamicUMCT();
 
         //this.testElementRroto();
+
+        //this.testFieldEntry();
+
+        this.testReflect();
     }
 
     private void testDynamic() throws Exception {
@@ -212,6 +219,72 @@ class Appleby extends JesusChrist {
         GenericBeanProtobufDecoder decoder = new GenericBeanProtobufDecoder();
         var dm = decoder.decode( String.class, descriptor, message, Set.of(), options );
         Debug.purplef( dm );
+    }
+
+    private void testFieldEntry() throws Exception {
+        GenericFieldProtobufEncoder encoder = new GenericFieldProtobufEncoder();
+
+
+        Map bear = JSON.unmarshal( "{ name: 'William', force: 320, values: [1,2,3], type: grizzly, trait: { species: mammal } }", Map.class );
+        Debug.trace( bear );
+        Options options = new Options();
+
+        FieldEntity[] entities = FieldEntity.from( bear );
+
+
+        Descriptors.Descriptor descriptor = encoder.transform( entities, "Args", Set.of(), options );
+        Debug.trace( descriptor.getFields() );
+        Debug.trace( descriptor.findFieldByName( "values" ).isRepeated() );
+        Debug.trace( descriptor.findFieldByName( "trait" ).getMessageType().getFields() );
+
+        DynamicMessage message = encoder.encode( descriptor, entities, Set.of(), options );
+        Debug.trace( message.getAllFields(), descriptor.findFieldByName( "trait" ).getMessageType().getFields() );
+        Debug.trace( message.getField( descriptor.findFieldByName( "values" )  ) );
+
+        byte[] rd = message.toByteArray();
+        DynamicMessage unmarshaled = DynamicMessage.parseFrom(descriptor, rd);
+        Debug.trace( unmarshaled.getAllFields() );
+        Debug.trace( unmarshaled.getField( descriptor.findFieldByName( "values" )  ) );
+
+
+
+        FieldEntity[] types = FieldEntity.typeFrom( bear );
+
+        GenericFieldProtobufDecoder decoder = new GenericFieldProtobufDecoder();
+        Map.Entry<String, Object>[] kvs = decoder.decodeEntries( descriptor, unmarshaled, Set.of(), options );
+        Debug.trace( kvs );
+
+        decoder.decodeEntries( types, descriptor, unmarshaled, Set.of(), options );
+        Debug.trace( types[4].getType() );
+
+        Object[] vals = decoder.decodeValues( types, descriptor, unmarshaled, Set.of(), options );
+        Debug.trace( vals );
+    }
+
+    private void testReflect() throws Exception {
+        GenericFieldProtobufEncoder encoder = new GenericFieldProtobufEncoder();
+        Options options = new Options();
+
+        GenericFieldProtobufDecoder decoder = new GenericFieldProtobufDecoder();
+
+        Method[] methods = Raccoon.class.getMethods();
+        for ( Method method : methods ) {
+            FieldEntity[] types = FieldEntity.from( method.getParameterTypes() );
+            Debug.trace( types );
+
+            types[ 0 ].setValue( "red_raccoon" );
+            types[ 1 ].setValue( 12345L );
+
+            Descriptors.Descriptor descriptor = encoder.transform( types, "Args", Set.of(), options );
+            Debug.trace( descriptor.getFields() );
+
+            DynamicMessage message = encoder.encode( descriptor, types, Set.of(), options );
+            Debug.trace( message.getAllFields() );
+
+            types = FieldEntity.from( method.getParameterTypes() );
+            Object[] vals = decoder.decodeValues( types, descriptor, message, Set.of(), options );
+            Debug.trace( vals );
+        }
     }
 
 }
