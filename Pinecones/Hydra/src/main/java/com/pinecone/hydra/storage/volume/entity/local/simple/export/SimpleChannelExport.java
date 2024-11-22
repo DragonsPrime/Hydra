@@ -8,5 +8,5 @@ import java.io.IOException;
 public interface SimpleChannelExport extends SimpleExporter{
 
     StorageIOResponse export() throws IOException;
-    StorageIOResponse raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException;
+    StorageIOResponse export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException;
 }

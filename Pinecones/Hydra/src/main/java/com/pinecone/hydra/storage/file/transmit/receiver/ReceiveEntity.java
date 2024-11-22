@@ -5,6 +5,10 @@ import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.transmit.receiver.channel.ChannelReceiverEntity;
 import com.pinecone.hydra.storage.file.transmit.receiver.stream.StreamReceiverEntity;
+import com.pinecone.hydra.storage.volume.entity.LogicVolume;
+
+import java.io.IOException;
+import java.sql.SQLException;
 
 public interface ReceiveEntity extends Pinenut {
     KOMFileSystem getFileSystem();
@@ -22,4 +26,9 @@ public interface ReceiveEntity extends Pinenut {
     default StreamReceiverEntity evinceStreamReceiverEntity(){
         return null;
     }
+
+    void receive(LogicVolume volume ) throws IOException, SQLException;
+    void receive( Number offset, Number endSize )throws IOException;
+
+
 }

@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
@@ -15,8 +16,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanStripBufferOutJob implements StripBufferOutJob {
     protected VolumeManager             volumeManager;
-    protected FileChannel               channel;
+    protected KChannel                  channel;
     protected int                       jobCount;
+
     protected StripBufferStatus         status;
     protected List< CacheBlock >        cacheBlocksGroup;
     protected AtomicInteger             currentPosition;
@@ -27,7 +29,7 @@ public class TitanStripBufferOutJob implements StripBufferOutJob {
     protected final Semaphore           mBlockerLatch;
     protected MasterVolumeGram          masterVolumeGram;
 
-    public TitanStripBufferOutJob(MasterVolumeGram masterVolumeGram, VolumeManager volumeManager, FileChannel channel, long totalSize, Semaphore blockerLatch){
+    public TitanStripBufferOutJob(MasterVolumeGram masterVolumeGram, VolumeManager volumeManager, KChannel channel, long totalSize, Semaphore blockerLatch){
         this.masterVolumeGram  = masterVolumeGram;
         this.volumeManager     = volumeManager;
         this.channel           = channel;
@@ -85,10 +87,12 @@ public class TitanStripBufferOutJob implements StripBufferOutJob {
             if (!writableCacheBlocks.isEmpty()){
                 Debug.trace("执行写入");
 
-                ByteBuffer buffer = this.mergeArrays( writableCacheBlocks );
+                //ByteBuffer buffer = this.mergeArrays( writableCacheBlocks );
                 //ByteBuffer writeBuffer = ByteBuffer.wrap(buffer, 0, buffer.length );
                 try {
-                    channel.write(buffer);
+                    //this.channel.write(buffer);
+                    int write = this.channel.write(this.mBuffer, writableCacheBlocks);
+                    this.exportSize += write;
                 }
                 catch (IOException e) {
                     throw new RuntimeException(e);
@@ -104,13 +108,17 @@ public class TitanStripBufferOutJob implements StripBufferOutJob {
                     CacheBlock cacheBlock = this.cacheBlocksGroup.get(i);
                     MasterVolumeGram masterVolumeGram = (MasterVolumeGram) this.parentThread.parentExecutum();
                     LocalStripedTaskThread bufferWriteThread = masterVolumeGram.getChildThread(cacheBlock.getBufferWriteThreadId());
-                    StripBufferStatus jobStatus = bufferWriteThread.getJobStatus();
-                    if( jobStatus == BufferWriteStatus.Suspended ){
-                        bufferWriteThread.setJobStatus( BufferWriteStatus.Writing );
-                        Semaphore jobLock = bufferWriteThread.getBlockerLatch();
-                        Debug.trace("线程"+bufferWriteThread.getName()+"被唤醒");
-                        jobLock.release();
+                    //当文件较小时，只有一个线程在执行写入且一次执行完就结束线程，可能会导致thread为null的情况
+                    if( bufferWriteThread != null ){
+                        StripBufferStatus jobStatus = bufferWriteThread.getJobStatus();
+                        if( jobStatus == BufferWriteStatus.Suspended ){
+                            bufferWriteThread.setJobStatus( BufferWriteStatus.Writing );
+                            Semaphore jobLock = bufferWriteThread.getBlockerLatch();
+                            Debug.trace("线程"+bufferWriteThread.getName()+"被唤醒");
+                            jobLock.release();
+                        }
                     }
+
                 }
             }
 
@@ -129,54 +137,54 @@ public class TitanStripBufferOutJob implements StripBufferOutJob {
         this.status = status;
     }
 
-    private int getCacheLength(){
-        int rounds = 0;
-        int length = 0;
-        for( int i = this.currentPosition.get(); i < this.cacheBlocksGroup.size(); i++ ){
-            if( i == currentPosition.get() && rounds == 1 ){
-                break;
-            }
-
-            CacheBlock cacheBlock = cacheBlocksGroup.get(i);
-            if( cacheBlock.getStatus() != CacheBlockStatus.Full){
-                return length;
-            }
-            length++;
-            if( i == this.cacheBlocksGroup.size() - 1 ){
-                rounds++;
-                i = -1;
-            }
-        }
-        return length;
-    }
-
-    private ByteBuffer mergeArrays( List< CacheBlock > writableCacheBlocks ){
-        // 计算所有缓存块的总长度
-        int totalLength = 0;
-        for (CacheBlock cacheBlock : writableCacheBlocks) {
-            totalLength += cacheBlock.getValidByteEnd().intValue() - cacheBlock.getValidByteStart().intValue();
-        }
-
-        // 创建一个 ByteBuffer 来存储合并的数据
-        ByteBuffer mergedBuffer = ByteBuffer.allocate(totalLength);
-
-        // 将数据从 mBuffer 复制到 mergedBuffer
-        for (CacheBlock cacheBlock : writableCacheBlocks) {
-            int start = cacheBlock.getValidByteStart().intValue();
-            int end = cacheBlock.getValidByteEnd().intValue();
-            int bufferSize = end - start;
-
-            // 将 mBuffer 中的数据复制到 mergedBuffer
-            mergedBuffer.put(mBuffer, start, bufferSize);
-
-            // 将缓存块状态设置为 Free
-            cacheBlock.setStatus(CacheBlockStatus.Free);
-        }
-        this.exportSize += totalLength;
-        // 准备将 mergedBuffer 用于读取
-        mergedBuffer.flip();
-        return mergedBuffer;
-    }
+//    private int getCacheLength(){
+//        int rounds = 0;
+//        int length = 0;
+//        for( int i = this.currentPosition.get(); i < this.cacheBlocksGroup.size(); i++ ){
+//            if( i == currentPosition.get() && rounds == 1 ){
+//                break;
+//            }
+//
+//            CacheBlock cacheBlock = cacheBlocksGroup.get(i);
+//            if( cacheBlock.getStatus() != CacheBlockStatus.Full){
+//                return length;
+//            }
+//            length++;
+//            if( i == this.cacheBlocksGroup.size() - 1 ){
+//                rounds++;
+//                i = -1;
+//            }
+//        }
+//        return length;
+//    }
+//
+//    private ByteBuffer mergeArrays( List< CacheBlock > writableCacheBlocks ){
+//        // 计算所有缓存块的总长度
+//        int totalLength = 0;
+//        for (CacheBlock cacheBlock : writableCacheBlocks) {
+//            totalLength += cacheBlock.getValidByteEnd().intValue() - cacheBlock.getValidByteStart().intValue();
+//        }
+//
+//        // 创建一个 ByteBuffer 来存储合并的数据
+//        ByteBuffer mergedBuffer = ByteBuffer.allocate(totalLength);
+//
+//        // 将数据从 mBuffer 复制到 mergedBuffer
+//        for (CacheBlock cacheBlock : writableCacheBlocks) {
+//            int start = cacheBlock.getValidByteStart().intValue();
+//            int end = cacheBlock.getValidByteEnd().intValue();
+//            int bufferSize = end - start;
+//
+//            // 将 mBuffer 中的数据复制到 mergedBuffer
+//            mergedBuffer.put(mBuffer, start, bufferSize);
+//
+//            // 将缓存块状态设置为 Free
+//            cacheBlock.setStatus(CacheBlockStatus.Free);
+//        }
+//        this.exportSize += totalLength;
+//        // 准备将 mergedBuffer 用于读取
+//        mergedBuffer.flip();
+//        return mergedBuffer;
+//    }
 
     private List< CacheBlock > getWritableCacheBlocks(){
         ArrayList<CacheBlock> cacheBlocks = new ArrayList<>();

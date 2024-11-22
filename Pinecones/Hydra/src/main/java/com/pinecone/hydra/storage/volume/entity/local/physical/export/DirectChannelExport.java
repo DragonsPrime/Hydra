@@ -9,5 +9,5 @@ public interface DirectChannelExport extends DirectExport{
     StorageIOResponse export(DirectChannelExportEntity entity ) throws IOException;
 
     //MiddleStorageObject raid0Export(DirectChannelExportEntity entity, byte[] buffer, Number offset, Number endSize, StripExportFlyweightEntity flyweightEntity);
-    StorageIOResponse raid0Export(DirectChannelExportEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer);
+    StorageIOResponse export(DirectChannelExportEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer);
 }

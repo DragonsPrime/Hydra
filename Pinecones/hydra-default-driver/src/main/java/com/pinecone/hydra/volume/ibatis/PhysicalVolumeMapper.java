@@ -49,4 +49,7 @@ public interface PhysicalVolumeMapper extends PhysicalVolumeManipulator {
 
     @Select("SELECT `id` AS enumId, `guid`, `create_time` AS createTime, `update_time` AS updateTime, `name`,  `type`, `ext_config` AS extConfig FROM `hydra_uofs_volumes` ORDER BY ( `definition_capacity` - hydra_uofs_volumes.`used_size` ) ASC LIMIT 1")
     TitanLocalPhysicalVolume getSmallestCapacityPhysicalVolume0();
+
+    @Select("SELECT `logic_guid` FROM `hydra_volume_physical_logic` WHERE `physical_guid` = #{guid}")
+    GUID getParent( GUID guid );
 }

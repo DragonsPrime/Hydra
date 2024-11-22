@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.simple.export;
 
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.StorageExportIORequest;
@@ -7,12 +8,11 @@ import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirec
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 
 public class TitanSimpleChannelExport64 implements SimpleChannelExport64{
     private VolumeManager           volumeManager;
-    private StorageExportIORequest storageExportIORequest;
-    private FileChannel             channel;
+    private StorageExportIORequest  storageExportIORequest;
+    private KChannel                channel;
     public TitanSimpleChannelExport64(SimpleChannelExportEntity entity){
         this.volumeManager       =  entity.getVolumeManager();
         this.storageExportIORequest =  entity.getStorageIORequest();
@@ -26,8 +26,8 @@ public class TitanSimpleChannelExport64 implements SimpleChannelExport64{
     }
 
     @Override
-    public StorageIOResponse raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
+    public StorageIOResponse export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
         TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(this.volumeManager, this.storageExportIORequest,this.channel);
-        return titanDirectChannelExportEntity64.raid0Export( cacheBlock, offset, endSize, buffer );
+        return titanDirectChannelExportEntity64.export( cacheBlock, offset, endSize, buffer );
     }
 }

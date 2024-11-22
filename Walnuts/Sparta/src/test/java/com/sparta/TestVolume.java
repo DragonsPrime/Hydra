@@ -4,7 +4,9 @@ import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
+import com.pinecone.hydra.storage.TitanKChannel;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
@@ -76,34 +78,34 @@ class Alice extends Radium {
         //this.testSpannedChannelExport( volumeTree );
         //Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
-        //this.testStripedInsert( volumeTree );
-        //this.testSpannedInsert( volumeTree );
+        this.testStripedInsert( volumeTree );
+        this.testSpannedInsert( volumeTree );
         //this.testStripedReceive( volumeTree );
         //this.testStripedExport( volumeTree );
-        this.testHash( volumeTree );
+        //this.testHash( volumeTree );
     }
 
-    private void testDirectReceive(VolumeManager volumeManager) throws IOException {
-        TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
-        titanReceiveStorageObject.setName("视频");
-        titanReceiveStorageObject.setSize(201*1024*1024);
-        String destDirPath = "D:\\文件系统\\大文件";
-        File sourceFile = new File("D:\\井盖视频块\\4月13日 (2).mp4");
-        Path path = sourceFile.toPath();
-        FileChannel channel = FileChannel.open(path, StandardOpenOption.READ);
-        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager,titanReceiveStorageObject,destDirPath,channel);
-        titanDirectChannelReceiveEntity64.receive();
-    }
-
-    private void testDirectExport( VolumeManager volumeManager) throws IOException {
-        File file = new File("D:\\文件系统\\大文件\\视频.mp4");
-        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
-        TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
-        titanExportStorageObject.setSize( 201*1024*1024 );
-        titanExportStorageObject.setSourceName("D:\\文件系统\\大文件\\视频_d95a91f4.storage");
-        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, titanExportStorageObject,channel);
-        titanDirectChannelExportEntity64.export();
-    }
+//    private void testDirectReceive(VolumeManager volumeManager) throws IOException {
+//        TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
+//        titanReceiveStorageObject.setName("视频");
+//        titanReceiveStorageObject.setSize(201*1024*1024);
+//        String destDirPath = "D:\\文件系统\\大文件";
+//        File sourceFile = new File("D:\\井盖视频块\\4月13日 (2).mp4");
+//        Path path = sourceFile.toPath();
+//        FileChannel channel = FileChannel.open(path, StandardOpenOption.READ);
+//        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager,titanReceiveStorageObject,destDirPath,channel);
+//        titanDirectChannelReceiveEntity64.receive();
+//    }
+//
+//    private void testDirectExport( VolumeManager volumeManager) throws IOException {
+//        File file = new File("D:\\文件系统\\大文件\\视频.mp4");
+//        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+//        TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
+//        titanExportStorageObject.setSize( 201*1024*1024 );
+//        titanExportStorageObject.setSourceName("D:\\文件系统\\大文件\\视频_d95a91f4.storage");
+//        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, titanExportStorageObject,channel);
+//        titanDirectChannelExportEntity64.export();
+//    }
 
 
     private void testChannelReceive( KOMFileSystem fileSystem, UniformVolumeManager volumeTree ) throws IOException {
@@ -134,18 +136,20 @@ class Alice extends Radium {
         titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
         File file = new File("D:\\井盖视频块\\4月13日 (1).mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        StorageIOResponse storageIOResponse = volume.channelReceive(titanReceiveStorageObject, channel);
+        TitanKChannel titanKChannel = new TitanKChannel( channel );
+        StorageIOResponse storageIOResponse = volume.channelReceive(titanReceiveStorageObject, titanKChannel);
     }
 
     private void testSpannedChannelExport( UniformVolumeManager volumeTree ) throws IOException, SQLException {
         File file = new File("D:\\文件系统\\大文件\\视频.mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        TitanKChannel titanKChannel = new TitanKChannel( channel );
         LogicVolume volume = volumeTree.get(GUIDs.GUID72("05e44c4-00022b-0006-20"));
         TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
         titanExportStorageObject.setSize( 85 * 1024 *1024 );
         titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("05e5206-0002de-0001-e8") );
         titanExportStorageObject.setSourceName("D:\\文件系统\\簇1\\文件夹\\视频_4a148d14.storage");
-        volume.channelExport( titanExportStorageObject, channel );
+        volume.channelExport( titanExportStorageObject, titanKChannel );
     }
 
     private void testRaid0Insert( KOMFileSystem fileSystem, UniformVolumeManager volumeTree ) throws SQLException {
@@ -338,38 +342,41 @@ class Alice extends Radium {
         GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
-        File file = new File("D:\\井盖视频块\\4月13日 (1).mp4");
-        titanReceiveStorageObject.setName( "视频" );
+        File file = new File("D:\\井盖视频块\\4月13日 (2).mp4");
+        titanReceiveStorageObject.setName( "我的视频" );
         titanReceiveStorageObject.setSize( file.length() );
         titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
 
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        StorageIOResponse storageIOResponse = volume.channelReceive(titanReceiveStorageObject, channel);
+        TitanKChannel titanKChannel = new TitanKChannel( channel );
+        StorageIOResponse storageIOResponse = volume.channelReceive(titanReceiveStorageObject, titanKChannel);
     }
 
     void testSpannedReceive( UniformVolumeManager volumeManager ) throws IOException, SQLException {
         GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("跨区卷"));
         TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
-        File file = new File("D:\\井盖视频块\\4月13日 (1).mp4");
+        File file = new File("D:/井盖视频块/4月13日 (2).mp4");
         titanReceiveStorageObject.setName( "视频" );
         titanReceiveStorageObject.setSize( file.length() );
         titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
 
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        StorageIOResponse storageIOResponse = volume.channelReceive(titanReceiveStorageObject, channel);
+        TitanKChannel titanKChannel = new TitanKChannel( channel );
+        StorageIOResponse storageIOResponse = volume.channelReceive(titanReceiveStorageObject, titanKChannel);
     }
 
     void testStripedExport( UniformVolumeManager volumeManager ) throws Exception {
-        File file = new File("D:\\文件系统\\大文件\\视频.mp4");
-        File originalFile = new File( "D:/井盖视频块/4月13日 (1).mp4" );
+        File file = new File("D:\\文件系统\\大文件\\我的视频.mp4");
+        File originalFile = new File( "D:/井盖视频块/4月13日 (2).mp4" );
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+        TitanKChannel titanKChannel = new TitanKChannel( channel );
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
         titanExportStorageObject.setSize( originalFile.length() );
-        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("07b730c-000000-0001-7c") );
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("08b4c6c-000090-0001-24") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
-        volume.channelExport( titanExportStorageObject, channel );
+        volume.channelExport( titanExportStorageObject, titanKChannel );
     }
 
     void testHash( UniformVolumeManager volumeManager ){

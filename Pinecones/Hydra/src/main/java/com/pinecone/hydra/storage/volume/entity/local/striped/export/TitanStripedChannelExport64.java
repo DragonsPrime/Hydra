@@ -2,6 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.striped.export;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.StorageExportIORequest;
@@ -25,8 +26,8 @@ import java.util.concurrent.Semaphore;
 
 public class TitanStripedChannelExport64 implements StripedChannelExport64{
     private VolumeManager           volumeManager;
-    private StorageExportIORequest storageExportIORequest;
-    private FileChannel             channel;
+    private StorageExportIORequest  storageExportIORequest;
+    private KChannel                channel;
     private StripedVolume           stripedVolume;
     private OnVolumeFileSystem      kenVolumeFileSystem;
 
@@ -62,7 +63,29 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
         return null;
     }
 
+    @Override
+    public StorageIOResponse export(Number offset, Number endSize) throws IOException, SQLException {
+        //初始化参数
+        List<LogicVolume> volumes = this.stripedVolume.getChildren();
+        int jobCount = volumes.size();
 
+        int superResolutionRatio = volumeManager.getConfig().getSuperResolutionRatio();
+        SQLiteExecutor sqLiteExecutor = this.stripedVolume.getSQLiteExecutor();
+
+        Hydrarum hydrarum = this.volumeManager.getHydrarum();
+        MasterVolumeGram masterVolumeGram = this.createMasterVolumeGram(hydrarum,jobCount,superResolutionRatio);
+
+        // 创建文件写入线程
+        createBufferOutJob( masterVolumeGram, this.storageExportIORequest.getSize().longValue());
+
+        // 处理每个卷的线程
+        createAndStartVolumeThreads(volumes, sqLiteExecutor,  masterVolumeGram );
+
+        // 同步等待任务完成并处理异常
+        this.waitForTaskCompletion(masterVolumeGram);
+
+        return null;
+    }
 
     private MasterVolumeGram createMasterVolumeGram(Hydrarum hydrarum, int jobCount, int superResolutionRatio ) {
         Number stripSize = this.volumeManager.getConfig().getDefaultStripSize();
@@ -72,10 +95,10 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
         return masterVolumeGram;
     }
 
-    private void  createBufferOutJob(MasterVolumeGram masterVolumeGram, long totalSIze) {
+    private void  createBufferOutJob(MasterVolumeGram masterVolumeGram, long totalSize) {
         Semaphore BufferOutLock = new Semaphore(0);
 
-        TitanStripBufferOutJob BufferOutJob = new TitanStripBufferOutJob(masterVolumeGram,this.volumeManager, this.channel,totalSIze, BufferOutLock );
+        TitanStripBufferOutJob BufferOutJob = new TitanStripBufferOutJob(masterVolumeGram,this.volumeManager, this.channel,totalSize, BufferOutLock );
         LocalStripedTaskThread BufferOutThread = new LocalStripedTaskThread("BufferOut", masterVolumeGram, BufferOutJob);
         masterVolumeGram.getTaskManager().add(BufferOutThread);
         BufferOutThread.start();
@@ -90,6 +113,9 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
         for ( LogicVolume volume : volumes ) {
 
             String sourceName = this.kenVolumeFileSystem.getKVFSFileStripSourceName(sqLiteExecutor, volume.getGuid(), this.storageExportIORequest.getStorageObjectGuid());
+            if ( sourceName == null ){
+                continue;
+            }
             int code = this.kenVolumeFileSystem.getKVFSFileStripCode(sqLiteExecutor, volume.getGuid(), this.storageExportIORequest.getStorageObjectGuid());
             File file = new File(sourceName);
             StorageExportIORequest titanStorageExportIORequest = new TitanStorageExportExportIORequest();
@@ -130,7 +156,7 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
     }
 
     @Override
-    public FileChannel getFileChannel() {
+    public KChannel getFileChannel() {
         return this.channel;
     }
 

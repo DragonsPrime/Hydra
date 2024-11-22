@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.file.transmit.receiver.channel;
 
 import com.pinecone.framework.util.Bytes;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.file.FrameSegmentNaming;
 import com.pinecone.hydra.storage.file.KOFSFrameSegmentNaming;
@@ -40,7 +41,7 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
     @Override
     public void receive( ReceiveEntity entity, Number offset, Number endSize ) throws IOException {
         ChannelReceiverEntity channelReceiverEntity = entity.evinceChannelReceiverEntity();
-        FileChannel fileChannel = channelReceiverEntity.getChannel();
+        KChannel fileChannel = channelReceiverEntity.getChannel();
         String destDirPath = channelReceiverEntity.getDestDirPath();
         FileNode file = channelReceiverEntity.getFile();
         KOMFileSystem fileSystem = channelReceiverEntity.getFileSystem();
@@ -113,7 +114,7 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
     @Override
     public void receive(ReceiveEntity entity, LogicVolume volume) throws IOException, SQLException {
         ChannelReceiverEntity channelReceiverEntity = entity.evinceChannelReceiverEntity();
-        FileChannel fileChannel = channelReceiverEntity.getChannel();
+        KChannel fileChannel = channelReceiverEntity.getChannel();
         FileNode file = channelReceiverEntity.getFile();
         KOMFileSystem fileSystem = channelReceiverEntity.getFileSystem();
         long frameSize = this.mKOMFileSystem.getConfig().getFrameSize().longValue();
@@ -146,18 +147,17 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
             storageReceiveIORequest.setName( file.getName() );
             storageReceiveIORequest.setStorageObjectGuid( localFrame.getSegGuid() );
             StorageIOResponse storageIOResponse = null;
-            if( volume instanceof StripedVolume){
-                 storageIOResponse = volume.channelReceive(storageReceiveIORequest, fileChannel);
-                 endSize = file.getDefinitionSize();
-            }
-            else {
-                 storageIOResponse = volume.channelReceive(storageReceiveIORequest, fileChannel, currentPosition, endSize);
-            }
-
+//            if( volume instanceof StripedVolume){
+//                 storageIOResponse = volume.channelReceive(storageReceiveIORequest, fileChannel);
+//                 endSize = file.getDefinitionSize();
+//            }
+//            else {
+//                 storageIOResponse = volume.channelReceive(storageReceiveIORequest, fileChannel, currentPosition, endSize);
+//            }
+            storageIOResponse = volume.channelReceive(storageReceiveIORequest, fileChannel, currentPosition, endSize);
 
             UniformSourceLocator uniformSourceLocator = new UniformSourceLocator();
             if( storageIOResponse != null ){
-                uniformSourceLocator.setSourceName( storageIOResponse.getSourceName() );
                 localFrame.setCrc32( storageIOResponse.getCre32() );
             }
             uniformSourceLocator.setVolumeGuid( volume.getGuid().toString() );
@@ -183,7 +183,7 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
     @Override
     public void resumableReceive(ReceiveEntity entity ) throws IOException {
         ChannelReceiverEntity channelReceiverEntity = entity.evinceChannelReceiverEntity();
-        FileChannel fileChannel = channelReceiverEntity.getChannel();
+        KChannel fileChannel = channelReceiverEntity.getChannel();
         String destDirPath = channelReceiverEntity.getDestDirPath();
         FileNode file = channelReceiverEntity.getFile();
         KOMFileSystem fileSystem = channelReceiverEntity.getFileSystem();
@@ -197,13 +197,13 @@ public class ChannelReceiver64 extends ArchReceiver implements ChannelReceiver{
         long bytesRead = segId * chunkSize; // 从最后一个已传输的分片计算出起始位置
 
         // 校验最后的frame是否存在数据错误
-        if (lastFrame.getSize() > 0 && isFrameCorrupted(lastFrame, fileChannel,chunkSize)) {
-            // 补全并传输损坏的分片
-            bytesRead = resumeIncompleteFrame(lastFrame, fileChannel, chunkSize);
-        }
-
-        // 从剩余部分继续传输文件
-        transferRemaining(fileChannel, bytesRead, segId, creator, guidAllocator, destDirPath, file, chunkSize);
+//        if (lastFrame.getSize() > 0 && isFrameCorrupted(lastFrame, fileChannel,chunkSize)) {
+//            // 补全并传输损坏的分片
+//            bytesRead = resumeIncompleteFrame(lastFrame, fileChannel, chunkSize);
+//        }
+//
+//        // 从剩余部分继续传输文件
+//        transferRemaining(fileChannel, bytesRead, segId, creator, guidAllocator, destDirPath, file, chunkSize);
     }
 
     // 校验frame是否存在数据损坏

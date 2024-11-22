@@ -1,6 +1,8 @@
 package com.pinecone.hydra.storage.volume.entity.local.physical.export;
 
 import com.pinecone.framework.util.Bytes;
+import com.pinecone.framework.util.Debug;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -21,7 +23,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
         StorageExportIORequest storageExportIORequest = entity.getStorageIORequest();
         String sourceName = storageExportIORequest.getSourceName();
         long size = storageExportIORequest.getSize().longValue();
-        FileChannel channel = entity.getChannel();
+        KChannel channel = entity.getChannel();
         TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
 
         long parityCheck = 0;
@@ -69,7 +71,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
 
     public StorageIOResponse export(DirectChannelExportEntity outputEntity, Number offset, Number endSize, long bufferStartPosition, ChannelBytesExportRecall recall ) {
         VolumeManager volumeManager = outputEntity.getVolumeManager();
-        FileChannel targetChannel = outputEntity.getChannel();
+        KChannel targetChannel = outputEntity.getChannel();
         Number stripSize = volumeManager.getConfig().getDefaultStripSize();
 
         StorageExportIORequest storageExportIORequest = outputEntity.getStorageIORequest();
@@ -110,7 +112,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
 
 
     @Override
-    public StorageIOResponse raid0Export(DirectChannelExportEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) {
+    public StorageIOResponse export(DirectChannelExportEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) {
         VolumeManager volumeManager = entity.getVolumeManager();
         StorageExportIORequest storageExportIORequest = entity.getStorageIORequest();
         String sourceName = storageExportIORequest.getSourceName();
@@ -134,7 +136,7 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
             if( read < bufferSize ){
                 bufferSize = read;
             }
-            //Debug.trace( "起始位置" + offset.longValue()+"终止大小"+bufferSize+"缓存大小"+endSize.intValue() );
+            Debug.trace( "起始位置" + offset.longValue()+"终止大小"+bufferSize+"缓存大小"+endSize.intValue() );
             byteBuffer.get(buffer, cacheBlock.getByteStart().intValue(), (int) bufferSize);
             cacheBlock.setStatus( CacheBlockStatus.Full );
             cacheBlock.setValidByteStart( cacheBlock.getByteStart().intValue() );

@@ -1,20 +1,22 @@
 package com.pinecone.hydra.storage.file.transmit.receiver.channel;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.transmit.receiver.ArchReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
+import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 
 public class GenericChannelReceiveEntity extends ArchReceiveEntity implements ChannelReceiverEntity{
-    private FileChannel     channel;
+    private KChannel channel;
     private ChannelReceiver channelReceiver;
 
-    public GenericChannelReceiveEntity(KOMFileSystem fileSystem, String destDirPath, FileNode file, FileChannel channel ) {
+    public GenericChannelReceiveEntity(KOMFileSystem fileSystem, String destDirPath, FileNode file, KChannel channel ) {
         super(fileSystem, destDirPath, file);
         this.channel = channel;
         this.channelReceiver = new ChannelReceiver64( this.getFileSystem() );
@@ -26,12 +28,12 @@ public class GenericChannelReceiveEntity extends ArchReceiveEntity implements Ch
     }
 
     @Override
-    public FileChannel getChannel() {
+    public KChannel getChannel() {
         return this.channel;
     }
 
     @Override
-    public void setChannel(FileChannel channel) {
+    public void setChannel(KChannel channel) {
         this.channel = channel;
     }
 

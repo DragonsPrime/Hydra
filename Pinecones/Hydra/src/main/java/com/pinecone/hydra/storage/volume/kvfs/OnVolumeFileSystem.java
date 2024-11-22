@@ -13,7 +13,8 @@ public interface OnVolumeFileSystem extends Pinenut {
 
     void createKVFSMetaTable(MappedExecutor mappedExecutor ) throws SQLException;
 
-    void insertKVFSTable(GUID storageObjectGuid, String storageObjectName, MappedExecutor mappedExecutor ) throws SQLException;
+    void insertKVFSTable(GUID storageObjectGuid, String storageObjectName, String sourceName, MappedExecutor mappedExecutor ) throws SQLException;
+    String getKVFSTableSourceName( GUID storageObjectGuid, MappedExecutor mappedExecutor ) throws SQLException;
 
     boolean existStorageObject( MappedExecutor mappedExecutor, GUID storageObjectGuid ) throws SQLException;
 

@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.spanned.receive;
 
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchReceiveEntity;
@@ -11,12 +12,12 @@ import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 
 public class TitanSpannedChannelReceiveEntity64 extends ArchReceiveEntity implements SpannedChannelReceiveEntity64{
-    private FileChannel             channel;
+    private KChannel                channel;
     private SpannedVolume           spannedVolume;
     private SpannedChannelReceive64 spannedChannelReceive64;
 
 
-    public TitanSpannedChannelReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, FileChannel channel, SpannedVolume spannedVolume) {
+    public TitanSpannedChannelReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, SpannedVolume spannedVolume) {
         super(volumeManager, storageReceiveIORequest);
         this.channel = channel;
         this.spannedVolume = spannedVolume;
@@ -24,12 +25,12 @@ public class TitanSpannedChannelReceiveEntity64 extends ArchReceiveEntity implem
     }
 
     @Override
-    public FileChannel getChannel() {
+    public KChannel getChannel() {
         return this.channel;
     }
 
     @Override
-    public void setChannel(FileChannel channel) {
+    public void setChannel(KChannel channel) {
         this.channel = channel;
     }
 

@@ -5,12 +5,15 @@ import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.InputChannel;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.StorageExportIORequest;
+import com.pinecone.hydra.storage.volume.entity.ExporterEntity;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
+import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.export.TitanStripedChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.receive.TitanStripedChannelReceiverEntity64;
@@ -63,24 +66,46 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
     }
 
     @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, FileChannel channel) throws IOException, SQLException {
+    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel) throws IOException, SQLException {
         TitanStripedChannelReceiverEntity64 titanStripedChannelReceiverEntity64 = new TitanStripedChannelReceiverEntity64(this.volumeManager, storageReceiveIORequest,  channel, this);
         return titanStripedChannelReceiverEntity64.receive();
     }
 
     @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, FileChannel channel, Number offset, Number endSize) throws IOException, SQLException {
-        return null;
+    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel, Number offset, Number endSize) throws IOException, SQLException {
+        TitanStripedChannelReceiverEntity64 titanStripedChannelReceiverEntity64 = new TitanStripedChannelReceiverEntity64(this.volumeManager, storageReceiveIORequest,  channel, this);
+        return titanStripedChannelReceiverEntity64.receive( offset, endSize );
     }
 
     @Override
-    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, FileChannel channel) throws IOException, SQLException {
+    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel) throws IOException, SQLException {
         TitanStripedChannelExportEntity64 titanStripedChannelExportEntity64 = new TitanStripedChannelExportEntity64( this.volumeManager, storageExportIORequest, channel, this );
         return titanStripedChannelExportEntity64.export();
     }
 
     @Override
-    public StorageIOResponse channelRaid0Export(StorageExportIORequest storageExportIORequest, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException {
+    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException {
+        return null;
+    }
+
+
+    @Override
+    public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException {
+        return entity.receive();
+    }
+
+    @Override
+    public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException {
+        return entity.receive( offset, endSize );
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity) throws SQLException, IOException {
+        return entity.export();
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, Number offset, Number endSize) {
         return null;
     }
 
@@ -109,8 +134,4 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
         this.volumeManager.storageExpansion( this.getGuid(), volumeGuid );
     }
 
-    @Override
-    public StorageIOResponse receive(InputChannel inputChannel) {
-        return null;
-    }
 }

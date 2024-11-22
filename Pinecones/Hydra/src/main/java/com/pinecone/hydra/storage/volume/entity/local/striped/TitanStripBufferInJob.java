@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
@@ -9,7 +10,6 @@ import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -19,11 +19,11 @@ import java.util.concurrent.locks.Lock;
 public class TitanStripBufferInJob implements StripBufferInJob {
     protected VolumeManager                 volumeManager;
 
-    protected StorageExportIORequest object;
+    protected StorageExportIORequest        object;
     protected int                           jobCount;
     protected int                           jobCode;
     protected LogicVolume                   volume;
-    protected FileChannel                   channel;
+    protected KChannel                      channel;
     protected AtomicInteger                 currentCacheBlockNumber;
     protected final Semaphore               blockerLatch;
 
@@ -31,9 +31,13 @@ public class TitanStripBufferInJob implements StripBufferInJob {
 
     protected List< CacheBlock >            cacheBlockGroup;
     protected LocalStripedTaskThread        parentThread;
+
     protected byte[]                        buffer;
     protected Lock                          majorStatusIO;
     protected MasterVolumeGram              masterVolumeGram;
+
+    protected Number                        offset;
+    protected Number                        endSize;
 
     public TitanStripBufferInJob(MasterVolumeGram masterVolumeGram, StripedChannelExport stripedChannelExport, LogicVolume volume, StorageExportIORequest object, int jobCode ){
         this.masterVolumeGram             = masterVolumeGram;
@@ -103,7 +107,7 @@ public class TitanStripBufferInJob implements StripBufferInJob {
                 }
 
                 try {
-                    this.volume.channelRaid0Export( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.buffer);
+                    this.volume.channelExport( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.buffer);
 
                     currentPosition += bufferSize;
                     this.wakeUpBufferToFileThread();

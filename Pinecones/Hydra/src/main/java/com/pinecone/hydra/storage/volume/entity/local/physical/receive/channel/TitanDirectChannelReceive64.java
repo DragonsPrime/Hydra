@@ -1,12 +1,15 @@
 package com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel;
 
 import com.pinecone.framework.util.Bytes;
+import com.pinecone.framework.util.Debug;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageNaming;
 import com.pinecone.hydra.storage.TitanStorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageNaming;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -30,10 +33,11 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
         return receiveWithOffsetAndSize(entity, offset.longValue(), endSize.intValue());
     }
 
-    private StorageIOResponse receiveWithOffsetAndSize(DirectChannelReceiveEntity entity, long offset, int size) throws IOException {
+    private synchronized StorageIOResponse receiveWithOffsetAndSize(DirectChannelReceiveEntity entity, long offset, int size) throws IOException {
+        Debug.trace("缓存的是"+offset+"到"+(offset + size));
         StorageReceiveIORequest storageReceiveIORequest = entity.getReceiveStorageObject();
         String destDirPath = entity.getDestDirPath();
-        FileChannel channel = entity.getChannel();
+        KChannel channel = entity.getChannel();
 
         int parityCheck = 0;
         long checksum = 0;
@@ -41,6 +45,7 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
 
         TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
         titanMiddleStorageObject.setObjectGuid(storageReceiveIORequest.getStorageObjectGuid());
+
 
         channel.position(offset);
         buffer.clear();

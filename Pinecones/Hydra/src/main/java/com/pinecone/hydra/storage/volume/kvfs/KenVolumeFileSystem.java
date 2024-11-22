@@ -42,8 +42,18 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
     }
 
     @Override
-    public void insertKVFSTable(GUID storageObjectGuid, String storageObjectName, MappedExecutor mappedExecutor) throws SQLException {
-        mappedExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` , `storage_object_name` ) VALUES ( '"+ storageObjectGuid+ "', '"+storageObjectName+"' )", false );
+    public void insertKVFSTable(GUID storageObjectGuid, String storageObjectName, String sourceName, MappedExecutor mappedExecutor) throws SQLException {
+        mappedExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` , `storage_object_name` , `source_name` ) VALUES ( '"+ storageObjectGuid+ "', '"+storageObjectName+"', '"+sourceName+"' )", false );
+    }
+
+    @Override
+    public String getKVFSTableSourceName(GUID storageObjectGuid, MappedExecutor mappedExecutor) throws SQLException {
+        ResultSession query = mappedExecutor.query("SELECT `source_name` FROM `table` WHERE `storage_object_guid` = '" + storageObjectGuid + "' ");
+        ResultSet resultSet = query.getResultSet();
+        if( resultSet.next() ){
+            return resultSet.getString("source_name");
+        }
+        return null;
     }
 
     @Override

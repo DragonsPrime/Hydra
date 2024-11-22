@@ -7,6 +7,5 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public interface SimpleReceiverEntity extends ReceiveEntity {
-    StorageIOResponse receive() throws IOException, SQLException;
-    StorageIOResponse receive(Number offset, Number endSize ) throws IOException;
+
 }

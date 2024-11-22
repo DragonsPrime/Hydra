@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.export;
 
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.StorageExportIORequest;
@@ -12,11 +13,13 @@ import java.sql.SQLException;
 public interface StripedChannelExport extends StripedExport{
     StorageIOResponse export() throws IOException, SQLException;
 
+    StorageIOResponse export( Number offset, Number endSize ) throws IOException, SQLException;
+
     VolumeManager getVolumeManager();
 
     StorageExportIORequest getStorageIORequest();
 
-    FileChannel getFileChannel();
+    KChannel getFileChannel();
 
     StripedVolume getStripedVolume();
 }

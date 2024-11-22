@@ -1,13 +1,17 @@
 package com.pinecone.hydra.storage.file;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.file.entity.Folder;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
 import com.pinecone.hydra.storage.file.entity.Frame;
+import com.pinecone.hydra.storage.file.transmit.exporter.ExporterEntity;
+import com.pinecone.hydra.storage.file.transmit.receiver.ReceiveEntity;
 import com.pinecone.hydra.storage.file.transmit.receiver.channel.ChannelReceiver;
+import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.system.ko.kom.ReparseKOMTree;
 import com.pinecone.hydra.unit.udtt.entity.EntityNode;
@@ -168,5 +172,10 @@ public interface KOMFileSystem extends ReparseKOMTree {
     void upload( FileNode file, String destDirPath );
     Frame getLastFrame( GUID guid );
 
-    void channelReceiveFile(LogicVolume volume, String destDirPath, FileNode fileNode, FileChannel channel) throws SQLException, IOException;
+
+    void receive( LogicVolume volume, ReceiveEntity entity ) throws IOException, SQLException;
+    void receive( LogicVolume volume, ReceiveEntity entity, Number offset, Number endSize )throws IOException;
+
+    void export( UniformVolumeManager volumeManager, ExporterEntity entity ) throws SQLException, IOException;
+    void export( UniformVolumeManager volumeManager, ExporterEntity entity, Number offset, Number endSize );
 }

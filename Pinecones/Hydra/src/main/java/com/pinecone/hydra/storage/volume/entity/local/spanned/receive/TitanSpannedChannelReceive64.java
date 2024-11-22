@@ -4,6 +4,7 @@ import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
@@ -22,7 +23,7 @@ import java.util.List;
 
 public class TitanSpannedChannelReceive64 implements SpannedChannelReceive64{
     private SpannedVolume           spannedVolume;
-    private FileChannel             channel;
+    private KChannel                channel;
     private VolumeManager           volumeManager;
     private StorageReceiveIORequest storageReceiveIORequest;
     private OnVolumeFileSystem      kenVolumeFileSystem;

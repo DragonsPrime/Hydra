@@ -2,6 +2,7 @@ package com.pinecone.hydra.storage.file;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.GenericFSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
@@ -25,7 +26,10 @@ import com.pinecone.hydra.storage.file.source.RemoteFrameManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicMetaManipulator;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
+import com.pinecone.hydra.storage.file.transmit.exporter.ExporterEntity;
+import com.pinecone.hydra.storage.file.transmit.receiver.ReceiveEntity;
 import com.pinecone.hydra.storage.file.transmit.receiver.channel.GenericChannelReceiveEntity;
+import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
@@ -436,11 +440,6 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         }
     }
 
-    @Override
-    public void channelReceiveFile(LogicVolume volume, String destDirPath, FileNode fileNode, FileChannel channel) throws SQLException, IOException {
-        GenericChannelReceiveEntity receiveEntity = new GenericChannelReceiveEntity(this, destDirPath, fileNode, channel);
-        receiveEntity.receive( volume );
-    }
 
     private String getNodeName(DistributedTreeNode node ){
         UOI type = node.getType();
@@ -476,94 +475,23 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         return new GUID[] { sourceGuid, destinationGuid };
     }
 
-//    protected void upload0(FileNode file, String destDirPath, long startChunkIndex) {
-//        long chunkSize = 10 * 1024 * 1024; // 每片的大小
-//        File sourceFile = new File(file.getSourceName());
-//        Path sourcePath = sourceFile.toPath();
-//
-//        try (FileChannel sourceChannel = FileChannel.open(sourcePath, StandardOpenOption.READ)) {
-//            ByteBuffer buffer = ByteBuffer.allocateDirect((int) chunkSize);
-//
-//            long chunkIndex = startChunkIndex; // 从指定的分片开始
-//            long bytesRead = chunkIndex * chunkSize; // 计算读取的初始位置
-//            long totalBytesRead = bytesRead; // 总读取的字节数
-//
-//            // 获取上一次的分片信息
-//            if (!file.getFrames().isEmpty()) {
-//                LocalFrame lastFrame = (LocalFrame) file.getFrames().lastEntry().getValue();
-//                bytesRead += lastFrame.getSize();
-//            }
-//
-//            sourceChannel.position(bytesRead); // 设置 FileChannel 的起始位置
-//
-//            while (bytesRead < file.getSize()) {
-//                LocalFrame localFrame = this.fileSystemCreator.dummyLocalFrame();
-//                GUID frameGuid = this.guidAllocator.nextGUID72();
-//                localFrame.setSegGuid(frameGuid);
-//                localFrame.setFileGuid(file.getGuid());
-//                localFrame.setSegId(chunkIndex);
-//
-//                buffer.clear();
-//                int readBytes = sourceChannel.read(buffer);
-//                int actualBytesRead = 0; // 实际写入的字节数
-//
-//                if (readBytes == -1) {
-//                    break;
-//                }
-//
-//                buffer.flip();
-//
-//                // 如果读到的字节小于 chunkSize，说明这是最后一片
-//                if (bytesRead + readBytes > file.getSize()) {
-//                    readBytes = (int)(file.getSize() - bytesRead);
-//                }
-//
-//                try {
-//                    // 计算当前分片的 CRC32 校验值
-//                    CRC32 crc = new CRC32();
-//                    while (buffer.hasRemaining()) {
-//                        crc.update(buffer.get());
-//                        actualBytesRead++; // 记录已经读取的字节
-//                    }
-//
-//                    long crcValue = crc.getValue(); // 获取CRC32值
-//                    localFrame.setCrc32(String.valueOf(crcValue)); // 将CRC32值设置在LocalFrame中
-//
-//                    buffer.rewind(); // 重置buffer的位置以便再次写入文件
-//
-//                    // 创建分片文件路径，确保分片的命名和索引一致
-//                    Path chunkFile = Path.of(destDirPath, file.getName() + "_" + chunkIndex);
-//                    localFrame.setSourceName(chunkFile.toString());
-//
-//                    // 设置实际的分片大小
-//                    localFrame.setSize(actualBytesRead);
-//
-//                    // 写入分片文件
-//                    try (FileChannel chunkChannel = FileChannel.open(chunkFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
-//                        chunkChannel.write(buffer);
-//                    }
-//
-//                    localFrame.save();
-//                    bytesRead += actualBytesRead;
-//                    chunkIndex++;
-//
-//                } catch (IOException e) {
-//                    // 发生异常时，记录当前已写入的字节数
-//                    localFrame.setSize(actualBytesRead);
-//                    file.getFrames().put(chunkIndex, localFrame); // 记录这个 frame 的大小
-//                    this.put(file); // 保存上传状态
-//                    throw new RuntimeException("文件传输中断", e);
-//                }
-//
-//                totalBytesRead += actualBytesRead;
-//            }
-//
-//            // 上传完成，更新状态
-//            file.setIsUploadSuccessful(true);
-//            this.put(file);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    @Override
+    public void receive(LogicVolume volume, ReceiveEntity entity) throws IOException, SQLException {
+        entity.receive( volume );
+    }
 
+    @Override
+    public void receive(LogicVolume volume, ReceiveEntity entity, Number offset, Number endSize) throws IOException {
+        entity.receive( offset, endSize );
+    }
+
+    @Override
+    public void export(UniformVolumeManager volumeManager, ExporterEntity entity) throws SQLException, IOException {
+        entity.export( volumeManager );
+    }
+
+    @Override
+    public void export(UniformVolumeManager volumeManager, ExporterEntity entity, Number offset, Number endSize) {
+
+    }
 }

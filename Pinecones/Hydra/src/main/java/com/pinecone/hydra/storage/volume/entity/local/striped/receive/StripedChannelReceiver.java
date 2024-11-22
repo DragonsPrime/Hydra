@@ -7,5 +7,5 @@ import java.sql.SQLException;
 
 public interface StripedChannelReceiver extends StripedReceiver{
     StorageIOResponse channelReceive( ) throws IOException, SQLException;
-    StorageIOResponse channelReceive(Number offset, Number endSize) throws IOException;
+    StorageIOResponse channelReceive(Number offset, Number endSize) throws IOException, SQLException;
 }

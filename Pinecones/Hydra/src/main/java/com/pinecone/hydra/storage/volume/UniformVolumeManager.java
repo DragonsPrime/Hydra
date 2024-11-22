@@ -6,6 +6,7 @@ import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
+import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.TitanVolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
@@ -209,6 +210,11 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
 //        finally {
 //            this.reentrantLock.unlock();
 //        }
+    }
+
+    @Override
+    public SimpleVolume getPhysicalVolumeParent(GUID guid) {
+        return null;
     }
 
     @Override

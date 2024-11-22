@@ -3,6 +3,7 @@ package com.pinecone.hydra.storage.volume.entity;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.hydra.storage.InputChannel;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
@@ -11,7 +12,6 @@ import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -46,12 +46,19 @@ public interface LogicVolume extends Volume, TreeNode {
     void setVolumeTree( VolumeManager volumeManager);
 
 
-    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, FileChannel channel ) throws IOException, SQLException;
-    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, FileChannel channel, Number offset, Number endSize ) throws IOException, SQLException;
-    StorageIOResponse channelExport      (StorageExportIORequest storageExportIORequest, FileChannel channel ) throws IOException, SQLException;
-    StorageIOResponse channelRaid0Export (StorageExportIORequest storageExportIORequest, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException, SQLException;
+    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, KChannel channel ) throws IOException, SQLException;
+    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, KChannel channel, Number offset, Number endSize ) throws IOException, SQLException;
+    StorageIOResponse channelExport      (StorageExportIORequest storageExportIORequest, KChannel channel ) throws IOException, SQLException;
+    StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException, SQLException;
 
-    StorageIOResponse receive( InputChannel inputChannel );
+
+    StorageIOResponse receive( ReceiveEntity entity ) throws SQLException, IOException;
+    StorageIOResponse receive( ReceiveEntity entity, Number offset, Number endSize ) throws SQLException, IOException;
+
+    StorageIOResponse export( ExporterEntity entity ) throws SQLException, IOException;
+    //敬请期待
+    StorageIOResponse export( ExporterEntity entity, Number offset, Number endSize );
+
 
     boolean existStorageObject( GUID storageObject ) throws SQLException;
 

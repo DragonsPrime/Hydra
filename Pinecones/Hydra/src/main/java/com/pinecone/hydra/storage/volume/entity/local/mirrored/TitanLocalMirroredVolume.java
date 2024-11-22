@@ -3,11 +3,14 @@ package com.pinecone.hydra.storage.volume.entity.local.mirrored;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.hydra.storage.InputChannel;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
+import com.pinecone.hydra.storage.volume.entity.ExporterEntity;
+import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.LocalMirroredVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.source.MirroredVolumeManipulator;
@@ -39,10 +42,6 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
         return this.toJSONString();
     }
 
-    @Override
-    public StorageIOResponse receive(InputChannel inputChannel) {
-        return null;
-    }
 
     @Override
     public void extendLogicalVolume(GUID physicalGuid) {
@@ -61,22 +60,42 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
     }
 
     @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, FileChannel channel) throws IOException {
+    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel) throws IOException {
         return null;
     }
 
     @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, FileChannel channel, Number offset, Number endSize) throws IOException, SQLException {
+    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel, Number offset, Number endSize) throws IOException, SQLException {
         return null;
     }
 
     @Override
-    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, FileChannel channel) throws IOException {
+    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel) throws IOException {
         return null;
     }
 
     @Override
-    public StorageIOResponse channelRaid0Export(StorageExportIORequest storageExportIORequest, FileChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException {
+    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity) throws SQLException, IOException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, Number offset, Number endSize) {
         return null;
     }
 

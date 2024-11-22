@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.simple.export;
 
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchExportEntity;
@@ -7,12 +8,11 @@ import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 
 public class TitanSimpleChannelExportEntity64 extends ArchExportEntity implements SimpleChannelExportEntity64{
-    private FileChannel                 channel;
+    private KChannel                    channel;
     private SimpleChannelExport64       simpleChannelExport64;
-    public TitanSimpleChannelExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, FileChannel channel) {
+    public TitanSimpleChannelExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel) {
         super(volumeManager, storageExportIORequest);
         this.channel = channel;
         this.simpleChannelExport64 = new TitanSimpleChannelExport64( this );
@@ -20,12 +20,12 @@ public class TitanSimpleChannelExportEntity64 extends ArchExportEntity implement
 
 
     @Override
-    public FileChannel getChannel() {
+    public KChannel getChannel() {
         return this.channel;
     }
 
     @Override
-    public void setChannel(FileChannel channel) {
+    public void setChannel(KChannel channel) {
         this.channel = channel;
     }
 
@@ -35,8 +35,8 @@ public class TitanSimpleChannelExportEntity64 extends ArchExportEntity implement
     }
 
     @Override
-    public StorageIOResponse raid0Export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
-        return this.simpleChannelExport64.raid0Export( cacheBlock, offset, endSize, buffer );
+    public StorageIOResponse export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
+        return this.simpleChannelExport64.export( cacheBlock, offset, endSize, buffer );
 
     }
 }
