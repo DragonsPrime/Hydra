@@ -11,15 +11,29 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.mc.JesusChrist;
 import com.pinecone.Pinecone;
-import com.pinecone.framework.lang.FieldEntity;
+import com.pinecone.framework.lang.field.FieldEntity;
+import com.pinecone.framework.lang.field.GenericFieldEntity;
+import com.pinecone.framework.lang.field.GenericStructure;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.JSON;
+import com.pinecone.framework.util.json.JSONMaptron;
+import com.pinecone.hydra.umc.msg.ChannelControlBlock;
+import com.pinecone.hydra.umc.msg.Medium;
+import com.pinecone.hydra.umc.msg.UMCMessage;
+import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
+import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
+import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
+import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
+import com.pinecone.hydra.umct.WolfMCExpress;
 import com.pinecone.ulf.util.protobuf.GenericBeanProtobufDecoder;
 import com.pinecone.ulf.util.protobuf.GenericBeanProtobufEncoder;
 import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 import com.pinecone.ulf.util.protobuf.GenericFieldProtobufEncoder;
 import com.pinecone.ulf.util.protobuf.Options;
+import com.sauron.radium.messagron.Messagron;
+
+import io.netty.channel.ChannelHandlerContext;
 
 class DynamicProtobufBuilder {
     public static Descriptors.Descriptor buildRpcRequestDescriptor() throws Descriptors.DescriptorValidationException {
@@ -100,7 +114,13 @@ class Appleby extends JesusChrist {
 
         //this.testFieldEntry();
 
-        this.testReflect();
+        //this.testReflect();
+
+        //this.testManualRPCServer();
+
+        //this.testManualRPCClient();
+
+        this.textStructure();
     }
 
     private void testDynamic() throws Exception {
@@ -285,6 +305,134 @@ class Appleby extends JesusChrist {
             Object[] vals = decoder.decodeValues( types, descriptor, message, Set.of(), options );
             Debug.trace( vals );
         }
+    }
+
+    private void testManualRPCServer() throws Exception {
+        Messagron messagron = new Messagron( "", this, new JSONMaptron() );
+        WolfMCServer wolf = new WolfMCServer( "", this, new JSONMaptron("{host: \"0.0.0.0\",\n" +
+                "port: 5777, SocketTimeout: 800, KeepAliveTimeout: 3600, MaximumConnections: 1e6}") );
+
+        Method[] methods = Raccoon.class.getMethods();
+        Class<? > retType = methods[0].getReturnType();
+        GenericFieldProtobufEncoder encoder = new GenericFieldProtobufEncoder();
+        Options options = new Options();
+
+        String sz = "xixihaha";
+        Descriptors.Descriptor descriptor = encoder.transform( String.class, sz, Set.of() );
+        Debug.trace( descriptor.getFields() );
+
+        DynamicMessage message = encoder.encode( descriptor, sz, Set.of(), options );
+        Debug.trace( message.getAllFields() );
+        wolf.apply( new UlfAsyncMsgHandleAdapter() {
+            public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
+                UlfInformMessage mc = (UlfInformMessage) rawMsg;
+                byte[]bytes = (byte[]) mc.getHead().getExtraHead();
+
+
+                Method[] methods = Raccoon.class.getMethods();
+                FieldEntity[] types = FieldEntity.from( methods[0].getParameterTypes() );
+                Debug.trace( types );
+
+                GenericFieldProtobufEncoder encoder = new GenericFieldProtobufEncoder();
+                Options options = new Options();
+
+                Descriptors.Descriptor descriptor = encoder.transform( types, "Args", Set.of(), options );
+                Debug.trace( descriptor.getFields() );
+
+                DynamicMessage unmarshaled = DynamicMessage.parseFrom(descriptor, bytes);
+                GenericFieldProtobufDecoder decoder = new GenericFieldProtobufDecoder();
+                types = FieldEntity.from( methods[0].getParameterTypes() );
+                Object[] vals = decoder.decodeValues( types, descriptor, unmarshaled, Set.of(), options );
+                Debug.trace( vals );
+
+
+                String sz = vals[0].toString();
+                Descriptors.Descriptor retDes = encoder.transform( String.class, sz, Set.of() );
+                Debug.trace( retDes.getFields() );
+
+                DynamicMessage retMsg = encoder.encode( retDes, sz, Set.of(), options );
+                block.getTransmit().sendMsg(new UlfInformMessage(retMsg.toByteArray()));
+
+            }
+        });
+
+        wolf.execute();
+
+        this.getTaskManager().add( wolf );
+        //this.getTaskManager().syncWaitingTerminated();
+    }
+
+
+    private void testManualRPCClient() throws Exception {
+        Messagron servtron = new Messagron( "", this, new JSONMaptron( "{\n" +
+                "  \"Engine\"            : \"com.sauron.radium.messagron.Messagron\",\n" +
+                "  \"Enable\"            : true,\n" +
+                "  \"ExpressFactory\"    : \"com.pinecone.framework.util.lang.GenericDynamicFactory\",\n" +
+                "\n" +
+                "  \"Expresses\"         : {\n" +
+                "    \"WolfMCExpress\": {\n" +
+                "      \"Engine\": \"com.pinecone.hydra.umct.WolfMCExpress\"\n" +
+                "    }\n" +
+                "  }\n" +
+                "}" ) );
+
+        WolfMCClient wolf = new WolfMCClient( "", this, this.getMiddlewareManager().getMiddlewareConfig().queryJSONObject( "Messagers.Messagers.WolfMCKingpin" ) );
+        wolf.apply( new WolfMCExpress( servtron ) ).execute();
+
+
+
+
+        Method[] methods = Raccoon.class.getMethods();
+        FieldEntity[] types = FieldEntity.from( methods[0].getParameterTypes() );
+        Debug.trace( types );
+
+        GenericFieldProtobufEncoder encoder = new GenericFieldProtobufEncoder();
+        Options options = new Options();
+
+        Descriptors.Descriptor descriptor = encoder.transform( types, "Args", Set.of(), options );
+        Debug.trace( descriptor.getFields() );
+
+        types[0].setValue("fuck you");
+        types[1].setValue(2024);
+        DynamicMessage message = encoder.encode( descriptor, types, Set.of(), options );
+        Debug.trace( message.getAllFields() );
+
+
+
+        Debug.sleep( 500 );
+        UMCMessage retMsg = wolf.sendSyncMsg(new UlfInformMessage(message.toByteArray()));
+        if(retMsg instanceof UlfInformMessage) {
+            Debug.trace(retMsg.getHead().getExtraHead());
+
+
+            Descriptors.Descriptor retDes = encoder.transform( String.class, "", Set.of() );
+            Debug.trace( retDes.getFields() );
+
+            DynamicMessage retDy = DynamicMessage.parseFrom( retDes, (byte[])retMsg.getHead().getExtraHead() );
+            GenericBeanProtobufDecoder decoder = new GenericBeanProtobufDecoder();
+            var dm = decoder.decode( String.class, retDes, retDy, Set.of(), options );
+            Debug.info(dm);
+        }
+        this.getTaskManager().add( wolf );
+        this.getTaskManager().syncWaitingTerminated();
+    }
+
+
+    protected void textStructure() throws Exception {
+        GenericStructure structure = new GenericStructure( "test.red", 3 );
+        structure.setDataField( 0, "name", "test" );
+        structure.setDataField( 1, "t1", "v1" );
+        structure.setDataField( 2, "t2", new JSONMaptron( "{ k: v}" ) );
+
+        Debug.trace( structure, structure.findDataField( "t2" ), structure.findTextField( "__NAME__" ), structure.findTextField( "sss" ) );
+
+        structure.resize( 4 );
+        structure.setDataField( 3, "t3", 3 );
+        Debug.trace( structure );
+
+        //structure.setDataOffset( 5 );
+        structure.setTextOffset( 3 );
+        Debug.trace( structure, structure.size(), structure.capacity() );
     }
 
 }

@@ -5,7 +5,7 @@ import java.util.Set;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
-import com.pinecone.framework.lang.FieldEntity;
+import com.pinecone.framework.lang.field.FieldEntity;
 
 public interface FieldProtobufEncoder extends BeanProtobufEncoder {
     Descriptors.Descriptor transform( Map.Entry<String, Object>[] fields, String szEntityName, Set<String > exceptedKeys, Options options );

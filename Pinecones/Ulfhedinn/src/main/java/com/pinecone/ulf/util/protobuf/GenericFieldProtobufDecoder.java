@@ -8,7 +8,7 @@ import java.util.Set;
 
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
-import com.pinecone.framework.lang.FieldEntity;
+import com.pinecone.framework.lang.field.FieldEntity;
 import com.pinecone.framework.unit.KeyValue;
 
 public class GenericFieldProtobufDecoder extends GenericBeanProtobufDecoder implements FieldProtobufDecoder {

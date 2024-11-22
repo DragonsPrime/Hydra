@@ -16,7 +16,7 @@ import java.util.Map;
 public class UMCHead implements Pinenut {
     public static final String     ProtocolVersion   = "1.1";
     public static final String     ProtocolSignature = "UMC/" + UMCHead.ProtocolVersion;
-    public static final int        StructBlockSize   = Byte.BYTES + Integer.BYTES + Long.BYTES + Long.BYTES + Short.BYTES + Byte.BYTES + Long.BYTES;
+    public static final int        StructBlockSize   = Byte.BYTES + Integer.BYTES + Long.BYTES + Long.BYTES + Short.BYTES + Byte.BYTES + Long.BYTES + Long.BYTES;
     public static final int        HeadBlockSize     = UMCHead.ProtocolSignature.length() + 1 + UMCHead.StructBlockSize;
     public static final ByteOrder  BinByteOrder      = ByteOrder.LITTLE_ENDIAN ;// Using x86, C/C++
 
@@ -27,7 +27,8 @@ public class UMCHead implements Pinenut {
     protected long                   nKeepAlive        = -1                     ; // sizeof( int64 ) = 8, [-1 for forever, 0 for off, others for millis]
     protected Status                 status            = Status.OK              ; // sizeof( Status/Short ) = 2
     protected ExtraEncode            extraEncode       = ExtraEncode.Undefined  ; // sizeof( ExtraEncode/byte ) = 1
-    protected long                   controlBits                               ; // sizeof( int64 ) = 8, Custom control bytes.
+    protected long                   controlBits                                ; // sizeof( int64 ) = 8, Custom control bytes.
+    protected long                   sessionId         = 0                      ; // sizeof( int64 ) = 8
     protected byte[]                 extraHead         = {}                     ;
     protected Object                 dyExtraHead                                ;
 
@@ -95,6 +96,10 @@ public class UMCHead implements Pinenut {
 
     void setControlBits      ( long controlBits       ) {
         this.controlBits = controlBits;
+    }
+
+    public void setSessionId ( long sessionId         ) {
+        this.sessionId = sessionId;
     }
 
     void setExtraHead        ( JSONObject jo          ) {
@@ -166,6 +171,10 @@ public class UMCHead implements Pinenut {
 
     public long            getKeepAlive() {
         return this.nKeepAlive;
+    }
+
+    public long            getSessionId() {
+        return this.sessionId;
     }
 
     public Status          getStatus() {
