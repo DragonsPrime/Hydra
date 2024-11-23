@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import com.pinecone.framework.util.StringUtils;
 import com.pinecone.framework.util.json.JSON;
+import lombok.val;
 
 public class GenericStructure implements DataStructureEntity {
     protected FieldEntity[] mSegments;
@@ -20,7 +21,7 @@ public class GenericStructure implements DataStructureEntity {
         this.mSegments       = new FieldEntity[ nDataOffset - nTextOffset + nElements ];
         this.mSegments[ 0 ]  = new GenericFieldEntity( DataStructureEntity.StructureNameKey, szName, String.class );
         this.mnTextOffset    = nTextOffset;
-        this.mnDataOffset   = nDataOffset;
+        this.mnDataOffset    = nDataOffset;
     }
 
     public GenericStructure( String szName ,int nElements ) {
@@ -68,6 +69,14 @@ public class GenericStructure implements DataStructureEntity {
             System.arraycopy( this.mSegments, this.mnTextOffset, this.mSegments, offset, this.mnDataOffset - this.mnTextOffset );
         }
 
+        if( offset < this.mnTextOffset ) {
+            int length = this.mnDataOffset - this.mnTextOffset;
+            System.arraycopy( this.mSegments, this.mnTextOffset, this.mSegments, offset, length );
+            for( int i = offset + length; i < mnDataOffset; i++ ){
+                this.mSegments[ i ] = null;
+            }
+        }
+
         this.mnTextOffset = offset;
     }
 
@@ -83,6 +92,10 @@ public class GenericStructure implements DataStructureEntity {
             for ( int i = this.mnDataOffset ; i < offset; ++i ) {
                 this.mSegments[ i ] = null;
             }
+        }
+
+        if( offset < this.mnDataOffset ){
+            this.trimResize( this.mSegments.length - ( this.mnDataOffset - offset ), offset );
         }
 
         this.mnDataOffset = offset;
@@ -113,6 +126,7 @@ public class GenericStructure implements DataStructureEntity {
         System.arraycopy( this.mSegments, 0, newSegments, 0, this.mSegments.length );
         this.mSegments = newSegments;
     }
+
 
     @Override
     public FieldEntity[] getFields() {
@@ -225,4 +239,13 @@ public class GenericStructure implements DataStructureEntity {
         sb.append( '}' );
         return sb.toString();
     }
+
+
+    protected void trimResize( int newSize, int newDataOffset ){
+        FieldEntity[] newSegments = new FieldEntity[newSize];
+        System.arraycopy( this.mSegments, this.mnDataOffset, newSegments, newDataOffset, this.mSegments.length - this.mnDataOffset );
+        System.arraycopy( this.mSegments, this.mnTextOffset, newSegments, this.mnTextOffset, newDataOffset - this.mnTextOffset  );
+        this.mSegments = newSegments;
+    }
+
 }

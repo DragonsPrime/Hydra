@@ -8,12 +8,15 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.List;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class TitanKChannel implements KChannel{
     private final FileChannel  channel;
+    private final ReentrantLock reentrantLock;
 
     public TitanKChannel( FileChannel channel ){
         this.channel = channel;
+        this.reentrantLock = new ReentrantLock();
     }
 
     @Override
@@ -24,6 +27,18 @@ public class TitanKChannel implements KChannel{
     @Override
     public int read(ByteBuffer buffer) throws IOException {
         return this.channel.read( buffer );
+    }
+
+    @Override
+    public int read(ByteBuffer buffer, long offset) throws IOException {
+        this.reentrantLock.lock();
+        try {
+            this.channel.position( offset );
+            this.channel.read( buffer );
+        }finally {
+            this.reentrantLock.unlock();
+        }
+        return 0;
     }
 
     @Override
