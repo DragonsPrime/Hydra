@@ -40,6 +40,7 @@ public class GenericChannelExporter extends ArchExporter implements ChannelExpor
             LogicVolume volume = volumeManager.get(GUIDs.GUID72(uniformSourceLocator.getVolumeGuid()));
             volume.channelExport( titanExportStorageObject, fileChannel );
         }
+        fileChannel.close();
     }
 
     @Override

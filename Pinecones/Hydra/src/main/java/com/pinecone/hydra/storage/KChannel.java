@@ -20,4 +20,6 @@ public interface KChannel extends Pinenut {
     int write(byte[] buffer, List<CacheBlock> writableCacheBlocks ) throws IOException;
 
     long position() throws IOException;
+
+    void close() throws IOException;
 }

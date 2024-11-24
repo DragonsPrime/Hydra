@@ -1,12 +1,20 @@
 package com.pinecone.hydra.storage.file.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
+import com.pinecone.hydra.registry.entity.PropertyJSONEncoder;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.source.FolderManipulator;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 import com.pinecone.ulf.util.id.GuidAllocator;
+import lombok.val;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -74,7 +82,13 @@ public class GenericFolder extends ArchElementNode implements Folder{
 
     @Override
     public List<FileTreeNode> listItem() {
-        return null;
+        ArrayList<FileTreeNode> fileTreeNodes = new ArrayList<>();
+        List<TreeNode> children = this.fileSystem.getChildren(this.guid);
+        for( TreeNode node : children ){
+            FileTreeNode fileTreeNode = this.fileSystem.get(node.getGuid());
+            fileTreeNodes.add( fileTreeNode );
+        }
+        return fileTreeNodes;
     }
 
     @Override
@@ -148,5 +162,14 @@ public class GenericFolder extends ArchElementNode implements Folder{
     @Override
     public void copyNamespaceMetaTo(GUID destinationGuid) {
 
+    }
+    @Override
+    public String toJSONString() {
+        return BeanJSONEncoder.BasicEncoder.encode( this );
+    }
+
+    @Override
+    public String toString() {
+        return this.toJSONString();
     }
 }

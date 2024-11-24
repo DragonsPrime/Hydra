@@ -63,6 +63,11 @@ public class TitanKChannel implements KChannel{
         return this.channel.position();
     }
 
+    @Override
+    public void close() throws IOException {
+        this.channel.close();
+    }
+
     private ByteBuffer copyToTemporaryBuffer(byte[] buffer, int startPosition, int endSize ){
         ByteBuffer temporaryBuffer = ByteBuffer.allocate( endSize );
         temporaryBuffer.put( buffer, startPosition, endSize );

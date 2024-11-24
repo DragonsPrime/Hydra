@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.file.operator;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pinecone.hydra.storage.file.FileSystemConfig;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.GenericFileNode;
@@ -13,6 +14,7 @@ import java.util.TreeMap;
 
 public class GenericFileSystemOperatorFactory implements FileSystemOperatorFactory{
     protected FileMasterManipulator            fileMasterManipulator;
+    @JsonIgnore
     protected KOMFileSystem                    fileSystem;
 
     protected Map<String, TreeNodeOperator>    registerer = new HashMap<>();

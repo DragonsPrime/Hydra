@@ -60,7 +60,7 @@ class Steve extends Radium {
         //this.testUpload(fileSystem);
         //this.testDelete( fileSystem );
         //this.testChannelReceive( fileSystem, volumeManager );
-        this.testChannelExport( fileSystem, volumeManager );
+        //this.testChannelExport( fileSystem, volumeManager );
 
     }
 
@@ -94,14 +94,13 @@ class Steve extends Radium {
     }
 
     private void testChannelExport( KOMFileSystem fileSystem, UniformVolumeManager volumeManager ) throws IOException, SQLException {
-        FileNode fileNode = (FileNode) fileSystem.get(fileSystem.queryGUIDByPath("D:/文件系统/大文件/我的视频.mp4"));
-        File file = new File("D:/文件系统/大文件/我的视频.mp4");
+        FileNode fileNode = (FileNode) fileSystem.get(fileSystem.queryGUIDByPath("D:/文件系统/大文件/我的图片.jpg"));
+        File file = new File("D:/文件系统/大文件/我的图片.jpg");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
         TitanKChannel titanKChannel = new TitanKChannel( channel );
         GenericChannelExporterEntity exporterEntity = new GenericChannelExporterEntity( fileSystem, fileNode, titanKChannel );
         fileSystem.export( volumeManager, exporterEntity );
     }
-
 
 }
 public class TestUOFS {

@@ -1,5 +1,6 @@
 package com.pinecone.hydra.system.ko.kom;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.lang.GenericDynamicFactory;
@@ -30,6 +31,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
     protected KOMInstrument         mParentInstrument;
 
     protected Hydrarum              hydrarum;
+
     protected GuidAllocator         guidAllocator;
     protected OperatorFactory       operatorFactory;
 
