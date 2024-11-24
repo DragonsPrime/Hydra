@@ -13,12 +13,12 @@ public abstract class ArchMessagelet implements Messagelet {
     protected Hydrarum                  mSystem;
     protected Map<String, Object >      mConfig;
     protected ArchMessagram             mMessagelet;
-    protected MessagePackage            mMsgPackage;
+    protected UMCConnection mMsgPackage;
 
     protected UMCTransmit               mUMCTransmit;
     protected UMCReceiver               mUMCReceiver;
 
-    public ArchMessagelet( MessagePackage msgPackage, ArchMessagram servtron ) {
+    public ArchMessagelet(UMCConnection msgPackage, ArchMessagram servtron ) {
         this.mMsgPackage   = msgPackage;
         this.mSystem       = this.getMessageDeliver().getSystem();
         this.mMessagelet   = servtron;
@@ -33,7 +33,7 @@ public abstract class ArchMessagelet implements Messagelet {
     }
 
     @Override
-    public MessagePackage getMessagePackage() {
+    public UMCConnection getMessagePackage() {
         return this.mMsgPackage;
     }
 

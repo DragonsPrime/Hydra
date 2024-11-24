@@ -33,6 +33,10 @@ public interface DataStructureEntity extends SegmentEntity {
 
     void setDataField( int index, String key, Object val );
 
+    void setTextField( int index, String key, Class<?> type );
+
+    void setDataField( int index, String key, Class<?> type );
+
     FieldEntity getTextField( int index );
 
     FieldEntity getDataField( int index );

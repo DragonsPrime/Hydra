@@ -19,7 +19,7 @@ public interface Messagelet extends Pinenut {
 
     MessageDeliver getMessageDeliver();
 
-    MessagePackage getMessagePackage();
+    UMCConnection getMessagePackage();
 
     ArchMessagram getMessagelet();
 

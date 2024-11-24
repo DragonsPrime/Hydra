@@ -7,7 +7,7 @@ import com.pinecone.hydra.umc.msg.UMCTransmit;
 import com.pinecone.hydra.express.Deliver;
 import com.pinecone.hydra.express.Package;
 
-public interface MessagePackage extends Package {
+public interface UMCConnection extends Package {
     MessageDeliver getDeliver();
 
     UMCMessage getMessage();
@@ -27,5 +27,5 @@ public interface MessagePackage extends Package {
         return e.toString();
     }
 
-    MessagePackage entrust( Deliver deliver );
+    UMCConnection entrust(Deliver deliver );
 }

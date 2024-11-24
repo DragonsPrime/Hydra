@@ -1,7 +1,7 @@
 package com.sauron.radium.messagron;
 
 import com.pinecone.hydra.umct.ArchMessagram;
-import com.pinecone.hydra.umct.MessagePackage;
+import com.pinecone.hydra.umct.UMCConnection;
 import com.pinecone.hydra.umct.MessageletMsgDeliver;
 import com.pinecone.hydra.umct.ArchMessagelet;
 import com.pinecone.framework.util.json.JSONObject;
@@ -13,7 +13,7 @@ import java.util.Map;
 public abstract class Messageletson extends ArchMessagelet {
     protected JSONObject       mLetLocal = new JSONMaptron();
 
-    public Messageletson(MessagePackage msgPackage, ArchMessagram servtron ) {
+    public Messageletson(UMCConnection msgPackage, ArchMessagram servtron ) {
         super( msgPackage, servtron );
         this.mUMCReceiver = this.getMessagePackage().getReceiver();
         this.mUMCTransmit = this.getMessagePackage().getTransmit();

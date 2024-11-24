@@ -35,7 +35,7 @@ public class WolfMCExpress extends ArchMsgExpress implements UlfAsyncMsgHandleAd
 
     @Override
     public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws IOException {
-        UlfMsgPackage msgPackage = new UlfMsgPackage(  medium, block, msg, ctx );
+        UlfConnection msgPackage = new UlfConnection(  medium, block, msg, ctx );
         this.mMessageletMsgDeliver.toDispatch( msgPackage );
         msgPackage.release();
     }

@@ -47,13 +47,13 @@ public abstract class ArchMessagram extends ArchServgramium implements Messagram
 
     public abstract String getLetsNamespace() ;
 
-    protected Messagelet contriveByClassName( String szClassName, MessagePackage messagePackage ) {
+    protected Messagelet contriveByClassName( String szClassName, UMCConnection UMCConnection) {
         Messagelet obj = null;
         try {
             Class<?> pVoid = Class.forName( szClassName );
             try{
-                Constructor<?> constructor = pVoid.getConstructor( MessagePackage.class, ArchMessagram.class );
-                obj = (Messagelet) constructor.newInstance( messagePackage, this );
+                Constructor<?> constructor = pVoid.getConstructor( UMCConnection.class, ArchMessagram.class );
+                obj = (Messagelet) constructor.newInstance(UMCConnection, this );
             }
             catch (NoSuchMethodException | InvocationTargetException e1){
                 e1.printStackTrace();
@@ -66,9 +66,9 @@ public abstract class ArchMessagram extends ArchServgramium implements Messagram
         return obj;
     }
 
-    public Messagelet contriveByScheme( String szSchemeName, MessagePackage messagePackage ) throws IllegalArgumentException {
+    public Messagelet contriveByScheme( String szSchemeName, UMCConnection UMCConnection) throws IllegalArgumentException {
         String szClassName = this.getLetsNamespace() + szSchemeName ;
-        Messagelet obj = this.contriveByClassName( szClassName, messagePackage );
+        Messagelet obj = this.contriveByClassName( szClassName, UMCConnection);
         if( obj == null ){
             throw new IllegalArgumentException( "[Messagelet] Fantasy scheme with no crew member." );
         }

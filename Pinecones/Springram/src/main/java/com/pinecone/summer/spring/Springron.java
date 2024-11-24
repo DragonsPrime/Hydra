@@ -2,7 +2,10 @@ package com.pinecone.summer.spring;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.system.executum.Processum;
+import com.pinecone.framework.system.functions.Executor;
 import com.pinecone.hydra.servgram.ArchServgramium;
+
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.concurrent.TimeoutException;
@@ -47,6 +50,11 @@ public class Springron extends ArchServgramium implements Springram {
         this( szName, parent, new String[0] );
     }
 
+    @Override
+    public Springram setPrimarySources( Class<?> primarySources ) {
+        this.mSpringKernel.setPrimarySources( primarySources );
+        return this;
+    }
 
     @Override
     public void join() throws InterruptedException {
@@ -66,6 +74,16 @@ public class Springron extends ArchServgramium implements Springram {
     @Override
     public ConfigurableApplicationContext getContext() {
         return this.mSpringKernel.getContext();
+    }
+
+    @Override
+    public SpringApplication getSpringApplication() {
+        return this.mSpringKernel.getSpringApplication();
+    }
+
+    @Override
+    public void setInitializer( Executor initializer ) {
+        this.mSpringKernel.setInitializer(initializer);
     }
 
     @Override

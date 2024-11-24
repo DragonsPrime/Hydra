@@ -49,8 +49,8 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     public abstract String getServiceKeyword() ;
 
 
-    protected MessagePackage wrap( Package that ) {
-        return (MessagePackage) that;
+    protected UMCConnection wrap(Package that ) {
+        return (UMCConnection) that;
     }
 
     protected abstract void prepareDispatch( Package that ) throws IOException;
@@ -62,7 +62,7 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     }
 
     protected void messageDispatch( Package that ) throws IOException {
-        MessagePackage msgPackage = this.wrap( that );
+        UMCConnection msgPackage = this.wrap( that );
         UMCMessage msg            = msgPackage.getMessage();
 
         if( this.sift( that ) ) {

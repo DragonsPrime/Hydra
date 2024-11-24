@@ -4,7 +4,6 @@ import java.util.Arrays;
 
 import com.pinecone.framework.util.StringUtils;
 import com.pinecone.framework.util.json.JSON;
-import lombok.val;
 
 public class GenericStructure implements DataStructureEntity {
     protected FieldEntity[] mSegments;
@@ -65,18 +64,23 @@ public class GenericStructure implements DataStructureEntity {
         }
 
         if ( offset > this.mnTextOffset ) {
+            int legacySize = this.mSegments.length - this.mnTextOffset;
             this.resize( offset + this.mSegments.length );
-            System.arraycopy( this.mSegments, this.mnTextOffset, this.mSegments, offset, this.mnDataOffset - this.mnTextOffset );
+            System.arraycopy( this.mSegments, this.mnTextOffset, this.mSegments, offset, legacySize );
+            for( int i = 0; i < offset; i++ ){
+                this.mSegments[ i ] = null;
+            }
         }
 
         if( offset < this.mnTextOffset ) {
             int length = this.mnDataOffset - this.mnTextOffset;
             System.arraycopy( this.mSegments, this.mnTextOffset, this.mSegments, offset, length );
-            for( int i = offset + length; i < mnDataOffset; i++ ){
+            for( int i = offset + length; i < this.mnDataOffset; i++ ){
                 this.mSegments[ i ] = null;
             }
         }
 
+        this.mnDataOffset = offset - this.mnTextOffset + this.mnDataOffset;
         this.mnTextOffset = offset;
     }
 
@@ -181,6 +185,16 @@ public class GenericStructure implements DataStructureEntity {
         }
         neo = new GenericFieldEntity( key, val );
         this.setDataField( index, neo );
+    }
+
+    @Override
+    public void setTextField( int index, String key, Class<?> type ) {
+        this.setTextField( index, new GenericFieldEntity( key, type ) );
+    }
+
+    @Override
+    public void setDataField( int index, String key, Class<?> type ) {
+        this.setDataField( index, new GenericFieldEntity( key, type ) );
     }
 
     @Override

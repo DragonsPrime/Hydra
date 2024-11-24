@@ -5,12 +5,10 @@ import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageNaming;
-import com.pinecone.hydra.storage.TemporaryLock;
 import com.pinecone.hydra.storage.TitanStorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageNaming;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -35,7 +33,6 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
     }
 
     private  StorageIOResponse receiveWithOffsetAndSize(DirectChannelReceiveEntity entity, long offset, int size) throws IOException {
-        TemporaryLock.reentrantLock.lock();
         Debug.trace("缓存的是"+offset+"到"+(offset + size));
         StorageReceiveIORequest storageReceiveIORequest = entity.getReceiveStorageObject();
         String destDirPath = entity.getDestDirPath();
@@ -75,7 +72,6 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
         titanMiddleStorageObject.setParityCheck(parityCheck);
         titanMiddleStorageObject.setSourceName(path.toString());
 
-        TemporaryLock.reentrantLock.unlock();
         return titanMiddleStorageObject;
     }
 

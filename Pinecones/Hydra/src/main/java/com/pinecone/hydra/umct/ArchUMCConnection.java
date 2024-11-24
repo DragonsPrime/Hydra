@@ -5,26 +5,19 @@ import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.umc.msg.UMCReceiver;
 import com.pinecone.hydra.umc.msg.UMCTransmit;
 import com.pinecone.hydra.express.Deliver;
-import com.pinecone.hydra.system.Hydrarum;
 
-public abstract class ArchMsgPackage implements MessagePackage {
+public abstract class ArchUMCConnection implements UMCConnection {
     protected MessageDeliver  mDeliver;
     protected Medium mMessageSource;
     protected UMCMessage mUMCMessage;
     protected UMCTransmit mUMCTransmit;
     protected UMCReceiver mUMCReceiver;
 
-    public ArchMsgPackage( Medium medium, UMCMessage message, UMCTransmit transmit, UMCReceiver receiver ) {
+    public ArchUMCConnection(Medium medium, UMCMessage message, UMCTransmit transmit, UMCReceiver receiver ) {
         this.mMessageSource = medium;
         this.mUMCMessage    = message;
         this.mUMCTransmit   = transmit;
         this.mUMCReceiver   = receiver;
-    }
-
-
-    @Override
-    public Hydrarum getSystem() {
-        return this.getDeliver().getSystem();
     }
 
     @Override
@@ -53,7 +46,7 @@ public abstract class ArchMsgPackage implements MessagePackage {
     }
 
     @Override
-    public ArchMsgPackage entrust( Deliver deliver ) {
+    public ArchUMCConnection entrust(Deliver deliver ) {
         this.mDeliver = (MessageDeliver)deliver;
         return this;
     }

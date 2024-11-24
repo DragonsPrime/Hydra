@@ -27,7 +27,7 @@ public class MessageletMsgDeliver extends ArchMsgDeliver {
 
     @Override
     protected void doMessagelet( String szMessagelet, Package that ) {
-        this.getMessagram().contriveByScheme( szMessagelet, (MessagePackage) that ).dispatch();
+        this.getMessagram().contriveByScheme( szMessagelet, (UMCConnection) that ).dispatch();
     }
 
 }

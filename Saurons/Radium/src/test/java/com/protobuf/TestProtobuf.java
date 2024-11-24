@@ -12,7 +12,6 @@ import com.google.protobuf.DynamicMessage;
 import com.mc.JesusChrist;
 import com.pinecone.Pinecone;
 import com.pinecone.framework.lang.field.FieldEntity;
-import com.pinecone.framework.lang.field.GenericFieldEntity;
 import com.pinecone.framework.lang.field.GenericStructure;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.Debug;
@@ -26,6 +25,7 @@ import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
 import com.pinecone.hydra.umct.WolfMCExpress;
+import com.pinecone.hydra.umct.protocol.function.GenericArgumentRequest;
 import com.pinecone.ulf.util.protobuf.GenericBeanProtobufDecoder;
 import com.pinecone.ulf.util.protobuf.GenericBeanProtobufEncoder;
 import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
@@ -430,9 +430,20 @@ class Appleby extends JesusChrist {
         structure.setDataField( 3, "t3", 3 );
         Debug.trace( structure );
 
-        //structure.setDataOffset( 5 );
-        structure.setTextOffset( 3 );
+        //structure.setDataOffset( 2 );
+        //structure.setTextOffset( 3 );
         Debug.trace( structure, structure.size(), structure.capacity() );
+
+
+
+
+
+
+
+        Method[] methods = Raccoon.class.getMethods();
+        GenericArgumentRequest request = new GenericArgumentRequest( Raccoon.class.getName(), methods[0].getParameterTypes() );
+
+        Debug.trace( request, request.getAddressPath(), request.getInterceptedPath(), request.getInterceptorName(), request.getSegment() );
     }
 
 }
