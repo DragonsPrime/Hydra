@@ -46,8 +46,6 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
         titanMiddleStorageObject.setObjectGuid(storageReceiveIORequest.getStorageObjectGuid());
 
         buffer.clear();
-//        channel.position(offset);
-//        channel.read(buffer);
         channel.read( buffer, offset );
         buffer.flip();
         CRC32 crc = new CRC32();

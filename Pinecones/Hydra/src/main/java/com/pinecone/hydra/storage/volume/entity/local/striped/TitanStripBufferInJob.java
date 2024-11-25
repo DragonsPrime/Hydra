@@ -37,6 +37,7 @@ public class TitanStripBufferInJob implements StripBufferInJob {
     protected MasterVolumeGram              masterVolumeGram;
 
     protected Number                        offset;
+
     protected Number                        endSize;
 
     public TitanStripBufferInJob(MasterVolumeGram masterVolumeGram, StripedChannelExport stripedChannelExport, LogicVolume volume, StorageExportIORequest object, int jobCode ){
@@ -58,7 +59,7 @@ public class TitanStripBufferInJob implements StripBufferInJob {
     @Override
     public void applyThread( LocalStripedTaskThread taskThread ) {
         this.parentThread                 = taskThread;
-         this.masterVolumeGram            = (MasterVolumeGram) this.parentThread.parentExecutum();
+        this.masterVolumeGram            = (MasterVolumeGram) this.parentThread.parentExecutum();
         this.majorStatusIO                = this.masterVolumeGram.getMajorStatusIO();
     }
 

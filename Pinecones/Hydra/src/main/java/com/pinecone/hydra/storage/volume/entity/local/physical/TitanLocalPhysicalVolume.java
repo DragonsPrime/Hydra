@@ -12,7 +12,7 @@ import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
-import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirectChannelExportEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.physical.export.channel.TitanDirectChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel.TitanDirectChannelReceiveEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
@@ -103,6 +103,11 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     @Override
     public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException {
         return entity.receive( offset, endSize );
+    }
+
+    @Override
+    public StorageIOResponse receive(ReceiveEntity entity, CacheBlock cacheBlock, byte[] buffer) throws SQLException, IOException {
+        return entity.receive( cacheBlock, buffer );
     }
 
     @Override

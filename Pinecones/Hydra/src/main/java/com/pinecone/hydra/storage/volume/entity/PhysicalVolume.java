@@ -27,6 +27,8 @@ public interface PhysicalVolume extends Volume{
     StorageIOResponse receive( ReceiveEntity entity ) throws SQLException, IOException;
     StorageIOResponse receive( ReceiveEntity entity, Number offset, Number endSize ) throws SQLException, IOException;
 
+    StorageIOResponse receive( ReceiveEntity entity, CacheBlock cacheBlock, byte[] buffer ) throws SQLException, IOException;
+
     StorageIOResponse export( ExporterEntity entity ) throws SQLException, IOException;
     //敬请期待
     StorageIOResponse export( ExporterEntity entity, Number offset, Number endSize );

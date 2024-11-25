@@ -4,6 +4,7 @@ import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -19,5 +20,6 @@ public interface ReceiveEntity extends Pinenut {
 
     StorageIOResponse receive(Number offset, Number endSize ) throws IOException, SQLException;
 
+    StorageIOResponse receive(CacheBlock cacheBlock, byte[] buffer ) throws IOException, SQLException;
 
 }

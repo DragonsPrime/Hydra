@@ -1,7 +1,5 @@
 package com.walnuts.sparta.uofs.service.api.controller;
 
-import com.pinecone.framework.util.Debug;
-import com.pinecone.framework.util.json.JSON;
 import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.TitanKChannel;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
@@ -14,9 +12,8 @@ import com.pinecone.hydra.storage.file.transmit.receiver.channel.GenericChannelR
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.walnuts.sparta.uofs.service.api.response.BasicResultResponse;
-import com.walnuts.sparta.uofs.service.domain.dto.downloadObjectByChannelDto;
-import com.walnuts.sparta.uofs.service.domain.dto.updateObjectByChannelDto;
-import com.walnuts.sparta.uofs.service.domain.vo.FolderContentVo;
+import com.walnuts.sparta.uofs.service.domain.dto.DownloadObjectByChannelDTO;
+import com.walnuts.sparta.uofs.service.domain.dto.UpdateObjectByChannelDTO;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -51,7 +48,7 @@ public class UOFSController {
      * @throws SQLException
      */
     @PostMapping("/channel/update")
-    public BasicResultResponse<String> updateObjectByChannel( updateObjectByChannelDto dto ) throws IOException, SQLException {
+    public BasicResultResponse<String> updateObjectByChannel( UpdateObjectByChannelDTO dto ) throws IOException, SQLException {
         MultipartFile object = dto.getObject();
         File file = File.createTempFile( "uofs","."+ getExtension(object.getOriginalFilename()) );
         object.transferTo( file );
@@ -75,7 +72,7 @@ public class UOFSController {
      * @throws SQLException
      */
     @PostMapping("/channel/download")
-    public BasicResultResponse<String> downloadObjectByChannel( downloadObjectByChannelDto dto ) throws IOException, SQLException {
+    public BasicResultResponse<String> downloadObjectByChannel( DownloadObjectByChannelDTO dto ) throws IOException, SQLException {
         File file = new File( dto.getTargetPath());
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
         TitanKChannel titanKChannel = new TitanKChannel( channel );
@@ -92,11 +89,33 @@ public class UOFSController {
      * @param folderGuid 文件夹guid
      * @returnS
      */
-    @GetMapping("/getFolderContent")
-    public String getFolderContent(@RequestParam String folderGuid ){
+    @GetMapping("/folder/listItem")
+    public String listItem(@RequestParam String folderGuid ){
         Folder folder = this.primaryFileSystem.getFolder(GUIDs.GUID72(folderGuid));
         List<FileTreeNode> fileTreeNodes = folder.listItem();
         return  BasicResultResponse.success(fileTreeNodes).toJSONString() ;
+    }
+
+    /**
+     * 创建文件夹
+     * @param destDirPath 文件夹路径
+     * @return 返回操作状态
+     */
+    @GetMapping("/creat/folder")
+    public BasicResultResponse<String> createFolder( @RequestParam String destDirPath ){
+        this.primaryFileSystem.affirmFolder( destDirPath );
+        return BasicResultResponse.success();
+    }
+
+    /**
+     * 创建文件
+     * @param filePath 文件路径
+     * @return 返回操作状态
+     */
+    @GetMapping("/creat/file")
+    public BasicResultResponse<String> createFile( @RequestParam String filePath ){
+        this.primaryFileSystem.affirmFileNode( filePath );
+        return BasicResultResponse.success();
     }
 
 
