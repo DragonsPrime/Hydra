@@ -76,7 +76,7 @@ public class GenericFieldProtobufDecoder extends GenericBeanProtobufDecoder impl
         return this.decodeEntries0( entities, descriptor, dynamicMessage, exceptedKeys, options, true );
     }
 
-    protected Object[] decodeEntries0(FieldEntity[] entities, Descriptors.Descriptor descriptor, DynamicMessage dynamicMessage, Set<String> exceptedKeys, Options options, boolean bEvalValue ) {
+    protected Object[] decodeEntries0( FieldEntity[] entities, Descriptors.Descriptor descriptor, DynamicMessage dynamicMessage, Set<String> exceptedKeys, Options options, boolean bEvalValue ) {
         if ( descriptor == null || dynamicMessage == null || entities == null ) {
             return null;
         }

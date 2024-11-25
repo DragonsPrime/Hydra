@@ -9,7 +9,7 @@ import java.sql.SQLException;
 import java.util.concurrent.Semaphore;
 
 public interface VolumeJob extends Executor {
-    void execute() throws VolumeJobCompromiseException, IOException, InterruptedException;
+    void execute() throws VolumeJobCompromiseException;
 
     void applyThread( LocalStripedTaskThread thread );
 

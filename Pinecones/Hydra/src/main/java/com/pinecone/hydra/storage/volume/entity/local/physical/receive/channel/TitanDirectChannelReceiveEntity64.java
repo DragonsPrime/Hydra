@@ -5,9 +5,11 @@ import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchReceiveEntity;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.sql.SQLException;
 
 public class TitanDirectChannelReceiveEntity64 extends ArchReceiveEntity implements DirectChannelReceiveEntity64{
     private KChannel     channel;
@@ -50,5 +52,10 @@ public class TitanDirectChannelReceiveEntity64 extends ArchReceiveEntity impleme
     @Override
     public void setDestDirPath(String destDirPath) {
         this.destDirPath = destDirPath;
+    }
+
+    @Override
+    public StorageIOResponse receive(CacheBlock cacheBlock, byte[] buffer) throws IOException, SQLException {
+        return null;
     }
 }

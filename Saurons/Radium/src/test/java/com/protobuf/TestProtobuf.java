@@ -25,7 +25,10 @@ import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
 import com.pinecone.hydra.umct.WolfMCExpress;
+import com.pinecone.hydra.umct.protocol.compiler.BytecodeIfacCompiler;
+import com.pinecone.hydra.umct.protocol.compiler.GenericIfaceInspector;
 import com.pinecone.hydra.umct.protocol.function.GenericArgumentRequest;
+import com.pinecone.ulf.util.lang.GenericPreloadClassInspector;
 import com.pinecone.ulf.util.protobuf.GenericBeanProtobufDecoder;
 import com.pinecone.ulf.util.protobuf.GenericBeanProtobufEncoder;
 import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
@@ -34,6 +37,7 @@ import com.pinecone.ulf.util.protobuf.Options;
 import com.sauron.radium.messagron.Messagron;
 
 import io.netty.channel.ChannelHandlerContext;
+import javassist.ClassPool;
 
 class DynamicProtobufBuilder {
     public static Descriptors.Descriptor buildRpcRequestDescriptor() throws Descriptors.DescriptorValidationException {
@@ -120,7 +124,9 @@ class Appleby extends JesusChrist {
 
         //this.testManualRPCClient();
 
-        this.textStructure();
+        //this.testStructure();
+
+        this.testIfacInspector();
     }
 
     private void testDynamic() throws Exception {
@@ -418,7 +424,7 @@ class Appleby extends JesusChrist {
     }
 
 
-    protected void textStructure() throws Exception {
+    protected void testStructure() throws Exception {
         GenericStructure structure = new GenericStructure( "test.red", 3 );
         structure.setDataField( 0, "name", "test" );
         structure.setDataField( 1, "t1", "v1" );
@@ -443,7 +449,17 @@ class Appleby extends JesusChrist {
         Method[] methods = Raccoon.class.getMethods();
         GenericArgumentRequest request = new GenericArgumentRequest( Raccoon.class.getName(), methods[0].getParameterTypes() );
 
-        Debug.trace( request, request.getAddressPath(), request.getInterceptedPath(), request.getInterceptorName(), request.getSegment() );
+        Debug.trace( request, request.getAddressPath(), request.getInterceptedPath(), request.getInterceptorName(), request.getSegments() );
+
+
+        Raccoon raccoon = new RedRaccoon();
+        Debug.trace( raccoon.scratch( "you", 166 ) );
+    }
+
+    protected void testIfacInspector() throws Exception {
+        BytecodeIfacCompiler inspector = new BytecodeIfacCompiler( ClassPool.getDefault() );
+
+        Debug.trace( inspector.inspect( Raccoon.class, false ) );
     }
 
 }

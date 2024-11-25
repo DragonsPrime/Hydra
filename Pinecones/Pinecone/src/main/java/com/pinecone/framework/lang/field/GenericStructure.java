@@ -27,6 +27,12 @@ public class GenericStructure implements DataStructureEntity {
         this( szName, 0, 1 , nElements );
     }
 
+    public GenericStructure( FieldEntity[] segments, int nTextOffset, int nDataOffset ) {
+        this.mSegments    = segments;
+        this.mnTextOffset = nTextOffset;
+        this.mnDataOffset = nDataOffset;
+    }
+
     @Override
     public String getName() {
         return (String) this.mSegments[ 0 ].getValue();
@@ -209,21 +215,21 @@ public class GenericStructure implements DataStructureEntity {
 
     @Override
     public FieldEntity findTextField( String key ) {
-        for ( int i = this.mnTextOffset; i < this.mnDataOffset; ++i ) {
-            FieldEntity entity = this.mSegments[ i ];
-            if( entity != null && entity.getName().equals( key ) ) {
-                return entity;
-            }
-        }
-
-        return null;
+        return this.findField( key, this.mnTextOffset );
     }
 
     @Override
     public FieldEntity findDataField( String key ) {
-        for ( int i = this.mnDataOffset; i < this.mSegments.length; ++i ) {
+        return this.findField( key, this.mnDataOffset );
+    }
+
+    protected FieldEntity findField( String key, int offset ) {
+        for ( int i = offset; i < this.mSegments.length; ++i ) {
             FieldEntity entity = this.mSegments[ i ];
-            if( entity != null && entity.getName().equals( key ) ) {
+            if( entity.getName() == (Object)key ) {
+                return entity;
+            }
+            if( entity.getName() != null && entity.getName().equals( key ) ) {
                 return entity;
             }
         }
