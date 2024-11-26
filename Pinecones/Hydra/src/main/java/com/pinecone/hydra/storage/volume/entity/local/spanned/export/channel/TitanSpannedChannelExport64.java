@@ -1,4 +1,4 @@
-package com.pinecone.hydra.storage.volume.entity.local.spanned.export;
+package com.pinecone.hydra.storage.volume.entity.local.spanned.export.channel;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
@@ -15,7 +15,6 @@ import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
 

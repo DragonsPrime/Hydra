@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.system.prototype.Pinenut;
+import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 
 public interface CacheBlock extends Pinenut { ;
 
@@ -24,4 +25,7 @@ public interface CacheBlock extends Pinenut { ;
 
     int getBufferWriteThreadId();
     void setBufferWriteThreadId( int bufferWriteThreadId );
+
+    LogicVolume getVolume();
+    void setVolume( LogicVolume volume );
 }

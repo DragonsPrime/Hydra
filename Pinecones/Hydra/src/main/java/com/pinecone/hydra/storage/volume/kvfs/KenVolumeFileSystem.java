@@ -145,4 +145,15 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
         }
         return 0;
     }
+
+    @Override
+    public boolean isExistKVFSFileStripTable(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
+        ResultSession query = mappedExecutor.query("SELECT COUNT(*) FROM `file_strip_table` WHERE `volume_guid` = '" + volumeGuid + "' AND `storage_object_guid` = '" + storageObjectGuid + "' ");
+        ResultSet resultSet = query.getResultSet();
+        if( resultSet.next() ){
+            int count = resultSet.getInt(1);
+            return count != 0;
+        }
+        return false;
+    }
 }

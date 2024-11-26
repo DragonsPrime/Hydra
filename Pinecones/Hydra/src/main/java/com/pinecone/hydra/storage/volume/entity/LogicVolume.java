@@ -54,6 +54,7 @@ public interface LogicVolume extends Volume, TreeNode {
 
     StorageIOResponse receive( ReceiveEntity entity ) throws SQLException, IOException;
     StorageIOResponse receive( ReceiveEntity entity, Number offset, Number endSize ) throws SQLException, IOException;
+    StorageIOResponse receive( ReceiveEntity entity, CacheBlock cacheBlock, byte[] buffer ) throws SQLException, IOException;
 
     StorageIOResponse export( ExporterEntity entity ) throws SQLException, IOException;
     //敬请期待

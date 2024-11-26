@@ -22,4 +22,6 @@ public interface VolumeGram extends Processum {
     void applyBufferOutBlockerLatch( Semaphore bufferOutBlockerLatch);
     Semaphore getBufferOutBlockerLatch();
 
+    int getCurrentBufferInJobCode();
+    void setCurrentBufferInJobCode( int currentBufferInJobCode );
 }

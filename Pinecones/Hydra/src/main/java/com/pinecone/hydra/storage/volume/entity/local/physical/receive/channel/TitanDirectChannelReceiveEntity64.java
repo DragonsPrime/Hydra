@@ -35,6 +35,11 @@ public class TitanDirectChannelReceiveEntity64 extends ArchReceiveEntity impleme
     }
 
     @Override
+    public StorageIOResponse receive(CacheBlock cacheBlock, byte[] buffer) throws IOException, SQLException {
+        return null;
+    }
+
+    @Override
     public KChannel getChannel() {
         return this.channel;
     }
@@ -52,10 +57,5 @@ public class TitanDirectChannelReceiveEntity64 extends ArchReceiveEntity impleme
     @Override
     public void setDestDirPath(String destDirPath) {
         this.destDirPath = destDirPath;
-    }
-
-    @Override
-    public StorageIOResponse receive(CacheBlock cacheBlock, byte[] buffer) throws IOException, SQLException {
-        return null;
     }
 }

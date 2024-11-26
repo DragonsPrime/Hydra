@@ -1,4 +1,4 @@
-package com.pinecone.hydra.storage.volume.entity.local.simple.export;
+package com.pinecone.hydra.storage.volume.entity.local.simple.export.channel;
 
 import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;

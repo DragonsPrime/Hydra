@@ -1,4 +1,4 @@
-package com.pinecone.hydra.storage.volume.entity.local.striped.export;
+package com.pinecone.hydra.storage.volume.entity.local.striped.export.channel;
 
 import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageIOResponse;
@@ -9,7 +9,6 @@ import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 
 public class TitanStripedChannelExportEntity64 extends ArchExportEntity implements StripedChannelExportEntity64{

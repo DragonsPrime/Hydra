@@ -1,4 +1,4 @@
-package com.pinecone.hydra.storage.volume.entity.local.striped.export;
+package com.pinecone.hydra.storage.volume.entity.local.striped.export.channel;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
@@ -19,7 +19,6 @@ import com.pinecone.hydra.system.Hydrarum;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.Semaphore;

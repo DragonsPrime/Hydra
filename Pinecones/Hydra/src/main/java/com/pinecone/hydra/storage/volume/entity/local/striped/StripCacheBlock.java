@@ -1,5 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
+import com.pinecone.hydra.storage.volume.entity.LogicVolume;
+
 import java.nio.ByteBuffer;
 
 public class StripCacheBlock implements CacheBlock{
@@ -10,6 +12,8 @@ public class StripCacheBlock implements CacheBlock{
     protected Number              byteStart;
     protected Number              byteEnd;
     protected int                 bufferWriteThreadId;
+
+    protected LogicVolume         volume;
 
     public StripCacheBlock( int cacheBlockNumber, Number byteStart, Number byteEnd ){
         this.status = CacheBlockStatus.Free;
@@ -87,5 +91,15 @@ public class StripCacheBlock implements CacheBlock{
     @Override
     public void setBufferWriteThreadId(int bufferWriteThreadId) {
         this.bufferWriteThreadId = bufferWriteThreadId;
+    }
+
+    @Override
+    public LogicVolume getVolume() {
+        return this.volume;
+    }
+
+    @Override
+    public void setVolume(LogicVolume volume) {
+        this.volume = volume;
     }
 }

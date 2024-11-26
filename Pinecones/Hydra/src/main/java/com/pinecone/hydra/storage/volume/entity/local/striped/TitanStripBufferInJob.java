@@ -5,7 +5,7 @@ import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
-import com.pinecone.hydra.storage.volume.entity.local.striped.export.StripedChannelExport;
+import com.pinecone.hydra.storage.volume.entity.local.striped.export.channel.StripedChannelExport;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 

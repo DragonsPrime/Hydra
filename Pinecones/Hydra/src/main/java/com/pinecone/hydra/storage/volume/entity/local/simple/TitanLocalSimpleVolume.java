@@ -15,7 +15,7 @@ import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
-import com.pinecone.hydra.storage.volume.entity.local.simple.export.TitanSimpleChannelExportEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.simple.export.channel.TitanSimpleChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.channel.TitanSimpleChannelReceiverEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
@@ -66,7 +66,6 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel ) throws IOException, SQLException {
         TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeManager, storageReceiveIORequest, channel, this );
         StorageIOResponse storageIOResponse = titanSimpleChannelReceiverEntity64.receive();
-        storageIOResponse.setBottomGuid( this.guid );
         this.saveMate( storageIOResponse, storageReceiveIORequest.getName() );
         return storageIOResponse;
     }
@@ -75,7 +74,6 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel, Number offset, Number endSize ) throws IOException, SQLException {
         TitanSimpleChannelReceiverEntity64 titanSimpleChannelReceiverEntity64 = new TitanSimpleChannelReceiverEntity64( this.volumeManager, storageReceiveIORequest, channel, this );
         StorageIOResponse storageIOResponse = titanSimpleChannelReceiverEntity64.receive(offset,endSize);
-        storageIOResponse.setBottomGuid( this.guid );
         this.saveMate(storageIOResponse, storageReceiveIORequest.getName());
         return storageIOResponse;
     }
@@ -98,12 +96,23 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
 
     @Override
     public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException {
-        return entity.receive();
+        StorageIOResponse response = entity.receive();
+        this.saveMate( response, entity.getReceiveStorageObject().getName() );
+        return response ;
     }
 
     @Override
     public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException {
-        return entity.receive( offset, endSize );
+        StorageIOResponse response = entity.receive( offset, endSize );
+        this.saveMate( response, entity.getReceiveStorageObject().getName() );
+        return response;
+    }
+
+    @Override
+    public StorageIOResponse receive(ReceiveEntity entity, CacheBlock cacheBlock, byte[] buffer) throws SQLException, IOException {
+        StorageIOResponse response = entity.receive(cacheBlock, buffer);
+        this.saveMate( response, entity.getReceiveStorageObject().getName() );
+        return response;
     }
 
     @Override

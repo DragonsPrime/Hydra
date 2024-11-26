@@ -33,7 +33,7 @@ public class TitanDirectChannelReceive64 implements DirectChannelReceive64{
     }
 
     private  StorageIOResponse receiveWithOffsetAndSize(DirectChannelReceiveEntity entity, long offset, int size) throws IOException {
-        Debug.trace("缓存的是"+offset+"到"+(offset + size));
+        //Debug.trace("缓存的是"+offset+"到"+(offset + size));
         StorageReceiveIORequest storageReceiveIORequest = entity.getReceiveStorageObject();
         String destDirPath = entity.getDestDirPath();
         KChannel channel = entity.getChannel();

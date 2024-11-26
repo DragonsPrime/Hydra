@@ -90,6 +90,11 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
     }
 
     @Override
+    public StorageIOResponse receive(ReceiveEntity entity, CacheBlock cacheBlock, byte[] buffer) throws SQLException, IOException {
+        return null;
+    }
+
+    @Override
     public StorageIOResponse export(ExporterEntity entity) throws SQLException, IOException {
         return null;
     }

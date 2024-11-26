@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
+import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
@@ -30,7 +31,7 @@ public class TitanStripReceiveBufferInJob implements StripReceiveBufferInJob{
 
     protected Lock                      majorStatusIO;
 
-    public TitanStripReceiveBufferInJob(MasterVolumeGram masterVolumeGram, int jobCode, InputStream stream){
+    public TitanStripReceiveBufferInJob(MasterVolumeGram masterVolumeGram, int jobCode, InputStream stream, LogicVolume volume){
         this.masterVolumeGram         = masterVolumeGram;
         this.buffer                   = this.masterVolumeGram.getBuffer();
         this.jobCode                  = jobCode;
@@ -38,48 +39,58 @@ public class TitanStripReceiveBufferInJob implements StripReceiveBufferInJob{
         this.status                   = ReceiveBufferInStatus.Suspended;
         this.stream                   = stream;
         this.blockerLatch             = new Semaphore(0);
+        this.cacheBlock.setVolume( volume );
     }
 
 
     @Override
     public void execute() throws VolumeJobCompromiseException {
-        try{
-            while( true ){
+        while( true ){
+            try {
                 if( this.status == ReceiveBufferInStatus.Exiting ){
                     break;
                 }
-                this.status = ReceiveBufferInStatus.Writing;
-                int start = this.cacheBlock.getByteStart().intValue();
-                int end   = this.cacheBlock.getByteEnd().intValue();
-                int length = end - start;
-                int read = this.stream.read(this.buffer, this.cacheBlock.getByteStart().intValue(), length);
-                this.cacheBlock.setValidByteStart( start );
-                this.cacheBlock.setValidByteEnd( start + read );
+                if(  this.masterVolumeGram.getCurrentBufferInJobCode() == this.jobCode ){
+                    Debug.trace("我是缓存线程我开始工作了");
+                    this.status = ReceiveBufferInStatus.Writing;
+                    this.cacheBlock.setStatus( CacheBlockStatus.Writing );
+                    int start = this.cacheBlock.getByteStart().intValue();
+                    int end   = this.cacheBlock.getByteEnd().intValue();
+                    int length = end - start;
+                    int read = this.stream.read(this.buffer, this.cacheBlock.getByteStart().intValue(), length);
+                    this.cacheBlock.setValidByteStart( start );
+                    this.cacheBlock.setValidByteEnd( start + read );
 
-                this.status = ReceiveBufferInStatus.Suspended;
+                    this.status = ReceiveBufferInStatus.Suspended;
+                    this.cacheBlock.setStatus( CacheBlockStatus.Full );
 
-                LocalStripedTaskThread bufferOutThread = this.masterVolumeGram.getChildThread(this.masterVolumeGram.getBufferOutThreadId());
-                //检测缓存写出线程的状态为摸鱼状态则唤醒
-                if( bufferOutThread.getJobStatus() == ReceiveBufferOutStatus.Suspended ){
-                    this.masterVolumeGram.getBufferOutBlockerLatch().acquire();
-                }
-                //如果下一个线程不在工作则唤醒
-                int nextJobCode = this.jobCode+1;
-                if( nextJobCode >= this.masterVolumeGram.getJobCount() ){
-                    nextJobCode = 0;
-                }
-                CacheBlock nextCacheBlock = this.masterVolumeGram.getCacheGroup().get(nextJobCode);
-                LocalStripedTaskThread nextThread = this.masterVolumeGram.getChildThread(nextCacheBlock.getBufferWriteThreadId());
-                if( nextThread.getJobStatus() == ReceiveBufferInStatus.Suspended ){
-                    nextThread.getBlockerLatch().acquire();
-                }
+                    LocalStripedTaskThread bufferOutThread = this.masterVolumeGram.getChildThread(this.masterVolumeGram.getBufferOutThreadId());
+                    //检测缓存写出线程的状态为摸鱼状态则唤醒
+                    if( bufferOutThread.getJobStatus() == ReceiveBufferOutStatus.Suspended ){
+                        this.masterVolumeGram.getBufferOutBlockerLatch().release();
+                    }
+                    //如果下一个线程不在工作则唤醒
+                    int nextJobCode = this.jobCode+1;
+                    if( nextJobCode >= this.masterVolumeGram.getJobCount() ){
+                        nextJobCode = 0;
+                    }
 
-                this.blockerLatch.release();
+                    CacheBlock nextCacheBlock = this.masterVolumeGram.getCacheGroup().get(nextJobCode);
+
+                    LocalStripedTaskThread nextThread = this.masterVolumeGram.getChildThread(nextCacheBlock.getBufferWriteThreadId());
+                    if( nextThread.getJobStatus() == ReceiveBufferInStatus.Suspended && nextJobCode != this.jobCode ){
+                        nextThread.getBlockerLatch().release();
+                    }
+                }
+                Debug.trace("我休息了");
+                this.blockerLatch.acquire();
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
             }
+
+
         }
-        catch ( InterruptedException | IOException e ) {
-            throw new VolumeJobCompromiseException( e );
-        }
+
     }
 
     @Override

@@ -19,6 +19,7 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
     protected int                   jobCount;
     protected int                   bufferOutThreadId;
     protected Semaphore             bufferOutBlockerLatch;
+    protected int                   currentBufferInJobCode;
     
     
     protected List<CacheBlock>      cacheGroup;
@@ -35,6 +36,7 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
         this.jobCount       = jobCount;
         this.cacheGroup     = this.initializeCacheGroup( jobCount, superResolutionRatio, stripSize );
         this.buffer         = new byte[ jobCount * stripSize * superResolutionRatio ];
+        this.currentBufferInJobCode = 0;
     }
 
     public Lock getMajorStatusIO() {
@@ -94,6 +96,16 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
     @Override
     public Semaphore getBufferOutBlockerLatch() {
         return this.bufferOutBlockerLatch;
+    }
+
+    @Override
+    public int getCurrentBufferInJobCode() {
+        return this.currentBufferInJobCode;
+    }
+
+    @Override
+    public void setCurrentBufferInJobCode(int currentBufferInJobCode) {
+        this.currentBufferInJobCode = currentBufferInJobCode;
     }
 
     private List< CacheBlock > initializeCacheGroup(int jobCount, int superResolutionRatio, Number stripSize ){

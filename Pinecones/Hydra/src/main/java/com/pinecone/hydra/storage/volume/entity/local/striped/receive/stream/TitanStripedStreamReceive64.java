@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.receive.stream;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
+import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.rdb.MappedExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
@@ -12,6 +13,11 @@ import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
+import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
+import com.pinecone.hydra.storage.volume.entity.local.striped.ReceiveBufferOutStatus;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripReceiveBufferInJob;
+import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripReceiveBufferOutJob;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
@@ -52,14 +58,25 @@ public class TitanStripedStreamReceive64 implements StripedStreamReceive64{
         List<LogicVolume> volumes = this.stripedVolume.getChildren();
         MasterVolumeGram masterVolumeGram = new MasterVolumeGram( this.stripedVolume.getGuid().toString(), hydrarum, volumes.size(), 1, this.volumeManager.getConfig().getDefaultStripSize().intValue() );
         hydrarum.getTaskManager().add( masterVolumeGram );
+        MappedExecutor executor = this.getExecutor();
 
-        MappedExecutor sqLiteExecutor = this.getExecutor();
+        TitanStripReceiveBufferOutJob bufferOutJob = new TitanStripReceiveBufferOutJob( masterVolumeGram, this.volumeManager, this.stream, this.storageReceiveIORequest, executor );
+        LocalStripedTaskThread taskThread = new LocalStripedTaskThread( "bufferOut",masterVolumeGram, bufferOutJob );
+        masterVolumeGram.getTaskManager().add( taskThread );
+        masterVolumeGram.applyBufferOutThreadId( taskThread.getId() );
+        taskThread.start();
 
         int index = 0;
         for( LogicVolume volume : volumes ){
-
+            TitanStripReceiveBufferInJob bufferInJob = new TitanStripReceiveBufferInJob( masterVolumeGram, index,this.stream,volume );
+            LocalStripedTaskThread bufferInThread = new LocalStripedTaskThread(volume.getName(), masterVolumeGram, bufferInJob);
+            masterVolumeGram.getTaskManager().add( bufferInThread );
+            CacheBlock cacheBlock = masterVolumeGram.getCacheGroup().get(index);
+            cacheBlock.setBufferWriteThreadId( bufferInThread.getId() );
+            bufferInThread.start();
+            index++;
         }
-        this.mSqLiteHost.close();
+
         this.waitForTaskCompletion( masterVolumeGram );
         return null;
     }

@@ -15,7 +15,7 @@ import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
-import com.pinecone.hydra.storage.volume.entity.local.spanned.export.TitanSpannedChannelExportEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.spanned.export.channel.TitanSpannedChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.spanned.receive.channel.TitanSpannedChannelReceiveEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
@@ -98,6 +98,11 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
     @Override
     public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException {
         return entity.receive( offset, endSize );
+    }
+
+    @Override
+    public StorageIOResponse receive(ReceiveEntity entity, CacheBlock cacheBlock, byte[] buffer) throws SQLException, IOException {
+        return null;
     }
 
     @Override
