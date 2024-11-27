@@ -1,7 +1,7 @@
 package com.walnuts.sparta.uofs.service.api.controller;
 
 import com.pinecone.hydra.storage.KChannel;
-import com.pinecone.hydra.storage.TitanKChannel;
+import com.pinecone.hydra.storage.TitanFileChannelKChannel;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
@@ -14,6 +14,7 @@ import com.pinecone.ulf.util.id.GUIDs;
 import com.walnuts.sparta.uofs.service.api.response.BasicResultResponse;
 import com.walnuts.sparta.uofs.service.domain.dto.DownloadObjectByChannelDTO;
 import com.walnuts.sparta.uofs.service.domain.dto.UpdateObjectByChannelDTO;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -75,10 +76,10 @@ public class UOFSController {
     public BasicResultResponse<String> downloadObjectByChannel( DownloadObjectByChannelDTO dto ) throws IOException, SQLException {
         File file = new File( dto.getTargetPath());
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-        TitanKChannel titanKChannel = new TitanKChannel( channel );
+        TitanFileChannelKChannel titanFileChannelKChannel = new TitanFileChannelKChannel( channel );
 
         FileNode fileNode = (FileNode) this.primaryFileSystem.get(this.primaryFileSystem.queryGUIDByPath(dto.getDestDirPath()));
-        GenericChannelExporterEntity exporterEntity = new GenericChannelExporterEntity(this.primaryFileSystem, fileNode, titanKChannel);
+        GenericChannelExporterEntity exporterEntity = new GenericChannelExporterEntity(this.primaryFileSystem, fileNode, titanFileChannelKChannel);
         this.primaryFileSystem.export( this.primaryVolume, exporterEntity );
 
         return BasicResultResponse.success();
@@ -118,10 +119,45 @@ public class UOFSController {
         return BasicResultResponse.success();
     }
 
+    /**
+     * 获取所有根文件夹
+     * @return 返回根信息
+     */
+    @GetMapping("/list/root")
+    public String listRoot(){
+        List<FileTreeNode> roots = this.primaryFileSystem.fetchRoot();
+        return BasicResultResponse.success( roots ).toJSONString();
+    }
+
+    /**
+     * 获取文件或文件夹属性
+     * @param nodeGuid 文件或文件夹guid
+     * @return 返回属性信息
+     */
+    @GetMapping("/attribute")
+    public BasicResultResponse< FileTreeNode > attribute( @RequestParam("nodeGuid") String nodeGuid ){
+        FileTreeNode fileTreeNode = this.primaryFileSystem.get(GUIDs.GUID72(nodeGuid));
+        return BasicResultResponse.success( fileTreeNode );
+    }
+
+    /**
+     * 移除文件夹或者文件
+     * @param fileGuid 文件夹或者文件guid
+     * @return 返回操作结果
+     */
+    @DeleteMapping("/remove/file")
+    public BasicResultResponse<String> removeFile( String fileGuid ){
+        this.primaryFileSystem.remove( GUIDs.GUID72( fileGuid ) );
+        return BasicResultResponse.success();
+    }
+
+
+    
+
 
     private KChannel getKChannel( File file ) throws IOException {
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        return new TitanKChannel( channel );
+        return new TitanFileChannelKChannel( channel );
     }
 
 

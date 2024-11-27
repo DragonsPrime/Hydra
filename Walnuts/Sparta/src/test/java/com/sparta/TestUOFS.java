@@ -2,24 +2,17 @@ package com.sparta;
 
 import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
-import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
-import com.pinecone.hydra.storage.TitanKChannel;
+import com.pinecone.hydra.storage.TitanFileChannelKChannel;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
-import com.pinecone.hydra.storage.file.entity.FileTreeNode;
-import com.pinecone.hydra.storage.file.entity.GenericFileNode;
 import com.pinecone.hydra.storage.file.transmit.exporter.channel.GenericChannelExporterEntity;
-import com.pinecone.hydra.storage.file.transmit.exporter.stream.GenericStreamExporterEntity;
-import com.pinecone.hydra.storage.file.transmit.receiver.channel.ChannelReceiverEntity;
 import com.pinecone.hydra.storage.file.transmit.receiver.channel.GenericChannelReceiveEntity;
-import com.pinecone.hydra.storage.file.transmit.receiver.stream.GenericStreamReceiverEntity;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
-import com.pinecone.hydra.unit.udtt.entity.EntityNode;
 import com.pinecone.hydra.volume.ibatis.hydranium.VolumeMappingDriver;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
 import com.pinecone.ulf.util.id.GUIDs;
@@ -27,12 +20,8 @@ import com.pinecone.ulf.util.id.GuidAllocator;
 import com.sauron.radium.Radium;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.sql.SQLException;
 
@@ -56,7 +45,7 @@ class Steve extends Radium {
         UniformVolumeManager volumeManager = new UniformVolumeManager(koiVolumeMappingDriver);
         GuidAllocator guidAllocator = fileSystem.getGuidAllocator();
         //Debug.trace( fileSystem.get( GUIDs.GUID72( "020c8b0-000006-0002-54" ) ) );
-        //this.testInsert( fileSystem );
+        this.testInsert( fileSystem );
         //this.testUpload(fileSystem);
         //this.testDelete( fileSystem );
         //this.testChannelReceive( fileSystem, volumeManager );
@@ -83,12 +72,12 @@ class Steve extends Radium {
         FSNodeAllotment fsNodeAllotment = fileSystem.getFSNodeAllotment();
         File file = new File("D:/井盖视频块/4月13日 (2).mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        TitanKChannel titanKChannel = new TitanKChannel( channel );
+        TitanFileChannelKChannel titanFileChannelKChannel = new TitanFileChannelKChannel( channel );
         FileNode fileNode = fsNodeAllotment.newFileNode();
         fileNode.setDefinitionSize( file.length() );
         fileNode.setName( file.getName() );
         String destDirPath = "D:/文件系统/大文件/我的视频.mp4";
-        GenericChannelReceiveEntity receiveEntity = new GenericChannelReceiveEntity( fileSystem,destDirPath,fileNode,titanKChannel );
+        GenericChannelReceiveEntity receiveEntity = new GenericChannelReceiveEntity( fileSystem,destDirPath,fileNode, titanFileChannelKChannel);
 
         fileSystem.receive( simpleVolume, receiveEntity );
     }
@@ -97,8 +86,8 @@ class Steve extends Radium {
         FileNode fileNode = (FileNode) fileSystem.get(fileSystem.queryGUIDByPath("D:/文件系统/大文件/我的图片.jpg"));
         File file = new File("D:/文件系统/大文件/我的图片.jpg");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-        TitanKChannel titanKChannel = new TitanKChannel( channel );
-        GenericChannelExporterEntity exporterEntity = new GenericChannelExporterEntity( fileSystem, fileNode, titanKChannel );
+        TitanFileChannelKChannel titanFileChannelKChannel = new TitanFileChannelKChannel( channel );
+        GenericChannelExporterEntity exporterEntity = new GenericChannelExporterEntity( fileSystem, fileNode, titanFileChannelKChannel);
         fileSystem.export( volumeManager, exporterEntity );
     }
 

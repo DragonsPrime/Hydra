@@ -16,7 +16,7 @@ public class TitanDirectChannelReceiveEntity64 extends ArchReceiveEntity impleme
     private String       destDirPath;
 
     public TitanDirectChannelReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, String destDirPath, KChannel channel) {
-        super(volumeManager, storageReceiveIORequest);
+        super(volumeManager, storageReceiveIORequest,null);
         this.channel = channel;
         this.destDirPath = destDirPath;
     }

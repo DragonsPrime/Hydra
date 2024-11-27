@@ -1,6 +1,5 @@
 package com.pinecone.hydra.storage;
 
-import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlockStatus;
 
@@ -10,11 +9,11 @@ import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class TitanKChannel implements KChannel{
+public class TitanFileChannelKChannel implements KChannel{
     private final FileChannel  channel;
     private final ReentrantLock reentrantLock;
 
-    public TitanKChannel( FileChannel channel ){
+    public TitanFileChannelKChannel(FileChannel channel ){
         this.channel = channel;
         this.reentrantLock = new ReentrantLock();
     }

@@ -8,5 +8,5 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public interface SimpleReceiverEntity extends ReceiveEntity {
-    StorageIOResponse receive(CacheBlock cacheBlock, byte[] buffer) throws IOException, SQLException;
+
 }

@@ -13,8 +13,8 @@ import java.sql.SQLException;
 
 public class TitanSimpleChannelReceiverEntity64 extends ArchReceiveEntity implements SimpleChannelReceiverEntity64{
 
-    private KChannel channel;
-    private SimpleVolume simpleVolume;
+    private KChannel                channel;
+    private SimpleVolume            simpleVolume;
     private SimpleChannelReceiver64 titanSimpleChannelReceiver64;
 
     public TitanSimpleChannelReceiverEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, SimpleVolume simpleVolume) {

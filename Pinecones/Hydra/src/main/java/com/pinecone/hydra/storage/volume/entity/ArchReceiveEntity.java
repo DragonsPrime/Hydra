@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity;
 
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 
@@ -8,10 +9,13 @@ public abstract class ArchReceiveEntity implements ReceiveEntity{
 
     protected StorageReceiveIORequest storageReceiveIORequest;
 
+    protected KChannel     channel;
 
-    public ArchReceiveEntity(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest){
+
+    public ArchReceiveEntity(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel){
         this.volumeManager = volumeManager;
         this.storageReceiveIORequest = storageReceiveIORequest;
+        this.channel = channel;
     }
 
 
@@ -35,4 +39,13 @@ public abstract class ArchReceiveEntity implements ReceiveEntity{
         this.storageReceiveIORequest = storageReceiveIORequest;
     }
 
+    @Override
+    public KChannel getKChannel() {
+        return this.channel;
+    }
+
+    @Override
+    public void setKChannel(KChannel channel) {
+        this.channel = channel;
+    }
 }

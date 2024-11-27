@@ -5,15 +5,12 @@ import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
 import com.pinecone.hydra.storage.StorageIOResponse;
-import com.pinecone.hydra.storage.TitanKChannel;
+import com.pinecone.hydra.storage.TitanFileChannelKChannel;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
-import com.pinecone.hydra.storage.file.entity.FileNode;
-import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
-import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
 import com.pinecone.hydra.storage.TitanStorageExportExportIORequest;
 import com.pinecone.hydra.storage.TitanStorageReceiveIORequest;
@@ -39,9 +36,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.channels.FileChannel;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.sql.SQLException;
 
@@ -242,13 +237,13 @@ class Alice extends Radium {
         File file = new File("D:\\文件系统\\大文件\\我的视频.mp4");
         File originalFile = new File( "D:/井盖视频块/4月13日 (2).mp4" );
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-        TitanKChannel titanKChannel = new TitanKChannel( channel );
+        TitanFileChannelKChannel titanFileChannelKChannel = new TitanFileChannelKChannel( channel );
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
         titanExportStorageObject.setSize( originalFile.length() );
         titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0955566-00008d-0001-ec") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
-        volume.channelExport( titanExportStorageObject, titanKChannel );
+        volume.channelExport( titanExportStorageObject, titanFileChannelKChannel);
     }
 
     void testSpannedExport( UniformVolumeManager volumeManager ) throws IOException {
