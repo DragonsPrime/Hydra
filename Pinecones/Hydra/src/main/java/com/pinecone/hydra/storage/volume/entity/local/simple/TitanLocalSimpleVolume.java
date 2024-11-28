@@ -126,6 +126,11 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     }
 
     @Override
+    public StorageIOResponse export(ExporterEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws SQLException, IOException {
+        return entity.export( cacheBlock, offset, endSize, buffer );
+    }
+
+    @Override
     public void setVolumeTree( VolumeManager volumeManager ) {
         this.volumeManager = volumeManager;
     }

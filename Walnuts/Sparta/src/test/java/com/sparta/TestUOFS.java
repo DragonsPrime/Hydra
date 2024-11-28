@@ -12,6 +12,7 @@ import com.pinecone.hydra.storage.file.transmit.exporter.channel.GenericChannelE
 import com.pinecone.hydra.storage.file.transmit.receiver.channel.GenericChannelReceiveEntity;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
+import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleReceiveEntity64;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.volume.ibatis.hydranium.VolumeMappingDriver;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
@@ -78,7 +79,6 @@ class Steve extends Radium {
         fileNode.setName( file.getName() );
         String destDirPath = "D:/文件系统/大文件/我的视频.mp4";
         GenericChannelReceiveEntity receiveEntity = new GenericChannelReceiveEntity( fileSystem,destDirPath,fileNode, titanFileChannelKChannel);
-
         fileSystem.receive( simpleVolume, receiveEntity );
     }
 

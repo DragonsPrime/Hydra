@@ -5,6 +5,8 @@ import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
+import com.pinecone.hydra.storage.volume.entity.local.simple.export.TitanSimpleExportEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.striped.export.IStripedExport;
 import com.pinecone.hydra.storage.volume.entity.local.striped.export.channel.StripedChannelExport;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
@@ -40,14 +42,14 @@ public class TitanStripBufferInJob implements StripBufferInJob {
 
     protected Number                        endSize;
 
-    public TitanStripBufferInJob(MasterVolumeGram masterVolumeGram, StripedChannelExport stripedChannelExport, LogicVolume volume, StorageExportIORequest object, int jobCode ){
+    public TitanStripBufferInJob(MasterVolumeGram masterVolumeGram, IStripedExport stripedExport, LogicVolume volume, StorageExportIORequest object, int jobCode ){
         this.masterVolumeGram             = masterVolumeGram;
         this.object                       = object;
         this.jobCount                     = this.masterVolumeGram.getJobCount();
         this.jobCode                      = jobCode;
-        this.volumeManager                = stripedChannelExport.getVolumeManager();
+        this.volumeManager                = stripedExport.getVolumeManager();
         this.volume                       = volume;
-        this.channel                      = stripedChannelExport.getFileChannel();
+        this.channel                      = stripedExport.getFileChannel();
         this.currentCacheBlockNumber      = new AtomicInteger( jobCode );
         this.blockerLatch                 = new Semaphore(0);
         this.buffer                       = masterVolumeGram.getBuffer();
@@ -108,8 +110,10 @@ public class TitanStripBufferInJob implements StripBufferInJob {
                 }
 
                 try {
-                    this.volume.channelExport( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.buffer);
-
+                    //todo 默认底层为simpleVolume
+//                    this.volume.channelExport( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.buffer);
+                    TitanSimpleExportEntity64 exportEntity = new TitanSimpleExportEntity64( this.volumeManager, this.object, this.channel );
+                    this.volume.export( exportEntity, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.buffer );
                     currentPosition += bufferSize;
                     this.wakeUpBufferToFileThread();
 

@@ -18,7 +18,7 @@ public class TitanSpannedStreamReceiveEntity64 extends ArchReceiveEntity impleme
     protected SpannedStreamReceive64 spannedStreamReceive64;
 
     public TitanSpannedStreamReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, InputStream stream, SpannedVolume spannedVolume) {
-        super(volumeManager, storageReceiveIORequest);
+        super(volumeManager, storageReceiveIORequest,null);
         this.stream = stream;
         this.spannedVolume = spannedVolume;
         this.spannedStreamReceive64 = new TitanSpannedStreamReceive64( this );

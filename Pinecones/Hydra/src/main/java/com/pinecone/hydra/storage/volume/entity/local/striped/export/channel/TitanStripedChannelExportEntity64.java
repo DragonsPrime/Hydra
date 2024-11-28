@@ -12,11 +12,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class TitanStripedChannelExportEntity64 extends ArchExportEntity implements StripedChannelExportEntity64{
-    private KChannel                 channel;
+    private KChannel                    channel;
     private StripedChannelExport64      stripedChannelExport64;
     private StripedVolume               stripedVolume;
     public TitanStripedChannelExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel, StripedVolume stripedVolume) {
-        super(volumeManager, storageExportIORequest);
+        super(volumeManager, storageExportIORequest,null);
         this.channel = channel;
         this.stripedVolume = stripedVolume;
         this.stripedChannelExport64 = new TitanStripedChannelExport64( this );

@@ -15,7 +15,7 @@ public class TitanDirectStreamReceiveEntity64 extends ArchReceiveEntity implemen
     protected String        destDirPath;
 
     public TitanDirectStreamReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, InputStream stream, String destDirPath) {
-        super(volumeManager, storageReceiveIORequest);
+        super(volumeManager, storageReceiveIORequest,null);
         this.stream = stream;
         this.destDirPath = destDirPath;
     }

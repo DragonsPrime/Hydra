@@ -31,13 +31,14 @@ public class TitanFileChannelKChannel implements KChannel{
     @Override
     public int read(ByteBuffer buffer, long offset) throws IOException {
         this.reentrantLock.lock();
+        int read = 0;
         try {
             this.channel.position( offset );
-            this.channel.read( buffer );
+             read = this.channel.read(buffer);
         }finally {
             this.reentrantLock.unlock();
         }
-        return 0;
+        return read;
     }
 
     @Override

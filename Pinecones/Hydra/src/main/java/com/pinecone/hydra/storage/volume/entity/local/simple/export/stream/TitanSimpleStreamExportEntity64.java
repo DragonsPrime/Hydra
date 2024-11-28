@@ -16,7 +16,7 @@ public class TitanSimpleStreamExportEntity64 extends ArchExportEntity implements
     protected SimpleStreamExport64  simpleStreamExport64;
 
     public TitanSimpleStreamExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest) {
-        super(volumeManager, storageExportIORequest);
+        super(volumeManager, storageExportIORequest,null);
     }
 
     @Override

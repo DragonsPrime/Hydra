@@ -13,7 +13,7 @@ public class TitanSimpleChannelExportEntity64 extends ArchExportEntity implement
     private KChannel                    channel;
     private SimpleChannelExport64       simpleChannelExport64;
     public TitanSimpleChannelExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel) {
-        super(volumeManager, storageExportIORequest);
+        super(volumeManager, storageExportIORequest,null);
         this.channel = channel;
         this.simpleChannelExport64 = new TitanSimpleChannelExport64( this );
     }

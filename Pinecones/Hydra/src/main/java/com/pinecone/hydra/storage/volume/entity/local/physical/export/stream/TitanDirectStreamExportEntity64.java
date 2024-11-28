@@ -16,7 +16,7 @@ public class TitanDirectStreamExportEntity64 extends ArchExportEntity implements
     protected DirectStreamExport    streamExport;
 
     public TitanDirectStreamExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, OutputStream stream) {
-        super(volumeManager, storageExportIORequest);
+        super(volumeManager, storageExportIORequest,null);
         this.stream = stream;
         this.streamExport = new TitanDirectStreamExport64();
     }

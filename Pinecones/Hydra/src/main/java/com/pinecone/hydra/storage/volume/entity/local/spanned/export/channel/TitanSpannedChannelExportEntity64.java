@@ -15,7 +15,7 @@ public class TitanSpannedChannelExportEntity64 extends ArchExportEntity implemen
     private KChannel                    channel;
     private SpannedChannelExport64      spannedChannelExport64;
     public TitanSpannedChannelExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel, SpannedVolume spannedVolume) {
-        super(volumeManager, storageExportIORequest);
+        super(volumeManager, storageExportIORequest,null);
         this.channel = channel;
         this.spannedChannelExport64 = new TitanSpannedChannelExport64( this, spannedVolume );
     }

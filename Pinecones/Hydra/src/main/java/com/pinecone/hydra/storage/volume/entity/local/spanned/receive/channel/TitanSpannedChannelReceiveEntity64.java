@@ -18,7 +18,7 @@ public class TitanSpannedChannelReceiveEntity64 extends ArchReceiveEntity implem
 
 
     public TitanSpannedChannelReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, SpannedVolume spannedVolume) {
-        super(volumeManager, storageReceiveIORequest);
+        super(volumeManager, storageReceiveIORequest,null);
         this.channel = channel;
         this.spannedVolume = spannedVolume;
         this.spannedChannelReceive64 = new TitanSpannedChannelReceive64( this );

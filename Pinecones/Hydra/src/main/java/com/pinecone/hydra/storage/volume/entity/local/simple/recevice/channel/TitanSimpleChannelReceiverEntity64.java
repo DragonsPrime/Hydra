@@ -18,7 +18,7 @@ public class TitanSimpleChannelReceiverEntity64 extends ArchReceiveEntity implem
     private SimpleChannelReceiver64 titanSimpleChannelReceiver64;
 
     public TitanSimpleChannelReceiverEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, SimpleVolume simpleVolume) {
-        super(volumeManager, storageReceiveIORequest);
+        super(volumeManager, storageReceiveIORequest, null);
         this.channel = channel;
         this.simpleVolume = simpleVolume;
         this.titanSimpleChannelReceiver64 = new TitanSimpleChannelReceiver64( this );

@@ -33,8 +33,16 @@ public class TitanInputStreamChannel implements KChannel{
 
     @Override
     public int read(ByteBuffer buffer, long offset) throws IOException {
-
-        return 0;
+        this.reentrantLock.lock();
+        int bytesRead = 0;
+        try {
+            byte[] tempBuffer = new byte[buffer.remaining()];
+             bytesRead = stream.read(tempBuffer);
+            buffer.put(tempBuffer, 0, bytesRead);
+        }finally {
+            this.reentrantLock.unlock();
+        }
+        return bytesRead;
     }
 
     @Override
@@ -59,6 +67,6 @@ public class TitanInputStreamChannel implements KChannel{
 
     @Override
     public void close() throws IOException {
-
+        this.stream.close();
     }
 }

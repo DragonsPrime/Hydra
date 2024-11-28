@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.system.prototype.Pinenut;
+import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -17,5 +18,8 @@ public interface ExporterEntity extends Pinenut {
    void setStorageIORequest(StorageExportIORequest storageExportIORequest);
 
     StorageIOResponse export() throws IOException, SQLException;
-    StorageIOResponse export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException;
+    StorageIOResponse export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException;
+
+    KChannel getChannel();
+    void setChannel( KChannel channel );
 }

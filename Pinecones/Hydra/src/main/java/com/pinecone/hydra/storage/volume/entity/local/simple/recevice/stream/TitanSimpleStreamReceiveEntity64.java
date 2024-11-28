@@ -19,7 +19,7 @@ public class TitanSimpleStreamReceiveEntity64 extends ArchReceiveEntity implemen
     protected SimpleStreamReceiver64 streamReceiver;
 
     public TitanSimpleStreamReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, InputStream stream, SimpleVolume simpleVolume ) {
-        super(volumeManager, storageReceiveIORequest);
+        super(volumeManager, storageReceiveIORequest,null);
         this.stream = stream;
         this.simpleVolume = simpleVolume;
         this.streamReceiver = new TitanSimpleStreamReceive64( this );

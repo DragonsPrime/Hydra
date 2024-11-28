@@ -17,7 +17,7 @@ public class TitanSpannedStreamExportEntity64 extends ArchExportEntity implement
     protected SpannedStreamExport64     streamExport;
 
     public TitanSpannedStreamExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, OutputStream stream, SpannedVolume volume) {
-        super(volumeManager, storageExportIORequest);
+        super(volumeManager, storageExportIORequest,null);
         this.stream  =  stream;
         this.streamExport = new TitanSpannedStreamExport64( this, volume );
     }

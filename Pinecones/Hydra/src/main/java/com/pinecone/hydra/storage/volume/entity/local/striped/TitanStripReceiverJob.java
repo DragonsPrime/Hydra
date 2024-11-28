@@ -9,6 +9,8 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
+import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
+import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleReceiveEntity64;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
@@ -62,8 +64,10 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
             }
 
             try {
-                this.storageIOResponse = this.volume.channelReceive(this.object, this.fileChannel, currentPosition, bufferSize);
-
+//                this.storageIOResponse = this.volume.channelReceive(this.object, this.fileChannel, currentPosition, bufferSize);
+                // todo 先默认底层是simpleVolume
+                TitanSimpleReceiveEntity64 receiveEntity = new TitanSimpleReceiveEntity64( this.volumeManager, this.object, this.fileChannel, (SimpleVolume) volume);
+                this.storageIOResponse = this.volume.receive( receiveEntity, currentPosition, bufferSize );
             } catch (IOException | SQLException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);

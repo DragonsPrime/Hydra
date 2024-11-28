@@ -113,6 +113,11 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
     }
 
     @Override
+    public StorageIOResponse export(ExporterEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws SQLException, IOException {
+        return entity.export( cacheBlock, offset, endSize, buffer );
+    }
+
+    @Override
     public String toString() {
         return this.toJSONString();
     }

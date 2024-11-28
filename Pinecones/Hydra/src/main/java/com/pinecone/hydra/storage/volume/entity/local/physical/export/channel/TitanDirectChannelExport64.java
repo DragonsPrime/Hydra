@@ -21,9 +21,9 @@ public class TitanDirectChannelExport64 implements DirectChannelExport64{
     @Override
     public StorageIOResponse export(DirectChannelExportEntity entity ) throws IOException {
         StorageExportIORequest storageExportIORequest = entity.getStorageIORequest();
+        KChannel channel = entity.getChannel();
         String sourceName = storageExportIORequest.getSourceName();
         long size = storageExportIORequest.getSize().longValue();
-        KChannel channel = entity.getChannel();
         TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
 
         long parityCheck = 0;

@@ -14,7 +14,7 @@ public class TitanDirectChannelExportEntity64 extends ArchExportEntity implement
     private DirectChannelExport     channelExporter;
 
     public TitanDirectChannelExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel) {
-        super(volumeManager, storageExportIORequest);
+        super(volumeManager, storageExportIORequest, null);
         this.channel = channel;
         this.channelExporter = new TitanDirectChannelExport64();
 

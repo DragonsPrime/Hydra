@@ -123,13 +123,13 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
             titanStorageExportIORequest.setSize(file.length());
 
 
-            TitanStripBufferInJob exportJob = new TitanStripBufferInJob(masterVolumeGram,this, volume, titanStorageExportIORequest,code);
-            LocalStripedTaskThread taskThread = new LocalStripedTaskThread(this.stripedVolume.getName() + code, masterVolumeGram, exportJob);
-            for( int i = code; i < masterVolumeGram.getCacheGroup().size(); i += masterVolumeGram.getJobCount() ){
-                masterVolumeGram.getCacheGroup().get( i ).setBufferWriteThreadId( taskThread.getId() );
-            }
-            masterVolumeGram.getTaskManager().add(taskThread);
-            taskThread.start();
+//            TitanStripBufferInJob exportJob = new TitanStripBufferInJob(masterVolumeGram,this, volume, titanStorageExportIORequest,code);
+//            LocalStripedTaskThread taskThread = new LocalStripedTaskThread(this.stripedVolume.getName() + code, masterVolumeGram, exportJob);
+//            for( int i = code; i < masterVolumeGram.getCacheGroup().size(); i += masterVolumeGram.getJobCount() ){
+//                masterVolumeGram.getCacheGroup().get( i ).setBufferWriteThreadId( taskThread.getId() );
+//            }
+//            masterVolumeGram.getTaskManager().add(taskThread);
+//            taskThread.start();
 
         }
 

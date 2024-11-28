@@ -16,7 +16,7 @@ public class TitanStripedChannelReceiverEntity64 extends ArchReceiveEntity imple
     private StripedVolume            stripedVolume;
     private StripedChannelReceiver64 stripedChannelReceiver64;
     public TitanStripedChannelReceiverEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, StripedVolume stripedVolume) {
-        super(volumeManager, storageReceiveIORequest);
+        super(volumeManager, storageReceiveIORequest,null);
         this.channel = channel;
         this.stripedVolume = stripedVolume;
         this.stripedChannelReceiver64 = new TitanStripedChannelReceiver64( this );
