@@ -2,7 +2,6 @@ package com.pinecone.hydra.storage.file.entity;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.file.transmit.receiver.channel.ChannelReceiverEntity;
 
 public interface FSNodeAllotment extends Pinenut {
      Folder              newFolder();
@@ -23,7 +22,6 @@ public interface FSNodeAllotment extends Pinenut {
      RemoteFrame         newRemoteFrame( GUID fileGuid, int segId );
      Symbolic            newSymbolic();
      SymbolicMeta        newSymbolicMeta();
-     ChannelReceiverEntity newChannelReceiverEntity();
 
      Strip  newStrip();
 }

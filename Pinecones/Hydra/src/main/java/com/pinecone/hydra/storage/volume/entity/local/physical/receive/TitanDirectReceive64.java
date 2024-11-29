@@ -7,9 +7,7 @@ import com.pinecone.hydra.storage.StorageNaming;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.TitanStorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageNaming;
-import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.hydra.storage.volume.VolumeManager;
-import com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel.DirectChannelReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
@@ -33,7 +31,7 @@ public class TitanDirectReceive64 implements DirectReceive64{
 
     protected String                  destDirPath;
 
-    public TitanDirectReceive64( IDirectReceiveEntity entity ){
+    public TitanDirectReceive64( DirectReceiveEntity entity ){
         this.channel                 = entity.getKChannel();
         this.storageReceiveIORequest = entity.getReceiveStorageObject();
         this.volumeManager           = entity.getVolumeManager();

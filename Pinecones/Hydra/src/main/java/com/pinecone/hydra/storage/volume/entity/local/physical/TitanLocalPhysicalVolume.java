@@ -12,12 +12,11 @@ import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
-import com.pinecone.hydra.storage.volume.entity.local.physical.export.channel.TitanDirectChannelExportEntity64;
-import com.pinecone.hydra.storage.volume.entity.local.physical.receive.channel.TitanDirectChannelReceiveEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.source.PhysicalVolumeManipulator;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysicalVolume {
@@ -64,44 +63,48 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
 
     @Override
     public StorageIOResponse channelReceive(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel) throws IOException, SQLException {
-        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager, storageReceiveIORequest, this.mountPoint.getMountPoint(), channel);
-        StorageIOResponse storageIOResponse = titanDirectChannelReceiveEntity64.receive();
-        storageIOResponse.setBottomGuid( this.guid );
-
-        return storageIOResponse;
+//        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager, storageReceiveIORequest, this.mountPoint.getMountPoint(), channel);
+//        StorageIOResponse storageIOResponse = titanDirectChannelReceiveEntity64.receive();
+//        storageIOResponse.setBottomGuid( this.guid );
+//
+//        return storageIOResponse;
+        return null;
     }
 
     @Override
     public StorageIOResponse channelReceive(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, Number offset, Number endSize) throws IOException {
-        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager, storageReceiveIORequest, this.mountPoint.getMountPoint(), channel);
-        StorageIOResponse storageIOResponse = titanDirectChannelReceiveEntity64.receive(offset, endSize);
-        storageIOResponse.setBottomGuid( this.getGuid() );
-        return storageIOResponse;
+//        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager, storageReceiveIORequest, this.mountPoint.getMountPoint(), channel);
+//        StorageIOResponse storageIOResponse = titanDirectChannelReceiveEntity64.receive(offset, endSize);
+//        storageIOResponse.setBottomGuid( this.getGuid() );
+//        return storageIOResponse;
+        return null;
     }
 
     @Override
     public StorageIOResponse channelExport(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel) throws IOException {
-        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, storageExportIORequest,channel );
-        StorageIOResponse storageIOResponse = titanDirectChannelExportEntity64.export();
-        storageIOResponse.setBottomGuid( this.getGuid() );
-        return storageIOResponse;
+//        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, storageExportIORequest,channel );
+//        StorageIOResponse storageIOResponse = titanDirectChannelExportEntity64.export();
+//        storageIOResponse.setBottomGuid( this.getGuid() );
+//        return storageIOResponse;
+        return null;
     }
 
     @Override
     public StorageIOResponse channelRaid0Export(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
-        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, storageExportIORequest,channel );
-        StorageIOResponse storageIOResponse = titanDirectChannelExportEntity64.export(cacheBlock, offset, endSize, buffer);
-        storageIOResponse.setBottomGuid( this.getGuid() );
-        return storageIOResponse;
+//        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, storageExportIORequest,channel );
+//        StorageIOResponse storageIOResponse = titanDirectChannelExportEntity64.export(cacheBlock, offset, endSize, buffer);
+//        storageIOResponse.setBottomGuid( this.getGuid() );
+//        return storageIOResponse;
+        return null;
     }
 
     @Override
-    public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException {
+    public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return entity.receive();
     }
 
     @Override
-    public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException {
+    public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return entity.receive( offset, endSize );
     }
 

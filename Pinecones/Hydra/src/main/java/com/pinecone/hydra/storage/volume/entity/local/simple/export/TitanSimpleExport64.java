@@ -4,10 +4,11 @@ import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
-import com.pinecone.hydra.storage.volume.entity.local.physical.export.channel.TitanDirectChannelExportEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirectExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
+import java.sql.SQLException;
 
 public class TitanSimpleExport64 implements SimpleExport64{
     private VolumeManager volumeManager;
@@ -16,20 +17,20 @@ public class TitanSimpleExport64 implements SimpleExport64{
 
     private KChannel channel;
 
-    public TitanSimpleExport64( ISimpleExportEntity entity ){
+    public TitanSimpleExport64( SimpleExportEntity entity ){
         this.volumeManager = entity.getVolumeManager();
         this.storageExportIORequest = entity.getStorageIORequest();
         this.channel = entity.getChannel();
     }
     @Override
-    public StorageIOResponse export() throws IOException {
-        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(this.volumeManager, this.storageExportIORequest,this.channel);
-        return titanDirectChannelExportEntity64.export();
+    public StorageIOResponse export() throws IOException, SQLException {
+        TitanDirectExportEntity64 exportEntity = new TitanDirectExportEntity64( this.volumeManager, this.storageExportIORequest, this.channel );
+        return exportEntity.export();
     }
 
     @Override
     public StorageIOResponse export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
-        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(this.volumeManager, this.storageExportIORequest,this.channel);
-        return titanDirectChannelExportEntity64.export( cacheBlock, offset, endSize, buffer );
+        TitanDirectExportEntity64 exportEntity = new TitanDirectExportEntity64( this.volumeManager, this.storageExportIORequest, this.channel );
+        return exportEntity.export( cacheBlock, offset, endSize, buffer );
     }
 }

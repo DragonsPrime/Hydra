@@ -8,6 +8,7 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 public interface ReceiveEntity extends Pinenut {
@@ -20,9 +21,9 @@ public interface ReceiveEntity extends Pinenut {
     KChannel getKChannel();
     void setKChannel( KChannel channel);
 
-    StorageIOResponse receive() throws IOException, SQLException;
+    StorageIOResponse receive() throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException;
 
-    StorageIOResponse receive(Number offset, Number endSize ) throws IOException, SQLException;
+    StorageIOResponse receive(Number offset, Number endSize ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException;
 
     StorageIOResponse receive(CacheBlock cacheBlock, byte[] buffer ) throws IOException, SQLException;
 

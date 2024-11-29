@@ -1,16 +1,14 @@
 package com.pinecone.hydra.storage.file;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.file.entity.Folder;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
 import com.pinecone.hydra.storage.file.entity.Frame;
-import com.pinecone.hydra.storage.file.transmit.exporter.ExporterEntity;
-import com.pinecone.hydra.storage.file.transmit.receiver.ReceiveEntity;
-import com.pinecone.hydra.storage.file.transmit.receiver.channel.ChannelReceiver;
+import com.pinecone.hydra.storage.file.transmit.exporter.FileExportEntity;
+import com.pinecone.hydra.storage.file.transmit.receiver.FileReceiveEntity;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.system.ko.kom.ReparseKOMTree;
@@ -19,7 +17,7 @@ import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.TreeMap;
@@ -173,9 +171,9 @@ public interface KOMFileSystem extends ReparseKOMTree {
     Frame getLastFrame( GUID guid );
 
 
-    void receive( LogicVolume volume, ReceiveEntity entity ) throws IOException, SQLException;
-    void receive( LogicVolume volume, ReceiveEntity entity, Number offset, Number endSize )throws IOException;
+    void receive( LogicVolume volume, FileReceiveEntity entity ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException;
+    void receive(LogicVolume volume, FileReceiveEntity entity, Number offset, Number endSize )throws IOException;
 
-    void export( UniformVolumeManager volumeManager, ExporterEntity entity ) throws SQLException, IOException;
-    void export( UniformVolumeManager volumeManager, ExporterEntity entity, Number offset, Number endSize );
+    void export( FileExportEntity entity ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException;
+    void export( FileExportEntity entity, Number offset, Number endSize );
 }

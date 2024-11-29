@@ -9,6 +9,7 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 
@@ -24,8 +25,8 @@ public interface PhysicalVolume extends Volume{
     StorageIOResponse channelExport(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel ) throws IOException;
     StorageIOResponse channelRaid0Export(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException;
 
-    StorageIOResponse receive( ReceiveEntity entity ) throws SQLException, IOException;
-    StorageIOResponse receive( ReceiveEntity entity, Number offset, Number endSize ) throws SQLException, IOException;
+    StorageIOResponse receive( ReceiveEntity entity ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException;
+    StorageIOResponse receive( ReceiveEntity entity, Number offset, Number endSize ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException;
 
     StorageIOResponse receive( ReceiveEntity entity, CacheBlock cacheBlock, byte[] buffer ) throws SQLException, IOException;
 

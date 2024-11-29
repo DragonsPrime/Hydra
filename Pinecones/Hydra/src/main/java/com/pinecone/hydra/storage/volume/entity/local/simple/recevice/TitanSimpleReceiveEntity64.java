@@ -9,6 +9,7 @@ import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 public class TitanSimpleReceiveEntity64 extends ArchReceiveEntity implements SimpleReceiveEntity64{
@@ -23,12 +24,12 @@ public class TitanSimpleReceiveEntity64 extends ArchReceiveEntity implements Sim
     }
 
     @Override
-    public StorageIOResponse receive() throws IOException, SQLException {
+    public StorageIOResponse receive() throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return this.simpleReceive.receive();
     }
 
     @Override
-    public StorageIOResponse receive(Number offset, Number endSize) throws IOException, SQLException {
+    public StorageIOResponse receive(Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return this.simpleReceive.receive( offset, endSize );
     }
 

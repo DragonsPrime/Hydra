@@ -2,8 +2,10 @@ package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.volume.UnifiedTransmitConstructor;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.StorageExportIORequest;
+import com.pinecone.hydra.storage.volume.entity.ExporterEntity;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.export.TitanSimpleExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.export.IStripedExport;
@@ -12,6 +14,7 @@ import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -42,6 +45,8 @@ public class TitanStripBufferInJob implements StripBufferInJob {
 
     protected Number                        endSize;
 
+    protected UnifiedTransmitConstructor    constructor;
+
     public TitanStripBufferInJob(MasterVolumeGram masterVolumeGram, IStripedExport stripedExport, LogicVolume volume, StorageExportIORequest object, int jobCode ){
         this.masterVolumeGram             = masterVolumeGram;
         this.object                       = object;
@@ -54,6 +59,7 @@ public class TitanStripBufferInJob implements StripBufferInJob {
         this.blockerLatch                 = new Semaphore(0);
         this.buffer                       = masterVolumeGram.getBuffer();
         this.cacheBlockGroup              = masterVolumeGram.getCacheGroup();
+        this.constructor                  = new UnifiedTransmitConstructor();
 
         this.intoWritingStatus();
     }
@@ -110,9 +116,10 @@ public class TitanStripBufferInJob implements StripBufferInJob {
                 }
 
                 try {
-                    //todo 默认底层为simpleVolume
+
 //                    this.volume.channelExport( this.object, this.channel, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.buffer);
-                    TitanSimpleExportEntity64 exportEntity = new TitanSimpleExportEntity64( this.volumeManager, this.object, this.channel );
+                    //TitanSimpleExportEntity64 exportEntity = new TitanSimpleExportEntity64( this.volumeManager, this.object, this.channel );
+                    ExporterEntity exportEntity = this.constructor.getExportEntity(this.volume.getClass(), this.volumeManager, this.object, this.channel,this.volume);
                     this.volume.export( exportEntity, this.cacheBlockGroup.get( currentCacheBlockNumber.get() ), currentPosition, bufferSize, this.buffer );
                     currentPosition += bufferSize;
                     this.wakeUpBufferToFileThread();
@@ -140,6 +147,8 @@ public class TitanStripBufferInJob implements StripBufferInJob {
                 }
                 catch ( IOException | SQLException e ) {
                     throw new VolumeJobCompromiseException( e );
+                } catch (InvocationTargetException | InstantiationException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
                 }
             }
             else {

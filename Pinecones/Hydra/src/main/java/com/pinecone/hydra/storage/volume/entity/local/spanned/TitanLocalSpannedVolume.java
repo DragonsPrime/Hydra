@@ -15,12 +15,11 @@ import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
-import com.pinecone.hydra.storage.volume.entity.local.spanned.export.channel.TitanSpannedChannelExportEntity64;
-import com.pinecone.hydra.storage.volume.entity.local.spanned.receive.channel.TitanSpannedChannelReceiveEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -64,24 +63,25 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
 
     @Override
     public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel) throws IOException, SQLException {
-        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeManager, storageReceiveIORequest,channel,this );
-        StorageIOResponse storageIOResponse = titanSpannedChannelReceiveEntity64.receive();
-        storageIOResponse.setBottomGuid( this.guid );
-        return storageIOResponse;
+//        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeManager, storageReceiveIORequest,channel,this );
+//        StorageIOResponse storageIOResponse = titanSpannedChannelReceiveEntity64.receive();
+//        storageIOResponse.setBottomGuid( this.guid );
+        return null;
     }
 
     @Override
     public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel, Number offset, Number endSize) throws IOException, SQLException {
-        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeManager, storageReceiveIORequest,channel,this );
-        StorageIOResponse storageIOResponse = titanSpannedChannelReceiveEntity64.receive( offset, endSize );
+//        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeManager, storageReceiveIORequest,channel,this );
+//        StorageIOResponse storageIOResponse = titanSpannedChannelReceiveEntity64.receive( offset, endSize );
         //storageIOResponse.setBottomGuid( this.guid );
-        return storageIOResponse;
+        return null;
     }
 
     @Override
     public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel) throws IOException, SQLException {
-        TitanSpannedChannelExportEntity64 titanSpannedChannelExportEntity64 = new TitanSpannedChannelExportEntity64( this.volumeManager, storageExportIORequest,channel, this );
-        return titanSpannedChannelExportEntity64.export();
+//        TitanSpannedChannelExportEntity64 titanSpannedChannelExportEntity64 = new TitanSpannedChannelExportEntity64( this.volumeManager, storageExportIORequest,channel, this );
+//        return titanSpannedChannelExportEntity64.export();
+        return null;
     }
 
     @Override
@@ -91,12 +91,12 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
 
 
     @Override
-    public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException {
+    public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return entity.receive();
     }
 
     @Override
-    public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException {
+    public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return entity.receive( offset, endSize );
     }
 

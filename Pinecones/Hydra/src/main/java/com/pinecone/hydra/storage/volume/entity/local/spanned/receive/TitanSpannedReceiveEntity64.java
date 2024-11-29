@@ -9,6 +9,7 @@ import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 public class TitanSpannedReceiveEntity64 extends ArchReceiveEntity implements SpannedReceiveEntity64{
@@ -22,12 +23,12 @@ public class TitanSpannedReceiveEntity64 extends ArchReceiveEntity implements Sp
     }
 
     @Override
-    public StorageIOResponse receive() throws IOException, SQLException {
+    public StorageIOResponse receive() throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return this.spannedReceive.receive();
     }
 
     @Override
-    public StorageIOResponse receive(Number offset, Number endSize) throws IOException, SQLException {
+    public StorageIOResponse receive(Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return this.spannedReceive.receive( offset, endSize );
     }
 

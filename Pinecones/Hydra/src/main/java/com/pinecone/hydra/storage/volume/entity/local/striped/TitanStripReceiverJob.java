@@ -15,6 +15,7 @@ import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.concurrent.Semaphore;
@@ -70,6 +71,8 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
                 this.storageIOResponse = this.volume.receive( receiveEntity, currentPosition, bufferSize );
             } catch (IOException | SQLException e) {
                 e.printStackTrace();
+                throw new RuntimeException(e);
+            } catch (InvocationTargetException | IllegalAccessException | InstantiationException e) {
                 throw new RuntimeException(e);
             }
 

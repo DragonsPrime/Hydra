@@ -15,13 +15,13 @@ import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
-import com.pinecone.hydra.storage.volume.entity.local.simple.export.channel.TitanSimpleChannelExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.channel.TitanSimpleChannelReceiverEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -83,26 +83,28 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         SQLiteExecutor sqLiteExecutor = this.getSQLiteExecutor();
         String sourceName = this.kenVolumeFileSystem.getKVFSTableSourceName(storageExportIORequest.getStorageObjectGuid(), sqLiteExecutor);
         storageExportIORequest.setSourceName( sourceName );
-        TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeManager, storageExportIORequest, channel );
-        return titanSimpleChannelExportEntity64.export();
+//        TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeManager, storageExportIORequest, channel );
+//        return titanSimpleChannelExportEntity64.export();
+        return null;
     }
 
     @Override
     public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException, SQLException {
-        TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeManager, storageExportIORequest, channel );
-        return titanSimpleChannelExportEntity64.export( cacheBlock, offset, endSize, buffer );
+//        TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeManager, storageExportIORequest, channel );
+//        return titanSimpleChannelExportEntity64.export( cacheBlock, offset, endSize, buffer );
+        return null;
     }
 
 
     @Override
-    public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException {
+    public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
         StorageIOResponse response = entity.receive();
         this.saveMate( response, entity.getReceiveStorageObject().getName() );
         return response ;
     }
 
     @Override
-    public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException {
+    public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
         StorageIOResponse response = entity.receive( offset, endSize );
         this.saveMate( response, entity.getReceiveStorageObject().getName() );
         return response;

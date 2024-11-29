@@ -3,8 +3,6 @@ package com.pinecone.hydra.storage.file.entity;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.source.FileMasterManipulator;
-import com.pinecone.hydra.storage.file.transmit.receiver.channel.ChannelReceiverEntity;
-import com.pinecone.hydra.storage.file.transmit.receiver.channel.GenericChannelReceiveEntity;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 public class GenericFSNodeAllotment implements FSNodeAllotment {
@@ -139,10 +137,6 @@ public class GenericFSNodeAllotment implements FSNodeAllotment {
         return new GenericSymbolicMeta(this.fileMasterManipulator.getSymbolicMetaManipulator());
     }
 
-    @Override
-    public ChannelReceiverEntity newChannelReceiverEntity() {
-        return new GenericChannelReceiveEntity(fileSystem,null,null,null);
-    }
 
     @Override
     public Strip newStrip() {

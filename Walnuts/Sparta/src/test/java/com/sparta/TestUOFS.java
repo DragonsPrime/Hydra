@@ -8,11 +8,10 @@ import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
-import com.pinecone.hydra.storage.file.transmit.exporter.channel.GenericChannelExporterEntity;
-import com.pinecone.hydra.storage.file.transmit.receiver.channel.GenericChannelReceiveEntity;
+import com.pinecone.hydra.storage.file.transmit.exporter.TitanFileExportEntity64;
+import com.pinecone.hydra.storage.file.transmit.receiver.TitanFileReceiveEntity64;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
-import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleReceiveEntity64;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.volume.ibatis.hydranium.VolumeMappingDriver;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
@@ -22,6 +21,7 @@ import com.sauron.radium.Radium;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.sql.SQLException;
@@ -46,11 +46,11 @@ class Steve extends Radium {
         UniformVolumeManager volumeManager = new UniformVolumeManager(koiVolumeMappingDriver);
         GuidAllocator guidAllocator = fileSystem.getGuidAllocator();
         //Debug.trace( fileSystem.get( GUIDs.GUID72( "020c8b0-000006-0002-54" ) ) );
-        this.testInsert( fileSystem );
+        //this.testInsert( fileSystem );
         //this.testUpload(fileSystem);
         //this.testDelete( fileSystem );
         //this.testChannelReceive( fileSystem, volumeManager );
-        //this.testChannelExport( fileSystem, volumeManager );
+        this.testChannelExport( fileSystem, volumeManager );
 
     }
 
@@ -68,8 +68,8 @@ class Steve extends Radium {
         fileSystem.remove( "movie" );
     }
 
-    private void testChannelReceive( KOMFileSystem fileSystem, UniformVolumeManager volumeManager ) throws IOException, SQLException {
-        LogicVolume simpleVolume = volumeManager.get(GUIDs.GUID72( "08cdf4c-00013c-0006-4c" ));
+    private void testChannelReceive( KOMFileSystem fileSystem, UniformVolumeManager volumeManager ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        LogicVolume volume = volumeManager.get(GUIDs.GUID72( "09d62c0-00037e-0006-c8" ));
         FSNodeAllotment fsNodeAllotment = fileSystem.getFSNodeAllotment();
         File file = new File("D:/井盖视频块/4月13日 (2).mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
@@ -78,17 +78,17 @@ class Steve extends Radium {
         fileNode.setDefinitionSize( file.length() );
         fileNode.setName( file.getName() );
         String destDirPath = "D:/文件系统/大文件/我的视频.mp4";
-        GenericChannelReceiveEntity receiveEntity = new GenericChannelReceiveEntity( fileSystem,destDirPath,fileNode, titanFileChannelKChannel);
-        fileSystem.receive( simpleVolume, receiveEntity );
+        TitanFileReceiveEntity64 receiveEntity = new TitanFileReceiveEntity64( fileSystem, destDirPath, fileNode,titanFileChannelKChannel,volumeManager );
+        fileSystem.receive( volume, receiveEntity );
     }
 
-    private void testChannelExport( KOMFileSystem fileSystem, UniformVolumeManager volumeManager ) throws IOException, SQLException {
-        FileNode fileNode = (FileNode) fileSystem.get(fileSystem.queryGUIDByPath("D:/文件系统/大文件/我的图片.jpg"));
-        File file = new File("D:/文件系统/大文件/我的图片.jpg");
+    private void testChannelExport( KOMFileSystem fileSystem, UniformVolumeManager volumeManager ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        FileNode fileNode = (FileNode) fileSystem.get(fileSystem.queryGUIDByPath("D:/文件系统/大文件/我的视频.mp4"));
+        File file = new File("D:/文件系统/大文件/我的视频.mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-        TitanFileChannelKChannel titanFileChannelKChannel = new TitanFileChannelKChannel( channel );
-        GenericChannelExporterEntity exporterEntity = new GenericChannelExporterEntity( fileSystem, fileNode, titanFileChannelKChannel);
-        fileSystem.export( volumeManager, exporterEntity );
+        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel( channel );
+        TitanFileExportEntity64 exportEntity = new TitanFileExportEntity64( fileSystem, volumeManager, fileNode, kChannel );
+        fileSystem.export( exportEntity );
     }
 
 }

@@ -12,8 +12,10 @@ import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
 import com.pinecone.hydra.storage.volume.UnifiedTransmitConstructor;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
+import com.pinecone.hydra.storage.volume.entity.ExporterEntity;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
+import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
 import com.pinecone.hydra.storage.TitanStorageExportExportIORequest;
@@ -28,13 +30,8 @@ import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.export.TitanSimpleExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleReceiveEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.spanned.export.TitanSpannedExportEntity64;
-import com.pinecone.hydra.storage.volume.entity.local.spanned.export.stream.TitanSpannedStreamExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.spanned.receive.SpannedReceiveEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.spanned.receive.TitanSpannedReceiveEntity64;
-import com.pinecone.hydra.storage.volume.entity.local.spanned.receive.stream.TitanSpannedStreamReceiveEntity64;
-import com.pinecone.hydra.storage.volume.entity.local.striped.export.TitanStripedExportEntity64;
-import com.pinecone.hydra.storage.volume.entity.local.striped.receive.TitanStripedReceiveEntity64;
-import com.pinecone.hydra.storage.volume.entity.local.striped.receive.stream.TitanStripedStreamReceiveEntity64;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.volume.ibatis.hydranium.VolumeMappingDriver;
@@ -45,7 +42,6 @@ import com.sauron.radium.Radium;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -82,8 +78,8 @@ class Alice extends Radium {
         //this.testDirectExport( volumeTree );
         //Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
-        //this.testStripedInsert( volumeTree );
-        //this.testSpannedInsert( volumeTree );
+        this.testStripedInsert( volumeTree );
+        this.testSpannedInsert( volumeTree );
         //this.testStripedReceive( volumeTree );
         //this.testStripedExport( volumeTree );
         //this.testHash( volumeTree );
@@ -91,7 +87,7 @@ class Alice extends Radium {
         //this.testSpannedExport( volumeTree );
         //this.testSimpleReceive( volumeTree );
         //this.testSimpleExport( volumeTree );
-        this.testConsumer( volumeTree );
+        //this.testConsumer( volumeTree );
     }
 
 
@@ -152,7 +148,7 @@ class Alice extends Radium {
         simpleVolume1.extendLogicalVolume( physicalVolume1.getGuid() );
         simpleVolume2.extendLogicalVolume( physicalVolume2.getGuid() );
         stripedVolume.storageExpansion( simpleVolume1.getGuid() );
-        //stripedVolume.storageExpansion( simpleVolume2.getGuid() );
+        stripedVolume.storageExpansion( simpleVolume2.getGuid() );
     }
 
     private void testSpannedInsert( UniformVolumeManager volumeManager ) throws SQLException {
@@ -212,7 +208,7 @@ class Alice extends Radium {
         spannedVolume.build();
     }
 
-    void testStripedReceive( UniformVolumeManager volumeManager ) throws IOException, SQLException {
+    void testStripedReceive( UniformVolumeManager volumeManager ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
@@ -225,14 +221,16 @@ class Alice extends Radium {
 //        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel( channel );
         FileInputStream stream = new FileInputStream( file );
         TitanInputStreamChannel kChannel = new TitanInputStreamChannel(stream);
-        TitanStripedReceiveEntity64 receiveEntity = new TitanStripedReceiveEntity64( volumeManager, titanReceiveStorageObject, kChannel, (StripedVolume) volume);
-        volume.receive( receiveEntity );
+        UnifiedTransmitConstructor unifiedTransmitConstructor = new UnifiedTransmitConstructor();
+        ReceiveEntity entity = unifiedTransmitConstructor.getReceiveEntity(volume.getClass(), volumeManager, titanReceiveStorageObject, kChannel, volume);
+        //TitanStripedReceiveEntity64 receiveEntity = new TitanStripedReceiveEntity64( volumeManager, titanReceiveStorageObject, kChannel, (StripedVolume) volume);
+        volume.receive( entity );
 
 
         //StorageIOResponse storageIOResponse = volume.channelReceive(titanReceiveStorageObject, titanKChannel);
     }
 
-    void testSpannedReceive( UniformVolumeManager volumeManager ) throws IOException, SQLException {
+    void testSpannedReceive( UniformVolumeManager volumeManager ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("跨区卷"));
         TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
@@ -248,7 +246,7 @@ class Alice extends Radium {
         volume.receive( receiveEntity );
     }
 
-    void testSimpleReceive( UniformVolumeManager volumeManager ) throws IOException, SQLException {
+    void testSimpleReceive( UniformVolumeManager volumeManager ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
         LogicVolume volume = volumeManager.get(GUIDs.GUID72("09a94b4-0002a9-0004-d8"));
         TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
@@ -276,12 +274,13 @@ class Alice extends Radium {
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
         titanExportStorageObject.setSize( originalFile.length() );
-        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("09b0706-00033d-0001-50") );
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("09cbd8e-000012-0001-30") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
         //volume.channelExport( titanExportStorageObject, titanFileChannelKChannel);
-
-        TitanStripedExportEntity64 exportEntity = new TitanStripedExportEntity64( volumeManager, titanExportStorageObject, kChannel, (StripedVolume) volume);
-        volume.export( exportEntity );
+        UnifiedTransmitConstructor unifiedTransmitConstructor = new UnifiedTransmitConstructor();
+        ExporterEntity entity = unifiedTransmitConstructor.getExportEntity(volume.getClass(), volumeManager, titanExportStorageObject, kChannel, volume);
+        //TitanStripedExportEntity64 exportEntity = new TitanStripedExportEntity64( volumeManager, titanExportStorageObject, kChannel, (StripedVolume) volume);
+        volume.export( entity );
     }
 
     void testSpannedExport( UniformVolumeManager volumeManager ) throws IOException, SQLException {
@@ -312,7 +311,7 @@ class Alice extends Radium {
 
         FileOutputStream fileOutputStream = new FileOutputStream( file );
         TitanOutputStreamChannel kChannel = new TitanOutputStreamChannel( fileOutputStream );
-        TitanSimpleExportEntity64 exportEntity = new TitanSimpleExportEntity64( volumeManager, titanExportStorageObject, kChannel );
+        TitanSimpleExportEntity64 exportEntity = new TitanSimpleExportEntity64( volumeManager, titanExportStorageObject, kChannel,(SimpleVolume) volume);
         volume.export( exportEntity );
     }
 

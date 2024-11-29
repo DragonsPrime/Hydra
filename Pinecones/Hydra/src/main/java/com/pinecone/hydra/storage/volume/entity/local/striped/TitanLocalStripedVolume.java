@@ -19,6 +19,7 @@ import com.pinecone.hydra.storage.volume.entity.local.striped.receive.channnel.T
 import com.pinecone.hydra.storage.volume.source.StripedVolumeManipulator;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -88,12 +89,12 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
 
 
     @Override
-    public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException {
+    public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return entity.receive();
     }
 
     @Override
-    public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException {
+    public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
         return entity.receive( offset, endSize );
     }
 

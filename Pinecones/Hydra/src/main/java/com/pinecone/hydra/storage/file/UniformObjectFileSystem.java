@@ -2,7 +2,6 @@ package com.pinecone.hydra.storage.file;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
-import com.pinecone.hydra.storage.KChannel;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.GenericFSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
@@ -26,9 +25,9 @@ import com.pinecone.hydra.storage.file.source.RemoteFrameManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicMetaManipulator;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
-import com.pinecone.hydra.storage.file.transmit.exporter.ExporterEntity;
-import com.pinecone.hydra.storage.file.transmit.receiver.ReceiveEntity;
-import com.pinecone.hydra.storage.file.transmit.receiver.channel.GenericChannelReceiveEntity;
+import com.pinecone.hydra.storage.file.transmit.exporter.FileExportEntity;
+import com.pinecone.hydra.storage.file.transmit.receiver.FileReceiveEntity;
+import com.pinecone.hydra.storage.file.transmit.receiver.TitanFileReceiveEntity64;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.system.Hydrarum;
@@ -45,7 +44,7 @@ import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
 import com.pinecone.ulf.util.id.GUIDs;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -476,22 +475,22 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     }
 
     @Override
-    public void receive(LogicVolume volume, ReceiveEntity entity) throws IOException, SQLException {
+    public void receive(LogicVolume volume, FileReceiveEntity entity) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         entity.receive( volume );
     }
 
     @Override
-    public void receive(LogicVolume volume, ReceiveEntity entity, Number offset, Number endSize) throws IOException {
-        entity.receive( offset, endSize );
+    public void receive(LogicVolume volume, FileReceiveEntity entity, Number offset, Number endSize) throws IOException {
+        entity.receive( volume, offset, endSize );
     }
 
     @Override
-    public void export(UniformVolumeManager volumeManager, ExporterEntity entity) throws SQLException, IOException {
-        entity.export( volumeManager );
+    public void export( FileExportEntity entity ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        entity.export();
     }
 
     @Override
-    public void export(UniformVolumeManager volumeManager, ExporterEntity entity, Number offset, Number endSize) {
+    public void export( FileExportEntity entity, Number offset, Number endSize ) {
 
     }
 }

@@ -5,6 +5,7 @@ import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchExportEntity;
+import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
@@ -13,9 +14,12 @@ import java.sql.SQLException;
 public class TitanSimpleExportEntity64 extends ArchExportEntity implements SimpleExportEntity64{
     protected SimpleExport64 simpleExportEntity;
 
-    public TitanSimpleExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel) {
+    protected SimpleVolume   simpleVolume;
+
+    public TitanSimpleExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel, SimpleVolume simpleVolume) {
         super(volumeManager, storageExportIORequest, channel);
         this.simpleExportEntity = new TitanSimpleExport64( this );
+        this.simpleVolume       = simpleVolume;
     }
 
     @Override
