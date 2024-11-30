@@ -2,10 +2,10 @@ package com.pinecone.hydra.storage.volume.entity.local.striped.export;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
-import com.pinecone.hydra.storage.TitanStorageExportExportIORequest;
+import com.pinecone.hydra.storage.TitanStorageExportIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
@@ -28,7 +28,7 @@ public class TitanStripedExport64 implements StripedExport64{
 
     protected StorageExportIORequest    storageExportIORequest;
 
-    protected KChannel                  channel;
+    protected Chanface channel;
 
     protected StripedVolume             stripedVolume;
 
@@ -120,7 +120,7 @@ public class TitanStripedExport64 implements StripedExport64{
             }
             int code = this.kenVolumeFileSystem.getKVFSFileStripCode(sqLiteExecutor, volume.getGuid(), this.storageExportIORequest.getStorageObjectGuid());
             File file = new File(sourceName);
-            StorageExportIORequest titanStorageExportIORequest = new TitanStorageExportExportIORequest();
+            StorageExportIORequest titanStorageExportIORequest = new TitanStorageExportIORequest();
             titanStorageExportIORequest.setStorageObjectGuid( this.storageExportIORequest.getStorageObjectGuid() );
             titanStorageExportIORequest.setSourceName(sourceName);
             titanStorageExportIORequest.setSize(file.length());
@@ -158,7 +158,7 @@ public class TitanStripedExport64 implements StripedExport64{
     }
 
     @Override
-    public KChannel getFileChannel() {
+    public Chanface getFileChannel() {
         return this.channel;
     }
 

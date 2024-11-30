@@ -2,16 +2,15 @@ package com.pinecone.hydra.storage.volume.entity.local.striped.export.channel;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
-import com.pinecone.hydra.storage.TitanStorageExportExportIORequest;
+import com.pinecone.hydra.storage.TitanStorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripBufferOutJob;
-import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripBufferInJob;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
@@ -26,7 +25,7 @@ import java.util.concurrent.Semaphore;
 public class TitanStripedChannelExport64 implements StripedChannelExport64{
     private VolumeManager           volumeManager;
     private StorageExportIORequest  storageExportIORequest;
-    private KChannel                channel;
+    private Chanface channel;
     private StripedVolume           stripedVolume;
     private OnVolumeFileSystem      kenVolumeFileSystem;
 
@@ -117,7 +116,7 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
             }
             int code = this.kenVolumeFileSystem.getKVFSFileStripCode(sqLiteExecutor, volume.getGuid(), this.storageExportIORequest.getStorageObjectGuid());
             File file = new File(sourceName);
-            StorageExportIORequest titanStorageExportIORequest = new TitanStorageExportExportIORequest();
+            StorageExportIORequest titanStorageExportIORequest = new TitanStorageExportIORequest();
             titanStorageExportIORequest.setStorageObjectGuid( this.storageExportIORequest.getStorageObjectGuid() );
             titanStorageExportIORequest.setSourceName(sourceName);
             titanStorageExportIORequest.setSize(file.length());
@@ -155,7 +154,7 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
     }
 
     @Override
-    public KChannel getFileChannel() {
+    public Chanface getFileChannel() {
         return this.channel;
     }
 

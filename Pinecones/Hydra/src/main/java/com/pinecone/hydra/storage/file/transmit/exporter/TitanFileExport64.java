@@ -1,8 +1,8 @@
 package com.pinecone.hydra.storage.file.transmit.exporter;
 
 import com.pinecone.framework.util.json.JSON;
-import com.pinecone.hydra.storage.KChannel;
-import com.pinecone.hydra.storage.TitanStorageExportExportIORequest;
+import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.TitanStorageExportIORequest;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.Frame;
 import com.pinecone.hydra.storage.file.entity.LocalFrame;
@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import java.util.TreeMap;
 
 public class TitanFileExport64 implements FileExport64{
-    protected KChannel                   channel;
+    protected Chanface channel;
 
     protected FileNode                   fileNode;
 
@@ -39,7 +39,7 @@ public class TitanFileExport64 implements FileExport64{
         TreeMap<Long, Frame> framesMap = fileNode.getFrames();
         for (long i = 0; i < framesMap.size(); i++) {
             LocalFrame frame = (LocalFrame) framesMap.get(i);
-            TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
+            TitanStorageExportIORequest titanExportStorageObject = new TitanStorageExportIORequest();
             titanExportStorageObject.setSize( frame.getSize() );
             titanExportStorageObject.setStorageObjectGuid( frame.getSegGuid() );
             String sourceName = frame.getSourceName();

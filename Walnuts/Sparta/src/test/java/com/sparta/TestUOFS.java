@@ -3,7 +3,7 @@ package com.sparta;
 import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
-import com.pinecone.hydra.storage.TitanFileChannelKChannel;
+import com.pinecone.hydra.storage.TitanFileChannelChanface;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
@@ -11,11 +11,9 @@ import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.transmit.exporter.TitanFileExportEntity64;
 import com.pinecone.hydra.storage.file.transmit.receiver.TitanFileReceiveEntity64;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
-import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.volume.ibatis.hydranium.VolumeMappingDriver;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
-import com.pinecone.ulf.util.id.GUIDs;
 import com.pinecone.ulf.util.id.GuidAllocator;
 import com.sauron.radium.Radium;
 
@@ -69,24 +67,24 @@ class Steve extends Radium {
     }
 
     private void testChannelReceive( KOMFileSystem fileSystem, UniformVolumeManager volumeManager ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        LogicVolume volume = volumeManager.get(GUIDs.GUID72( "09d62c0-00037e-0006-c8" ));
+        //LogicVolume volume = volumeManager.get(GUIDs.GUID72( "09d62c0-00037e-0006-c8" ));
         FSNodeAllotment fsNodeAllotment = fileSystem.getFSNodeAllotment();
         File file = new File("D:/井盖视频块/4月13日 (2).mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        TitanFileChannelKChannel titanFileChannelKChannel = new TitanFileChannelKChannel( channel );
+        TitanFileChannelChanface titanFileChannelKChannel = new TitanFileChannelChanface( channel );
         FileNode fileNode = fsNodeAllotment.newFileNode();
         fileNode.setDefinitionSize( file.length() );
         fileNode.setName( file.getName() );
         String destDirPath = "D:/文件系统/大文件/我的视频.mp4";
         TitanFileReceiveEntity64 receiveEntity = new TitanFileReceiveEntity64( fileSystem, destDirPath, fileNode,titanFileChannelKChannel,volumeManager );
-        fileSystem.receive( volume, receiveEntity );
+        fileSystem.receive( receiveEntity );
     }
 
     private void testChannelExport( KOMFileSystem fileSystem, UniformVolumeManager volumeManager ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         FileNode fileNode = (FileNode) fileSystem.get(fileSystem.queryGUIDByPath("D:/文件系统/大文件/我的视频.mp4"));
         File file = new File("D:/文件系统/大文件/我的视频.mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel( channel );
+        TitanFileChannelChanface kChannel = new TitanFileChannelChanface( channel );
         TitanFileExportEntity64 exportEntity = new TitanFileExportEntity64( fileSystem, volumeManager, fileNode, kChannel );
         fileSystem.export( exportEntity );
     }

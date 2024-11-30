@@ -9,8 +9,6 @@ import com.pinecone.hydra.storage.file.entity.ElementNode;
 import com.pinecone.hydra.storage.file.entity.Frame;
 import com.pinecone.hydra.storage.file.transmit.exporter.FileExportEntity;
 import com.pinecone.hydra.storage.file.transmit.receiver.FileReceiveEntity;
-import com.pinecone.hydra.storage.volume.UniformVolumeManager;
-import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.system.ko.kom.ReparseKOMTree;
 import com.pinecone.hydra.unit.udtt.entity.EntityNode;
 import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
@@ -170,9 +168,14 @@ public interface KOMFileSystem extends ReparseKOMTree {
     void upload( FileNode file, String destDirPath );
     Frame getLastFrame( GUID guid );
 
+    void setFolderVolumeMapping(GUID folderGuid, GUID volumeGuid );
+    GUID getMappingVolume(GUID folderGuid );
 
-    void receive( LogicVolume volume, FileReceiveEntity entity ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException;
-    void receive(LogicVolume volume, FileReceiveEntity entity, Number offset, Number endSize )throws IOException;
+    GUID getMappingVolume(String path );
+
+
+    void receive(  FileReceiveEntity entity ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException;
+    void receive( FileReceiveEntity entity, Number offset, Number endSize )throws IOException;
 
     void export( FileExportEntity entity ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException;
     void export( FileExportEntity entity, Number offset, Number endSize );

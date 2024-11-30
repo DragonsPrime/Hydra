@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage;
 
+import com.pinecone.framework.system.NotImplementedException;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
@@ -8,12 +9,12 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class TitanInputStreamChannel implements KChannel{
+public class TitanInputStreamChanface implements Chanface {
     protected InputStream          stream;
 
     protected final ReentrantLock  reentrantLock;
 
-    public TitanInputStreamChannel( InputStream stream ){
+    public TitanInputStreamChanface(InputStream stream ){
         this.stream        = stream;
         this.reentrantLock = new ReentrantLock();
     }
@@ -36,7 +37,7 @@ public class TitanInputStreamChannel implements KChannel{
         this.reentrantLock.lock();
         int bytesRead = 0;
         try {
-            byte[] tempBuffer = new byte[buffer.remaining()];
+             byte[] tempBuffer = new byte[buffer.remaining()];
              bytesRead = stream.read(tempBuffer);
             buffer.put(tempBuffer, 0, bytesRead);
         }finally {
@@ -47,22 +48,22 @@ public class TitanInputStreamChannel implements KChannel{
 
     @Override
     public int write(ByteBuffer buffer) throws IOException {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public int write(byte[] buffer, int startPosition, int endSize) throws IOException {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public int write(byte[] buffer, List<CacheBlock> writableCacheBlocks) throws IOException {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override
     public long position() throws IOException {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override

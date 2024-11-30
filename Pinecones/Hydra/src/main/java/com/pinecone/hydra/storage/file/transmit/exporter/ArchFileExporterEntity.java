@@ -1,19 +1,19 @@
 package com.pinecone.hydra.storage.file.transmit.exporter;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 
 public abstract class ArchFileExporterEntity implements FileExportEntity {
-    protected KChannel channel;
+    protected Chanface channel;
 
     protected VolumeManager volumeManager;
     private KOMFileSystem fileSystem;
     private FileNode file;
 
 
-    public ArchFileExporterEntity(KOMFileSystem fileSystem, FileNode file, KChannel channel, VolumeManager volumeManager) {
+    public ArchFileExporterEntity(KOMFileSystem fileSystem, FileNode file, Chanface channel, VolumeManager volumeManager) {
         this.fileSystem = fileSystem;
         this.file = file;
         this.channel = channel;
@@ -50,12 +50,12 @@ public abstract class ArchFileExporterEntity implements FileExportEntity {
     }
 
     @Override
-    public KChannel getKChannel() {
+    public Chanface getKChannel() {
         return this.channel;
     }
 
     @Override
-    public void setKChannel(KChannel channel) {
+    public void setKChannel(Chanface channel) {
         this.channel = channel;
     }
 

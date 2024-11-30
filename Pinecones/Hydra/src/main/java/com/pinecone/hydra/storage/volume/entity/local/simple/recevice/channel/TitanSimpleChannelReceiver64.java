@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.simple.recevice.channel;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
@@ -15,7 +15,7 @@ import java.util.List;
 public class TitanSimpleChannelReceiver64   implements SimpleChannelReceiver64{
     private SimpleVolume            simpleVolume;
 
-    private KChannel                fileChannel;
+    private Chanface fileChannel;
 
     private VolumeManager           volumeManager;
 

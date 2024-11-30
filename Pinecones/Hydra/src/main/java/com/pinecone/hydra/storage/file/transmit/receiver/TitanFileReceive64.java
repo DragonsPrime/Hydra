@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.file.transmit.receiver;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.TitanStorageReceiveIORequest;
@@ -28,7 +28,7 @@ public class TitanFileReceive64 implements FileReceive64{
 
     protected UnifiedTransmitConstructor    constructor;
 
-    protected KChannel                      kChannel;
+    protected Chanface chanface;
 
     protected FileNode                      fileNode;
 
@@ -41,7 +41,7 @@ public class TitanFileReceive64 implements FileReceive64{
         this.mKOMFileSystem      = entity.getFileSystem();
         this.mFrameSegmentNaming = new KOFSFrameSegmentNaming();
         this.constructor         = new UnifiedTransmitConstructor();
-        this.kChannel            = entity.getChannel();
+        this.chanface = entity.getChannel();
         this.destDirPath         = entity.getDestDirPath();
         this.fileNode            = entity.getFile();
         this.volumeManager       = entity.getVolumeManager();
@@ -80,7 +80,7 @@ public class TitanFileReceive64 implements FileReceive64{
             storageReceiveIORequest.setStorageObjectGuid( localFrame.getSegGuid() );
             StorageIOResponse storageIOResponse = null;
             //storageIOResponse = volume.channelReceive(storageReceiveIORequest, kChannel, currentPosition, endSize);
-            ReceiveEntity receiveEntity = this.constructor.getReceiveEntity(volume.getClass(), this.volumeManager, storageReceiveIORequest, this.kChannel, volume);
+            ReceiveEntity receiveEntity = this.constructor.getReceiveEntity(volume.getClass(), this.volumeManager, storageReceiveIORequest, this.chanface, volume);
             storageIOResponse = volume.receive( receiveEntity, currentPosition, endSize );
 
             UniformSourceLocator uniformSourceLocator = new UniformSourceLocator();

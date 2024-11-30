@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.file.transmit.receiver;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -12,11 +12,11 @@ public abstract class ArchFileReceiveEntity implements FileReceiveEntity {
 
     protected FileNode          file;
 
-    protected KChannel          channel;
+    protected Chanface channel;
 
     protected VolumeManager     volumeManager;
 
-    public ArchFileReceiveEntity( KOMFileSystem fileSystem, String destDirPath, FileNode file, KChannel channel, VolumeManager volumeManager ){
+    public ArchFileReceiveEntity(KOMFileSystem fileSystem, String destDirPath, FileNode file, Chanface channel, VolumeManager volumeManager ){
         this.fileSystem = fileSystem;
         this.file = file;
         this.destDirPath = destDirPath;
@@ -55,12 +55,12 @@ public abstract class ArchFileReceiveEntity implements FileReceiveEntity {
     }
 
     @Override
-    public KChannel getChannel() {
+    public Chanface getChannel() {
         return this.channel;
     }
 
     @Override
-    public void setChannel(KChannel channel) {
+    public void setChannel(Chanface channel) {
         this.channel = channel;
     }
 

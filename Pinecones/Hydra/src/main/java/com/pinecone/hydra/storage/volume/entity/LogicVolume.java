@@ -2,8 +2,7 @@ package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
-import com.pinecone.hydra.storage.InputChannel;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
@@ -47,10 +46,10 @@ public interface LogicVolume extends Volume, TreeNode {
     void setVolumeTree( VolumeManager volumeManager);
 
 
-    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, KChannel channel ) throws IOException, SQLException;
-    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, KChannel channel, Number offset, Number endSize ) throws IOException, SQLException;
-    StorageIOResponse channelExport      (StorageExportIORequest storageExportIORequest, KChannel channel ) throws IOException, SQLException;
-    StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException, SQLException;
+    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, Chanface channel ) throws IOException, SQLException;
+    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, Chanface channel, Number offset, Number endSize ) throws IOException, SQLException;
+    StorageIOResponse channelExport      (StorageExportIORequest storageExportIORequest, Chanface channel ) throws IOException, SQLException;
+    StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, Chanface channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException, SQLException;
 
 
     StorageIOResponse receive( ReceiveEntity entity ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException;

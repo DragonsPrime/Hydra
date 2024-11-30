@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 
@@ -9,9 +9,9 @@ public abstract  class ArchExportEntity implements ExporterEntity{
 
     protected StorageExportIORequest storageExportIORequest;
 
-    protected KChannel  channel;
+    protected Chanface channel;
 
-    public ArchExportEntity(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel){
+    public ArchExportEntity(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, Chanface channel){
         this.volumeManager = volumeManager;
         this.storageExportIORequest = storageExportIORequest;
         this.channel = channel;
@@ -37,12 +37,12 @@ public abstract  class ArchExportEntity implements ExporterEntity{
     }
 
     @Override
-    public KChannel getChannel() {
+    public Chanface getChannel() {
         return this.channel;
     }
 
     @Override
-    public void setChannel(KChannel channel) {
+    public void setChannel(Chanface channel) {
         this.channel = channel;
     }
 }

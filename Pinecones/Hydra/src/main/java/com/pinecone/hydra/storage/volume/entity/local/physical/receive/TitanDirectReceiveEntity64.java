@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.physical.receive;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -15,7 +15,7 @@ public class TitanDirectReceiveEntity64 extends ArchReceiveEntity implements Dir
 
     protected DirectReceive64 directReceive;
 
-    public TitanDirectReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, String destDirPath) {
+    public TitanDirectReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, Chanface channel, String destDirPath) {
         super(volumeManager, storageReceiveIORequest, channel);
         this.destDirPath = destDirPath;
         this.directReceive = new TitanDirectReceive64( this );

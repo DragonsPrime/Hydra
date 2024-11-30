@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.receive.channnel;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchReceiveEntity;
@@ -12,10 +12,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class TitanStripedChannelReceiverEntity64 extends ArchReceiveEntity implements StripedChannelReceiverEntity64{
-    private KChannel                 channel;
+    private Chanface channel;
     private StripedVolume            stripedVolume;
     private StripedChannelReceiver64 stripedChannelReceiver64;
-    public TitanStripedChannelReceiverEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, StripedVolume stripedVolume) {
+    public TitanStripedChannelReceiverEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, Chanface channel, StripedVolume stripedVolume) {
         super(volumeManager, storageReceiveIORequest,null);
         this.channel = channel;
         this.stripedVolume = stripedVolume;
@@ -23,12 +23,12 @@ public class TitanStripedChannelReceiverEntity64 extends ArchReceiveEntity imple
     }
 
     @Override
-    public KChannel getChannel() {
+    public Chanface getChannel() {
         return this.channel;
     }
 
     @Override
-    public void setChannel(KChannel channel) {
+    public void setChannel(Chanface channel) {
         this.channel = channel;
     }
 

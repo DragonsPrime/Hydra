@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.simple.recevice.channel;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchReceiveEntity;
@@ -13,11 +13,11 @@ import java.sql.SQLException;
 
 public class TitanSimpleChannelReceiverEntity64 extends ArchReceiveEntity implements SimpleChannelReceiverEntity64{
 
-    private KChannel                channel;
+    private Chanface channel;
     private SimpleVolume            simpleVolume;
     private SimpleChannelReceiver64 titanSimpleChannelReceiver64;
 
-    public TitanSimpleChannelReceiverEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, SimpleVolume simpleVolume) {
+    public TitanSimpleChannelReceiverEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, Chanface channel, SimpleVolume simpleVolume) {
         super(volumeManager, storageReceiveIORequest, null);
         this.channel = channel;
         this.simpleVolume = simpleVolume;
@@ -26,12 +26,12 @@ public class TitanSimpleChannelReceiverEntity64 extends ArchReceiveEntity implem
 
 
     @Override
-    public KChannel getChannel() {
+    public Chanface getChannel() {
         return this.channel;
     }
 
     @Override
-    public void setChannel(KChannel channel) {
+    public void setChannel(Chanface channel) {
         this.channel = channel;
     }
 

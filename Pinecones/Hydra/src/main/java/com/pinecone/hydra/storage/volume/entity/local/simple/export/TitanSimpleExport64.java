@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.simple.export;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -15,7 +15,7 @@ public class TitanSimpleExport64 implements SimpleExport64{
 
     private StorageExportIORequest storageExportIORequest;
 
-    private KChannel channel;
+    private Chanface channel;
 
     public TitanSimpleExport64( SimpleExportEntity entity ){
         this.volumeManager = entity.getVolumeManager();

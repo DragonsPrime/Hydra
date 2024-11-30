@@ -1,9 +1,8 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
-import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.rdb.MappedExecutor;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
@@ -16,7 +15,6 @@ import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.concurrent.Semaphore;
 
@@ -26,7 +24,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
     private int                         jobCode;
     private VolumeManager               volumeManager;
     private StorageReceiveIORequest     object;
-    private KChannel                    fileChannel;
+    private Chanface fileChannel;
     private OnVolumeFileSystem          kenVolumeFileSystem;
     private MappedExecutor              executor;
     private StorageIOResponse           storageIOResponse;
@@ -34,7 +32,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
     private Number                      endSize;
 
 
-    public TitanStripReceiverJob(ReceiveEntity entity, KChannel channel, int jobCount, int jobCode, LogicVolume volume, MappedExecutor executor, Number offset, Number ednSize ){
+    public TitanStripReceiverJob(ReceiveEntity entity, Chanface channel, int jobCount, int jobCode, LogicVolume volume, MappedExecutor executor, Number offset, Number ednSize ){
         this.volumeManager          = entity.getVolumeManager();
         this.object                 = entity.getReceiveStorageObject();
         this.fileChannel            = channel;

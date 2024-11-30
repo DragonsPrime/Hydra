@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.simple.export;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -16,7 +16,7 @@ public class TitanSimpleExportEntity64 extends ArchExportEntity implements Simpl
 
     protected SimpleVolume   simpleVolume;
 
-    public TitanSimpleExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel, SimpleVolume simpleVolume) {
+    public TitanSimpleExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, Chanface channel, SimpleVolume simpleVolume) {
         super(volumeManager, storageExportIORequest, channel);
         this.simpleExportEntity = new TitanSimpleExport64( this );
         this.simpleVolume       = simpleVolume;

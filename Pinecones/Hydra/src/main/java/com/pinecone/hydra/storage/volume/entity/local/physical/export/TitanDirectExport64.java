@@ -2,7 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.physical.export;
 
 import com.pinecone.framework.util.Bytes;
 import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageIOResponse;
@@ -19,7 +19,7 @@ import java.util.zip.CRC32;
 
 public class TitanDirectExport64 implements DirectExport64{
 
-    protected KChannel channel;
+    protected Chanface channel;
 
     protected VolumeManager volumeManager;
 

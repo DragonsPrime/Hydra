@@ -4,7 +4,7 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
@@ -62,7 +62,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
     }
 
     @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel) throws IOException, SQLException {
+    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, Chanface channel) throws IOException, SQLException {
 //        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeManager, storageReceiveIORequest,channel,this );
 //        StorageIOResponse storageIOResponse = titanSpannedChannelReceiveEntity64.receive();
 //        storageIOResponse.setBottomGuid( this.guid );
@@ -70,7 +70,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
     }
 
     @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel, Number offset, Number endSize) throws IOException, SQLException {
+    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, Chanface channel, Number offset, Number endSize) throws IOException, SQLException {
 //        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeManager, storageReceiveIORequest,channel,this );
 //        StorageIOResponse storageIOResponse = titanSpannedChannelReceiveEntity64.receive( offset, endSize );
         //storageIOResponse.setBottomGuid( this.guid );
@@ -78,14 +78,14 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
     }
 
     @Override
-    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel) throws IOException, SQLException {
+    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, Chanface channel) throws IOException, SQLException {
 //        TitanSpannedChannelExportEntity64 titanSpannedChannelExportEntity64 = new TitanSpannedChannelExportEntity64( this.volumeManager, storageExportIORequest,channel, this );
 //        return titanSpannedChannelExportEntity64.export();
         return null;
     }
 
     @Override
-    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException {
+    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, Chanface channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException {
         return null;
     }
 

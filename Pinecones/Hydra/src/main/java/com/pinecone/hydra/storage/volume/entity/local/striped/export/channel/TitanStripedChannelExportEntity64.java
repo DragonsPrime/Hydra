@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.export.channel;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchExportEntity;
@@ -12,10 +12,10 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 public class TitanStripedChannelExportEntity64 extends ArchExportEntity implements StripedChannelExportEntity64{
-    private KChannel                    channel;
+    private Chanface channel;
     private StripedChannelExport64      stripedChannelExport64;
     private StripedVolume               stripedVolume;
-    public TitanStripedChannelExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel, StripedVolume stripedVolume) {
+    public TitanStripedChannelExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, Chanface channel, StripedVolume stripedVolume) {
         super(volumeManager, storageExportIORequest,null);
         this.channel = channel;
         this.stripedVolume = stripedVolume;
@@ -23,12 +23,12 @@ public class TitanStripedChannelExportEntity64 extends ArchExportEntity implemen
     }
 
     @Override
-    public KChannel getChannel() {
+    public Chanface getChannel() {
         return this.channel;
     }
 
     @Override
-    public void setChannel(KChannel channel) {
+    public void setChannel(Chanface channel) {
         this.channel = channel;
     }
 

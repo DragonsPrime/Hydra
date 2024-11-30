@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.physical.export;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -13,7 +13,7 @@ import java.sql.SQLException;
 public class TitanDirectExportEntity64 extends ArchExportEntity implements DirectExportEntity64{
     protected DirectExport64 directExport;
 
-    public TitanDirectExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel) {
+    public TitanDirectExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, Chanface channel) {
         super(volumeManager, storageExportIORequest, channel);
         this.directExport = new TitanDirectExport64( this );
     }

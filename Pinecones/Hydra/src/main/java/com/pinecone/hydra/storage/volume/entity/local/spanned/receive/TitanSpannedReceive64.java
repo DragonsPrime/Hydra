@@ -3,7 +3,7 @@ package com.pinecone.hydra.storage.volume.entity.local.spanned.receive;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.UnifiedTransmitConstructor;
@@ -11,11 +11,9 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
-import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.Volume;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
-import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleReceiveEntity64;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
@@ -27,7 +25,7 @@ import java.util.List;
 public class TitanSpannedReceive64 implements SpannedReceive64{
     protected SpannedVolume                 spannedVolume;
 
-    protected KChannel                      channel;
+    protected Chanface channel;
 
     protected VolumeManager                 volumeManager;
 

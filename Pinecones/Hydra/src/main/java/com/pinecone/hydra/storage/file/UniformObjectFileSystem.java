@@ -20,6 +20,7 @@ import com.pinecone.hydra.storage.file.source.FileMasterManipulator;
 import com.pinecone.hydra.storage.file.source.FileMetaManipulator;
 import com.pinecone.hydra.storage.file.source.FolderManipulator;
 import com.pinecone.hydra.storage.file.source.FolderMetaManipulator;
+import com.pinecone.hydra.storage.file.source.FolderVolumeMappingManipulator;
 import com.pinecone.hydra.storage.file.source.LocalFrameManipulator;
 import com.pinecone.hydra.storage.file.source.RemoteFrameManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicManipulator;
@@ -27,9 +28,6 @@ import com.pinecone.hydra.storage.file.source.SymbolicMetaManipulator;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
 import com.pinecone.hydra.storage.file.transmit.exporter.FileExportEntity;
 import com.pinecone.hydra.storage.file.transmit.receiver.FileReceiveEntity;
-import com.pinecone.hydra.storage.file.transmit.receiver.TitanFileReceiveEntity64;
-import com.pinecone.hydra.storage.volume.UniformVolumeManager;
-import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
@@ -76,6 +74,7 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     protected RemoteFrameManipulator            remoteFrameManipulator;
     protected SymbolicManipulator               symbolicManipulator;
     protected SymbolicMetaManipulator           symbolicMetaManipulator;
+    protected FolderVolumeMappingManipulator folderVolumeMappingManipulator;
 
 
     public UniformObjectFileSystem( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, KOMFileSystem parent, String name ){
@@ -88,16 +87,17 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         this.guidAllocator                 =  GUIDs.newGuidAllocator();
 
         // Phase [3] Construct manipulators.
-        this.operatorFactory                =  new GenericFileSystemOperatorFactory( this, (FileMasterManipulator) masterManipulator );
-        this.fileSystemAttributeManipulator =  this.fileMasterManipulator.getAttributeManipulator();
-        this.fileManipulator                =  this.fileMasterManipulator.getFileManipulator();
-        this.fileMetaManipulator            =  this.fileMasterManipulator.getFileMetaManipulator();
-        this.folderManipulator              =  this.fileMasterManipulator.getFolderManipulator();
-        this.folderMetaManipulator          =  this.fileMasterManipulator.getFolderMetaManipulator();
-        this.localFrameManipulator          =  this.fileMasterManipulator.getLocalFrameManipulator();
-        this.remoteFrameManipulator         =  this.fileMasterManipulator.getRemoteFrameManipulator();
-        this.symbolicManipulator            =  this.fileMasterManipulator.getSymbolicManipulator();
-        this.symbolicMetaManipulator        =  this.fileMasterManipulator.getSymbolicMetaManipulator();
+        this.operatorFactory                 =  new GenericFileSystemOperatorFactory( this, (FileMasterManipulator) masterManipulator );
+        this.fileSystemAttributeManipulator  =  this.fileMasterManipulator.getAttributeManipulator();
+        this.fileManipulator                 =  this.fileMasterManipulator.getFileManipulator();
+        this.fileMetaManipulator             =  this.fileMasterManipulator.getFileMetaManipulator();
+        this.folderManipulator               =  this.fileMasterManipulator.getFolderManipulator();
+        this.folderMetaManipulator           =  this.fileMasterManipulator.getFolderMetaManipulator();
+        this.localFrameManipulator           =  this.fileMasterManipulator.getLocalFrameManipulator();
+        this.remoteFrameManipulator          =  this.fileMasterManipulator.getRemoteFrameManipulator();
+        this.symbolicManipulator             =  this.fileMasterManipulator.getSymbolicManipulator();
+        this.symbolicMetaManipulator         =  this.fileMasterManipulator.getSymbolicMetaManipulator();
+        this.folderVolumeMappingManipulator =  this.fileMasterManipulator.getFolderVolumeRelationManipulator();
 
         // Phase [4] Construct selectors.
         this.pathSelector                  =  new StandardPathSelector(
@@ -257,12 +257,16 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
 
     @Override
     public FileNode affirmFileNode(String path) {
-        return ( FileNode ) this.affirmTreeNodeByPath(path,GenericFileNode.class, GenericFolder.class);
+        FileNode fileNode = (FileNode) this.affirmTreeNodeByPath(path, GenericFileNode.class, GenericFolder.class);
+        this.initVolume( path );
+        return fileNode;
     }
 
     @Override
     public Folder affirmFolder(String path) {
-        return ( Folder ) this.affirmTreeNodeByPath(path, null,GenericFolder.class);
+        Folder folder = (Folder) this.affirmTreeNodeByPath(path, null, GenericFolder.class);
+        this.initVolume( path );
+        return folder;
     }
 
     @Override
@@ -475,13 +479,13 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     }
 
     @Override
-    public void receive(LogicVolume volume, FileReceiveEntity entity) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        entity.receive( volume );
+    public void receive( FileReceiveEntity entity) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        entity.receive();
     }
 
     @Override
-    public void receive(LogicVolume volume, FileReceiveEntity entity, Number offset, Number endSize) throws IOException {
-        entity.receive( volume, offset, endSize );
+    public void receive( FileReceiveEntity entity, Number offset, Number endSize) throws IOException {
+        entity.receive(offset, endSize );
     }
 
     @Override
@@ -492,5 +496,40 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     @Override
     public void export( FileExportEntity entity, Number offset, Number endSize ) {
 
+    }
+
+    @Override
+    public void setFolderVolumeMapping(GUID folderGuid, GUID volumeGuid) {
+        this.folderVolumeMappingManipulator.insert( folderGuid, volumeGuid );
+    }
+
+    @Override
+    public GUID getMappingVolume(GUID folderGuid) {
+        return this.folderVolumeMappingManipulator.getVolumeGuid( folderGuid );
+    }
+
+    @Override
+    public GUID getMappingVolume(String path) {
+        String[] parts = this.pathResolver.segmentPathParts( path );
+        GUID currentVolumeGuid = null;
+        String currentPath = "";
+        for( int i = 0; i < parts.length - 1; i++ ){
+            currentPath = currentPath + ( i > 0 ? this.getConfig().getPathNameSeparator() : "" ) + parts[ i ];
+            ElementNode elementNode = this.queryElement(currentPath);
+            Folder folder = this.getFolder(elementNode.getGuid());
+            GUID relationVolume = folder.getRelationVolume();
+            if ( relationVolume != null ){
+                currentVolumeGuid = relationVolume;
+            }
+        }
+        return currentVolumeGuid;
+    }
+
+    private void initVolume(String path ){
+        String[] parts = this.pathResolver.segmentPathParts( path );
+        Folder root = this.getFolder(this.queryGUIDByPath(parts[0]));
+        if( root.getRelationVolume() == null ){
+            root.applyVolume( GUIDs.GUID72( this.getConfig().getDefaultVolume() ) );
+        }
     }
 }

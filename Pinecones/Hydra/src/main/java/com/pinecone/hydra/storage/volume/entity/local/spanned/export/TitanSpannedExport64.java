@@ -3,7 +3,7 @@ package com.pinecone.hydra.storage.volume.entity.local.spanned.export;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -12,7 +12,6 @@ import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.physical.export.TitanDirectExportEntity64;
-import com.pinecone.hydra.storage.volume.entity.local.physical.receive.TitanDirectReceiveEntity64;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
@@ -25,7 +24,7 @@ public class TitanSpannedExport64 implements SpannedExport64{
 
     protected StorageExportIORequest storageExportIORequest;
 
-    protected KChannel channel;
+    protected Chanface channel;
 
     protected SpannedVolume spannedVolume;
 

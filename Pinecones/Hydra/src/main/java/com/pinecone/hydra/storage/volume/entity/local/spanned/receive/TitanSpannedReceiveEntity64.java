@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.spanned.receive;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -16,7 +16,7 @@ public class TitanSpannedReceiveEntity64 extends ArchReceiveEntity implements Sp
     protected SpannedVolume    spannedVolume;
 
     protected SpannedReceive64 spannedReceive;
-    public TitanSpannedReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, SpannedVolume spannedVolume) {
+    public TitanSpannedReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, Chanface channel, SpannedVolume spannedVolume) {
         super(volumeManager, storageReceiveIORequest, channel);
         this.spannedVolume = spannedVolume;
         this.spannedReceive = new TitanSpannedReceive64( this );

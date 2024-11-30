@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage;
 
+import com.pinecone.framework.system.NotImplementedException;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlockStatus;
 
@@ -9,12 +10,12 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class TitanOutputStreamChannel implements KChannel {
+public class TitanOutputStreamChanface implements Chanface {
     protected OutputStream  stream;
 
     protected final ReentrantLock reentrantLock;
 
-    public TitanOutputStreamChannel( OutputStream stream ){
+    public TitanOutputStreamChanface(OutputStream stream ){
         this.stream = stream;
         this.reentrantLock = new ReentrantLock();
     }
@@ -26,7 +27,7 @@ public class TitanOutputStreamChannel implements KChannel {
 
     @Override
     public int read(ByteBuffer buffer) throws IOException {
-        return 0;
+        throw new NotImplementedException();
     }
 
     @Override

@@ -9,11 +9,11 @@ import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class TitanFileChannelKChannel implements KChannel{
-    private final FileChannel  channel;
-    private final ReentrantLock reentrantLock;
+public class TitanFileChannelChanface implements Chanface {
+    private final FileChannel       channel;
+    private final ReentrantLock     reentrantLock;
 
-    public TitanFileChannelKChannel(FileChannel channel ){
+    public TitanFileChannelChanface(FileChannel channel ){
         this.channel = channel;
         this.reentrantLock = new ReentrantLock();
     }
@@ -34,7 +34,7 @@ public class TitanFileChannelKChannel implements KChannel{
         int read = 0;
         try {
             this.channel.position( offset );
-             read = this.channel.read(buffer);
+            read = this.channel.read(buffer);
         }finally {
             this.reentrantLock.unlock();
         }

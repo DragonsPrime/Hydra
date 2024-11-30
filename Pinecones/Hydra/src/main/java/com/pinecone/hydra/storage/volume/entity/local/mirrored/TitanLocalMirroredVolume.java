@@ -2,8 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.mirrored;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
-import com.pinecone.hydra.storage.InputChannel;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
@@ -16,7 +15,6 @@ import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.source.MirroredVolumeManipulator;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -60,22 +58,22 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
     }
 
     @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel) throws IOException {
+    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, Chanface channel) throws IOException {
         return null;
     }
 
     @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, KChannel channel, Number offset, Number endSize) throws IOException, SQLException {
+    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, Chanface channel, Number offset, Number endSize) throws IOException, SQLException {
         return null;
     }
 
     @Override
-    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel) throws IOException {
+    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, Chanface channel) throws IOException {
         return null;
     }
 
     @Override
-    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, KChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException {
+    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, Chanface channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException {
         return null;
     }
 

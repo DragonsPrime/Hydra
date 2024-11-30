@@ -5,7 +5,7 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.rdb.MappedExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
@@ -25,7 +25,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
-    private KChannel                    fileChannel;
+    private Chanface fileChannel;
     private VolumeManager               volumeManager;
     private StorageReceiveIORequest     storageReceiveIORequest;
     private StripedVolume               stripedVolume;

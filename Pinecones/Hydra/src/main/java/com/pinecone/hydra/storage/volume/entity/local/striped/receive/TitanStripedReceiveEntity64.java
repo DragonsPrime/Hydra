@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.receive;
 
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -16,7 +16,7 @@ public class TitanStripedReceiveEntity64 extends ArchReceiveEntity implements St
 
     protected StripedReceive64 stripedReceive;
 
-    public TitanStripedReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, StripedVolume stripedVolume) {
+    public TitanStripedReceiveEntity64(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, Chanface channel, StripedVolume stripedVolume) {
         super(volumeManager, storageReceiveIORequest, channel);
         this.stripedVolume  = stripedVolume;
         this.stripedReceive = new TitanStripedReceive64( this );

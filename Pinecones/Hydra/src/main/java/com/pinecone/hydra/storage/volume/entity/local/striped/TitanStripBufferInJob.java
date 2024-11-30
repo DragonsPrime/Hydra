@@ -1,15 +1,13 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.volume.UnifiedTransmitConstructor;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.ExporterEntity;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
-import com.pinecone.hydra.storage.volume.entity.local.simple.export.TitanSimpleExportEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.export.IStripedExport;
-import com.pinecone.hydra.storage.volume.entity.local.striped.export.channel.StripedChannelExport;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
@@ -28,7 +26,7 @@ public class TitanStripBufferInJob implements StripBufferInJob {
     protected int                           jobCount;
     protected int                           jobCode;
     protected LogicVolume                   volume;
-    protected KChannel                      channel;
+    protected Chanface channel;
     protected AtomicInteger                 currentCacheBlockNumber;
     protected final Semaphore               blockerLatch;
 

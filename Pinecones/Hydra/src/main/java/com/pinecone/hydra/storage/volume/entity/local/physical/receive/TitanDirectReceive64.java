@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.physical.receive;
 
 import com.pinecone.framework.util.Bytes;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageNaming;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
@@ -23,7 +23,7 @@ import java.util.zip.CRC32;
 public class TitanDirectReceive64 implements DirectReceive64{
     protected StorageNaming           storageNaming;
 
-    protected KChannel                channel;
+    protected Chanface channel;
 
     protected StorageReceiveIORequest storageReceiveIORequest;
 

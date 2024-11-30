@@ -1,14 +1,12 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
 import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.nio.channels.FileChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -16,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class TitanStripBufferOutJob implements StripBufferOutJob {
     protected VolumeManager             volumeManager;
-    protected KChannel                  channel;
+    protected Chanface channel;
     protected int                       jobCount;
 
     protected StripBufferStatus         status;
@@ -29,7 +27,7 @@ public class TitanStripBufferOutJob implements StripBufferOutJob {
     protected final Semaphore           mBlockerLatch;
     protected MasterVolumeGram          masterVolumeGram;
 
-    public TitanStripBufferOutJob(MasterVolumeGram masterVolumeGram, VolumeManager volumeManager, KChannel channel, long totalSize, Semaphore blockerLatch){
+    public TitanStripBufferOutJob(MasterVolumeGram masterVolumeGram, VolumeManager volumeManager, Chanface channel, long totalSize, Semaphore blockerLatch){
         this.masterVolumeGram  = masterVolumeGram;
         this.volumeManager     = volumeManager;
         this.channel           = channel;

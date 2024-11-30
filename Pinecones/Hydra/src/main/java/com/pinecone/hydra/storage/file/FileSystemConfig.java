@@ -12,5 +12,5 @@ public interface FileSystemConfig extends KernelObjectConfig {
 
     Number getTinyFileStripSizing();
 
-
+    String getDefaultVolume();
 }

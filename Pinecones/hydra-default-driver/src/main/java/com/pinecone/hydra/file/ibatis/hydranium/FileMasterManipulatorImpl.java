@@ -6,6 +6,7 @@ import com.pinecone.hydra.file.ibatis.FileMetaMapper;
 import com.pinecone.hydra.file.ibatis.FileSystemAttributeMapper;
 import com.pinecone.hydra.file.ibatis.FolderMapper;
 import com.pinecone.hydra.file.ibatis.FolderMetaMapper;
+import com.pinecone.hydra.file.ibatis.FolderVolumeMappingMapper;
 import com.pinecone.hydra.file.ibatis.LocalFrameMapper;
 import com.pinecone.hydra.file.ibatis.RemoteFrameMapper;
 import com.pinecone.hydra.file.ibatis.StripMapper;
@@ -18,6 +19,7 @@ import com.pinecone.hydra.storage.file.source.FileMetaManipulator;
 import com.pinecone.hydra.storage.file.source.FileSystemAttributeManipulator;
 import com.pinecone.hydra.storage.file.source.FolderManipulator;
 import com.pinecone.hydra.storage.file.source.FolderMetaManipulator;
+import com.pinecone.hydra.storage.file.source.FolderVolumeMappingManipulator;
 import com.pinecone.hydra.storage.file.source.LocalFrameManipulator;
 import com.pinecone.hydra.storage.file.source.RemoteFrameManipulator;
 import com.pinecone.hydra.storage.file.source.StripManipulator;
@@ -73,6 +75,9 @@ public class FileMasterManipulatorImpl implements FileMasterManipulator {
 
     @Structure( type = StripMapper.class )
     StripManipulator            stripManipulator;
+
+    @Structure( type = FolderVolumeMappingMapper.class)
+    FolderVolumeMappingMapper folderVolumeRelationMapper;
 
     public FileMasterManipulatorImpl() {
 
@@ -131,6 +136,11 @@ public class FileMasterManipulatorImpl implements FileMasterManipulator {
     @Override
     public StripManipulator getStripManipulator() {
         return this.stripManipulator;
+    }
+
+    @Override
+    public FolderVolumeMappingManipulator getFolderVolumeRelationManipulator() {
+        return this.folderVolumeRelationMapper;
     }
 
     @Override

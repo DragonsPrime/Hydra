@@ -4,10 +4,9 @@ import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
-import com.pinecone.hydra.storage.StorageIOResponse;
-import com.pinecone.hydra.storage.TitanFileChannelKChannel;
-import com.pinecone.hydra.storage.TitanInputStreamChannel;
-import com.pinecone.hydra.storage.TitanOutputStreamChannel;
+import com.pinecone.hydra.storage.TitanFileChannelChanface;
+import com.pinecone.hydra.storage.TitanInputStreamChanface;
+import com.pinecone.hydra.storage.TitanOutputStreamChanface;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
 import com.pinecone.hydra.storage.volume.UnifiedTransmitConstructor;
@@ -18,9 +17,8 @@ import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.SpannedVolume;
-import com.pinecone.hydra.storage.TitanStorageExportExportIORequest;
+import com.pinecone.hydra.storage.TitanStorageExportIORequest;
 import com.pinecone.hydra.storage.TitanStorageReceiveIORequest;
-import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
@@ -220,7 +218,7 @@ class Alice extends Radium {
 //        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
 //        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel( channel );
         FileInputStream stream = new FileInputStream( file );
-        TitanInputStreamChannel kChannel = new TitanInputStreamChannel(stream);
+        TitanInputStreamChanface kChannel = new TitanInputStreamChanface(stream);
         UnifiedTransmitConstructor unifiedTransmitConstructor = new UnifiedTransmitConstructor();
         ReceiveEntity entity = unifiedTransmitConstructor.getReceiveEntity(volume.getClass(), volumeManager, titanReceiveStorageObject, kChannel, volume);
         //TitanStripedReceiveEntity64 receiveEntity = new TitanStripedReceiveEntity64( volumeManager, titanReceiveStorageObject, kChannel, (StripedVolume) volume);
@@ -240,7 +238,7 @@ class Alice extends Radium {
         titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
 
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel( channel );
+        TitanFileChannelChanface kChannel = new TitanFileChannelChanface( channel );
 
         SpannedReceiveEntity64 receiveEntity = new TitanSpannedReceiveEntity64( volumeManager, titanReceiveStorageObject, kChannel, (SpannedVolume) volume);
         volume.receive( receiveEntity );
@@ -258,7 +256,7 @@ class Alice extends Radium {
 //        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
 //        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel(channel);
         FileInputStream fileInputStream = new FileInputStream( file );
-        TitanInputStreamChannel kChannel = new TitanInputStreamChannel( fileInputStream );
+        TitanInputStreamChanface kChannel = new TitanInputStreamChanface( fileInputStream );
         TitanSimpleReceiveEntity64 receiveEntity = new TitanSimpleReceiveEntity64( volumeManager, titanReceiveStorageObject, kChannel, (SimpleVolume) volume);
         volume.receive( receiveEntity );
     }
@@ -270,9 +268,9 @@ class Alice extends Radium {
 //        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
 //        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel( channel );
         FileOutputStream stream = new FileOutputStream( file );
-        TitanOutputStreamChannel kChannel = new TitanOutputStreamChannel(stream);
+        TitanOutputStreamChanface kChannel = new TitanOutputStreamChanface(stream);
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
-        TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
+        TitanStorageExportIORequest titanExportStorageObject = new TitanStorageExportIORequest();
         titanExportStorageObject.setSize( originalFile.length() );
         titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("09cbd8e-000012-0001-30") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
@@ -287,9 +285,9 @@ class Alice extends Radium {
         File file = new File("D:\\文件系统\\大文件\\我的视频.mp4");
         File originalFile = new File( "D:/井盖视频块/4月13日 (2).mp4" );
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel( channel );
+        TitanFileChannelChanface kChannel = new TitanFileChannelChanface( channel );
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("跨区卷"));
-        TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
+        TitanStorageExportIORequest titanExportStorageObject = new TitanStorageExportIORequest();
         titanExportStorageObject.setSize( originalFile.length() );
         titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("09ab8ac-0003d7-0001-04") );
         titanExportStorageObject.setSourceName("D:\\文件系统\\簇4\\视频_09ab8ac-0003d7-0001-04.storage");
@@ -304,13 +302,13 @@ class Alice extends Radium {
 //        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
 //        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel(channel);
         LogicVolume volume = volumeManager.get(GUIDs.GUID72("09a94b4-0002a9-0004-d8"));
-        TitanStorageExportExportIORequest titanExportStorageObject = new TitanStorageExportExportIORequest();
+        TitanStorageExportIORequest titanExportStorageObject = new TitanStorageExportIORequest();
         titanExportStorageObject.setSize( originalFile.length() );
         titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("09a99b4-00038c-0001-f0") );
         titanExportStorageObject.setSourceName( "D:\\文件系统\\簇4\\视频_09aa0ba-0001a1-0001-68.storage" );
 
         FileOutputStream fileOutputStream = new FileOutputStream( file );
-        TitanOutputStreamChannel kChannel = new TitanOutputStreamChannel( fileOutputStream );
+        TitanOutputStreamChanface kChannel = new TitanOutputStreamChanface( fileOutputStream );
         TitanSimpleExportEntity64 exportEntity = new TitanSimpleExportEntity64( volumeManager, titanExportStorageObject, kChannel,(SimpleVolume) volume);
         volume.export( exportEntity );
     }

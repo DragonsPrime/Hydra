@@ -2,7 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.physical;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
-import com.pinecone.hydra.storage.KChannel;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchVolume;
@@ -62,7 +62,7 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
 
 
     @Override
-    public StorageIOResponse channelReceive(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel) throws IOException, SQLException {
+    public StorageIOResponse channelReceive(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, Chanface channel) throws IOException, SQLException {
 //        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager, storageReceiveIORequest, this.mountPoint.getMountPoint(), channel);
 //        StorageIOResponse storageIOResponse = titanDirectChannelReceiveEntity64.receive();
 //        storageIOResponse.setBottomGuid( this.guid );
@@ -72,7 +72,7 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     }
 
     @Override
-    public StorageIOResponse channelReceive(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, KChannel channel, Number offset, Number endSize) throws IOException {
+    public StorageIOResponse channelReceive(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, Chanface channel, Number offset, Number endSize) throws IOException {
 //        TitanDirectChannelReceiveEntity64 titanDirectChannelReceiveEntity64 = new TitanDirectChannelReceiveEntity64(volumeManager, storageReceiveIORequest, this.mountPoint.getMountPoint(), channel);
 //        StorageIOResponse storageIOResponse = titanDirectChannelReceiveEntity64.receive(offset, endSize);
 //        storageIOResponse.setBottomGuid( this.getGuid() );
@@ -81,7 +81,7 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     }
 
     @Override
-    public StorageIOResponse channelExport(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel) throws IOException {
+    public StorageIOResponse channelExport(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, Chanface channel) throws IOException {
 //        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, storageExportIORequest,channel );
 //        StorageIOResponse storageIOResponse = titanDirectChannelExportEntity64.export();
 //        storageIOResponse.setBottomGuid( this.getGuid() );
@@ -90,7 +90,7 @@ public class TitanLocalPhysicalVolume extends ArchVolume implements LocalPhysica
     }
 
     @Override
-    public StorageIOResponse channelRaid0Export(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, KChannel channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
+    public StorageIOResponse channelRaid0Export(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, Chanface channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
 //        TitanDirectChannelExportEntity64 titanDirectChannelExportEntity64 = new TitanDirectChannelExportEntity64(volumeManager, storageExportIORequest,channel );
 //        StorageIOResponse storageIOResponse = titanDirectChannelExportEntity64.export(cacheBlock, offset, endSize, buffer);
 //        storageIOResponse.setBottomGuid( this.getGuid() );
