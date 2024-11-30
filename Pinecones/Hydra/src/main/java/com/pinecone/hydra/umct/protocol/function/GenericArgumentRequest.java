@@ -13,6 +13,11 @@ public class GenericArgumentRequest extends ArchRequestPackage implements Argume
         super( szInterceptedPath );
     }
 
+    public GenericArgumentRequest( DataStructureEntity dataStructureEntity, String szInterceptedPath ) {
+        super( szInterceptedPath );
+        this.mDataStructureEntity = dataStructureEntity;
+    }
+
     public GenericArgumentRequest( String szInterceptedPath, Class<? >[] parameters ) {
         super( szInterceptedPath );
         this.from( parameters );
@@ -21,6 +26,11 @@ public class GenericArgumentRequest extends ArchRequestPackage implements Argume
     public GenericArgumentRequest( String szInterceptedPath, Object[] args ) {
         super( szInterceptedPath );
         this.from( args );
+    }
+
+    public GenericArgumentRequest( String szInterceptedPath, DataStructureEntity tpl ) {
+        super( szInterceptedPath );
+        this.conform( tpl );
     }
 
     public GenericArgumentRequest( FieldEntity[] segments ) {
@@ -34,18 +44,7 @@ public class GenericArgumentRequest extends ArchRequestPackage implements Argume
 
     @Override
     public void from( Class<? >[] parameters ) {
-        if( this.mDataStructureEntity == null || parameters.length != this.mDataStructureEntity.size() ) {
-            this.mDataStructureEntity = new GenericStructure( this.mszInterceptedPath, parameters.length );
-        }
-
-        int i = 0;
-        for( Class<? > parameter : parameters ) {
-            this.mDataStructureEntity.setDataField( i,
-                    parameter.getName().replace( ".", "_" ) + "_" + i,
-                    parameter
-            );
-            ++i;
-        }
+        this.mDataStructureEntity = MethodTemplates.from( this.mDataStructureEntity, this.mszInterceptedPath, parameters );
     }
 
     @Override
@@ -60,6 +59,11 @@ public class GenericArgumentRequest extends ArchRequestPackage implements Argume
                     args[ i ]
             );
         }
+    }
+
+    @Override
+    public void conform( DataStructureEntity tpl ) {
+        this.mDataStructureEntity = MethodTemplates.conform( tpl, this.mszInterceptedPath );
     }
 
     @Override

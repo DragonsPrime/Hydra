@@ -43,16 +43,16 @@ public class PrimitiveWrapper<T> implements Pinenut {
     }
 
     public Descriptors.Descriptor transform() {
-        return PrimitiveWrapper.transform( this.value );
+        return PrimitiveWrapper.transform( this.value.getClass() );
     }
 
-    public static Descriptors.Descriptor transform( Object elem ) {
+    public static Descriptors.Descriptor transform( Class<?> elemClass ) {
         try{
             DescriptorProtos.DescriptorProto.Builder descriptorBuilder = DescriptorProtos.DescriptorProto.newBuilder();
-            String szEntityName = PrimitiveWrapper.class.getSimpleName() + "_" + elem.getClass().getSimpleName();
+            String szEntityName = PrimitiveWrapper.class.getSimpleName() + "_" + elemClass.getSimpleName();
             descriptorBuilder.setName( szEntityName );
 
-            DescriptorProtos.FieldDescriptorProto.Type fieldType = BeanProtobufEncoder.DefaultEncoder.reinterpret( elem.getClass() );
+            DescriptorProtos.FieldDescriptorProto.Type fieldType = BeanProtobufEncoder.DefaultEncoder.reinterpret( elemClass );
 
             DescriptorProtos.FieldDescriptorProto.Builder fieldBuilder = DescriptorProtos.FieldDescriptorProto.newBuilder()
                     .setName( PrimitiveWrapper.FieldName )

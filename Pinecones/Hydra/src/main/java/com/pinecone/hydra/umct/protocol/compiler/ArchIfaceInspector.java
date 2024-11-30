@@ -18,7 +18,7 @@ public abstract class ArchIfaceInspector extends GenericPreloadClassInspector im
     }
 
     @Override
-    public List<CtMethod> inspect(Class<?> clazz, boolean bAsIface ) throws NotFoundException {
+    public List<CtMethod> inspect( Class<?> clazz, boolean bAsIface ) throws NotFoundException {
         return this.inspect( clazz.getName(), bAsIface );
     }
 
@@ -38,5 +38,19 @@ public abstract class ArchIfaceInspector extends GenericPreloadClassInspector im
         }
 
         return ifaceMethods;
+    }
+
+    public String getIfaceMethodName( CtMethod method ) throws ClassNotFoundException {
+        String ifaceName = method.getName();
+
+        Object annotation = method.getAnnotation( Iface.class );
+        if ( annotation != null ) {
+            Iface iface = (Iface) annotation;
+            if ( !iface.name().isEmpty() ) {
+                ifaceName = iface.name();
+            }
+        }
+
+        return ifaceName;
     }
 }

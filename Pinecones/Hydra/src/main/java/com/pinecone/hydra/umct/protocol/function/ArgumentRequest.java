@@ -9,6 +9,8 @@ public interface ArgumentRequest extends RequestPackage {
 
     void from( Object[] args );
 
+    void conform( DataStructureEntity tpl );
+
     DataStructureEntity getDataStructureEntity() ;
 
     FieldEntity[] getSegments() ;

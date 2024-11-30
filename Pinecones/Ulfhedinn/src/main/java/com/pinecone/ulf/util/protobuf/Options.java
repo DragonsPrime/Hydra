@@ -19,6 +19,16 @@ public class Options implements Pinenut {
         }
     };
 
+    public static final DescriptorNameNormalizer UnderlineDescriptorNameNormalizer = new DescriptorNameNormalizer() {
+        @Override
+        public String normalize( String bad ) {
+            if ( bad == null ) {
+                return null;
+            }
+            return bad.replaceAll( "[^a-zA-Z0-9_]", "_" );
+        }
+    };
+
     public static final Class<?> DefaultMapType = LinkedHashMap.class;
 
     public static final String DescriptorFileExtend = "$File";
@@ -32,16 +42,19 @@ public class Options implements Pinenut {
         }
     };
 
-    protected FileDescriptorFormater mFileDescriptorFormater;
+    protected FileDescriptorFormater    mFileDescriptorFormater;
 
-    protected String                 mszDescriptorFileExtend;
+    protected String                    mszDescriptorFileExtend;
 
-    protected Class<?>               mDefaultMapType;
+    protected DescriptorNameNormalizer  mDescriptorNameNormalizer;
+
+    protected Class<?>                  mDefaultMapType;
 
     public Options( FileDescriptorFormater formater, String szDescriptorFileExtend,  Class<?> defaultMapType ) {
-        this.mFileDescriptorFormater = formater;
-        this.mszDescriptorFileExtend = szDescriptorFileExtend;
-        this.mDefaultMapType         = defaultMapType;
+        this.mFileDescriptorFormater   = formater;
+        this.mszDescriptorFileExtend   = szDescriptorFileExtend;
+        this.mDefaultMapType           = defaultMapType;
+        this.mDescriptorNameNormalizer = Options.UnderlineDescriptorNameNormalizer;
     }
 
     public Options() {
@@ -63,5 +76,18 @@ public class Options implements Pinenut {
     @SuppressWarnings( "unchecked" )
     public <T> Class<T> getDefaultMapType() {
         return (Class<T>) this.mDefaultMapType;
+    }
+
+    public void setDescriptorNameNormalizer( DescriptorNameNormalizer descriptorNameNormalizer ) {
+        this.mDescriptorNameNormalizer = descriptorNameNormalizer;
+    }
+
+    public Options applyDescriptorNameNormalizer( DescriptorNameNormalizer descriptorNameNormalizer ) {
+        this.mDescriptorNameNormalizer = descriptorNameNormalizer;
+        return this;
+    }
+
+    public String normalizeDescriptorName( String szName ) {
+        return this.mDescriptorNameNormalizer.normalize( szName );
     }
 }

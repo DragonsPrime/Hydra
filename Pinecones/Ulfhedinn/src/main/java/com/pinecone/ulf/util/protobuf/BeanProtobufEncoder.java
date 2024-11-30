@@ -25,16 +25,16 @@ public interface BeanProtobufEncoder extends Pinenut {
     Descriptors.Descriptor transform( Class<?> clazz, Object dynamicObject, Set<String > exceptedKeys, Options options );
 
     default Descriptors.Descriptor transform( Class<?> clazz, Object dynamicObject, Set<String > exceptedKeys ) {
-        Descriptors.Descriptor primitiveDesc = this.transformPrimitive( clazz, dynamicObject );
+        Descriptors.Descriptor primitiveDesc = this.transformPrimitive( clazz );
         if( primitiveDesc != null ) {
             return primitiveDesc;
         }
         return this.transform( clazz, dynamicObject, exceptedKeys, Options.DefaultOptions );
     }
 
-    default Descriptors.Descriptor transformPrimitive( Class<?> clazz, Object dynamicObject ) {
+    default Descriptors.Descriptor transformPrimitive( Class<?> clazz ) {
         if( PrimitiveWrapper.isSupportedPrimitive( clazz ) ) {
-            return PrimitiveWrapper.transform( dynamicObject );
+            return PrimitiveWrapper.transform( clazz );
         }
 
         return null;

@@ -14,6 +14,7 @@ import com.pinecone.Pinecone;
 import com.pinecone.framework.lang.field.FieldEntity;
 import com.pinecone.framework.lang.field.GenericStructure;
 import com.pinecone.framework.system.CascadeSystem;
+import com.pinecone.framework.util.ClassUtils;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.JSON;
 import com.pinecone.framework.util.json.JSONMaptron;
@@ -25,6 +26,7 @@ import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
 import com.pinecone.hydra.umct.WolfMCExpress;
+import com.pinecone.hydra.umct.appoint.proxy.GenericIfaceProxyFactory;
 import com.pinecone.hydra.umct.protocol.compiler.BytecodeIfacCompiler;
 import com.pinecone.hydra.umct.protocol.compiler.GenericIfaceInspector;
 import com.pinecone.hydra.umct.protocol.function.GenericArgumentRequest;
@@ -126,7 +128,9 @@ class Appleby extends JesusChrist {
 
         //this.testStructure();
 
-        this.testIfacInspector();
+        //this.testIfacInspector();
+
+        this.testIfaceProxy();
     }
 
     private void testDynamic() throws Exception {
@@ -445,12 +449,13 @@ class Appleby extends JesusChrist {
 
 
 
-
-        Method[] methods = Raccoon.class.getMethods();
-        GenericArgumentRequest request = new GenericArgumentRequest( Raccoon.class.getName(), methods[0].getParameterTypes() );
-
-        Debug.trace( request, request.getAddressPath(), request.getInterceptedPath(), request.getInterceptorName(), request.getSegments() );
-
+        Method method = ClassUtils.getFirstMethodByName( Raccoon.class, "scratch" );
+        if( method != null ) {
+            GenericArgumentRequest request = new GenericArgumentRequest(
+                    Raccoon.class.getName(), method.getParameterTypes()
+            );
+            Debug.trace( request, request.getAddressPath(), request.getInterceptedPath(), request.getInterceptorName(), request.getSegments() );
+        }
 
         Raccoon raccoon = new RedRaccoon();
         Debug.trace( raccoon.scratch( "you", 166 ) );
@@ -459,7 +464,19 @@ class Appleby extends JesusChrist {
     protected void testIfacInspector() throws Exception {
         BytecodeIfacCompiler inspector = new BytecodeIfacCompiler( ClassPool.getDefault() );
 
-        Debug.trace( inspector.inspect( Raccoon.class, false ) );
+        Debug.trace( inspector.compile( Raccoon.class, false ).getMethodDigests() );
+    }
+
+
+    protected void testIfaceProxy(){
+        GenericIfaceProxyFactory factory = new GenericIfaceProxyFactory();
+
+        Beaver redBeaver = new RedBeaver();
+        Beaver pBeaver = factory.createProxy(Beaver.class, redBeaver);
+        Debug.trace( pBeaver.cutting( "tree" ) );
+
+        Beaver pCBeaver = factory.createProxy(null, redBeaver);
+        Debug.trace( pCBeaver.cutting( "tree" ) );
     }
 
 }

@@ -12,7 +12,7 @@ public interface FieldProtobufEncoder extends BeanProtobufEncoder {
 
     DynamicMessage encode( Descriptors.Descriptor descriptor, Map.Entry<String, Object>[] fields, Set<String > exceptedKeys, Options options );
 
-    Descriptors.Descriptor transform(FieldEntity[] fields, String szEntityName, Set<String > exceptedKeys, Options options );
+    Descriptors.Descriptor transform( FieldEntity[] fields, String szEntityName, Set<String > exceptedKeys, Options options );
 
     DynamicMessage encode( Descriptors.Descriptor descriptor, FieldEntity[] fields, Set<String > exceptedKeys, Options options );
 }

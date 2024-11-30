@@ -7,8 +7,8 @@ import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.file.entity.Folder;
-import com.pinecone.hydra.storage.file.transmit.exporter.channel.GenericChannelFileExporterEntity;
-import com.pinecone.hydra.storage.file.transmit.receiver.channel.GenericChannelFileReceiveEntity;
+//import com.pinecone.hydra.storage.file.transmit.exporter.channel.GenericChannelFileExporterEntity;
+//import com.pinecone.hydra.storage.file.transmit.receiver.channel.GenericChannelFileReceiveEntity;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.walnuts.sparta.uofs.service.api.response.BasicResultResponse;
@@ -60,8 +60,8 @@ public class UOFSController {
         fileNode.setDefinitionSize( file.length() );
         fileNode.setName( file.getName() );
 
-        GenericChannelFileReceiveEntity receiveEntity = new GenericChannelFileReceiveEntity(this.primaryFileSystem, dto.getDestDirPath(), fileNode, kChannel);
-        this.primaryFileSystem.receive( primaryVolume.get(GUIDs.GUID72( dto.getVolumeGuid() ) ), receiveEntity );
+        //GenericChannelFileReceiveEntity receiveEntity = new GenericChannelFileReceiveEntity(this.primaryFileSystem, dto.getDestDirPath(), fileNode, kChannel);
+        //this.primaryFileSystem.receive( primaryVolume.get(GUIDs.GUID72( dto.getVolumeGuid() ) ), receiveEntity );
         return BasicResultResponse.success();
     }
 
@@ -78,9 +78,9 @@ public class UOFSController {
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
         TitanFileChannelKChannel titanFileChannelKChannel = new TitanFileChannelKChannel( channel );
 
-        FileNode fileNode = (FileNode) this.primaryFileSystem.get(this.primaryFileSystem.queryGUIDByPath(dto.getDestDirPath()));
-        GenericChannelFileExporterEntity exporterEntity = new GenericChannelFileExporterEntity(this.primaryFileSystem, fileNode, titanFileChannelKChannel);
-        this.primaryFileSystem.export( this.primaryVolume, exporterEntity );
+        //FileNode fileNode = (FileNode) this.primaryFileSystem.get(this.primaryFileSystem.queryGUIDByPath(dto.getDestDirPath()));
+        //GenericChannelFileExporterEntity exporterEntity = new GenericChannelFileExporterEntity(this.primaryFileSystem, fileNode, titanFileChannelKChannel);
+        //this.primaryFileSystem.export( this.primaryVolume, exporterEntity );
 
         return BasicResultResponse.success();
     }
