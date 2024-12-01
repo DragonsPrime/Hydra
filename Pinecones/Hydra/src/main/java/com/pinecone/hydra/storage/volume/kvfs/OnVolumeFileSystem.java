@@ -14,7 +14,7 @@ public interface OnVolumeFileSystem extends Pinenut {
     void createSimpleTargetMappingTab(MappedExecutor mappedExecutor ) throws SQLException;
 
     void insertSimpleTargetMappingSoloRecord(GUID storageObjectGuid, String storageObjectName, String sourceName, MappedExecutor mappedExecutor ) throws SQLException;
-    String getKVFSTableSourceName( GUID storageObjectGuid, MappedExecutor mappedExecutor ) throws SQLException;
+    String getSimpleStorageObjectSourceName(GUID storageObjectGuid, MappedExecutor mappedExecutor ) throws SQLException;
 
     boolean existStorageObject( MappedExecutor mappedExecutor, GUID storageObjectGuid ) throws SQLException;
 
