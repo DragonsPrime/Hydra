@@ -79,7 +79,7 @@ class Alice extends Radium {
         //this.testStripedInsert( volumeTree );
         //this.testSpannedInsert( volumeTree );
         //this.testStripedReceive( volumeTree );
-        this.testStripedExport( volumeTree );
+        //this.testStripedExport( volumeTree );
         //this.testHash( volumeTree );
         //this.testSpannedReceive( volumeTree );
         //this.testSpannedExport( volumeTree );

@@ -164,7 +164,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         SQLiteHost sqLiteHost = new SQLiteHost(url);
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( sqLiteHost );
         if( !kenVolumeFileSystem.existStorageObject( sqLiteExecutor, storageIOResponse.getObjectGuid() ) ){
-            this.kenVolumeFileSystem.insertSimpleStorageObjectMeta( storageIOResponse.getObjectGuid(), storageObjectName, storageIOResponse.getSourceName(), sqLiteExecutor );
+            this.kenVolumeFileSystem.insertSimpleTargetMappingSoloRecord( storageIOResponse.getObjectGuid(), storageObjectName, storageIOResponse.getSourceName(), sqLiteExecutor );
         }
         sqLiteHost.close();
 
@@ -180,9 +180,9 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
         String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + config.getPathSeparator() + this.guid + config.getSqliteFileExtension();
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-        this.kenVolumeFileSystem.createSimpleStorageObjectMetaTable( sqLiteExecutor );
+        this.kenVolumeFileSystem.createSimpleTargetMappingTab( sqLiteExecutor );
         this.volumeManager.put( this );
-        this.kenVolumeFileSystem.insertDetachedIdxVolumeMapping( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+        this.kenVolumeFileSystem.insertSimpleTargetMappingTab( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
     }
 
     @Override

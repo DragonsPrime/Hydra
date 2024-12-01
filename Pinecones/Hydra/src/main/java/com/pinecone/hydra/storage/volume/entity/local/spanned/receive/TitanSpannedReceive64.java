@@ -69,7 +69,7 @@ public class TitanSpannedReceive64 implements SpannedReceive64{
         GUID physicsGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume( this.spannedVolume.getGuid() );
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
         SQLiteExecutor sqLiteExecutor = this.getSQLiteExecutor(physicalVolume);
-        int idx = this.kenVolumeFileSystem.KVFSHash(this.storageReceiveIORequest.getStorageObjectGuid(), volumes.size());
+        int idx = this.kenVolumeFileSystem.hashStorageObjectID(this.storageReceiveIORequest.getStorageObjectGuid(), volumes.size());
         //Debug.trace("存储的GUID是："+storageReceiveIORequest.getStorageObjectGuid());
         GUID volumeGuid = this.kenVolumeFileSystem.getSpannedIndexTableTargetGuid(sqLiteExecutor, idx);
         //Debug.trace( volumeGuid );
@@ -80,7 +80,7 @@ public class TitanSpannedReceive64 implements SpannedReceive64{
 
             for (LogicVolume volume : volumes) {
                 if (this.freeSpace(volume) > storageReceiveIORequest.getSize().longValue()) {
-                    this.kenVolumeFileSystem.insertSpannedLinkedVolume(sqLiteExecutor, idx, storageReceiveIORequest.getStorageObjectGuid(), volume.getGuid());
+                    this.kenVolumeFileSystem.insertSpanLinkedVolumeTable(sqLiteExecutor, idx, storageReceiveIORequest.getStorageObjectGuid(), volume.getGuid());
                     //TitanSimpleReceiveEntity64 receiveEntity = new TitanSimpleReceiveEntity64( this.volumeManager, this.storageReceiveIORequest, this.channel, (SimpleVolume) volume);
 
                     ReceiveEntity receiveEntity = constructor.getReceiveEntity(volume.getClass(), this.volumeManager, this.storageReceiveIORequest, this.channel, volume);

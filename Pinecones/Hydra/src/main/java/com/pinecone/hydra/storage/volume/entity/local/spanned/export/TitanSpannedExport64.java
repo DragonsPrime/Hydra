@@ -45,9 +45,9 @@ public class TitanSpannedExport64 implements SpannedExport64{
         GUID physicsVolumeGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.spannedVolume.getGuid());
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsVolumeGuid);
         SQLiteExecutor sqLiteExecutor = this.getSQLiteExecutor(physicalVolume);
-        GUID targetGuid = this.kenVolumeFileSystem.getSpannedLinkedVolumeTargetGuid(sqLiteExecutor, this.storageExportIORequest.getStorageObjectGuid());
+        GUID targetGuid = this.kenVolumeFileSystem.getSpanLinkedVolumeTableTargetGuid(sqLiteExecutor, this.storageExportIORequest.getStorageObjectGuid());
         if ( targetGuid == null ){
-            int idx = this.kenVolumeFileSystem.KVFSHash(this.storageExportIORequest.getStorageObjectGuid(), volumes.size());
+            int idx = this.kenVolumeFileSystem.hashStorageObjectID(this.storageExportIORequest.getStorageObjectGuid(), volumes.size());
             GUID tableTargetGuid = this.kenVolumeFileSystem.getSpannedIndexTableTargetGuid(sqLiteExecutor, idx);
             String source = this.getSource(tableTargetGuid, this.storageExportIORequest.getStorageObjectGuid());
             this.storageExportIORequest.setSourceName( source );
