@@ -20,18 +20,18 @@ public interface OnVolumeFileSystem extends Pinenut {
 
     int hashStorageObjectID( GUID keyGuid, int volumeNum);
 
-    void creatKVFSIndexTable( MappedExecutor mappedExecutor ) throws SQLException;
-    void insertKVFSIndexTable( MappedExecutor mappedExecutor, int hashKey, GUID targetVolumeGuid ) throws SQLException;
-    GUID getKVFSIndexTableTargetGuid(MappedExecutor mappedExecutor, int hashKey ) throws SQLException;
+    void createSpannedIndexTable(MappedExecutor mappedExecutor ) throws SQLException;
+    void insertSpannedIndexTable(MappedExecutor mappedExecutor, int hashKey, GUID targetVolumeGuid ) throws SQLException;
+    GUID getSpannedIndexTableTargetGuid(MappedExecutor mappedExecutor, int hashKey ) throws SQLException;
 
 
     void creatSpanLinkedVolumeTable( MappedExecutor mappedExecutor ) throws SQLException;
     void insertSpanLinkedVolumeTable( MappedExecutor mappedExecutor, int hashKey, GUID keyGuid, GUID targetVolumeGuid ) throws SQLException;
     GUID getSpanLinkedVolumeTableTargetGuid( MappedExecutor mappedExecutor, GUID keyGuid ) throws SQLException;
 
-    void createKVFSFileStripTable( MappedExecutor mappedExecutor ) throws SQLException;
-    void insertKVFSFileStripTable( MappedExecutor mappedExecutor, int code, GUID volumeGuid, GUID storageObjectGuid, String sourceName ) throws SQLException;
-    String getKVFSFileStripSourceName( MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid ) throws SQLException;
-    int getKVFSFileStripCode( MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid ) throws SQLException;
-    boolean isExistKVFSFileStripTable( MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid ) throws SQLException;
+    void createStripMetaTable(MappedExecutor mappedExecutor ) throws SQLException;
+    void insertStripMetaTable(MappedExecutor mappedExecutor, int code, GUID volumeGuid, GUID storageObjectGuid, String sourceName ) throws SQLException;
+    String getStripMetaSourceName(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid ) throws SQLException;
+    int getStripMetaCode(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid ) throws SQLException;
+    boolean isExistStripMetaTable(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid ) throws SQLException;
 }

@@ -76,10 +76,10 @@ class Alice extends Radium {
         //this.testDirectExport( volumeTree );
         //Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
-        this.testStripedInsert( volumeTree );
-        this.testSpannedInsert( volumeTree );
+        //this.testStripedInsert( volumeTree );
+        //this.testSpannedInsert( volumeTree );
         //this.testStripedReceive( volumeTree );
-        //this.testStripedExport( volumeTree );
+        this.testStripedExport( volumeTree );
         //this.testHash( volumeTree );
         //this.testSpannedReceive( volumeTree );
         //this.testSpannedExport( volumeTree );
@@ -147,6 +147,7 @@ class Alice extends Radium {
         simpleVolume2.extendLogicalVolume( physicalVolume2.getGuid() );
         stripedVolume.storageExpansion( simpleVolume1.getGuid() );
         stripedVolume.storageExpansion( simpleVolume2.getGuid() );
+        //stripedVolume.storageExpansion( GUIDs.GUID72("0a21870-000251-0006-f0") );
     }
 
     private void testSpannedInsert( UniformVolumeManager volumeManager ) throws SQLException {
@@ -215,10 +216,10 @@ class Alice extends Radium {
         titanReceiveStorageObject.setSize( file.length() );
         titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
 
-//        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-//        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel( channel );
-        FileInputStream stream = new FileInputStream( file );
-        TitanInputStreamChanface kChannel = new TitanInputStreamChanface(stream);
+        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
+        TitanFileChannelChanface kChannel = new TitanFileChannelChanface( channel );
+//        FileInputStream stream = new FileInputStream( file );
+//        TitanInputStreamChanface kChannel = new TitanInputStreamChanface(stream);
         UnifiedTransmitConstructor unifiedTransmitConstructor = new UnifiedTransmitConstructor();
         ReceiveEntity entity = unifiedTransmitConstructor.getReceiveEntity(volume.getClass(), volumeManager, titanReceiveStorageObject, kChannel, volume);
         //TitanStripedReceiveEntity64 receiveEntity = new TitanStripedReceiveEntity64( volumeManager, titanReceiveStorageObject, kChannel, (StripedVolume) volume);
@@ -265,14 +266,14 @@ class Alice extends Radium {
     void testStripedExport( UniformVolumeManager volumeManager ) throws Exception {
         File file = new File("D:\\文件系统\\大文件\\我的视频.mp4");
         File originalFile = new File( "D:/井盖视频块/4月13日 (2).mp4" );
-//        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-//        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel( channel );
-        FileOutputStream stream = new FileOutputStream( file );
-        TitanOutputStreamChanface kChannel = new TitanOutputStreamChanface(stream);
+        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+        TitanFileChannelChanface kChannel = new TitanFileChannelChanface( channel );
+//        FileOutputStream stream = new FileOutputStream( file );
+//        TitanOutputStreamChanface kChannel = new TitanOutputStreamChanface(stream);
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanStorageExportIORequest titanExportStorageObject = new TitanStorageExportIORequest();
         titanExportStorageObject.setSize( originalFile.length() );
-        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("09cbd8e-000012-0001-30") );
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0a2238e-0000cf-0001-14") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
         //volume.channelExport( titanExportStorageObject, titanFileChannelKChannel);
         UnifiedTransmitConstructor unifiedTransmitConstructor = new UnifiedTransmitConstructor();

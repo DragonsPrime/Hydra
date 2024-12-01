@@ -3,6 +3,7 @@ package com.pinecone.hydra.storage.volume.entity;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
+import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
@@ -59,9 +60,10 @@ public abstract class ArchLogicVolume extends ArchVolume implements LogicVolume{
 
     @Override
     public SQLiteExecutor getSQLiteExecutor() throws SQLException {
+        VolumeConfig config = this.volumeManager.getConfig();
         GUID physicsVolumeGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.getGuid());
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsVolumeGuid);
-        String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.getGuid()+".db";
+        String url = physicalVolume.getMountPoint().getMountPoint()+ config.getPathSeparator() +this.getGuid()+config.getSqliteFileExtension();
         return new SQLiteExecutor( new SQLiteHost(url) );
     }
 }

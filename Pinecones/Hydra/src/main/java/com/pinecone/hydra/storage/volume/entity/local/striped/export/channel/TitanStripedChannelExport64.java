@@ -110,11 +110,11 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
 
         for ( LogicVolume volume : volumes ) {
 
-            String sourceName = this.kenVolumeFileSystem.getKVFSFileStripSourceName(sqLiteExecutor, volume.getGuid(), this.storageExportIORequest.getStorageObjectGuid());
+            String sourceName = this.kenVolumeFileSystem.getStripMetaSourceName(sqLiteExecutor, volume.getGuid(), this.storageExportIORequest.getStorageObjectGuid());
             if ( sourceName == null ){
                 continue;
             }
-            int code = this.kenVolumeFileSystem.getKVFSFileStripCode(sqLiteExecutor, volume.getGuid(), this.storageExportIORequest.getStorageObjectGuid());
+            int code = this.kenVolumeFileSystem.getStripMetaCode(sqLiteExecutor, volume.getGuid(), this.storageExportIORequest.getStorageObjectGuid());
             File file = new File(sourceName);
             StorageExportIORequest titanStorageExportIORequest = new TitanStorageExportIORequest();
             titanStorageExportIORequest.setStorageObjectGuid( this.storageExportIORequest.getStorageObjectGuid() );

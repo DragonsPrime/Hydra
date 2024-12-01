@@ -16,7 +16,7 @@ public interface Chanface extends Pinenut {
 
     int write( byte[] buffer, int startPosition, int endSize ) throws IOException;
 
-    int write(byte[] buffer, List<CacheBlock> writableCacheBlocks ) throws IOException;
+    int write(byte[] buffer, List<CacheBlock> writableCacheBlocks, WriteChannelRecalled function ) throws IOException;
 
     long position() throws IOException;
 

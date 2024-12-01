@@ -6,6 +6,7 @@ import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
+import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
@@ -31,7 +32,7 @@ public class TitanSpannedExport64 implements SpannedExport64{
     protected OnVolumeFileSystem kenVolumeFileSystem;
 
     public TitanSpannedExport64( SpannedExportEntity64 entity ){
-        this.spannedVolume              = entity.getSpannedVolume();
+        this.spannedVolume              = entity.getSpannedVolume();;
         this.volumeManager              = entity.getVolumeManager();
         this.storageExportIORequest     = entity.getStorageIORequest();
         this.channel                    = entity.getChannel();
@@ -44,10 +45,10 @@ public class TitanSpannedExport64 implements SpannedExport64{
         GUID physicsVolumeGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.spannedVolume.getGuid());
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsVolumeGuid);
         SQLiteExecutor sqLiteExecutor = this.getSQLiteExecutor(physicalVolume);
-        GUID targetGuid = this.kenVolumeFileSystem.getSpanLinkedVolumeTableTargetGuid(sqLiteExecutor, this.storageExportIORequest.getStorageObjectGuid());
+        GUID targetGuid = this.kenVolumeFileSystem.getSpannedLinkedVolumeTargetGuid(sqLiteExecutor, this.storageExportIORequest.getStorageObjectGuid());
         if ( targetGuid == null ){
-            int idx = this.kenVolumeFileSystem.hashStorageObjectID(this.storageExportIORequest.getStorageObjectGuid(), volumes.size());
-            GUID tableTargetGuid = this.kenVolumeFileSystem.getKVFSIndexTableTargetGuid(sqLiteExecutor, idx);
+            int idx = this.kenVolumeFileSystem.KVFSHash(this.storageExportIORequest.getStorageObjectGuid(), volumes.size());
+            GUID tableTargetGuid = this.kenVolumeFileSystem.getSpannedIndexTableTargetGuid(sqLiteExecutor, idx);
             String source = this.getSource(tableTargetGuid, this.storageExportIORequest.getStorageObjectGuid());
             this.storageExportIORequest.setSourceName( source );
             SimpleVolume simpleVolume = (SimpleVolume)this.volumeManager.get(tableTargetGuid);
@@ -66,17 +67,19 @@ public class TitanSpannedExport64 implements SpannedExport64{
     }
 
     private SQLiteExecutor getSQLiteExecutor(PhysicalVolume physicalVolume ) throws SQLException {
+        VolumeConfig config = this.volumeManager.getConfig();
         String mountPoint = physicalVolume.getMountPoint().getMountPoint();
-        String url = mountPoint + "/" + this.spannedVolume.getGuid()+".db";
+        String url = mountPoint + config.getPathSeparator() + this.spannedVolume.getGuid()+ config.getSqliteFileExtension();
         return new SQLiteExecutor( new SQLiteHost(url) );
     }
 
     private String getSource(GUID volumeGuid, GUID storageObjectGuid ) throws SQLException {
+        VolumeConfig config = this.volumeManager.getConfig();
         GUID physicsVolumeGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume( volumeGuid );
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume( physicsVolumeGuid );
         String mountPoint = physicalVolume.getMountPoint().getMountPoint();
-        String url = mountPoint + "/" + volumeGuid+".db";
+        String url = mountPoint + config.getPathSeparator() + volumeGuid+ config.getSqliteFileExtension();
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor(new SQLiteHost(url));
-        return this.kenVolumeFileSystem.getKVFSTableSourceName(storageObjectGuid, sqLiteExecutor);
+        return this.kenVolumeFileSystem.getSimpleStorageObjectSourceName(storageObjectGuid, sqLiteExecutor);
     }
 }

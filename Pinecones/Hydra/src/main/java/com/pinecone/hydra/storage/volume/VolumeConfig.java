@@ -14,4 +14,10 @@ public interface VolumeConfig extends KernelObjectConfig {
     Number getDefaultStripSize() ;
 
     int getStripResidentCacheAllotRatio();
+
+    String getStorageObjectExtension();
+
+    String getSqliteFileExtension();
+
+    String getPathSeparator();
 }

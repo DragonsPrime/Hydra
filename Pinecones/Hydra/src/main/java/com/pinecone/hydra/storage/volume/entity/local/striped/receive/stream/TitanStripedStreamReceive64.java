@@ -8,6 +8,7 @@ import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
+import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
@@ -87,9 +88,10 @@ public class TitanStripedStreamReceive64 implements StripedStreamReceive64{
     }
 
     private MappedExecutor getExecutor() throws SQLException {
+        VolumeConfig config = this.volumeManager.getConfig();
         GUID physicsVolumeGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.stripedVolume.getGuid());
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsVolumeGuid);
-        String url = physicalVolume.getMountPoint().getMountPoint()+ "/" +this.stripedVolume.getGuid()+".db";
+        String url = physicalVolume.getMountPoint().getMountPoint()+ config.getPathSeparator() +this.stripedVolume.getGuid()+ config.getSqliteFileExtension();
         this.mSqLiteHost = new SQLiteHost(url);
         return new SQLiteExecutor( this.mSqLiteHost );
     }

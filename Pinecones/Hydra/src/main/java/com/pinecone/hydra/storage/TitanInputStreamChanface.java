@@ -34,15 +34,10 @@ public class TitanInputStreamChanface implements Chanface {
 
     @Override
     public int read(ByteBuffer buffer, long offset) throws IOException {
-        this.reentrantLock.lock();
         int bytesRead = 0;
-        try {
-             byte[] tempBuffer = new byte[buffer.remaining()];
-             bytesRead = stream.read(tempBuffer);
-            buffer.put(tempBuffer, 0, bytesRead);
-        }finally {
-            this.reentrantLock.unlock();
-        }
+        byte[] tempBuffer = new byte[buffer.remaining()];
+        bytesRead = stream.read(tempBuffer);
+        buffer.put(tempBuffer, 0, bytesRead);
         return bytesRead;
     }
 
@@ -57,7 +52,7 @@ public class TitanInputStreamChanface implements Chanface {
     }
 
     @Override
-    public int write(byte[] buffer, List<CacheBlock> writableCacheBlocks) throws IOException {
+    public int write(byte[] buffer, List<CacheBlock> writableCacheBlocks,WriteChannelRecalled function) throws IOException {
         throw new NotImplementedException();
     }
 

@@ -1,15 +1,11 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
-import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.rdb.MappedExecutor;
-import com.pinecone.framework.util.sqlite.SQLiteExecutor;
-import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
-import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.stream.TitanSimpleStreamReceiveEntity64;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
@@ -95,7 +91,7 @@ public class TitanStripReceiveBufferOutJob implements StripReceiveBufferOutJob{
                 if( !this.isExist() ){
                     LogicVolume currentVolume = this.cacheBlocksGroup.get(this.masterVolumeGram.getCurrentBufferInJobCode()).getVolume();
 
-                    this.kenVolumeFileSystem.insertKVFSFileStripTable( this.executor, this.masterVolumeGram.getCurrentBufferInJobCode(), currentVolume.getGuid(), this.request.getStorageObjectGuid(), response.getSourceName() );
+                    this.kenVolumeFileSystem.insertStripMetaTable( this.executor, this.masterVolumeGram.getCurrentBufferInJobCode(), currentVolume.getGuid(), this.request.getStorageObjectGuid(), response.getSourceName() );
 
                 }
 
@@ -142,6 +138,6 @@ public class TitanStripReceiveBufferOutJob implements StripReceiveBufferOutJob{
 
     boolean isExist(  ) throws SQLException {
         LogicVolume currentVolume = this.cacheBlocksGroup.get(this.masterVolumeGram.getCurrentBufferInJobCode()).getVolume();
-        return this.kenVolumeFileSystem.isExistKVFSFileStripTable(this.executor, currentVolume.getGuid(), this.request.getStorageObjectGuid());
+        return this.kenVolumeFileSystem.isExistStripMetaTable(this.executor, currentVolume.getGuid(), this.request.getStorageObjectGuid());
     }
 }

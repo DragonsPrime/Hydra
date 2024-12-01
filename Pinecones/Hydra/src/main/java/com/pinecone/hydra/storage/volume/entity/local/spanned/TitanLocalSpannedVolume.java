@@ -6,6 +6,7 @@ import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
+import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.StorageExportIORequest;
@@ -139,18 +140,19 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
     // Build 模式，最后去执行
     @Override
     public void build() throws SQLException {
+        VolumeConfig config = this.volumeManager.getConfig();
         PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
-        String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + "/" + this.guid + ".db";
+        String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + config.getPathSeparator() + this.guid + config.getSqliteFileExtension();
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-        this.kenVolumeFileSystem.creatSpanLinkedVolumeTable( sqLiteExecutor );
-        this.kenVolumeFileSystem.creatKVFSIndexTable( sqLiteExecutor );
+        this.kenVolumeFileSystem.createSpannedLinkedVolumeTable( sqLiteExecutor );
+        this.kenVolumeFileSystem.createSpannedIndexTable( sqLiteExecutor );
         List<LogicVolume> volumes = this.getChildren();
         int index = 0;
         for( LogicVolume volume : volumes ){
-            this.kenVolumeFileSystem.insertKVFSIndexTable( sqLiteExecutor, index, volume.getGuid() );
+            this.kenVolumeFileSystem.insertSpannedIndexTable( sqLiteExecutor, index, volume.getGuid() );
             index++;
         }
-        this.kenVolumeFileSystem.insertSimpleTargetMappingTab( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+        this.kenVolumeFileSystem.insertDetachedIdxVolumeMapping( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
         this.volumeManager.put( this );
     }
 

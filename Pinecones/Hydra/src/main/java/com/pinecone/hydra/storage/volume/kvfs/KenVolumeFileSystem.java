@@ -47,8 +47,8 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
     }
 
     @Override
-    public String getKVFSTableSourceName(GUID storageObjectGuid, MappedExecutor mappedExecutor) throws SQLException {
-        ResultSession query = mappedExecutor.query("SELECT `source_name` FROM `table` WHERE `storage_object_guid` = '" + storageObjectGuid + "' ");
+    public String getSimpleStorageObjectSourceName(GUID storageObjectGuid, MappedExecutor mappedExecutor) throws SQLException {
+        ResultSession query = mappedExecutor.query("SELECT `source_name` FROM `kvfs_simple_target_mapping` WHERE `storage_object_guid` = '" + storageObjectGuid + "' ");
         ResultSet resultSet = query.getResultSet();
         if( resultSet.next() ){
             return resultSet.getString("source_name");
@@ -58,7 +58,7 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
 
     @Override
     public boolean existStorageObject(MappedExecutor mappedExecutor, GUID storageObjectGuid) throws SQLException {
-        ResultSession query = mappedExecutor.query(" SELECT COUNT(*) FROM `table` WHERE `storage_object_guid` = '" + storageObjectGuid + "' ");
+        ResultSession query = mappedExecutor.query(" SELECT COUNT(*) FROM `kvfs_simple_target_mapping` WHERE `storage_object_guid` = '" + storageObjectGuid + "' ");
         ResultSet resultSet = query.getResultSet();
         if( resultSet.next() ){
             int count = resultSet.getInt(1);
@@ -75,18 +75,18 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
     }
 
     @Override
-    public void creatKVFSIndexTable(MappedExecutor mappedExecutor) throws SQLException {
-        mappedExecutor.execute( "CREATE TABLE `index_table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `hash_key` int , `target_volume_guid` VARCHAR(36));", false );
+    public void createSpannedIndexTable(MappedExecutor mappedExecutor) throws SQLException {
+        mappedExecutor.execute( "CREATE TABLE `kvfs_span_volume_index`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `hash_key` int , `target_volume_guid` VARCHAR(36));", false );
     }
 
     @Override
-    public void insertKVFSIndexTable(MappedExecutor mappedExecutor, int hashKey, GUID targetVolumeGuid) throws SQLException {
-        mappedExecutor.execute( "INSERT INTO `index_table` ( `hash_key`, `target_volume_guid` ) VALUES ( "+hashKey+", '"+targetVolumeGuid+"' )", false );
+    public void insertSpannedIndexTable(MappedExecutor mappedExecutor, int hashKey, GUID targetVolumeGuid) throws SQLException {
+        mappedExecutor.execute( "INSERT INTO `kvfs_span_volume_index` ( `hash_key`, `target_volume_guid` ) VALUES ( "+hashKey+", '"+targetVolumeGuid+"' )", false );
     }
 
     @Override
-    public GUID getKVFSIndexTableTargetGuid(MappedExecutor mappedExecutor, int hashKey) throws SQLException {
-        ResultSession query = mappedExecutor.query("SELECT `target_volume_guid` FROM `index_table` WHERE `hash_key` = " + hashKey + " ");
+    public GUID getSpannedIndexTableTargetGuid(MappedExecutor mappedExecutor, int hashKey) throws SQLException {
+        ResultSession query = mappedExecutor.query("SELECT `target_volume_guid` FROM `kvfs_span_volume_index` WHERE `hash_key` = " + hashKey + " ");
         ResultSet resultSet = query.getResultSet();
         if ( resultSet.next() ){
             String targetVolumeGuid = resultSet.getString("target_volume_guid");
@@ -117,18 +117,18 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
     }
 
     @Override
-    public void createKVFSFileStripTable(MappedExecutor mappedExecutor) throws SQLException {
-        mappedExecutor.execute( "CREATE TABLE `file_strip_table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `code` int , `volume_guid` VARCHAR(36), `storage_object_guid` VARCHAR(36), `source_name` TEXT) ;", false );
+    public void createStripMetaTable(MappedExecutor mappedExecutor) throws SQLException {
+        mappedExecutor.execute( "CREATE TABLE `kvfs_strip_meta`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `code` int , `volume_guid` VARCHAR(36), `storage_object_guid` VARCHAR(36), `source_name` TEXT) ;", false );
     }
 
     @Override
-    public void insertKVFSFileStripTable(MappedExecutor mappedExecutor, int code, GUID volumeGuid, GUID storageObjectGuid, String sourceName) throws SQLException {
-        mappedExecutor.execute( "INSERT INTO `file_strip_table` ( `code`, `volume_guid`, `storage_object_guid`, `source_name` ) VALUES ( "+code+", '"+volumeGuid+"', '"+storageObjectGuid+"', '"+sourceName+"' )", false );
+    public void insertStripMetaTable(MappedExecutor mappedExecutor, int code, GUID volumeGuid, GUID storageObjectGuid, String sourceName) throws SQLException {
+        mappedExecutor.execute( "INSERT INTO `kvfs_strip_meta` ( `code`, `volume_guid`, `storage_object_guid`, `source_name` ) VALUES ( "+code+", '"+volumeGuid+"', '"+storageObjectGuid+"', '"+sourceName+"' )", false );
     }
 
     @Override
-    public String getKVFSFileStripSourceName(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
-        ResultSession query = mappedExecutor.query("SELECT `source_name` FROM `file_strip_table` WHERE `volume_guid` = '" + volumeGuid + "' AND `storage_object_guid` = '" + storageObjectGuid + "' ");
+    public String getStripMetaSourceName(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
+        ResultSession query = mappedExecutor.query("SELECT `source_name` FROM `kvfs_strip_meta` WHERE `volume_guid` = '" + volumeGuid + "' AND `storage_object_guid` = '" + storageObjectGuid + "' ");
         ResultSet resultSet = query.getResultSet();
         if ( resultSet.next() ){
             return resultSet.getString("source_name");
@@ -137,8 +137,8 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
     }
 
     @Override
-    public int getKVFSFileStripCode(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
-        ResultSession query = mappedExecutor.query("SELECT `code` FROM `file_strip_table` WHERE `volume_guid` = '" + volumeGuid + "' AND `storage_object_guid` = '" + storageObjectGuid + "' ");
+    public int getStripMetaCode(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
+        ResultSession query = mappedExecutor.query("SELECT `code` FROM `kvfs_strip_meta` WHERE `volume_guid` = '" + volumeGuid + "' AND `storage_object_guid` = '" + storageObjectGuid + "' ");
         ResultSet resultSet = query.getResultSet();
         if ( resultSet.next() ){
             return resultSet.getInt("code");
@@ -147,8 +147,8 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
     }
 
     @Override
-    public boolean isExistKVFSFileStripTable(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
-        ResultSession query = mappedExecutor.query("SELECT COUNT(*) FROM `file_strip_table` WHERE `volume_guid` = '" + volumeGuid + "' AND `storage_object_guid` = '" + storageObjectGuid + "' ");
+    public boolean isExistStripMetaTable(MappedExecutor mappedExecutor, GUID volumeGuid, GUID storageObjectGuid) throws SQLException {
+        ResultSession query = mappedExecutor.query("SELECT COUNT(*) FROM `kvfs_strip_meta` WHERE `volume_guid` = '" + volumeGuid + "' AND `storage_object_guid` = '" + storageObjectGuid + "' ");
         ResultSet resultSet = query.getResultSet();
         if( resultSet.next() ){
             int count = resultSet.getInt(1);

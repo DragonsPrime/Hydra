@@ -2,6 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.WriteChannelRecalled;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
@@ -89,7 +90,11 @@ public class TitanStripBufferOutJob implements StripBufferOutJob {
                 //ByteBuffer writeBuffer = ByteBuffer.wrap(buffer, 0, buffer.length );
                 try {
                     //this.channel.write(buffer);
-                    int write = this.channel.write(this.mBuffer, writableCacheBlocks);
+
+                    //int write = this.channel.write(this.mBuffer, writableCacheBlocks);
+                    int write = 0;
+                    WriteChannelRecalled writeChannelRecalled = new WriteChannelRecalled(write);
+                    this.channel.write( this.mBuffer, writableCacheBlocks, writeChannelRecalled );
                     this.exportSize += write;
                 }
                 catch (IOException e) {

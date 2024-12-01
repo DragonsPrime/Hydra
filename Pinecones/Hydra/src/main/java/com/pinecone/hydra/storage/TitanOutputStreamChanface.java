@@ -47,7 +47,7 @@ public class TitanOutputStreamChanface implements Chanface {
     }
 
     @Override
-    public int write(byte[] buffer, List<CacheBlock> writableCacheBlocks) throws IOException {
+    public int write(byte[] buffer, List<CacheBlock> writableCacheBlocks, WriteChannelRecalled function) throws IOException {
         int length = 0;
 
         for( CacheBlock cacheBlock : writableCacheBlocks ){

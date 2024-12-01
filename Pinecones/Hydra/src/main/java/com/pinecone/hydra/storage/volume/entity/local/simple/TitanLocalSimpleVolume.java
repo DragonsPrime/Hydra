@@ -6,6 +6,7 @@ import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
+import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.StorageExportIORequest;
@@ -81,7 +82,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     @Override
     public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, Chanface channel ) throws IOException, SQLException {
         SQLiteExecutor sqLiteExecutor = this.getSQLiteExecutor();
-        String sourceName = this.kenVolumeFileSystem.getKVFSTableSourceName(storageExportIORequest.getStorageObjectGuid(), sqLiteExecutor);
+        String sourceName = this.kenVolumeFileSystem.getSimpleStorageObjectSourceName(storageExportIORequest.getStorageObjectGuid(), sqLiteExecutor);
         storageExportIORequest.setSourceName( sourceName );
 //        TitanSimpleChannelExportEntity64 titanSimpleChannelExportEntity64 = new TitanSimpleChannelExportEntity64( this.volumeManager, storageExportIORequest, channel );
 //        return titanSimpleChannelExportEntity64.export();
@@ -154,15 +155,16 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     }
 
     private synchronized void saveMate(StorageIOResponse storageIOResponse, String storageObjectName) throws SQLException {
+        VolumeConfig config = this.volumeManager.getConfig();
         GUID physicsGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.guid);
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
-        String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
+        String url = physicalVolume.getMountPoint().getMountPoint()+ config.getPathSeparator() +this.guid+ config.getSqliteFileExtension();
         File file = new File(url);
         //long totalSpace = file.getTotalSpace();
         SQLiteHost sqLiteHost = new SQLiteHost(url);
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( sqLiteHost );
         if( !kenVolumeFileSystem.existStorageObject( sqLiteExecutor, storageIOResponse.getObjectGuid() ) ){
-            this.kenVolumeFileSystem.insertSimpleTargetMappingSoloRecord( storageIOResponse.getObjectGuid(), storageObjectName, storageIOResponse.getSourceName(), sqLiteExecutor );
+            this.kenVolumeFileSystem.insertSimpleStorageObjectMeta( storageIOResponse.getObjectGuid(), storageObjectName, storageIOResponse.getSourceName(), sqLiteExecutor );
         }
         sqLiteHost.close();
 
@@ -174,12 +176,13 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
 
     @Override
     public void build() throws SQLException {
+        VolumeConfig config = this.volumeManager.getConfig();
         PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
-        String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + "/" + this.guid + ".db";
+        String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + config.getPathSeparator() + this.guid + config.getSqliteFileExtension();
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-        this.kenVolumeFileSystem.createSimpleTargetMappingTab( sqLiteExecutor );
+        this.kenVolumeFileSystem.createSimpleStorageObjectMetaTable( sqLiteExecutor );
         this.volumeManager.put( this );
-        this.kenVolumeFileSystem.insertSimpleTargetMappingTab( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+        this.kenVolumeFileSystem.insertDetachedIdxVolumeMapping( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
     }
 
     @Override
@@ -188,9 +191,10 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     }
     @Override
     public SQLiteExecutor getSQLiteExecutor() throws SQLException {
+        VolumeConfig config = this.volumeManager.getConfig();
         GUID physicsGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.guid);
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
-        String url = physicalVolume.getMountPoint().getMountPoint()+ "\\" +this.guid+".db";
+        String url = physicalVolume.getMountPoint().getMountPoint()+ config.getPathSeparator() +this.guid+ config.getSqliteFileExtension();
         SQLiteHost sqLiteHost = new SQLiteHost(url);
         return new SQLiteExecutor( sqLiteHost );
     }

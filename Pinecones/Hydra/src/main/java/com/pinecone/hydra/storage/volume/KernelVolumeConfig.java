@@ -4,13 +4,16 @@ import com.pinecone.hydra.storage.StorageConstants;
 import com.pinecone.hydra.system.ko.ArchKernelObjectConfig;
 
 public class KernelVolumeConfig extends ArchKernelObjectConfig implements VolumeConfig {
-    protected String mszVersionSignature            = StorageConstants.StorageVersionSignature;
+    protected String mszVersionSignature    = StorageConstants.StorageVersionSignature;
 
-    protected Number mnTinyFileStripSizing          = VolumeConstants.TinyFileStripSizing  ;
-    protected Number mnSmallFileStripSizing         = VolumeConstants.SmallFileStripSizing ;
-    protected Number mnMegaFileStripSizing          = VolumeConstants.MegaFileStripSizing  ;
-    protected Number mnDefaultStripSize             = VolumeConstants.DefaultStripSize     ;
-    protected int    mStripResidentCacheAllotRatio  = VolumeConstants.StripResidentCacheAllotRatio;
+    protected Number mnTinyFileStripSizing  = VolumeConstants.TinyFileStripSizing  ;
+    protected Number mnSmallFileStripSizing = VolumeConstants.SmallFileStripSizing ;
+    protected Number mnMegaFileStripSizing  = VolumeConstants.MegaFileStripSizing  ;
+    protected Number mnDefaultStripSize     = VolumeConstants.DefaultStripSize     ;
+    protected int    StripResidentCacheAllotRatio   = VolumeConstants.StripResidentCacheAllotRatio;
+    protected String storageObjectExtension = VolumeConstants.StorageObjectExtension;
+    protected String sqliteFileExtension    = VolumeConstants.SqliteFileExtension;
+    protected String pathSeparator          = VolumeConstants.PathSeparator;
 
 
     @Override
@@ -41,6 +44,21 @@ public class KernelVolumeConfig extends ArchKernelObjectConfig implements Volume
 
     @Override
     public int getStripResidentCacheAllotRatio() {
-        return this.mStripResidentCacheAllotRatio;
+        return this.StripResidentCacheAllotRatio;
+    }
+
+    @Override
+    public String getStorageObjectExtension() {
+        return this.storageObjectExtension;
+    }
+
+    @Override
+    public String getSqliteFileExtension() {
+        return this.sqliteFileExtension;
+    }
+
+    @Override
+    public String getPathSeparator() {
+        return this.pathSeparator;
     }
 }

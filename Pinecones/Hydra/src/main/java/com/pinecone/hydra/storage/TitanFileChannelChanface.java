@@ -53,9 +53,11 @@ public class TitanFileChannelChanface implements Chanface {
     }
 
     @Override
-    public int write(byte[] buffer, List<CacheBlock> writableCacheBlocks) throws IOException {
+    public int write(byte[] buffer, List<CacheBlock> writableCacheBlocks, WriteChannelRecalled function) throws IOException {
         ByteBuffer byteBuffer = this.mergeArrays(buffer, writableCacheBlocks);
-        return this.channel.write( byteBuffer );
+        int write = this.channel.write(byteBuffer);
+        function.recalled( write );
+        return write;
     }
 
     @Override

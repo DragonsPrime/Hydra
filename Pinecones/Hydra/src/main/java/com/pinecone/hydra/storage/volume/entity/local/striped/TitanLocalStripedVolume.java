@@ -6,6 +6,7 @@ import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
+import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
 import com.pinecone.hydra.storage.StorageExportIORequest;
@@ -130,12 +131,13 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
 
     @Override
     public void build() throws SQLException {
+        VolumeConfig config = this.volumeManager.getConfig();
         PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
-        String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + "/" + this.guid + ".db";
+        String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + config.getPathSeparator() + this.guid + config.getSqliteFileExtension();
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-        this.kenVolumeFileSystem.createKVFSFileStripTable( sqLiteExecutor );
+        this.kenVolumeFileSystem.createStripMetaTable( sqLiteExecutor );
         this.volumeManager.put( this );
-        this.kenVolumeFileSystem.insertSimpleTargetMappingTab( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+        this.kenVolumeFileSystem.insertDetachedIdxVolumeMapping( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.rdb.MappedExecutor;
 import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
+import com.pinecone.hydra.storage.volume.UnifiedTransmitConstructor;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
@@ -30,6 +31,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
     private StorageIOResponse           storageIOResponse;
     private Number                      offset;
     private Number                      endSize;
+    private UnifiedTransmitConstructor  constructor;
 
 
     public TitanStripReceiverJob(ReceiveEntity entity, Chanface channel, int jobCount, int jobCode, LogicVolume volume, MappedExecutor executor, Number offset, Number ednSize ){
@@ -43,6 +45,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
         this.executor               = executor;
         this.offset                 = offset;
         this.endSize                = ednSize;
+        this.constructor            = new UnifiedTransmitConstructor();
     }
 
     @Override
@@ -64,8 +67,8 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
 
             try {
 //                this.storageIOResponse = this.volume.channelReceive(this.object, this.fileChannel, currentPosition, bufferSize);
-                // todo 先默认底层是simpleVolume
-                TitanSimpleReceiveEntity64 receiveEntity = new TitanSimpleReceiveEntity64( this.volumeManager, this.object, this.fileChannel, (SimpleVolume) volume);
+//                TitanSimpleReceiveEntity64 receiveEntity = new TitanSimpleReceiveEntity64( this.volumeManager, this.object, this.fileChannel, (SimpleVolume) volume);
+                ReceiveEntity receiveEntity = this.constructor.getReceiveEntity(this.volume.getClass(), this.volumeManager, this.object, this.fileChannel, volume);
                 this.storageIOResponse = this.volume.receive( receiveEntity, currentPosition, bufferSize );
             } catch (IOException | SQLException e) {
                 e.printStackTrace();
@@ -78,7 +81,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
         }
         try {
             if( this.storageIOResponse != null ){
-                this.kenVolumeFileSystem.insertKVFSFileStripTable( executor, jobCode,  volume.getGuid(), this.object.getStorageObjectGuid(), this.storageIOResponse.getSourceName() );
+                this.kenVolumeFileSystem.insertStripMetaTable( executor, jobCode,  volume.getGuid(), this.object.getStorageObjectGuid(), this.storageIOResponse.getSourceName() );
             }
             //this.kenVolumeFileSystem.insertKVFSFileStripTable( executor, jobCode,  volume.getGuid(), this.object.getStorageObjectGuid(), this.storageIOResponse.getSourceName() );
         } catch (SQLException e) {
