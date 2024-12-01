@@ -142,7 +142,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
         PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
         String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + "/" + this.guid + ".db";
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
-        this.kenVolumeFileSystem.creatKVFSCollisionTable( sqLiteExecutor );
+        this.kenVolumeFileSystem.creatSpanLinkedVolumeTable( sqLiteExecutor );
         this.kenVolumeFileSystem.creatKVFSIndexTable( sqLiteExecutor );
         List<LogicVolume> volumes = this.getChildren();
         int index = 0;
@@ -150,7 +150,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
             this.kenVolumeFileSystem.insertKVFSIndexTable( sqLiteExecutor, index, volume.getGuid() );
             index++;
         }
-        this.kenVolumeFileSystem.insertKVFSMateTable( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+        this.kenVolumeFileSystem.insertSimpleTargetMappingTab( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
         this.volumeManager.put( this );
     }
 

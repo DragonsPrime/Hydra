@@ -9,25 +9,25 @@ import java.sql.SQLException;
 public interface OnVolumeFileSystem extends Pinenut {
     GUID getKVFSPhysicsVolume(GUID volumeGuid);
 
-    void insertKVFSMateTable(GUID physicsGuid, GUID volumeGuid);
+    void insertSimpleTargetMappingTab(GUID physicsGuid, GUID volumeGuid);
 
-    void createKVFSMetaTable(MappedExecutor mappedExecutor ) throws SQLException;
+    void createSimpleTargetMappingTab(MappedExecutor mappedExecutor ) throws SQLException;
 
-    void insertKVFSTable(GUID storageObjectGuid, String storageObjectName, String sourceName, MappedExecutor mappedExecutor ) throws SQLException;
+    void insertSimpleTargetMappingSoloRecord(GUID storageObjectGuid, String storageObjectName, String sourceName, MappedExecutor mappedExecutor ) throws SQLException;
     String getKVFSTableSourceName( GUID storageObjectGuid, MappedExecutor mappedExecutor ) throws SQLException;
 
     boolean existStorageObject( MappedExecutor mappedExecutor, GUID storageObjectGuid ) throws SQLException;
 
-    int KVFSHash( GUID keyGuid, int volumeNum);
+    int hashStorageObjectID( GUID keyGuid, int volumeNum);
 
     void creatKVFSIndexTable( MappedExecutor mappedExecutor ) throws SQLException;
     void insertKVFSIndexTable( MappedExecutor mappedExecutor, int hashKey, GUID targetVolumeGuid ) throws SQLException;
     GUID getKVFSIndexTableTargetGuid(MappedExecutor mappedExecutor, int hashKey ) throws SQLException;
 
 
-    void creatKVFSCollisionTable( MappedExecutor mappedExecutor ) throws SQLException;
-    void insertKVFSCollisionTable( MappedExecutor mappedExecutor, int hashKey, GUID keyGuid, GUID targetVolumeGuid ) throws SQLException;
-    GUID getKVFSCollisionTableTargetGuid( MappedExecutor mappedExecutor, GUID keyGuid ) throws SQLException;
+    void creatSpanLinkedVolumeTable( MappedExecutor mappedExecutor ) throws SQLException;
+    void insertSpanLinkedVolumeTable( MappedExecutor mappedExecutor, int hashKey, GUID keyGuid, GUID targetVolumeGuid ) throws SQLException;
+    GUID getSpanLinkedVolumeTableTargetGuid( MappedExecutor mappedExecutor, GUID keyGuid ) throws SQLException;
 
     void createKVFSFileStripTable( MappedExecutor mappedExecutor ) throws SQLException;
     void insertKVFSFileStripTable( MappedExecutor mappedExecutor, int code, GUID volumeGuid, GUID storageObjectGuid, String sourceName ) throws SQLException;

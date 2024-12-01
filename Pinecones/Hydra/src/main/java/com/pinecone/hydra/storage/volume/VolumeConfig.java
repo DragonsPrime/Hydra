@@ -13,5 +13,5 @@ public interface VolumeConfig extends KernelObjectConfig {
 
     Number getDefaultStripSize() ;
 
-    int getSuperResolutionRatio();
+    int getStripResidentCacheAllotRatio();
 }

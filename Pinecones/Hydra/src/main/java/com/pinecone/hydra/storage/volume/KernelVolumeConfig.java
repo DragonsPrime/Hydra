@@ -4,13 +4,13 @@ import com.pinecone.hydra.storage.StorageConstants;
 import com.pinecone.hydra.system.ko.ArchKernelObjectConfig;
 
 public class KernelVolumeConfig extends ArchKernelObjectConfig implements VolumeConfig {
-    protected String mszVersionSignature    = StorageConstants.StorageVersionSignature;
+    protected String mszVersionSignature            = StorageConstants.StorageVersionSignature;
 
-    protected Number mnTinyFileStripSizing  = VolumeConstants.TinyFileStripSizing  ;
-    protected Number mnSmallFileStripSizing = VolumeConstants.SmallFileStripSizing ;
-    protected Number mnMegaFileStripSizing  = VolumeConstants.MegaFileStripSizing  ;
-    protected Number mnDefaultStripSize     = VolumeConstants.DefaultStripSize     ;
-    protected int    superResolutionRatio   = VolumeConstants.superResolutionRatio;
+    protected Number mnTinyFileStripSizing          = VolumeConstants.TinyFileStripSizing  ;
+    protected Number mnSmallFileStripSizing         = VolumeConstants.SmallFileStripSizing ;
+    protected Number mnMegaFileStripSizing          = VolumeConstants.MegaFileStripSizing  ;
+    protected Number mnDefaultStripSize             = VolumeConstants.DefaultStripSize     ;
+    protected int    mStripResidentCacheAllotRatio  = VolumeConstants.StripResidentCacheAllotRatio;
 
 
     @Override
@@ -40,7 +40,7 @@ public class KernelVolumeConfig extends ArchKernelObjectConfig implements Volume
     }
 
     @Override
-    public int getSuperResolutionRatio() {
-        return this.superResolutionRatio;
+    public int getStripResidentCacheAllotRatio() {
+        return this.mStripResidentCacheAllotRatio;
     }
 }

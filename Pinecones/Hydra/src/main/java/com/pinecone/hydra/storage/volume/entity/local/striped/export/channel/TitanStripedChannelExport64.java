@@ -43,11 +43,11 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
         List<LogicVolume> volumes = this.stripedVolume.getChildren();
         int jobCount = volumes.size();
 
-        int superResolutionRatio = volumeManager.getConfig().getSuperResolutionRatio();
+        int StripResidentCacheAllotRatio = volumeManager.getConfig().getStripResidentCacheAllotRatio();
         SQLiteExecutor sqLiteExecutor = this.stripedVolume.getSQLiteExecutor();
 
         Hydrarum hydrarum = this.volumeManager.getHydrarum();
-        MasterVolumeGram masterVolumeGram = this.createMasterVolumeGram(hydrarum,jobCount,superResolutionRatio);
+        MasterVolumeGram masterVolumeGram = this.createMasterVolumeGram(hydrarum,jobCount,StripResidentCacheAllotRatio);
 
         // 创建文件写入线程
          createBufferOutJob( masterVolumeGram, this.storageExportIORequest.getSize().longValue());
@@ -67,11 +67,11 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
         List<LogicVolume> volumes = this.stripedVolume.getChildren();
         int jobCount = volumes.size();
 
-        int superResolutionRatio = volumeManager.getConfig().getSuperResolutionRatio();
+        int StripResidentCacheAllotRatio = volumeManager.getConfig().getStripResidentCacheAllotRatio();
         SQLiteExecutor sqLiteExecutor = this.stripedVolume.getSQLiteExecutor();
 
         Hydrarum hydrarum = this.volumeManager.getHydrarum();
-        MasterVolumeGram masterVolumeGram = this.createMasterVolumeGram(hydrarum,jobCount,superResolutionRatio);
+        MasterVolumeGram masterVolumeGram = this.createMasterVolumeGram(hydrarum,jobCount,StripResidentCacheAllotRatio);
 
         // 创建文件写入线程
         createBufferOutJob( masterVolumeGram, this.storageExportIORequest.getSize().longValue());
@@ -85,10 +85,10 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
         return null;
     }
 
-    private MasterVolumeGram createMasterVolumeGram(Hydrarum hydrarum, int jobCount, int superResolutionRatio ) {
+    private MasterVolumeGram createMasterVolumeGram(Hydrarum hydrarum, int jobCount, int StripResidentCacheAllotRatio ) {
         Number stripSize = this.volumeManager.getConfig().getDefaultStripSize();
 
-        MasterVolumeGram masterVolumeGram = new MasterVolumeGram(this.stripedVolume.getGuid().toString(), hydrarum,jobCount, superResolutionRatio, stripSize.intValue());
+        MasterVolumeGram masterVolumeGram = new MasterVolumeGram(this.stripedVolume.getGuid().toString(), hydrarum,jobCount, StripResidentCacheAllotRatio, stripSize.intValue());
         hydrarum.getTaskManager().add(masterVolumeGram);
         return masterVolumeGram;
     }
@@ -163,7 +163,7 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
         return this.stripedVolume;
     }
 
-    private byte[] initializationBuffer(int jobCount, int bufferSize, int superResolutionRatio ){
-        return new byte[jobCount * bufferSize * superResolutionRatio];
+    private byte[] initializationBuffer(int jobCount, int bufferSize, int StripResidentCacheAllotRatio ){
+        return new byte[jobCount * bufferSize * StripResidentCacheAllotRatio];
     }
 }

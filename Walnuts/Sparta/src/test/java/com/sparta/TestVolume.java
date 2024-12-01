@@ -317,12 +317,12 @@ class Alice extends Radium {
         KenVolumeFileSystem kenVolumeFileSystem = new KenVolumeFileSystem(volumeManager);
 //        for( int i = 0; i < 1000000; i++ ){
 //            GUID72 guid72 = GUIDs.Dummy72();
-//            int hash = kenVolumeFileSystem.KVFSHash(guid72, 2);
+//            int hash = kenVolumeFileSystem.hashStorageObjectID(guid72, 2);
 //            if( hash != 0 && hash != 1 ){
 //                Debug.trace( guid72 );
 //            }
 //        }
-        Debug.trace( kenVolumeFileSystem.KVFSHash( GUIDs.GUID72( "0860ff4-0003ac-0000-cc" ), 2 ) );
+        Debug.trace( kenVolumeFileSystem.hashStorageObjectID( GUIDs.GUID72( "0860ff4-0003ac-0000-cc" ), 2 ) );
     }
 
     void testConsumer( UniformVolumeManager volumeManager ) throws InvocationTargetException, InstantiationException, IllegalAccessException {

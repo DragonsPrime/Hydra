@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume;
 
+import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.hydra.storage.volume.entity.ExporterEntity;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
@@ -44,7 +45,7 @@ public class UnifiedTransmitConstructor implements IUnifiedTransmitConstructor{
     public ReceiveEntity getReceiveEntity(Class<? extends LogicVolume> volumeClass, Object... params) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<? extends ReceiveEntity> receiveEntityClass = receiveMap.get(volumeClass);
         if( receiveEntityClass == null ){
-            throw new IllegalArgumentException(" No find class ");
+            throw new IllegalArgumentException( "Class not found." );
         }
 
         Constructor<? extends ReceiveEntity> receiveConstructor = this.findReceiveConstructor(receiveEntityClass, params);
@@ -56,48 +57,41 @@ public class UnifiedTransmitConstructor implements IUnifiedTransmitConstructor{
     public ExporterEntity getExportEntity(Class<? extends LogicVolume> volumeClass, Object... params) throws InvocationTargetException, InstantiationException, IllegalAccessException {
         Class<? extends ExporterEntity> exportEntityClass = exportMap.get(volumeClass);
         if( exportEntityClass == null ){
-            throw new IllegalArgumentException(" No find class ");
+            throw new IllegalArgumentException( "Class not found." );
         }
 
         Constructor<? extends ExporterEntity> exportConstructor = this.findExportConstructor(exportEntityClass, params);
         return exportConstructor.newInstance( params );
     }
 
-    private  Constructor<? extends ReceiveEntity> findReceiveConstructor(Class<? extends ReceiveEntity> clazz, Object... params) {
-        for (Constructor<?> constructor : clazz.getConstructors()) {
-            if (constructor.getParameterCount() == params.length) {
+
+    private Constructor<? > searchConstructor( Class<? > clazz, Object... params ) {
+        for ( Constructor<?> constructor : clazz.getConstructors() ) {
+            if ( constructor.getParameterCount() == params.length ) {
                 boolean matches = true;
                 Class<?>[] parameterTypes = constructor.getParameterTypes();
-                for (int i = 0; i < params.length; i++) {
-                    if (!parameterTypes[i].isInstance(params[i])) {
+                for ( int i = 0; i < params.length; ++i ) {
+                    if ( !parameterTypes[ i ].isInstance(params[ i ]) ) {
                         matches = false;
                         break;
                     }
                 }
-                if (matches) {
-                    return (Constructor<? extends ReceiveEntity>) constructor;
+                if ( matches ) {
+                    return constructor;
                 }
             }
         }
+
         return null;
     }
 
-    private  Constructor<? extends ExporterEntity> findExportConstructor(Class<? extends ExporterEntity> clazz, Object... params) {
-        for (Constructor<?> constructor : clazz.getConstructors()) {
-            if (constructor.getParameterCount() == params.length) {
-                boolean matches = true;
-                Class<?>[] parameterTypes = constructor.getParameterTypes();
-                for (int i = 0; i < params.length; i++) {
-                    if (!parameterTypes[i].isInstance(params[i])) {
-                        matches = false;
-                        break;
-                    }
-                }
-                if (matches) {
-                    return (Constructor<? extends ExporterEntity>) constructor;
-                }
-            }
-        }
-        return null;
+    @SuppressWarnings( "unchecked" )
+    private Constructor<? extends ReceiveEntity> findReceiveConstructor( Class<? extends ReceiveEntity> clazz, Object... params ) {
+        return (Constructor<? extends ReceiveEntity>) this.searchConstructor( clazz, params );
+    }
+
+    @SuppressWarnings( "unchecked" )
+    private Constructor<? extends ExporterEntity> findExportConstructor(Class<? extends ExporterEntity> clazz, Object... params) {
+        return (Constructor<? extends ExporterEntity>) this.searchConstructor( clazz, params );
     }
 }

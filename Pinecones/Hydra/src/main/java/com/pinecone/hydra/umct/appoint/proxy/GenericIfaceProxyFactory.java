@@ -7,6 +7,8 @@ import org.springframework.cglib.proxy.MethodProxy;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.pinecone.framework.system.prototype.Pinenut;
+import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.umct.stereotype.Iface;
 
 public class GenericIfaceProxyFactory {
@@ -14,14 +16,15 @@ public class GenericIfaceProxyFactory {
     // Thread-safe cache for Enhancer instances
     private final ConcurrentHashMap<Class<?>, Enhancer> enhancerCache = new ConcurrentHashMap<>();
 
-    public <T> T createProxy(Class<T> iface, Object impl) {
+    public <T> T createProxy( Class<T> iface, Object impl) {
 //        if (!iface.isInterface()) {
 //            throw new IllegalArgumentException("The provided class must be an interface.");
 //        }
 
         Enhancer enhancer = enhancerCache.computeIfAbsent(impl.getClass(), clazz -> {
             Enhancer e = new Enhancer();
-            e.setSuperclass(impl.getClass());
+            //e.setSuperclass(impl.getClass());
+            e.setSuperclass(EmptyDummy.class);
             if( iface != null ) {
                 e.setInterfaces(new Class[]{iface});
             }
@@ -36,7 +39,11 @@ public class GenericIfaceProxyFactory {
 //                }
 
                 // Invoke the original method on the implementation
-                return proxy.invoke(impl, args) + " proxy ";
+
+                Debug.trace( method.getName() );
+
+                return "pp";
+                //return proxy.invoke(impl, args) + " proxy ";
             });
             return e;
         });

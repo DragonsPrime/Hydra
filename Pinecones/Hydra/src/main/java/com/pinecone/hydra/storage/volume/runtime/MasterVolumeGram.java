@@ -30,12 +30,12 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
         this.mTaskManager      = new GenericMasterTaskManager( this );
     }
 
-    public MasterVolumeGram( String szName, Processum parent, int jobCount, int superResolutionRatio, int stripSize ){
+    public MasterVolumeGram( String szName, Processum parent, int jobCount, int StripResidentCacheAllotRatio, int stripSize ){
         super( szName, parent );
         this.mTaskManager   = new GenericMasterTaskManager( this );
         this.jobCount       = jobCount;
-        this.cacheGroup     = this.initializeCacheGroup( jobCount, superResolutionRatio, stripSize );
-        this.buffer         = new byte[ jobCount * stripSize * superResolutionRatio ];
+        this.cacheGroup     = this.initializeCacheGroup( jobCount, StripResidentCacheAllotRatio, stripSize );
+        this.buffer         = new byte[ jobCount * stripSize * StripResidentCacheAllotRatio ];
         this.currentBufferInJobCode = 0;
     }
 
@@ -108,10 +108,10 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
         this.currentBufferInJobCode = currentBufferInJobCode;
     }
 
-    private List< CacheBlock > initializeCacheGroup(int jobCount, int superResolutionRatio, Number stripSize ){
+    private List< CacheBlock > initializeCacheGroup(int jobCount, int StripResidentCacheAllotRatio, Number stripSize ){
         ArrayList<CacheBlock> cacheGroup = new ArrayList<>();
         Number currentPosition = 0;
-        for( int i = 0; i < jobCount * superResolutionRatio; i++ ){
+        for( int i = 0; i < jobCount * StripResidentCacheAllotRatio; i++ ){
             StripCacheBlock stripCacheBlock = new StripCacheBlock( i, currentPosition, currentPosition.intValue() + stripSize.intValue() );
             cacheGroup.add( stripCacheBlock );
             currentPosition = currentPosition.intValue() + stripSize.intValue();

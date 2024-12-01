@@ -135,7 +135,7 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
         this.kenVolumeFileSystem.createKVFSFileStripTable( sqLiteExecutor );
         this.volumeManager.put( this );
-        this.kenVolumeFileSystem.insertKVFSMateTable( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+        this.kenVolumeFileSystem.insertSimpleTargetMappingTab( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
     }
 
     @Override

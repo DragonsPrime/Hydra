@@ -31,7 +31,7 @@ public class TitanSpannedExport64 implements SpannedExport64{
     protected OnVolumeFileSystem kenVolumeFileSystem;
 
     public TitanSpannedExport64( SpannedExportEntity64 entity ){
-        this.spannedVolume              = entity.getSpannedVolume();;
+        this.spannedVolume              = entity.getSpannedVolume();
         this.volumeManager              = entity.getVolumeManager();
         this.storageExportIORequest     = entity.getStorageIORequest();
         this.channel                    = entity.getChannel();
@@ -44,9 +44,9 @@ public class TitanSpannedExport64 implements SpannedExport64{
         GUID physicsVolumeGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.spannedVolume.getGuid());
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsVolumeGuid);
         SQLiteExecutor sqLiteExecutor = this.getSQLiteExecutor(physicalVolume);
-        GUID targetGuid = this.kenVolumeFileSystem.getKVFSCollisionTableTargetGuid(sqLiteExecutor, this.storageExportIORequest.getStorageObjectGuid());
+        GUID targetGuid = this.kenVolumeFileSystem.getSpanLinkedVolumeTableTargetGuid(sqLiteExecutor, this.storageExportIORequest.getStorageObjectGuid());
         if ( targetGuid == null ){
-            int idx = this.kenVolumeFileSystem.KVFSHash(this.storageExportIORequest.getStorageObjectGuid(), volumes.size());
+            int idx = this.kenVolumeFileSystem.hashStorageObjectID(this.storageExportIORequest.getStorageObjectGuid(), volumes.size());
             GUID tableTargetGuid = this.kenVolumeFileSystem.getKVFSIndexTableTargetGuid(sqLiteExecutor, idx);
             String source = this.getSource(tableTargetGuid, this.storageExportIORequest.getStorageObjectGuid());
             this.storageExportIORequest.setSourceName( source );
