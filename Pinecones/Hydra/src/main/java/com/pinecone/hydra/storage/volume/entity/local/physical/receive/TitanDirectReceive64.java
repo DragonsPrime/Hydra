@@ -92,18 +92,25 @@ public class TitanDirectReceive64 implements DirectReceive64{
         return titanMiddleStorageObject;
     }
 
-    private  StorageIOResponse receiveWithOffsetAndSize(long offset, int size) throws IOException {
+    private StorageIOResponse receiveWithOffsetAndSize(long offset, int size) throws IOException {
         //Debug.trace("缓存的是"+offset+"到"+(offset + size));
 
         int parityCheck = 0;
         long checksum = 0;
-        ByteBuffer buffer = ByteBuffer.allocateDirect(size);
+        //ByteBuffer buffer = ByteBuffer.allocateDirect(size);
 
         TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
         titanMiddleStorageObject.setObjectGuid(storageReceiveIORequest.getStorageObjectGuid());
 
-        buffer.clear();
-        channel.read( buffer, offset );
+        //buffer.clear();
+
+        ByteBuffer[] lpBuf = new ByteBuffer[ 1 ];
+        this.channel.read( (out)->{
+            lpBuf[0] = out;
+        }, size, offset );
+        ByteBuffer buffer = lpBuf[ 0 ];
+
+
         buffer.flip();
         CRC32 crc = new CRC32();
 

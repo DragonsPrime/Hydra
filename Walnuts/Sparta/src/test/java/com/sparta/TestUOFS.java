@@ -32,6 +32,7 @@ class Steve extends Radium {
     public Steve( String[] args, String szName, CascadeSystem parent ){
         super( args, szName, parent );
     }
+
     @Override
     public void vitalize () throws Exception {
         KOIMappingDriver koiMappingDriver = new FileMappingDriver(
@@ -69,20 +70,20 @@ class Steve extends Radium {
     private void testChannelReceive( KOMFileSystem fileSystem, UniformVolumeManager volumeManager ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         //LogicVolume volume = volumeManager.get(GUIDs.GUID72( "09d62c0-00037e-0006-c8" ));
         FSNodeAllotment fsNodeAllotment = fileSystem.getFSNodeAllotment();
-        File file = new File("D:/井盖视频块/4月13日 (2).mp4");
+        File file = new File("K:/undefined/Video/Rick.and.Morty/R&M S3/瑞克和莫蒂第三季-06.mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
         TitanFileChannelChanface titanFileChannelKChannel = new TitanFileChannelChanface( channel );
         FileNode fileNode = fsNodeAllotment.newFileNode();
         fileNode.setDefinitionSize( file.length() );
         fileNode.setName( file.getName() );
-        String destDirPath = "D:/文件系统/大文件/我的视频.mp4";
+        String destDirPath = "video/ram/ram36.mp4";
         TitanFileReceiveEntity64 receiveEntity = new TitanFileReceiveEntity64( fileSystem, destDirPath, fileNode,titanFileChannelKChannel,volumeManager );
         fileSystem.receive( receiveEntity );
     }
 
     private void testChannelExport( KOMFileSystem fileSystem, UniformVolumeManager volumeManager ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        FileNode fileNode = (FileNode) fileSystem.get(fileSystem.queryGUIDByPath("D:/文件系统/大文件/我的视频.mp4"));
-        File file = new File("D:/文件系统/大文件/我的视频.mp4");
+        FileNode fileNode = (FileNode) fileSystem.get(fileSystem.queryGUIDByPath("video/ram/ram36.mp4"));
+        File file = new File("E:/ram36.mp4");
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
         TitanFileChannelChanface kChannel = new TitanFileChannelChanface( channel );
         TitanFileExportEntity64 exportEntity = new TitanFileExportEntity64( fileSystem, volumeManager, fileNode, kChannel );

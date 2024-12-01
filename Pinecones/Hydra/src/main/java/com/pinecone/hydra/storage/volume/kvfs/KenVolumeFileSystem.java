@@ -38,12 +38,12 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
 
     @Override
     public void createSimpleTargetMappingTab( MappedExecutor mappedExecutor ) throws SQLException {
-        mappedExecutor.execute( "CREATE TABLE `table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36) , `storage_object_name` VARCHAR(36), `source_name` VARCHAR(330) );", false );
+        mappedExecutor.execute( "CREATE TABLE `kvfs_simple_target_mapping`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36) , `storage_object_name` VARCHAR(36), `source_name` VARCHAR(330) );", false );
     }
 
     @Override
     public void insertSimpleTargetMappingSoloRecord( GUID storageObjectGuid, String storageObjectName, String sourceName, MappedExecutor mappedExecutor ) throws SQLException {
-        mappedExecutor.execute( "INSERT INTO `table` ( `storage_object_guid` , `storage_object_name` , `source_name` ) VALUES ( '"+ storageObjectGuid+ "', '"+storageObjectName+"', '"+sourceName+"' )", false );
+        mappedExecutor.execute( "INSERT INTO `kvfs_simple_target_mapping` ( `storage_object_guid` , `storage_object_name` , `source_name` ) VALUES ( '"+ storageObjectGuid+ "', '"+storageObjectName+"', '"+sourceName+"' )", false );
     }
 
     @Override
@@ -97,12 +97,12 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
 
     @Override
     public void creatSpanLinkedVolumeTable(MappedExecutor mappedExecutor) throws SQLException {
-        mappedExecutor.execute( "CREATE TABLE `collision_table`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `hash_key` int , `key_guid` VARCHAR(36), `target_volume_guid` VARCHAR(36)) ;", false );
+        mappedExecutor.execute( "CREATE TABLE `kvfs_span_linked_volume`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `hash_key` int , `key_guid` VARCHAR(36), `target_volume_guid` VARCHAR(36)) ;", false );
     }
 
     @Override
     public void insertSpanLinkedVolumeTable(MappedExecutor mappedExecutor, int hashKey, GUID keyGuid, GUID targetVolumeGuid) throws SQLException {
-        mappedExecutor.execute( "INSERT INTO `collision_table` ( `hash_key`, `key_guid`, `target_volume_guid` ) VALUES ( "+hashKey+", '"+keyGuid+"', '"+targetVolumeGuid+"' )", false );
+        mappedExecutor.execute( "INSERT INTO `kvfs_span_linked_volume` ( `hash_key`, `key_guid`, `target_volume_guid` ) VALUES ( "+hashKey+", '"+keyGuid+"', '"+targetVolumeGuid+"' )", false );
     }
 
     @Override

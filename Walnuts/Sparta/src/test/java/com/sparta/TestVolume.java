@@ -79,7 +79,7 @@ class Alice extends Radium {
         //this.testStripedInsert( volumeTree );
         //this.testSpannedInsert( volumeTree );
         //this.testStripedReceive( volumeTree );
-        //this.testStripedExport( volumeTree );
+        this.testStripedExport( volumeTree );
         //this.testHash( volumeTree );
         //this.testSpannedReceive( volumeTree );
         //this.testSpannedExport( volumeTree );
@@ -102,17 +102,17 @@ class Alice extends Radium {
         LocalPhysicalVolume physicalVolume1 = volumeAllotment.newLocalPhysicalVolume();
         physicalVolume1.setType("PhysicalVolume");
         physicalVolume1.setVolumeCapacity( volumeCapacity1 );
-        physicalVolume1.setName( "C" );
+        physicalVolume1.setName( "S1" );
         MountPoint mountPoint1 = volumeAllotment.newMountPoint();
-        mountPoint1.setMountPoint("D:/文件系统/簇1");
+        mountPoint1.setMountPoint("E:/fs/s1");
         physicalVolume1.setMountPoint( mountPoint1 );
 
         LocalPhysicalVolume physicalVolume2 = volumeAllotment.newLocalPhysicalVolume();
         physicalVolume2.setType("PhysicalVolume");
         physicalVolume2.setVolumeCapacity( volumeCapacity2 );
-        physicalVolume2.setName( "D" );
+        physicalVolume2.setName( "S2" );
         MountPoint mountPoint2 = volumeAllotment.newMountPoint();
-        mountPoint2.setMountPoint( "D:/文件系统/簇2" );
+        mountPoint2.setMountPoint( "E:/fs/s2" );
         physicalVolume2.setMountPoint( mountPoint2 );
 
         VolumeCapacity64 logicVolumeCapacity1 = volumeAllotment.newVolumeCapacity();
@@ -211,7 +211,7 @@ class Alice extends Radium {
         GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
-        File file = new File("D:\\井盖视频块\\4月13日 (2).mp4");
+        File file = new File("K:/undefined/Video/Rick.and.Morty/R&M S3/瑞克和莫蒂第三季-07.mp4");
         titanReceiveStorageObject.setName( "我的视频" );
         titanReceiveStorageObject.setSize( file.length() );
         titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
@@ -264,8 +264,8 @@ class Alice extends Radium {
 
 
     void testStripedExport( UniformVolumeManager volumeManager ) throws Exception {
-        File file = new File("D:\\文件系统\\大文件\\我的视频.mp4");
-        File originalFile = new File( "D:/井盖视频块/4月13日 (2).mp4" );
+        File file = new File("E:/ram.mp4");
+        File originalFile = new File( "K:/undefined/Video/Rick.and.Morty/R&M S3/瑞克和莫蒂第三季-07.mp4" );
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
         TitanFileChannelChanface kChannel = new TitanFileChannelChanface( channel );
 //        FileOutputStream stream = new FileOutputStream( file );
@@ -273,7 +273,7 @@ class Alice extends Radium {
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanStorageExportIORequest titanExportStorageObject = new TitanStorageExportIORequest();
         titanExportStorageObject.setSize( originalFile.length() );
-        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0a2238e-0000cf-0001-14") );
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0a2df10-0002df-0001-f4") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
         //volume.channelExport( titanExportStorageObject, titanFileChannelKChannel);
         UnifiedTransmitConstructor unifiedTransmitConstructor = new UnifiedTransmitConstructor();

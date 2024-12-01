@@ -24,25 +24,28 @@ public class TitanFileChannelChanface implements Chanface {
     }
 
     @Override
-    public int read(ByteBuffer buffer) throws IOException {
+    public int read( ByteBuffer buffer ) throws IOException {
         return this.channel.read( buffer );
     }
 
     @Override
-    public int read(ByteBuffer buffer, long offset) throws IOException {
+    public int read( ChanfaceReader reader, int size, long offset ) throws IOException {
         this.reentrantLock.lock();
         int read = 0;
         try {
             this.channel.position( offset );
+            ByteBuffer buffer = ByteBuffer.allocateDirect(size);
             read = this.channel.read(buffer);
-        }finally {
+            reader.afterRead( buffer );
+        }
+        finally {
             this.reentrantLock.unlock();
         }
         return read;
     }
 
     @Override
-    public int write(ByteBuffer buffer) throws IOException {
+    public int write( ByteBuffer buffer ) throws IOException {
         return this.channel.write( buffer );
     }
 
@@ -53,11 +56,9 @@ public class TitanFileChannelChanface implements Chanface {
     }
 
     @Override
-    public int write(byte[] buffer, List<CacheBlock> writableCacheBlocks, WriteChannelRecalled function) throws IOException {
+    public int write(byte[] buffer, List<CacheBlock> writableCacheBlocks) throws IOException {
         ByteBuffer byteBuffer = this.mergeArrays(buffer, writableCacheBlocks);
-        int write = this.channel.write(byteBuffer);
-        function.recalled( write );
-        return write;
+        return this.channel.write(byteBuffer);
     }
 
     @Override

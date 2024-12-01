@@ -26,13 +26,13 @@ public class TitanOutputStreamChanface implements Chanface {
     }
 
     @Override
-    public int read(ByteBuffer buffer) throws IOException {
+    public int read( ByteBuffer buffer ) throws IOException {
         throw new NotImplementedException();
     }
 
     @Override
-    public int read(ByteBuffer buffer, long offset) throws IOException {
-        return 0;
+    public int read( ChanfaceReader reader, int size, long offset ) throws IOException {
+        throw new NotImplementedException();
     }
 
     @Override
@@ -47,7 +47,7 @@ public class TitanOutputStreamChanface implements Chanface {
     }
 
     @Override
-    public int write(byte[] buffer, List<CacheBlock> writableCacheBlocks, WriteChannelRecalled function) throws IOException {
+    public int write(byte[] buffer, List<CacheBlock> writableCacheBlocks) throws IOException {
         int length = 0;
 
         for( CacheBlock cacheBlock : writableCacheBlocks ){
