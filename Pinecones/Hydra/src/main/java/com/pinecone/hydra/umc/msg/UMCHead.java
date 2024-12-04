@@ -110,8 +110,11 @@ public class UMCHead implements Pinenut {
         this.dyExtraHead = jo;
     }
 
-    void setExtraHead        ( Object jo              ) {
-        this.dyExtraHead = jo;
+    void setExtraHead        ( Object o               ) {
+        this.dyExtraHead = o;
+        if( o == null ) {
+            this.nExtraHeadLength = 0;
+        }
     }
 
     void transApplyExHead    (                        ) {
@@ -122,6 +125,11 @@ public class UMCHead implements Pinenut {
         else {
             if( this.extraEncode == ExtraEncode.JSONString ) {
                 this.extraHead  = "{}".getBytes();
+            }
+            else if( this.extraEncode == ExtraEncode.Prototype ) {
+                this.extraHead         = null;
+                this.nExtraHeadLength  = 0;
+                return;
             }
             else {
                 this.dyExtraHead = this.extraHeadCoder.newExtraHead();

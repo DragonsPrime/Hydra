@@ -1,6 +1,8 @@
 package com.pinecone.hydra.umc.msg;
 
+import com.pinecone.framework.unit.KeyValue;
 import com.pinecone.framework.util.json.JSON;
+import com.pinecone.framework.util.json.JSONEncoder;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -85,12 +87,12 @@ public abstract class ArchUMCMessage implements UMCMessage {
 
     @Override
     public String      toJSONString() {
-        return String.format(
-                "{\"head\":%s, \"Method\":\"%s\", \"BodyLength\":%d}",
-                JSON.stringify( this.getHead().getExtraHead() ),
-                this.getHead().getMethod().getName(),
-                this.getHead().getBodyLength()
-        );
+        return JSONEncoder.stringifyMapFormat( new KeyValue[]{
+                new KeyValue<>( "Head"      , this.getHead().getExtraHead()                                ),
+                new KeyValue<>( "Method"         , this.getHead().getMethod()                              ),
+                new KeyValue<>( "BodyLength"     , this.getHead().getBodyLength()                          ),
+                new KeyValue<>( "Status"         , this.getHead().getStatus()                              )
+        } );
     }
 
 }

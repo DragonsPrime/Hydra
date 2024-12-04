@@ -1,7 +1,7 @@
 package com.pinecone.hydra.umc.msg;
 
-import com.pinecone.framework.system.prototype.Pinenut;
+import com.pinecone.hydra.umct.UMCTExpressHandler;
 
-public interface AsyncMsgHandleAdapter extends Pinenut {
+public interface AsyncMsgHandleAdapter extends UMCTExpressHandler {
 
 }

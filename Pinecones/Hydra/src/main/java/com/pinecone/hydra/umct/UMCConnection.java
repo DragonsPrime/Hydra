@@ -28,4 +28,6 @@ public interface UMCConnection extends Package {
     }
 
     UMCConnection entrust(Deliver deliver );
+
+    void release();
 }

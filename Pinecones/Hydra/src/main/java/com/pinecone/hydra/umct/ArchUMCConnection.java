@@ -8,12 +8,12 @@ import com.pinecone.hydra.express.Deliver;
 
 public abstract class ArchUMCConnection implements UMCConnection {
     protected MessageDeliver  mDeliver;
-    protected Medium mMessageSource;
-    protected UMCMessage mUMCMessage;
-    protected UMCTransmit mUMCTransmit;
-    protected UMCReceiver mUMCReceiver;
+    protected Medium          mMessageSource;
+    protected UMCMessage      mUMCMessage;
+    protected UMCTransmit     mUMCTransmit;
+    protected UMCReceiver     mUMCReceiver;
 
-    public ArchUMCConnection(Medium medium, UMCMessage message, UMCTransmit transmit, UMCReceiver receiver ) {
+    public ArchUMCConnection( Medium medium, UMCMessage message, UMCTransmit transmit, UMCReceiver receiver ) {
         this.mMessageSource = medium;
         this.mUMCMessage    = message;
         this.mUMCTransmit   = transmit;
@@ -46,18 +46,14 @@ public abstract class ArchUMCConnection implements UMCConnection {
     }
 
     @Override
-    public ArchUMCConnection entrust(Deliver deliver ) {
+    public ArchUMCConnection entrust( Deliver deliver ) {
         this.mDeliver = (MessageDeliver)deliver;
         return this;
     }
 
+    @Override
     public void release() {
         this.mMessageSource.release();
-        this.mDeliver       = null;
-        this.mMessageSource = null;
-        this.mUMCMessage    = null;
-        this.mUMCTransmit   = null;
-        this.mUMCReceiver   = null;
     }
 
 }

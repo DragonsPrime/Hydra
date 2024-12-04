@@ -1,34 +1,44 @@
 package com.pinecone.hydra.umc.msg;
 
-import com.pinecone.framework.util.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTransmit {
     public ArchUMCTransmit( Medium messageSource ) {
         super( messageSource );
     }
 
+    @SuppressWarnings( "unchecked" )
+    protected void applyExHead( Object msg ) {
+        if( msg instanceof Map ) {
+            this.mHead.applyExHead( (Map) msg );
+        }
+        else {
+            this.mHead.setExtraHead( msg );
+        }
+    }
+
     @Override
-    public void sendInformMsg( JSONObject msg, Status status ) throws IOException {
-        this.mHead.applyExHead( msg );
+    public void sendInformMsg( Object msg, Status status ) throws IOException {
+        this.applyExHead( msg );
         this.mHead.setStatus( status );
         this.mHead.setMethod( UMCMethod.INFORM );
         this.sendMsgHead( this.mHead );
     }
 
     @Override
-    public void sendInformMsg( JSONObject msg ) throws IOException {
+    public void sendInformMsg( Object msg ) throws IOException {
         this.sendInformMsg( msg, Status.OK );
     }
 
-    public void sendTransferMsgHead( JSONObject msg ) throws IOException {
+    public void sendTransferMsgHead( Object msg ) throws IOException {
         this.sendTransferMsgHead( msg, false );
     }
 
-    public void sendTransferMsgHead( JSONObject msg, boolean bFlush ) throws IOException {
-        this.mHead.applyExHead( msg );
+
+    public void sendTransferMsgHead( Object msg, boolean bFlush ) throws IOException {
+        this.applyExHead( msg );
         this.mHead.setMethod( UMCMethod.TRANSFER );
         this.sendMsgHead( this.mHead, bFlush );
     }
@@ -44,7 +54,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
     }
 
     @Override
-    public void sendTransferMsg( JSONObject msg, byte[] bytes, Status status ) throws IOException {
+    public void sendTransferMsg( Object msg, byte[] bytes, Status status ) throws IOException {
         this.mHead.setBodyLength( bytes.length );
         this.mHead.setStatus( status );
         this.sendTransferMsgHead( msg, false );
@@ -52,7 +62,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
     }
 
     @Override
-    public void sendTransferMsg( JSONObject msg, byte[] bytes ) throws IOException {
+    public void sendTransferMsg( Object msg, byte[] bytes ) throws IOException {
         this.sendTransferMsg( msg, bytes, Status.OK );
     }
 
@@ -84,7 +94,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
     }
 
     @Override
-    public void sendTransferMsg( JSONObject msg, InputStream is ) throws IOException {
+    public void sendTransferMsg( Object msg, InputStream is ) throws IOException {
         this.mHead.setBodyLength( is.available() );
         this.sendTransferMsgHead( msg, false );
         this.onlySendPostBody( is, false );

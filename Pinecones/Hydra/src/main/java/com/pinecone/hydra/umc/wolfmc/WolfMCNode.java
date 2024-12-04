@@ -8,15 +8,21 @@ import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.name.Namespace;
 import com.pinecone.hydra.system.Hydrarum;
+import com.pinecone.hydra.umc.msg.ChannelControlBlock;
 import com.pinecone.hydra.umc.msg.ExtraEncode;
+import com.pinecone.hydra.umc.msg.Medium;
+import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 import com.pinecone.hydra.umc.msg.extra.GenericExtraHeadCoder;
 import com.pinecone.hydra.umc.msg.handler.ErrorMessageAudit;
 import com.pinecone.hydra.umc.msg.handler.GenericErrorMessageAudit;
+import com.pinecone.hydra.umct.UMCTExpressHandler;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantLock;
+
+import io.netty.channel.ChannelHandlerContext;
 
 public abstract class WolfMCNode extends WolfNettyServgram implements UlfMessageNode {
     protected ExtraHeadCoder        mExtraHeadCoder     ;
@@ -92,6 +98,11 @@ public abstract class WolfMCNode extends WolfNettyServgram implements UlfMessage
     }
 
     public abstract WolfMCNode apply( UlfAsyncMsgHandleAdapter fnRecipientMsgHandler );
+
+    public WolfMCNode apply( UMCTExpressHandler handler ){
+        this.apply( UlfAsyncMsgHandleAdapter.wrap( handler ) );
+        return this;
+    }
 
     @Override
     public ErrorMessageAudit getErrorMessageAudit() {

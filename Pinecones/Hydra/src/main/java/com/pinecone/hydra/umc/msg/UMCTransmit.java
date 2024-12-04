@@ -1,24 +1,24 @@
 package com.pinecone.hydra.umc.msg;
 
-import com.pinecone.framework.util.json.JSONObject;
-
 import java.io.IOException;
 import java.io.InputStream;
 
-public interface UMCTransmit extends UMCProtocol{
-    void sendInformMsg( JSONObject msg ) throws IOException;
+public interface UMCTransmit extends UMCProtocol {
 
-    void sendInformMsg( JSONObject msg, Status status ) throws IOException;
+    void sendInformMsg( Object msg ) throws IOException;
 
-    void sendTransferMsg( JSONObject msg, byte[] bytes ) throws IOException;
+    void sendInformMsg( Object msg, Status status ) throws IOException;
 
-    void sendTransferMsg( JSONObject msg, byte[] bytes, Status status ) throws IOException;
+    void sendTransferMsg( Object msg, byte[] bytes ) throws IOException;
 
-    default void sendTransferMsg( JSONObject msg, String sz ) throws IOException {
+    void sendTransferMsg( Object msg, byte[] bytes, Status status ) throws IOException;
+
+    default void sendTransferMsg( Object msg, String sz ) throws IOException {
         this.sendTransferMsg( msg, sz.getBytes() );
     }
 
-    void sendTransferMsg( JSONObject msg, InputStream is ) throws IOException;
+    void sendTransferMsg( Object msg, InputStream is ) throws IOException;
+
 
     void sendMsg( UMCMessage msg, boolean bNoneBuffered ) throws IOException;
 

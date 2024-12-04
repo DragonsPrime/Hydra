@@ -19,11 +19,11 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 public final class StringUtils {
-    private static final String FOLDER_SEPARATOR = "/";
-    private static final String WINDOWS_FOLDER_SEPARATOR = "\\";
-    private static final String TOP_PATH = "..";
-    private static final String CURRENT_PATH = ".";
-    private static final char EXTENSION_SEPARATOR = '.';
+    public static final String FOLDER_SEPARATOR = "/";
+    public static final String WINDOWS_FOLDER_SEPARATOR = "\\";
+    public static final String TOP_PATH = "..";
+    public static final String CURRENT_PATH = ".";
+    public static final char EXTENSION_SEPARATOR = '.';
 
     public StringUtils() {
     }

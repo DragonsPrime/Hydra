@@ -1,8 +1,13 @@
 package com.pinecone.hydra.umct;
 
+import com.pinecone.framework.unit.trie.TrieMap;
+import com.pinecone.framework.unit.trie.TrieSegmentor;
+import com.pinecone.framework.unit.trie.UniTrieMaptron;
 import com.pinecone.framework.util.Debug;
 
+import com.pinecone.framework.util.StringUtils;
 import com.pinecone.framework.util.json.JSONMaptron;
+import com.pinecone.framework.util.name.Namespace;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.express.Package;
 import com.pinecone.hydra.umc.msg.Status;
@@ -11,18 +16,31 @@ import com.pinecone.hydra.umc.msg.UMCMessage;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 
 public abstract class ArchMsgDeliver implements MessageDeliver {
-    protected String          mszName;
-    protected Hydrarum        mSystem;
-    protected MessageExpress  mExpress;
-    protected ArchMessagram   mMessagram;
+    protected String                                      mszName;
+    protected Hydrarum                                    mSystem;
+    protected MessageExpress                              mExpress;
+    protected ArchMessagram                               mMessagram;
+    protected TrieMap<String, MessageController >         mRoutingTable;
 
     public ArchMsgDeliver( String szName, MessageExpress express ) {
-        this.mszName     = szName;
-        this.mExpress    = express;
-        this.mSystem     = this.mExpress.getSystem();
-        this.mMessagram  = this.mExpress.getMessagram();
+        this.mszName       = szName;
+        this.mExpress      = express;
+        this.mSystem       = this.mExpress.getSystem();
+        this.mMessagram    = this.mExpress.getMessagram();
+        this.mRoutingTable = new UniTrieMaptron<>(HashMap::new, new TrieSegmentor() {
+            @Override
+            public String[] segments( String szPathKey ) {
+                return szPathKey.split( ".|\\/" );
+            }
+
+            @Override
+            public String getSeparator() {
+                return StringUtils.FOLDER_SEPARATOR;
+            }
+        });
     }
 
 
@@ -46,10 +64,19 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     }
 
     @Override
+    public TrieMap<String, MessageController > getRoutingTable() {
+        return this.mRoutingTable;
+    }
+
+    public void registerController( String addr, MessageController controller ){
+        this.mRoutingTable.put( addr, controller );
+    }
+
+    @Override
     public abstract String getServiceKeyword() ;
 
 
-    protected UMCConnection wrap(Package that ) {
+    protected UMCConnection wrap( Package that ) {
         return (UMCConnection) that;
     }
 
@@ -62,11 +89,11 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     }
 
     protected void messageDispatch( Package that ) throws IOException {
-        UMCConnection msgPackage = this.wrap( that );
-        UMCMessage msg            = msgPackage.getMessage();
+        UMCConnection connection  = this.wrap( that );
+        UMCMessage msg            = connection.getMessage();
 
         if( this.sift( that ) ) {
-            msgPackage.getTransmit().sendInformMsg(
+            connection.getTransmit().sendInformMsg(
                     (new JSONMaptron()).put( "What", "Illegal message." ), Status.IllegalMessage
             );
             return;
@@ -94,13 +121,20 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
         }
 
 
+        String addr = connection.getMessage().getHead().getExHeaderVal( this.getServiceKeyword() ).toString();
+        MessageController controller = this.mRoutingTable.get( addr );
+        if( controller != null ) {
 
+        }
+        else {
+            throw new DenialServiceException( "It's none of my business." );
+        }
         if( this.isMyJob( that, szServiceKey ) ) {
-            msgPackage.entrust( this );
+            connection.entrust( this );
 
             switch ( szServiceKey ) {
                 case "close": {
-                    msgPackage.getMessageSource().release();
+                    connection.getMessageSource().release();
                     break;
                 }
                 case "SystemShutdown": {
@@ -115,12 +149,15 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
                         this.doMessagelet( szServiceKey, that );
                     }
                     catch ( IllegalArgumentException e ) {
-                        msgPackage.getTransmit().sendInformMsg(
+                        connection.getTransmit().sendInformMsg(
                                 (new JSONMaptron()).put( "What", "Messagelet not found." ), Status.MappingNotFound
                         );
                     }
                 }
             }
+        }
+        else {
+
         }
     }
 

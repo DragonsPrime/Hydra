@@ -1,6 +1,6 @@
 package com.pinecone.hydra.umc.msg;
 
-import com.pinecone.framework.util.json.JSONObject;
+import java.util.Map;
 
 /**
  *  Pinecone Ursus For Java UMCProtocol [ Unified Message Control Protocol ]
@@ -27,7 +27,11 @@ public interface UMCProtocol extends MsgProtocol {
 
     void setHead  ( UMCHead head );
 
-    default void setExHead( JSONObject jo ) {
+    default void setExHead( Map<String, Object > jo ) {
+        this.getHead().setExtraHead( jo );
+    }
+
+    default void setExHead( Object jo ) {
         this.getHead().setExtraHead( jo );
     }
 

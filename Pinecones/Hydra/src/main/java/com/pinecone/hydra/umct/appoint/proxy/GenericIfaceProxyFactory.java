@@ -16,12 +16,12 @@ public class GenericIfaceProxyFactory {
     // Thread-safe cache for Enhancer instances
     private final ConcurrentHashMap<Class<?>, Enhancer> enhancerCache = new ConcurrentHashMap<>();
 
-    public <T> T createProxy( Class<T> iface, Object impl) {
+    public <T> T createProxy( Class<T> iface ) {
 //        if (!iface.isInterface()) {
 //            throw new IllegalArgumentException("The provided class must be an interface.");
 //        }
 
-        Enhancer enhancer = enhancerCache.computeIfAbsent(impl.getClass(), clazz -> {
+        Enhancer enhancer = enhancerCache.computeIfAbsent(iface, clazz -> {
             Enhancer e = new Enhancer();
             //e.setSuperclass(impl.getClass());
             e.setSuperclass(EmptyDummy.class);

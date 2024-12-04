@@ -472,11 +472,8 @@ class Appleby extends JesusChrist {
         GenericIfaceProxyFactory factory = new GenericIfaceProxyFactory();
 
         Beaver redBeaver = new RedBeaver();
-        Beaver pBeaver = factory.createProxy(Beaver.class, redBeaver);
+        Beaver pBeaver = factory.createProxy( Beaver.class );
         Debug.trace( pBeaver.cutting( "tree" ) );
-
-        Beaver pCBeaver = factory.createProxy(null, redBeaver);
-        Debug.trace( pCBeaver.cutting( "tree" ) );
     }
 
 }

@@ -21,6 +21,7 @@ import com.pinecone.hydra.umc.msg.MessageNode;
 import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
 import com.pinecone.hydra.umc.wolfmc.WolfMCNode;
 import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
+import com.pinecone.hydra.umct.UMCTExpressHandler;
 import com.sauron.radium.system.MiddlewareManager;
 import com.sauron.radium.system.RadiumSystem;
 import com.sauron.radium.system.Saunut;
@@ -191,7 +192,13 @@ public class MessagersManager extends ArchSystemAutoAssembleComponent implements
             }
 
             if( node instanceof WolfMCNode ) {
-                ((WolfMCNode) node).apply( (UlfAsyncMsgHandleAdapter)me );
+                if( me instanceof UlfAsyncMsgHandleAdapter ) {
+                    ((WolfMCNode) node).apply( (UlfAsyncMsgHandleAdapter)me );
+                }
+                else {
+                    ((WolfMCNode) node).apply( UlfAsyncMsgHandleAdapter.wrap( (UMCTExpressHandler) me ) );
+                }
+
                 this.infoCriticalOperation(
                         "SetMessageExpress(`" + szMessageHandler + "`) ==> (`" + szInsNam + "`)", LogStatuses.StatusDone
                 );
