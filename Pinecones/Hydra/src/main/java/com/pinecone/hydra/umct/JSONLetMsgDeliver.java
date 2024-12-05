@@ -1,14 +1,19 @@
 package com.pinecone.hydra.umct;
 
 import com.pinecone.hydra.express.Package;
+import com.pinecone.hydra.umct.util.JSONHeaderEvaluator;
+
 import java.io.IOException;
 
-public class MessageletMsgDeliver extends ArchMsgDeliver {
+public class JSONLetMsgDeliver extends ArchMsgDeliver {
 
-    public MessageletMsgDeliver( MessageExpress express ) {
-        super( "Messagelet", express );
+    public JSONLetMsgDeliver( String name, MessageExpress express ) {
+        super( name, express, new JSONHeaderEvaluator() );
     }
 
+    public JSONLetMsgDeliver( MessageExpress express ) {
+        this( "Messagelet", express );
+    }
 
     @Override
     public String getServiceKeyword() {

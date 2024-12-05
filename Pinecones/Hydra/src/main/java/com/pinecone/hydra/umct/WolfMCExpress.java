@@ -3,7 +3,6 @@ package com.pinecone.hydra.umct;
 import java.io.IOException;
 import java.util.Map;
 
-import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.Status;
 import com.pinecone.hydra.umc.msg.UMCMessage;
@@ -31,7 +30,7 @@ public class WolfMCExpress extends ArchMsgExpress implements UMCTExpressHandler 
     @Override
     protected MessageDeliver spawn( String szName ) { // TODO
         if( szName.equals( "Messagelet" ) ) {
-            return new MessageletMsgDeliver( this );
+            return new JSONLetMsgDeliver( this );
         }
         return null;
     }

@@ -3,20 +3,18 @@ package com.pinecone.hydra.umct;
 import com.pinecone.framework.unit.trie.TrieMap;
 import com.pinecone.framework.unit.trie.TrieSegmentor;
 import com.pinecone.framework.unit.trie.UniTrieMaptron;
-import com.pinecone.framework.util.Debug;
 
 import com.pinecone.framework.util.StringUtils;
-import com.pinecone.framework.util.json.JSONMaptron;
-import com.pinecone.framework.util.name.Namespace;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.express.Package;
 import com.pinecone.hydra.umc.msg.Status;
 import com.pinecone.hydra.umc.msg.UMCHead;
 import com.pinecone.hydra.umc.msg.UMCMessage;
+import com.pinecone.hydra.umct.util.HeaderEvaluator;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 
 public abstract class ArchMsgDeliver implements MessageDeliver {
     protected String                                      mszName;
@@ -24,13 +22,15 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     protected MessageExpress                              mExpress;
     protected ArchMessagram                               mMessagram;
     protected TrieMap<String, MessageController >         mRoutingTable;
+    protected HeaderEvaluator                             mHeaderEvaluator;
 
-    public ArchMsgDeliver( String szName, MessageExpress express ) {
-        this.mszName       = szName;
-        this.mExpress      = express;
-        this.mSystem       = this.mExpress.getSystem();
-        this.mMessagram    = this.mExpress.getMessagram();
-        this.mRoutingTable = new UniTrieMaptron<>(HashMap::new, new TrieSegmentor() {
+    public ArchMsgDeliver( String szName, MessageExpress express, HeaderEvaluator headerEvaluator ) {
+        this.mszName          = szName;
+        this.mExpress         = express;
+        this.mSystem          = this.mExpress.getSystem();
+        this.mMessagram       = this.mExpress.getMessagram();
+        this.mHeaderEvaluator = headerEvaluator;
+        this.mRoutingTable    = new UniTrieMaptron<>(HashMap::new, new TrieSegmentor() {
             @Override
             public String[] segments( String szPathKey ) {
                 return szPathKey.split( ".|\\/" );
@@ -93,71 +93,40 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
         UMCMessage msg            = connection.getMessage();
 
         if( this.sift( that ) ) {
-            connection.getTransmit().sendInformMsg(
-                    (new JSONMaptron()).put( "What", "Illegal message." ), Status.IllegalMessage
-            );
+            connection.getTransmit().sendInformMsg(null, Status.IllegalMessage );
             return;
         }
 
-        UMCHead head                    = msg.getHead();
-        String szServiceKey             = (String) head.getExHeaderVal( this.getServiceKeyword() );
-        if( szServiceKey == null ) {
-            szServiceKey = (String) head.getExHeaderVal( "/" );
+        UMCHead head                = msg.getHead();
+        Object  exHead              = head.getExtraHead();
+        String szAddr               = this.mHeaderEvaluator.evalString( exHead, this.getServiceKeyword() );
+        if( szAddr == null ) {
+            connection.getTransmit().sendInformMsg(null, Status.IllegalMessage );
+            return;
         }
 
-
-//        try ( ByteArrayInputStream byteStream = new ByteArrayInputStream( (byte[]) msg.getExHead() ); ObjectInputStream objectStream = new ObjectInputStream(byteStream) ) {
-//            try{
-//                Debug.trace( objectStream.readObject() );
-//            }
-//            catch ( ClassNotFoundException e ) {
-//
-//            }
-//        }
-        Debug.trace( msg.getExHead() );
-        if( msg.evinceTransferMessage() != null ) {
-            InputStream is = (InputStream)msg.evinceTransferMessage().getBody();
-            Debug.trace( msg.getExHead(), new String( is.readAllBytes() ) );
-        }
-
-
-        String addr = connection.getMessage().getHead().getExHeaderVal( this.getServiceKeyword() ).toString();
-        MessageController controller = this.mRoutingTable.get( addr );
+        MessageController controller = this.mRoutingTable.get( szAddr );
         if( controller != null ) {
-
-        }
-        else {
-            throw new DenialServiceException( "It's none of my business." );
-        }
-        if( this.isMyJob( that, szServiceKey ) ) {
             connection.entrust( this );
 
-            switch ( szServiceKey ) {
-                case "close": {
-                    connection.getMessageSource().release();
-                    break;
-                }
-                case "SystemShutdown": {
-                    this.getSystem().kill();
-                    break;
-                }
-                case "ReceiveConfirm": {
-                    return;
-                }
-                default: {
-                    try{
-                        this.doMessagelet( szServiceKey, that );
-                    }
-                    catch ( IllegalArgumentException e ) {
-                        connection.getTransmit().sendInformMsg(
-                                (new JSONMaptron()).put( "What", "Messagelet not found." ), Status.MappingNotFound
-                        );
-                    }
-                }
+            Object[] args;
+            if( controller.isArgsIndexed() ) {
+                args = this.mHeaderEvaluator.values( exHead ).toArray();
+            }
+            else {
+                List<String > keys = controller.getArgumentsKey();
+                args = this.mHeaderEvaluator.evals( exHead, keys );
+            }
+
+            try{
+                controller.invoke( args );
+            }
+            catch ( Exception e ) {
+                connection.getTransmit().sendInformMsg(null, Status.InternalError );
             }
         }
         else {
-
+            throw new DenialServiceException( "It's none of my business." );
         }
     }
 

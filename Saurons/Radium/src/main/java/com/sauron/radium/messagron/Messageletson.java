@@ -2,7 +2,7 @@ package com.sauron.radium.messagron;
 
 import com.pinecone.hydra.umct.ArchMessagram;
 import com.pinecone.hydra.umct.UMCConnection;
-import com.pinecone.hydra.umct.MessageletMsgDeliver;
+import com.pinecone.hydra.umct.JSONLetMsgDeliver;
 import com.pinecone.hydra.umct.ArchMessagelet;
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.framework.util.json.JSONMaptron;
@@ -31,8 +31,8 @@ public abstract class Messageletson extends ArchMessagelet {
     }
 
     @Override
-    public MessageletMsgDeliver getMessageDeliver() {
-        return (MessageletMsgDeliver)super.getMessageDeliver();
+    public JSONLetMsgDeliver getMessageDeliver() {
+        return (JSONLetMsgDeliver)super.getMessageDeliver();
     }
 
     @Override
