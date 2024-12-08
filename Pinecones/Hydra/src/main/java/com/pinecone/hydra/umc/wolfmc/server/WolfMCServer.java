@@ -45,7 +45,7 @@ import java.util.concurrent.locks.ReentrantLock;
  *  etc.
  *  *****************************************************************************************
  */
-public class WolfMCServer extends WolfMCNode implements Recipient {
+public class WolfMCServer extends WolfMCNode implements UlfServer {
     protected ServerConnectArguments                          mConnectionArguments ;
 
     protected EventLoopGroup                                  mMasterEventGroup    ;

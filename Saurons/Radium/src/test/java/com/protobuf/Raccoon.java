@@ -1,5 +1,6 @@
 package com.protobuf;
 
+import com.pinecone.hydra.umct.bind.ArgParam;
 import com.pinecone.hydra.umct.stereotype.Iface;
 
 //@Iface

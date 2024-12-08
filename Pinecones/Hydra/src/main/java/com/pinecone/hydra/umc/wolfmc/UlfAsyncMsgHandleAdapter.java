@@ -38,11 +38,6 @@ public interface UlfAsyncMsgHandleAdapter extends AsyncMsgHandleAdapter {
             }
 
             @Override
-            public void onSuccessfulMsgReceived( UMCConnection connection, Object[] args ) throws Exception {
-                handler.onSuccessfulMsgReceived( connection, args );
-            }
-
-            @Override
             public void onErrorMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
                 handler.onErrorMsgReceived( medium, block.getTransmit(), block.getReceiver(), msg, new Object[]{ block, rawMsg } );
             }

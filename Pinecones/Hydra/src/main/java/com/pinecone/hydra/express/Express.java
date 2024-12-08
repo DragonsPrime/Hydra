@@ -14,5 +14,7 @@ public interface Express extends Pinenut {
 
     boolean  hasOwnDeliver( Deliver deliver );
 
+    boolean  hasOwnDeliver( String deliverName );
+
     int      size    ();
 }

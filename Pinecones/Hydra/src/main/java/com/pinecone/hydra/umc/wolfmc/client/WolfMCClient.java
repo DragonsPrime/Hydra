@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
  *  etc.
  *  *****************************************************************************************
  */
-public class WolfMCClient extends ArchAsyncMessenger {
+public class WolfMCClient extends ArchAsyncMessenger implements UlfClient {
     protected EventLoopGroup                       mExecutorGroup;
     protected Bootstrap                            mBootstrap;
 
@@ -367,15 +367,17 @@ public class WolfMCClient extends ArchAsyncMessenger {
         this.redirectIOException2ParentThread( lastException[0] );
     }
 
-
+    @Override
     public UMCMessage                     sendSyncMsg( UMCMessage request ) throws IOException {
         return this.sendSyncMsg( request, false );
     }
 
+    @Override
     public UMCMessage                     sendSyncMsg( UMCMessage request, boolean bNoneBuffered ) throws IOException {
         return this.sendSyncMsg( request, bNoneBuffered, this.getConnectionArguments().getKeepAliveTimeout() * 1000 );
     }
 
+    @Override
     public void                           sendAsynMsg( UMCMessage request ) throws IOException {
         this.sendAsynMsg( request, false );
     }

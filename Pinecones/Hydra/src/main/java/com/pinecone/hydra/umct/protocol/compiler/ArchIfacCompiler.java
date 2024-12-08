@@ -1,12 +1,17 @@
 package com.pinecone.hydra.umct.protocol.compiler;
 
 import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.List;
+
+import com.pinecone.hydra.umct.bind.ArgParam;
 
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
+import javassist.bytecode.ParameterAnnotationsAttribute;
+import javassist.bytecode.annotation.Annotation;
 
 public abstract class ArchIfacCompiler extends ArchIfaceInspector implements IfaceCompiler {
     protected ClassLoader     mClassLoader;
@@ -21,6 +26,51 @@ public abstract class ArchIfacCompiler extends ArchIfaceInspector implements Ifa
 
     public ArchIfacCompiler( ClassPool classPool, ClassLoader classLoader ) {
         this( classPool, classLoader, CompilerEncoder.DefaultMethodArgumentsCompilerEncoder );
+    }
+
+    protected String annotationKeyNormalize( String bad ) {
+        if ( bad != null ) {
+            bad = bad.trim();
+            if ( bad.startsWith( "\"" ) ) {
+                return bad.replace( "\"", "" );
+            }
+        }
+        return bad;
+    }
+
+    @Override
+    public List<ParamsDigest > inspectArgParams( MethodDigest methodDigest, CtMethod method ) {
+        List<ParamsDigest > argParams = null;
+
+        ParameterAnnotationsAttribute paramAnnotationsAttr = ( ParameterAnnotationsAttribute) method.getMethodInfo().
+                getAttribute(ParameterAnnotationsAttribute.visibleTag );
+
+        if ( paramAnnotationsAttr != null ) {
+            Annotation[][] parameterAnnotations = paramAnnotationsAttr.getAnnotations();
+            if ( parameterAnnotations.length > 0 ) {
+                argParams = new ArrayList<>();
+            }
+
+            for ( int i = 0; i < parameterAnnotations.length; ++i ) {
+                for ( Annotation annotation : parameterAnnotations[ i ] ) {
+                    if ( ArgParam.class.getName().equals(annotation.getTypeName()) ) {
+                        String name   = annotation.getMemberValue("name") != null ? annotation.getMemberValue("name").toString() : null;
+                        String value  = annotation.getMemberValue("value") != null ? annotation.getMemberValue("value").toString() : null;
+                        String defVal = annotation.getMemberValue("defaultValue") != null ? annotation.getMemberValue("defaultValue").toString() : null;
+
+                        boolean required =
+                                annotation.getMemberValue("required") == null ||
+                                        Boolean.parseBoolean(annotation.getMemberValue("required").toString());
+
+                        argParams.add( new GenericParamsDigest(
+                                methodDigest, i, this.annotationKeyNormalize(name), this.annotationKeyNormalize(value), this.annotationKeyNormalize(defVal), required )
+                        );
+                    }
+                }
+            }
+        }
+
+        return argParams;
     }
 
     protected MethodDigest compile ( ClassDigest classDigest, CtMethod method, CompilerEncoder encoder ) {
@@ -66,16 +116,21 @@ public abstract class ArchIfacCompiler extends ArchIfaceInspector implements Ifa
                 returnType = null;
             }
 
+            MethodDigest ret;
             if( encoder != null ) {
-                return new DynamicMethodPrototype(
-                        classDigest, this.getIfaceMethodName( method ), method.getName(), parameters, returnType, encoder
+                ret = new DynamicMethodPrototype(
+                        classDigest, this.getIfaceMethodName( method ), method.getName(), parameters, returnType, encoder, null
                 );
             }
             else {
-                return new GenericMethodDigest(
-                        classDigest, this.getIfaceMethodName( method ), method.getName(), parameters, returnType
+                ret = new GenericMethodDigest(
+                        classDigest, this.getIfaceMethodName( method ), method.getName(), parameters, returnType, null
                 );
             }
+
+            List<ParamsDigest > paramsDigests = this.inspectArgParams( ret, method );
+            ret.apply( paramsDigests );
+            return ret;
         }
         catch ( ClassNotFoundException e ) {
             throw new CompileException( e );

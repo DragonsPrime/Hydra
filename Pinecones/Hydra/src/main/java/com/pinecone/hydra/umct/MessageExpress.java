@@ -19,11 +19,13 @@ public interface MessageExpress extends Express {
 
     ArchMessagram getMessagram();
 
-    MessageDeliver  recruit ( String szName );
+    MessageDeliver  recruit     ( String szName );
 
-    MessageExpress  register( Deliver deliver );
+    MessageExpress  register    ( Deliver deliver );
 
-    MessageExpress  fired   ( Deliver deliver );
+    MessageExpress  fired       ( Deliver deliver );
+
+    MessageDeliver  getDeliver  ( String szName );
 
 
 

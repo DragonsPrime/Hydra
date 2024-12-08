@@ -29,11 +29,6 @@ public final class UnsetUlfAsyncMsgHandleAdapter implements UlfAsyncMsgHandleAda
     }
 
     @Override
-    public void onSuccessfulMsgReceived( UMCConnection connection, Object[] args ) throws Exception {
-        this.mMessageNode.getSystem().console().warn( "Warning, MsgHandleAdapter is unset.", connection.getMessage() );
-    }
-
-    @Override
     public void onSuccessfulMsgReceived( Medium medium, UMCTransmit transmit, UMCReceiver receiver, UMCMessage msg, Object[] args ) throws Exception {
         this.mMessageNode.getSystem().console().warn( "Warning, MsgHandleAdapter is unset.", msg );
     }

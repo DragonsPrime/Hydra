@@ -69,9 +69,13 @@ public class PrototypeDecipher implements HeaderDecipher {
             DynamicMessage message = DynamicMessage.parseFrom( messageDescriptor, data );
             Collection<Object > fieldValues = new ArrayList<>();
 
+            int i = 0;
             for ( Descriptors.FieldDescriptor fieldDescriptor : messageDescriptor.getFields() ) {
-                Object value = message.getField(fieldDescriptor);
-                fieldValues.add( value );
+                if ( i != 0 ) {
+                    Object value = message.getField( fieldDescriptor );
+                    fieldValues.add( value );
+                }
+                ++i;
             }
             return fieldValues;
         }
@@ -89,7 +93,7 @@ public class PrototypeDecipher implements HeaderDecipher {
             DynamicMessage message = DynamicMessage.parseFrom( messageDescriptor, data );
             Object[] results = new Object[ keys.size() ];
 
-            for ( int i = 0; i < keys.size(); ++i ) {
+            for ( int i = 1; i < keys.size(); ++i ) {
                 String key = keys.get(i);
                 Descriptors.FieldDescriptor fieldDescriptor = messageDescriptor.findFieldByName(key);
 

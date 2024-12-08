@@ -1,6 +1,6 @@
 package com.pinecone.hydra.umct;
 
-import com.pinecone.framework.system.prototype.Pinenut;
+import com.pinecone.hydra.servgram.Servgram;
 
-public interface UMCTNode extends Pinenut {
+public interface UMCTNode extends Servgram {
 }

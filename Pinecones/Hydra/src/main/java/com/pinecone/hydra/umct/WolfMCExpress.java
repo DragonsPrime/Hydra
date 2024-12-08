@@ -44,8 +44,7 @@ public class WolfMCExpress extends ArchMsgExpress implements UMCTExpress {
         this.onSuccessfulMsgReceived( connection, args );
     }
 
-    @Override
-    public void onSuccessfulMsgReceived( UMCConnection connection, Object[] args ) throws Exception {
+    protected void onSuccessfulMsgReceived( UMCConnection connection, Object[] args ) throws Exception {
         int c = 0;
         for( Map.Entry<String, MessageDeliver > kv : this.mDeliverPool.entrySet() ) {
             try{

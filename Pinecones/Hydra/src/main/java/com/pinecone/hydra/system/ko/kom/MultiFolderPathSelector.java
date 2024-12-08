@@ -45,6 +45,29 @@ public class MultiFolderPathSelector implements PathSelector {
         return (GUID) this.dfsSearch( resolvedParts );
     }
 
+
+    @Override
+    public GUID searchGUID( GUID parentId, String[] parts ) {
+        return this.searchGUID( parentId, parts, null );
+    }
+
+    @Override
+    public GUID searchGUID( GUID parentId, String[] parts, @Nullable String[] lpResolvedPath ) {
+        List<String > resolvedParts = this.pathResolver.resolvePath( parts );
+        if( lpResolvedPath != null ) {
+            lpResolvedPath[ 0 ] = this.pathResolver.assemblePath( resolvedParts );
+        }
+
+        return this.searchGUID( parentId, resolvedParts );
+    }
+
+    @Override
+    public GUID searchGUID( GUID parentId, List<String> resolvedParts ) {
+        //return dfsSearchGUID(fileMan, dirMan, resolvedParts, 0, null);
+        return (GUID) this.dfsSearch( parentId, resolvedParts );
+    }
+
+
     @Override
     public Object querySelector( String szSelector ) {
         return this.searchGUID( this.pathResolver.resolvePathParts( szSelector ) );
@@ -60,10 +83,14 @@ public class MultiFolderPathSelector implements PathSelector {
         return JSON.stringify( this.querySelector( szSelector ) );
     }
 
-    /** Iterative DFS, 迭代 DFS 法 **/
     protected Object dfsSearch( List<String > parts ) {
+        return this.dfsSearch( null, parts );
+    }
+
+    /** Iterative DFS, 迭代 DFS 法 **/
+    protected Object dfsSearch( GUID parentId, List<String > parts ) {
         Stack<StandardPathSelector.SearchArgs> stack = new Stack<>();
-        stack.push( new StandardPathSelector.SearchArgs( null, 0 ) );
+        stack.push( new StandardPathSelector.SearchArgs( parentId, 0 ) );
 
         while ( !stack.isEmpty() ) {
             StandardPathSelector.SearchArgs currentArgs = stack.pop();

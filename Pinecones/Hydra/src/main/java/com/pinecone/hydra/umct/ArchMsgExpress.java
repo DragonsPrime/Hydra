@@ -106,7 +106,12 @@ public abstract class ArchMsgExpress implements MessageExpress, Slf4jTraceable {
         return this;
     }
 
-    public ArchMsgExpress   syncRegister( Deliver deliver ) {
+    @Override
+    public MessageDeliver getDeliver    ( String szName ) {
+        return this.getDeliverPool().get( szName );
+    }
+
+    public ArchMsgExpress   syncRegister(Deliver deliver ) {
         this.getPoolLock().writeLock().lock();
         try{
             this.register( deliver );
@@ -130,7 +135,12 @@ public abstract class ArchMsgExpress implements MessageExpress, Slf4jTraceable {
 
     @Override
     public boolean hasOwnDeliver( Deliver deliver ) {
-        return this.getDeliverPool().containsKey( deliver.getName() );
+        return this.hasOwnDeliver( deliver.getName() );
+    }
+
+    @Override
+    public boolean hasOwnDeliver( String deliverName ) {
+        return this.getDeliverPool().containsKey( deliverName );
     }
 
     @Override
