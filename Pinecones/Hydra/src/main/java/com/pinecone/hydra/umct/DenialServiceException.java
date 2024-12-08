@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 
-public class DenialServiceException extends IOException implements Pinenut {
+public class DenialServiceException extends ServiceException implements Pinenut {
     public DenialServiceException() {
         super();
     }

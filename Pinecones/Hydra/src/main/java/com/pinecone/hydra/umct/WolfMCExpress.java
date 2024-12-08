@@ -3,6 +3,7 @@ package com.pinecone.hydra.umct;
 import java.io.IOException;
 import java.util.Map;
 
+import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.Status;
 import com.pinecone.hydra.umc.msg.UMCMessage;
@@ -15,12 +16,13 @@ import com.pinecone.hydra.umc.msg.UMCTransmit;
  *  Author: Harold.E / JH.W (DragonKing)
  *  Copyright © 2008 - 2028 Bean Nuts Foundation All rights reserved.
  */
-public class WolfMCExpress extends ArchMsgExpress implements UMCTExpressHandler {
+public class WolfMCExpress extends ArchMsgExpress implements UMCTExpress {
+    public WolfMCExpress( String name, Hydrarum system ) {
+        super( name, system );
+    }
+
     public WolfMCExpress( String name, ArchMessagram messagram ) {
         super( name, messagram );
-        this.register(
-                this.recruit( "Messagelet" )
-        );
     }
 
     public WolfMCExpress( ArchMessagram messagram ) {
@@ -50,7 +52,7 @@ public class WolfMCExpress extends ArchMsgExpress implements UMCTExpressHandler 
                 MessageDeliver deliver = kv.getValue();
                 deliver.toDispatch( connection );
             }
-            catch ( IOException e ) {
+            catch ( DenialServiceException e ) {
                 // Just continue.
                 // 你不干有的是人干.
                 ++c;

@@ -10,7 +10,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 public abstract class ArchMessagram extends ArchServgramium implements Messagram {
-    public static final String DefaultServiceKey = "Messagelet";
+    public static final String DefaultServiceKey = "__NAME__";
 
     protected Map<String, MessageExpress > mExpresses;
     protected Map<String, Object >         mProtoConfig;

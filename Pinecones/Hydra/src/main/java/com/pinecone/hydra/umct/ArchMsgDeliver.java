@@ -10,7 +10,7 @@ import com.pinecone.hydra.express.Package;
 import com.pinecone.hydra.umc.msg.Status;
 import com.pinecone.hydra.umc.msg.UMCHead;
 import com.pinecone.hydra.umc.msg.UMCMessage;
-import com.pinecone.hydra.umct.util.HeaderEvaluator;
+import com.pinecone.hydra.umct.decipher.HeaderDecipher;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,18 +22,20 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     protected MessageExpress                              mExpress;
     protected ArchMessagram                               mMessagram;
     protected TrieMap<String, MessageController >         mRoutingTable;
-    protected HeaderEvaluator                             mHeaderEvaluator;
+    protected HeaderDecipher                              mHeaderDecipher;
+    protected String                                      mszServicePathKey;
 
-    public ArchMsgDeliver( String szName, MessageExpress express, HeaderEvaluator headerEvaluator ) {
-        this.mszName          = szName;
-        this.mExpress         = express;
-        this.mSystem          = this.mExpress.getSystem();
-        this.mMessagram       = this.mExpress.getMessagram();
-        this.mHeaderEvaluator = headerEvaluator;
-        this.mRoutingTable    = new UniTrieMaptron<>(HashMap::new, new TrieSegmentor() {
+    public ArchMsgDeliver(String szName, MessageExpress express, HeaderDecipher headerDecipher, String szServicePathKey ) {
+        this.mszName           = szName;
+        this.mExpress          = express;
+        this.mSystem           = this.mExpress.getSystem();
+        this.mMessagram        = this.mExpress.getMessagram();
+        this.mHeaderDecipher   = headerDecipher;
+        this.mszServicePathKey = szServicePathKey;
+        this.mRoutingTable     = new UniTrieMaptron<>(HashMap::new, new TrieSegmentor() {
             @Override
             public String[] segments( String szPathKey ) {
-                return szPathKey.split( ".|\\/" );
+                return szPathKey.split( "\\.|\\/" );
             }
 
             @Override
@@ -43,6 +45,10 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
         });
     }
 
+    @Override
+    public String getServiceKeyword() {
+        return this.mszServicePathKey;
+    }
 
     @Override
     public String getName() {
@@ -68,12 +74,10 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
         return this.mRoutingTable;
     }
 
+    @Override
     public void registerController( String addr, MessageController controller ){
         this.mRoutingTable.put( addr, controller );
     }
-
-    @Override
-    public abstract String getServiceKeyword() ;
 
 
     protected UMCConnection wrap( Package that ) {
@@ -88,44 +92,60 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
         return szServiceKey != null;
     }
 
-    protected void messageDispatch( Package that ) throws IOException {
-        UMCConnection connection  = this.wrap( that );
-        UMCMessage msg            = connection.getMessage();
+    protected void messageDispatch( Package that ) throws IOException, ServiceException {
+        boolean bDenialService = false;
 
-        if( this.sift( that ) ) {
-            connection.getTransmit().sendInformMsg(null, Status.IllegalMessage );
-            return;
-        }
+        try{
+            UMCConnection connection  = this.wrap( that );
+            UMCMessage msg            = connection.getMessage();
 
-        UMCHead head                = msg.getHead();
-        Object  exHead              = head.getExtraHead();
-        String szAddr               = this.mHeaderEvaluator.evalString( exHead, this.getServiceKeyword() );
-        if( szAddr == null ) {
-            connection.getTransmit().sendInformMsg(null, Status.IllegalMessage );
-            return;
-        }
+            if( this.sift( that ) ) {
+                connection.getTransmit().sendInformMsg(null, Status.IllegalMessage );
+                return;
+            }
 
-        MessageController controller = this.mRoutingTable.get( szAddr );
-        if( controller != null ) {
-            connection.entrust( this );
+            UMCHead head                = msg.getHead();
+            Object  exHead              = head.getExtraHead();
+            String szAddr               = this.mHeaderDecipher.getServicePath( exHead );
+            if( szAddr == null ) {
+                this.mHeaderDecipher.sendIllegalMessage( connection );
+                return;
+            }
 
-            Object[] args;
-            if( controller.isArgsIndexed() ) {
-                args = this.mHeaderEvaluator.values( exHead ).toArray();
+            MessageController controller = this.mRoutingTable.get( szAddr );
+            if( controller != null ) {
+                connection.entrust( this );
+
+                Object[] args;
+                if( controller.isArgsIndexed() ) {
+                    args = this.mHeaderDecipher.values( exHead, controller.getArgumentsDescriptor() ).toArray();
+                }
+                else {
+                    List<String > keys = controller.getArgumentsKey();
+                    args = this.mHeaderDecipher.evals( exHead, controller.getArgumentsDescriptor(), keys );
+                }
+
+                try{
+                    Object ret = controller.invoke( args );
+                    connection.getTransmit().sendMsg( this.mHeaderDecipher.assembleReturnMsg( ret, controller.getReturnDescriptor() ) );
+                }
+                catch ( Exception e ) {
+                    this.mHeaderDecipher.sendInternalError( connection );
+                }
             }
             else {
-                List<String > keys = controller.getArgumentsKey();
-                args = this.mHeaderEvaluator.evals( exHead, keys );
-            }
+                if ( this.mMessagram != null ) {
+                    this.doMessagelet( szAddr, that );
+                }
 
-            try{
-                controller.invoke( args );
-            }
-            catch ( Exception e ) {
-                connection.getTransmit().sendInformMsg(null, Status.InternalError );
+                bDenialService = true;
             }
         }
-        else {
+        catch ( RuntimeException e ) {
+            throw new ServiceInternalException( e );
+        }
+
+        if ( bDenialService ) {
             throw new DenialServiceException( "It's none of my business." );
         }
     }
@@ -133,7 +153,7 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     protected abstract void doMessagelet( String szMessagelet, Package that ) ;
 
     @Override
-    public void toDispatch( Package that ) throws IOException {
+    public void toDispatch( Package that ) throws IOException, ServiceException {
         this.prepareDispatch( that );
         this.messageDispatch( that );
     }

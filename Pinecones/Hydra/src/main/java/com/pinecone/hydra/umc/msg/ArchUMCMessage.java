@@ -22,37 +22,53 @@ public abstract class ArchUMCMessage implements UMCMessage {
         this.mHead.applyExHead( joExHead );
     }
 
-    ArchUMCMessage( Object protoExHead, UMCMethod method, long controlBits ) {
-        this.mHead = new UMCHead();
-        this.mHead.setControlBits( controlBits );
-        this.mHead.setMethod( method );
-        this.mHead.setExtraHead( protoExHead );
-        this.mHead.setExtraEncode( ExtraEncode.Prototype );
-    }
-
     ArchUMCMessage( Map<String,Object > joExHead, UMCMethod method ) {
         this( joExHead, method, 0 );
-    }
-
-    ArchUMCMessage( Object protoExHead, UMCMethod method ) {
-        this( protoExHead, method, 0 );
     }
 
     public ArchUMCMessage( Map<String,Object > joExHead, long controlBits ) {
         this( joExHead, UMCMethod.INFORM, controlBits );
     }
 
-    public ArchUMCMessage( Object protoExHead, long controlBits ) {
-        this( protoExHead, UMCMethod.INFORM, controlBits );
-    }
-
     public ArchUMCMessage( Map<String,Object > joExHead ) {
         this( joExHead, UMCMethod.INFORM );
+    }
+
+
+
+    ArchUMCMessage( Object protoExHead, ExtraEncode encode, UMCMethod method, long controlBits ) {
+        this.mHead = new UMCHead();
+        this.mHead.setControlBits( controlBits );
+        this.mHead.setMethod( method );
+        this.mHead.setExtraHead( protoExHead );
+        this.mHead.setExtraEncode( encode );
+    }
+
+    ArchUMCMessage( Object protoExHead, UMCMethod method, long controlBits ) {
+        this( protoExHead, ExtraEncode.Prototype, method, controlBits );
+    }
+
+    ArchUMCMessage( Object protoExHead, UMCMethod method ) {
+        this( protoExHead, method, 0 );
+    }
+
+    ArchUMCMessage( Object protoExHead, ExtraEncode encode, UMCMethod method ) {
+        this( protoExHead, encode, method, 0 );
+    }
+
+    public ArchUMCMessage( Object protoExHead, long controlBits ) {
+        this( protoExHead, UMCMethod.INFORM, controlBits );
     }
 
     public ArchUMCMessage( Object protoExHead ) {
         this( protoExHead, UMCMethod.INFORM );
     }
+
+    public ArchUMCMessage( Object protoExHead, ExtraEncode encode ) {
+        this( protoExHead, encode, UMCMethod.INFORM );
+    }
+
+
 
     @Override
     public UMCHead     getHead() {
@@ -88,7 +104,7 @@ public abstract class ArchUMCMessage implements UMCMessage {
     @Override
     public String      toJSONString() {
         return JSONEncoder.stringifyMapFormat( new KeyValue[]{
-                new KeyValue<>( "Head"      , this.getHead().getExtraHead()                                ),
+                new KeyValue<>( "Head"           , this.getHead().getExtraHead()                           ),
                 new KeyValue<>( "Method"         , this.getHead().getMethod()                              ),
                 new KeyValue<>( "BodyLength"     , this.getHead().getBodyLength()                          ),
                 new KeyValue<>( "Status"         , this.getHead().getStatus()                              )

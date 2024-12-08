@@ -19,6 +19,10 @@ public abstract class ArchInformMessage extends ArchUMCMessage {
         super( joExHead, UMCMethod.INFORM );
     }
 
+    public ArchInformMessage( Object protoExHead, ExtraEncode encode ) {
+        super( protoExHead, encode );
+    }
+
     public ArchInformMessage( Object protoExHead ) {
         super( protoExHead, UMCMethod.INFORM );
     }

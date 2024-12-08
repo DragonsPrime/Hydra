@@ -31,15 +31,19 @@ public abstract class ArchMsgExpress implements MessageExpress, Slf4jTraceable {
     protected Map<String, MessageDeliver > mDeliverPool = new LinkedHashMap<>();
     protected ReadWriteLock                mPoolLock    = new ReentrantReadWriteLock();
 
-    public ArchMsgExpress( String name, ArchMessagram messagram ) {
+    public ArchMsgExpress( String name, Hydrarum system ) {
         this.mszName      = name;
-        this.mMessagram   = messagram;
-        this.mSystem      = messagram.getSystem();
+        this.mSystem      = system;
         this.mLogger      = this.getSystem().getTracerScope().newLogger( this.className() );
 
         if( this.mszName == null ){
             this.mszName = this.className();
         }
+    }
+
+    public ArchMsgExpress( String name, ArchMessagram messagram ) {
+        this( name, messagram.getSystem() );
+        this.mMessagram   = messagram;
     }
 
     public ArchMsgExpress( ArchMessagram messagram ) {

@@ -3,7 +3,9 @@ package com.pinecone.hydra.umc.wolfmc;
 import java.util.Map;
 
 import com.pinecone.hydra.umc.msg.ArchBytesTransferMessage;
+import com.pinecone.hydra.umc.msg.ExtraEncode;
 import com.pinecone.hydra.umc.msg.UMCHead;
+import com.pinecone.hydra.umc.msg.UMCMethod;
 
 public class UlfBytesTransferMessage extends ArchBytesTransferMessage {
     public UlfBytesTransferMessage( UMCHead head ) {
@@ -33,4 +35,22 @@ public class UlfBytesTransferMessage extends ArchBytesTransferMessage {
     public UlfBytesTransferMessage( Map<String,Object > joExHead, String szStringBody ) {
         this( joExHead, szStringBody.getBytes(), 0 );
     }
+
+
+    public UlfBytesTransferMessage( Object exHead, ExtraEncode encode, byte[] sBytesBody, long controlBits ) {
+        super( exHead, encode, sBytesBody, controlBits );
+    }
+
+    public UlfBytesTransferMessage( Object exHead, ExtraEncode encode, String szStringBody, long controlBits ) {
+        this( exHead, encode, szStringBody.getBytes(), controlBits );
+    }
+
+    public UlfBytesTransferMessage( Object exHead, byte[] sBytesBody ) {
+        this( exHead, ExtraEncode.Prototype, sBytesBody, 0 );
+    }
+
+    public UlfBytesTransferMessage( Object exHead, String szStringBody ) {
+        this( exHead, ExtraEncode.Prototype, szStringBody, 0 );
+    }
+
 }

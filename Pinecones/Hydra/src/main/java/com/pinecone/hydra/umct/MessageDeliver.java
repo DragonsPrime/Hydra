@@ -10,10 +10,11 @@ public interface MessageDeliver extends Deliver {
 
     MessageExpress  getExpress();
 
-    void toDispatch( Package that ) throws IOException;
+    void toDispatch( Package that ) throws IOException, ServiceException;
 
     String  getServiceKeyword();
 
     TrieMap<String, MessageController > getRoutingTable();
 
+    void registerController( String addr, MessageController controller );
 }

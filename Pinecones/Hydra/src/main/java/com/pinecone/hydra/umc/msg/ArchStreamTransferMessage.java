@@ -28,6 +28,18 @@ public class ArchStreamTransferMessage extends ArchUMCMessage implements Transfe
 
 
 
+    public ArchStreamTransferMessage( Object exHead, ExtraEncode encode, InputStream inStream, long controlBits ) {
+        super( exHead, encode, UMCMethod.TRANSFER, controlBits );
+        this.setBody( inStream );
+    }
+
+    public ArchStreamTransferMessage( Object exHead, InputStream inStream ) {
+        this( exHead, ExtraEncode.Prototype, inStream, 0 );
+    }
+
+
+
+
     void setBody( InputStream inStream ) {
         this.mIStreamBody = inStream;
         try{

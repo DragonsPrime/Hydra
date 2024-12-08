@@ -37,6 +37,25 @@ public abstract class ArchBytesTransferMessage extends ArchUMCMessage implements
 
 
 
+    public ArchBytesTransferMessage( Object exHead, ExtraEncode encode, byte[] sBytesBody, long controlBits ) {
+        super( exHead, encode, UMCMethod.TRANSFER, controlBits );
+        this.setBody( sBytesBody );
+    }
+
+    public ArchBytesTransferMessage( Object exHead, ExtraEncode encode, String szStringBody, long controlBits ) {
+        this( exHead, encode, szStringBody.getBytes(), controlBits );
+    }
+
+    public ArchBytesTransferMessage( Object exHead, byte[] sBytesBody ) {
+        this( exHead, ExtraEncode.Prototype, sBytesBody, 0 );
+    }
+
+    public ArchBytesTransferMessage( Object exHead, String szStringBody ) {
+        this( exHead, ExtraEncode.Prototype, szStringBody, 0 );
+    }
+
+
+
     void setBody( byte[] sBytesBody ) {
         this.msBytesBody = sBytesBody;
         this.mHead.setBodyLength( this.msBytesBody.length );

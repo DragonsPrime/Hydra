@@ -2,16 +2,21 @@ package com.pinecone.hydra.umct;
 
 import java.util.List;
 
-import com.pinecone.framework.system.prototype.Pinenut;
+import com.pinecone.framework.system.functions.Function;
 
-public interface MessageController extends Pinenut {
+public interface MessageController extends Function {
     String getAddressMapping();
 
-    void invoke( Object... args ) throws Exception;
+    @Override
+    Object invoke( Object... args ) throws Exception;
 
     List<String > getArgumentsKey();
 
     default boolean isArgsIndexed() {
         return this.getArgumentsKey() == null;
     }
+
+    Object getReturnDescriptor();
+
+    Object getArgumentsDescriptor();
 }

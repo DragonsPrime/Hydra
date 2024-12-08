@@ -9,12 +9,22 @@ public class UlfMessageController implements MessageController {
     }
 
     @Override
-    public void invoke( Object... args ) throws Exception {
-
+    public Object invoke( Object... args ) throws Exception {
+        return null;
     }
 
     @Override
     public List<String > getArgumentsKey() {
+        return null;
+    }
+
+    @Override
+    public Object getReturnDescriptor() {
+        return null;
+    }
+
+    @Override
+    public Object getArgumentsDescriptor() {
         return null;
     }
 }

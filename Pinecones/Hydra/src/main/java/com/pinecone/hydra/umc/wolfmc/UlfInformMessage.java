@@ -1,6 +1,7 @@
 package com.pinecone.hydra.umc.wolfmc;
 
 import com.pinecone.hydra.umc.msg.ArchInformMessage;
+import com.pinecone.hydra.umc.msg.ExtraEncode;
 import com.pinecone.hydra.umc.msg.UMCHead;
 
 import java.util.Map;
@@ -20,6 +21,10 @@ public class UlfInformMessage extends ArchInformMessage {
 
     public UlfInformMessage( Map<String,Object > joExHead ) {
         super( joExHead );
+    }
+
+    public UlfInformMessage( Object protoExHead, ExtraEncode encode ) {
+        super( protoExHead, encode );
     }
 
     public UlfInformMessage( Object protoExHead ) {
