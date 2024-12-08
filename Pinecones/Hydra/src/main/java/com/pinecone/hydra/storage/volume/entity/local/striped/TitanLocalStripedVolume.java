@@ -65,29 +65,6 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
         this.volumeManager = volumeManager;
     }
 
-    @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, Chanface channel) throws IOException, SQLException {
-        TitanStripedChannelReceiverEntity64 titanStripedChannelReceiverEntity64 = new TitanStripedChannelReceiverEntity64(this.volumeManager, storageReceiveIORequest,  channel, this);
-        return titanStripedChannelReceiverEntity64.receive();
-    }
-
-    @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, Chanface channel, Number offset, Number endSize) throws IOException, SQLException {
-        TitanStripedChannelReceiverEntity64 titanStripedChannelReceiverEntity64 = new TitanStripedChannelReceiverEntity64(this.volumeManager, storageReceiveIORequest,  channel, this);
-        return titanStripedChannelReceiverEntity64.receive( offset, endSize );
-    }
-
-    @Override
-    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, Chanface channel) throws IOException, SQLException {
-        TitanStripedChannelExportEntity64 titanStripedChannelExportEntity64 = new TitanStripedChannelExportEntity64( this.volumeManager, storageExportIORequest, channel, this );
-        return titanStripedChannelExportEntity64.export();
-    }
-
-    @Override
-    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, Chanface channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException {
-        return null;
-    }
-
 
     @Override
     public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {

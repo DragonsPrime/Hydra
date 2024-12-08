@@ -40,6 +40,8 @@ public class TitanStripedReceive64 implements StripedReceive64{
 
     protected SQLiteHost                mSqLiteHost;
 
+    protected MappedExecutor            mappedExecutor;
+
     public TitanStripedReceive64( StripedReceiveEntity64 entity ){
         this.channel                    = entity.getKChannel();
         this.volumeManager              = entity.getVolumeManager();
@@ -47,6 +49,11 @@ public class TitanStripedReceive64 implements StripedReceive64{
         this.kenVolumeFileSystem        = new KenVolumeFileSystem( this.volumeManager );
         this.stripedVolume              = entity.getStripedVolume();
         this.entity                     = entity;
+        try {
+            this.mappedExecutor             = this.getExecutor();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
     @Override
     public StorageIOResponse receive() throws IOException, SQLException {
@@ -55,11 +62,10 @@ public class TitanStripedReceive64 implements StripedReceive64{
         hydrarum.getTaskManager().add( masterVolumeGram );
         List<LogicVolume> volumes = this.stripedVolume.getChildren();
 
-        MappedExecutor sqLiteExecutor = this.getExecutor();
 
         int index = 0;
         for( LogicVolume volume : volumes ){
-            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob( this.entity, this.channel, volumes.size(), index, volume, sqLiteExecutor, 0, this.entity.getReceiveStorageObject().getSize() );
+            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob( this.entity, this.channel, volumes.size(), index, volume, mappedExecutor, 0, this.entity.getReceiveStorageObject().getSize() );
             LocalStripedTaskThread taskThread = new LocalStripedTaskThread(  this.stripedVolume.getName() + index, masterVolumeGram, receiverJob );
             masterVolumeGram.getTaskManager().add( taskThread );
             taskThread.start();
@@ -78,11 +84,10 @@ public class TitanStripedReceive64 implements StripedReceive64{
         hydrarum.getTaskManager().add( masterVolumeGram );
         List<LogicVolume> volumes = this.stripedVolume.getChildren();
 
-        MappedExecutor sqLiteExecutor = this.getExecutor();
 
         int index = 0;
         for( LogicVolume volume : volumes ){
-            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob( this.entity, this.channel, volumes.size(), index, volume, sqLiteExecutor, offset, offset.longValue()+endSize.longValue() );
+            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob( this.entity, this.channel, volumes.size(), index, volume, this.mappedExecutor, offset, offset.longValue()+endSize.longValue() );
             LocalStripedTaskThread taskThread = new LocalStripedTaskThread(  this.stripedVolume.getName() + index, masterVolumeGram, receiverJob );
             masterVolumeGram.getTaskManager().add( taskThread );
             taskThread.start();

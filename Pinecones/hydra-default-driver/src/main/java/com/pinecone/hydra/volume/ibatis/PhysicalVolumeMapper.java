@@ -10,10 +10,6 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Select;
 
-class GG {
-    public static int id = 0;
-}
-
 @IbatisDataAccessObject
 public interface PhysicalVolumeMapper extends PhysicalVolumeManipulator {
     @Insert("INSERT INTO `hydra_uofs_volumes` (`guid`, `create_time`, `update_time`, `name`, `type`, `ext_config`) VALUES ( #{guid}, #{createTime}, #{updateTime}, #{name}, #{type}, #{extConfig} )")

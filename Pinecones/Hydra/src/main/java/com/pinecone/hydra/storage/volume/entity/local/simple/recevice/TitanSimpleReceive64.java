@@ -18,7 +18,7 @@ import java.util.List;
 public class TitanSimpleReceive64 implements SimpleReceive64{
     private SimpleVolume            simpleVolume;
 
-    private Chanface fileChannel;
+    private Chanface                fileChannel;
 
     private VolumeManager           volumeManager;
 

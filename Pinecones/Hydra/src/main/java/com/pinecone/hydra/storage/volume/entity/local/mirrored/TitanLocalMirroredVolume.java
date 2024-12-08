@@ -57,25 +57,6 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
         this.volumeManager = volumeManager;
     }
 
-    @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, Chanface channel) throws IOException {
-        return null;
-    }
-
-    @Override
-    public StorageIOResponse channelReceive(StorageReceiveIORequest storageReceiveIORequest, Chanface channel, Number offset, Number endSize) throws IOException, SQLException {
-        return null;
-    }
-
-    @Override
-    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, Chanface channel) throws IOException {
-        return null;
-    }
-
-    @Override
-    public StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, Chanface channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException, SQLException {
-        return null;
-    }
 
     @Override
     public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException {

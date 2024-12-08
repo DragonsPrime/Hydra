@@ -19,5 +19,6 @@ public interface CompilerEncoder extends Pinenut {
 
     Set<String > getExceptedKeys();
 
-    Descriptors.Descriptor transform( DataStructureEntity entity );
+
+    Descriptors.Descriptor transform(DataStructureEntity entity );
 }

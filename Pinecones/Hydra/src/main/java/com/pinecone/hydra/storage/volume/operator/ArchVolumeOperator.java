@@ -14,7 +14,7 @@ import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 import java.time.LocalDateTime;
 
 public abstract class ArchVolumeOperator implements VolumeOperator{
-    protected VolumeManager volumeManager;
+    protected VolumeManager                 volumeManager;
     protected VolumeOperatorFactory         factory;
     protected DistributedTrieTree           distributedTrieTree;
     protected VolumeMasterManipulator       volumeMasterManipulator;

@@ -46,12 +46,6 @@ public interface LogicVolume extends Volume, TreeNode {
     void setVolumeTree( VolumeManager volumeManager);
 
 
-    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, Chanface channel ) throws IOException, SQLException;
-    StorageIOResponse channelReceive     (StorageReceiveIORequest storageReceiveIORequest, Chanface channel, Number offset, Number endSize ) throws IOException, SQLException;
-    StorageIOResponse channelExport      (StorageExportIORequest storageExportIORequest, Chanface channel ) throws IOException, SQLException;
-    StorageIOResponse channelExport(StorageExportIORequest storageExportIORequest, Chanface channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws IOException, SQLException;
-
-
     StorageIOResponse receive( ReceiveEntity entity ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException;
     StorageIOResponse receive( ReceiveEntity entity, Number offset, Number endSize ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException;
     StorageIOResponse receive( ReceiveEntity entity, CacheBlock cacheBlock, byte[] buffer ) throws SQLException, IOException;
