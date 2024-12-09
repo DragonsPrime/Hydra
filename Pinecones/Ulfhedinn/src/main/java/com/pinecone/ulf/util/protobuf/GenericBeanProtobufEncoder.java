@@ -31,12 +31,16 @@ public class GenericBeanProtobufEncoder implements BeanProtobufEncoder {
     }
 
     protected DescriptorProtos.FieldDescriptorProto.Builder transformEntry(
-            String key, Object value, int fieldNumber, List<Descriptors.FileDescriptor> dependencies,
+            String key, Object value, Class<?> valType, int fieldNumber, List<Descriptors.FileDescriptor> dependencies,
             Set<String> exceptedKeys, Options options, String thisKey
     ) {
-        DescriptorProtos.FieldDescriptorProto.Type fieldType = value == null
+        if ( valType == null ) {
+            valType = value.getClass();
+        }
+
+        DescriptorProtos.FieldDescriptorProto.Type fieldType = valType == null
                 ? DescriptorProtos.FieldDescriptorProto.Type.TYPE_STRING // Default for null values
-                : this.reinterpret( value.getClass() );
+                : this.reinterpret( valType );
 
 
         DescriptorProtos.FieldDescriptorProto.Builder fieldBuilder;
@@ -81,7 +85,7 @@ public class GenericBeanProtobufEncoder implements BeanProtobufEncoder {
         }
 
         if ( fieldType == DescriptorProtos.FieldDescriptorProto.Type.TYPE_MESSAGE ) {
-            Descriptors.Descriptor nestedDescriptor = this.transform0( value.getClass(), thisKey, value, exceptedKeys, options );
+            Descriptors.Descriptor nestedDescriptor = this.transform0( valType, thisKey, value, exceptedKeys, options );
             if ( nestedDescriptor != null ) {
                 fieldBuilder.setTypeName( nestedDescriptor.getFullName() );
                 dependencies.add( nestedDescriptor.getFile() );
@@ -111,7 +115,7 @@ public class GenericBeanProtobufEncoder implements BeanProtobufEncoder {
                 }
 
                 DescriptorProtos.FieldDescriptorProto.Builder fieldBuilder = this.transformEntry(
-                        key, entry.getValue(), fieldNumber, dependencies, exceptedKeys, options, szEntityName + "_" + key
+                        key, entry.getValue(), null, fieldNumber, dependencies, exceptedKeys, options, szEntityName + "_" + key
                 );
 
                 descriptorBuilder.addField( fieldBuilder );

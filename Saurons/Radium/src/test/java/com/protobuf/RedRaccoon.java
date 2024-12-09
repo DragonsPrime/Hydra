@@ -24,7 +24,7 @@ import javassist.ClassPool;
 
 public class RedRaccoon implements Raccoon {
     //@Override
-    public String scratch1( String target, long time ) {
+    public String scratch1( String target, int time ) {
         try{
             Method[] methods = Raccoon.class.getMethods();
             GenericArgumentRequest request = new GenericArgumentRequest( Raccoon.class.getName(), methods[0].getParameterTypes() );
@@ -63,7 +63,7 @@ public class RedRaccoon implements Raccoon {
     }
 
     @Override
-    public String scratch( String target, long time ) {
+    public String scratch( String target, int time ) {
         try{
             BytecodeIfacCompiler inspector = new BytecodeIfacCompiler( ClassPool.getDefault() );
             List<MethodDigest> digests = inspector.compile( Raccoon.class, false ).getMethodDigests();

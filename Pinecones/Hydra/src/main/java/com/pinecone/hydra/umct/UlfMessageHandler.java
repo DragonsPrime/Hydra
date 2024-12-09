@@ -2,7 +2,7 @@ package com.pinecone.hydra.umct;
 
 import java.util.List;
 
-public class UlfMessageController implements MessageController {
+public class UlfMessageHandler implements MessageHandler {
     @Override
     public String getAddressMapping() {
         return null;

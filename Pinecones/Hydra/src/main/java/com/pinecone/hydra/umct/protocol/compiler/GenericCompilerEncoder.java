@@ -46,7 +46,7 @@ public class GenericCompilerEncoder implements CompilerEncoder {
     }
 
     @Override
-    public Descriptors.Descriptor transform(DataStructureEntity entity ) {
+    public Descriptors.Descriptor transform( DataStructureEntity entity ) {
         String szEntityName = this.getOptions().normalizeDescriptorName( entity.getName() + this.getEntityExtend() );
         return this.getEncoder().transform(
                 entity.getSegments(), szEntityName, this.getExceptedKeys(), this.getOptions()

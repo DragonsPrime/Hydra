@@ -112,7 +112,7 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
 
         FieldEntity[] types = prototype.getArgumentTemplate().getSegments();
         for ( int i = 0; i < args.length; ++i ) {
-            types[ i + 1 ].setValue( args [ i ] ); // 1 for path argument.
+            types[ i + 1 ].setValue( args [ i ] );
         }
 
         return encoder.encode(

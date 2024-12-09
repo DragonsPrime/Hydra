@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.pinecone.framework.system.functions.Function;
 
-public interface MessageController extends Function {
+public interface MessageHandler extends Function {
     String getAddressMapping();
 
     @Override

@@ -21,7 +21,7 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     protected Hydrarum                                    mSystem;
     protected MessageExpress                              mExpress;
     protected ArchMessagram                               mMessagram;
-    protected TrieMap<String, MessageController >         mRoutingTable;
+    protected TrieMap<String, MessageHandler>             mRoutingTable;
     protected HeaderDecipher                              mHeaderDecipher;
     protected String                                      mszServicePathKey;
 
@@ -70,12 +70,12 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     }
 
     @Override
-    public TrieMap<String, MessageController > getRoutingTable() {
+    public TrieMap<String, MessageHandler> getRoutingTable() {
         return this.mRoutingTable;
     }
 
     @Override
-    public void registerController( String addr, MessageController controller ){
+    public void registerController( String addr, MessageHandler controller ){
         this.mRoutingTable.put( addr, controller );
     }
 
@@ -112,7 +112,7 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
                 return;
             }
 
-            MessageController controller = this.mRoutingTable.get( szAddr );
+            MessageHandler controller = this.mRoutingTable.get( szAddr );
             if( controller != null ) {
                 connection.entrust( this );
 

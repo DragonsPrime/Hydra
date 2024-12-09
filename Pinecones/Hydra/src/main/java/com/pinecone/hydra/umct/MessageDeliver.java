@@ -14,7 +14,7 @@ public interface MessageDeliver extends Deliver {
 
     String  getServiceKeyword();
 
-    TrieMap<String, MessageController > getRoutingTable();
+    TrieMap<String, MessageHandler> getRoutingTable();
 
-    void registerController( String addr, MessageController controller );
+    void registerController( String addr, MessageHandler controller );
 }

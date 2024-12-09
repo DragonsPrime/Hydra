@@ -29,7 +29,7 @@ public class GenericFieldProtobufEncoder extends GenericBeanProtobufEncoder impl
                 }
 
                 descriptorBuilder.addField( this.transformEntry(
-                        key, entry.getValue(), fieldNumber, dependencies, exceptedKeys, options, szEntityName + "_" + key
+                        key, entry.getValue(), null, fieldNumber, dependencies, exceptedKeys, options, szEntityName + "_" + key
                 ) );
                 ++fieldNumber;
             }
@@ -62,7 +62,7 @@ public class GenericFieldProtobufEncoder extends GenericBeanProtobufEncoder impl
                 }
 
                 descriptorBuilder.addField( this.transformEntry(
-                        key, entry.getValue(), fieldNumber, dependencies, exceptedKeys, options, szEntityName + "_" + key
+                        key, entry.getValue(), entry.getType(), fieldNumber, dependencies, exceptedKeys, options, szEntityName + "_" + key
                 ) );
                 ++fieldNumber;
             }

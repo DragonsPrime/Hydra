@@ -40,6 +40,7 @@ public abstract class ArchIfaceInspector extends GenericPreloadClassInspector im
         return ifaceMethods;
     }
 
+    @Override
     public String getIfaceMethodName( CtMethod method ) throws ClassNotFoundException {
         String ifaceName = method.getName();
 

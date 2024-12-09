@@ -185,7 +185,7 @@ public abstract class ArchIfacCompiler extends ArchIfaceInspector implements Ifa
         return this.mCompilerEncoder;
     }
 
-    protected Class<?> reinterpretClass(String className ) throws ClassNotFoundException {
+    protected Class<?> reinterpretClass( String className ) throws ClassNotFoundException {
         switch (className) {
             case "boolean": {
                 return boolean.class;
