@@ -40,7 +40,7 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
     @Override
     public StorageIOResponse export() throws IOException, SQLException {
         //初始化参数
-        List<LogicVolume> volumes = this.stripedVolume.getChildren();
+        List<LogicVolume> volumes = this.stripedVolume.queryChildren();
         int jobCount = volumes.size();
 
         int StripResidentCacheAllotRatio = volumeManager.getConfig().getStripResidentCacheAllotRatio();
@@ -64,7 +64,7 @@ public class TitanStripedChannelExport64 implements StripedChannelExport64{
     @Override
     public StorageIOResponse export(Number offset, Number endSize) throws IOException, SQLException {
         //初始化参数
-        List<LogicVolume> volumes = this.stripedVolume.getChildren();
+        List<LogicVolume> volumes = this.stripedVolume.queryChildren();
         int jobCount = volumes.size();
 
         int StripResidentCacheAllotRatio = volumeManager.getConfig().getStripResidentCacheAllotRatio();

@@ -76,10 +76,10 @@ class Alice extends Radium {
         //this.testDirectExport( volumeTree );
         //Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
-        //this.testStripedInsert( volumeTree );
+        this.testStripedInsert( volumeTree );
         //this.testSpannedInsert( volumeTree );
         //this.testStripedReceive( volumeTree );
-        this.testStripedExport( volumeTree );
+        //this.testStripedExport( volumeTree );
         //this.testHash( volumeTree );
         //this.testSpannedReceive( volumeTree );
         //this.testSpannedExport( volumeTree );
@@ -102,17 +102,17 @@ class Alice extends Radium {
         LocalPhysicalVolume physicalVolume1 = volumeAllotment.newLocalPhysicalVolume();
         physicalVolume1.setType("PhysicalVolume");
         physicalVolume1.setVolumeCapacity( volumeCapacity1 );
-        physicalVolume1.setName( "S1" );
+        physicalVolume1.setName( "C" );
         MountPoint mountPoint1 = volumeAllotment.newMountPoint();
-        mountPoint1.setMountPoint("E:/fs/s1");
+        mountPoint1.setMountPoint("D:/文件系统/簇1");
         physicalVolume1.setMountPoint( mountPoint1 );
 
         LocalPhysicalVolume physicalVolume2 = volumeAllotment.newLocalPhysicalVolume();
         physicalVolume2.setType("PhysicalVolume");
         physicalVolume2.setVolumeCapacity( volumeCapacity2 );
-        physicalVolume2.setName( "S2" );
+        physicalVolume2.setName( "D" );
         MountPoint mountPoint2 = volumeAllotment.newMountPoint();
-        mountPoint2.setMountPoint( "E:/fs/s2" );
+        mountPoint2.setMountPoint( "D:/文件系统/簇2" );
         physicalVolume2.setMountPoint( mountPoint2 );
 
         VolumeCapacity64 logicVolumeCapacity1 = volumeAllotment.newVolumeCapacity();
@@ -121,6 +121,9 @@ class Alice extends Radium {
         logicVolumeCapacity2.setDefinitionCapacity( 200*1024*1024 );
         VolumeCapacity64 logicVolumeCapacity3 = volumeAllotment.newVolumeCapacity();
         logicVolumeCapacity3.setDefinitionCapacity( 300*1024*1024 );
+
+        volumeManager.insertPhysicalVolume( physicalVolume1 );
+        volumeManager.insertPhysicalVolume( physicalVolume2 );
 
         LocalSimpleVolume simpleVolume1 = volumeAllotment.newLocalSimpleVolume();
         simpleVolume1.setName( "简单卷一" );
@@ -137,8 +140,7 @@ class Alice extends Radium {
         stripedVolume.setVolumeCapacity( logicVolumeCapacity3 );
         stripedVolume.setType( "StripedVolume" );
 
-        volumeManager.insertPhysicalVolume( physicalVolume1 );
-        volumeManager.insertPhysicalVolume( physicalVolume2 );
+
         simpleVolume1.build();
         simpleVolume2.build();
         stripedVolume.build();

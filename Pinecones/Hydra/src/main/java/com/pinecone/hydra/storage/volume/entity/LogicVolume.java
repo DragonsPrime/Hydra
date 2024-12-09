@@ -2,10 +2,7 @@ package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
-import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
-import com.pinecone.hydra.storage.StorageExportIORequest;
-import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
@@ -20,7 +17,7 @@ public interface LogicVolume extends Volume, TreeNode {
 
     void setName( String name );
 
-    List<LogicVolume> getChildren();
+    List<LogicVolume> queryChildren();
 
     void setChildren( List<LogicVolume> children );
 

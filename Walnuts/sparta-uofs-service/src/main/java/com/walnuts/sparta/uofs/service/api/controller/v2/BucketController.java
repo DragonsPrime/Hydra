@@ -1,4 +1,4 @@
-package com.walnuts.sparta.uofs.service.api.controller;
+package com.walnuts.sparta.uofs.service.api.controller.v2;
 
 import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.TitanFileChannelChanface;
@@ -31,8 +31,8 @@ import java.util.List;
 import static org.apache.commons.io.FilenameUtils.getExtension;
 
 @RestController
-@RequestMapping( "/api/service/uofs" )
-public class UOFSController {
+@RequestMapping( "/api/v2/uofs/bucket" )
+public class BucketController {
     @Resource
     private KOMFileSystem primaryFileSystem;
 

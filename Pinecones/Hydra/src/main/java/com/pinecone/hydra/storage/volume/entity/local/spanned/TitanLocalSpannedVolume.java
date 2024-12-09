@@ -4,16 +4,13 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
-import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
-import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.ExporterEntity;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
-import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
@@ -100,7 +97,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
 
     @Override
     public boolean existStorageObject(GUID storageObject) throws SQLException {
-        List<LogicVolume> volumes = this.getChildren();
+        List<LogicVolume> volumes = this.queryChildren();
         for( LogicVolume volume : volumes ){
             if ( volume.existStorageObject( storageObject ) ){
                 return true;
@@ -118,7 +115,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
         this.kenVolumeFileSystem.creatSpanLinkedVolumeTable( sqLiteExecutor );
         this.kenVolumeFileSystem.createSpannedIndexTable( sqLiteExecutor );
-        List<LogicVolume> volumes = this.getChildren();
+        List<LogicVolume> volumes = this.queryChildren();
         int index = 0;
         for( LogicVolume volume : volumes ){
             this.kenVolumeFileSystem.insertSpannedIndexTable( sqLiteExecutor, index, volume.getGuid() );

@@ -2,12 +2,23 @@ package com.pinecone.hydra.account;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
+import com.pinecone.hydra.account.entity.Account;
+import com.pinecone.hydra.account.entity.Domain;
+import com.pinecone.hydra.account.entity.ElementNode;
+import com.pinecone.hydra.account.entity.GenericAccount;
+import com.pinecone.hydra.account.entity.GenericDomain;
+import com.pinecone.hydra.account.entity.GenericGroup;
+import com.pinecone.hydra.account.entity.Group;
+import com.pinecone.hydra.service.kom.entity.Namespace;
+import com.pinecone.hydra.service.kom.entity.ServiceTreeNode;
+import com.pinecone.hydra.service.kom.entity.ServoElement;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.system.ko.kom.ArchKOMTree;
+import com.pinecone.hydra.system.ko.kom.MultiFolderPathSelector;
 import com.pinecone.hydra.system.ko.kom.SimplePathSelector;
 import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
@@ -19,19 +30,24 @@ import com.pinecone.hydra.account.source.UserMasterManipulator;
 import com.pinecone.hydra.account.source.UserNodeManipulator;
 import com.pinecone.ulf.util.id.GUIDs;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class UniformAccountManager extends ArchKOMTree implements AccountManager {
-    protected Hydrarum                  hydrarum;
+    protected Hydrarum                          hydrarum;
 
-    protected UserMasterManipulator     userMasterManipulator;
+    protected UserMasterManipulator             userMasterManipulator;
 
-    protected GroupNodeManipulator      groupNodeManipulator;
+    protected GroupNodeManipulator              groupNodeManipulator;
 
-    protected UserNodeManipulator       userNodeManipulator;
+    protected UserNodeManipulator               userNodeManipulator;
 
-    protected DomainNodeManipulator     domainNodeManipulator;
+    protected DomainNodeManipulator             domainNodeManipulator;
+
+    protected List<GUIDNameManipulator >        folderManipulators;
+
+    protected List<GUIDNameManipulator >        fileManipulators;
 
     public UniformAccountManager(Hydrarum hydrarum, KOIMasterManipulator masterManipulator, AccountManager parent, String name) {
         super(hydrarum, masterManipulator, KernelAccountConfig, parent, name);
@@ -45,8 +61,11 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
         this.userNodeManipulator    = this.userMasterManipulator.getUserNodeManipulator();
         this.domainNodeManipulator  = this.userMasterManipulator.getDomainNodeManipulator();
 
-        this.pathSelector                  =   new SimplePathSelector(
-                this.pathResolver, this.distributedTrieTree, this.domainNodeManipulator, new GUIDNameManipulator[] { this.groupNodeManipulator, this.userNodeManipulator }
+        this.folderManipulators = new ArrayList<>(List.of(this.domainNodeManipulator, this.groupNodeManipulator));
+        this.fileManipulators   = new ArrayList<>(List.of(this.userNodeManipulator));
+
+        this.pathSelector                = new MultiFolderPathSelector(
+                this.pathResolver, this.distributedTrieTree, this.folderManipulators.toArray( new GUIDNameManipulator[]{} ), this.fileManipulators.toArray( new GUIDNameManipulator[]{} )
         );
     }
 
@@ -77,7 +96,73 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
         return this.getNS( guid, this.kernelObjectConfig.getFullNameSeparator() );
     }
 
+    @Override
+    public ElementNode queryElement(String path) {
+        GUID guid = this.queryGUIDByPath(path);
+        if( guid != null ) {
+            return (ElementNode) this.get( guid );
+        }
 
+        return null;
+    }
+
+    protected ElementNode affirmTreeNodeByPath(String path, Class<? > cnSup, Class<? > nsSup ) {
+        String[] parts = this.pathResolver.segmentPathParts( path );
+        String currentPath = "";
+        GUID parentGuid = GUIDs.Dummy72();
+
+        ElementNode node = this.queryElement(path);
+        if ( node != null ){
+            return node;
+        }
+
+        ElementNode ret = null;
+        for( int i = 0; i < parts.length; ++i ){
+            currentPath = currentPath + ( i > 0 ? this.getConfig().getPathNameSeparator() : "" ) + parts[ i ];
+            node = this.queryElement( currentPath );
+            if ( node == null){
+                if ( i == parts.length - 1 && cnSup != null ){
+                    Account account = (Account) this.dynamicFactory.optNewInstance( cnSup, new Object[]{ this } );
+                    account.setName( parts[i] );
+                    GUID guid = this.put( account );
+                    return account;
+                }
+                else {
+                    ElementNode element = (ElementNode) this.dynamicFactory.optNewInstance( nsSup, new Object[]{ this } );
+                    element.setName( parts[i] );
+                    GUID guid = this.put( element );
+                    if ( i != 0 ){
+                        this.treeMasterManipulator.getTrieTreeManipulator().addChild( guid, parentGuid );
+                        parentGuid = guid;
+                    }
+                    else {
+                        parentGuid = guid;
+                    }
+
+                    ret = element;
+                }
+            }
+            else {
+                parentGuid = node.getGuid();
+            }
+        }
+
+        return ret;
+    }
+    @Override
+    public Account affirmAccount(String path) {
+        return (Account) this.affirmTreeNodeByPath( path, GenericAccount.class, GenericDomain.class );
+    }
+
+    @Override
+    public Group affirmGroup(String path) {
+        return (Group) this.affirmTreeNodeByPath( path, GenericGroup.class, GenericDomain.class);
+    }
+
+    @Override
+    public Domain affirmDomain(String path) {
+        return (Domain) this.affirmTreeNodeByPath( path, null, GenericDomain.class );
+    }
 
     protected String getNS(GUID guid, String szSeparator ){
         String path = this.distributedTrieTree.getCachePath(guid);

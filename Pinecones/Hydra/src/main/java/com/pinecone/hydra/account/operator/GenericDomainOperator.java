@@ -27,7 +27,7 @@ public class GenericDomainOperator extends ArchAccountServiceOperator implements
     public GUID insert(TreeNode treeNode) {
         Domain domain = (Domain) treeNode;
         DistributedTreeNode distributedTreeNode = this.affirmPreinsertionInitialize(domain);
-        GUID guid = domain.getDomainGuid();
+        GUID guid = domain.getGuid();
 
         this.distributedTrieTree.insert( distributedTreeNode );
         this.domainNodeManipulator.insert( domain );

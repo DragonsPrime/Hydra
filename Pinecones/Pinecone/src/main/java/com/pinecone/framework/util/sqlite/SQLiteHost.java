@@ -62,6 +62,7 @@ public class SQLiteHost implements RDBHost {
 
     @Override
     public void connect() throws SQLException {
+        Debug.trace("开启");
         try{
             Class.forName( this.mszDriver );
         }
@@ -74,6 +75,7 @@ public class SQLiteHost implements RDBHost {
 
     @Override
     public void close() throws SQLException {
+        Debug.trace("关闭");
         if( this.mGlobalConnection != null ) {
             this.mGlobalConnection.close();
         }

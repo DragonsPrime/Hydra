@@ -48,7 +48,7 @@ public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
         Hydrarum hydrarum = this.volumeManager.getHydrarum();
         MasterVolumeGram masterVolumeGram = new MasterVolumeGram( this.stripedVolume.getGuid().toString(), hydrarum );
         hydrarum.getTaskManager().add( masterVolumeGram );
-        List<LogicVolume> volumes = this.stripedVolume.getChildren();
+        List<LogicVolume> volumes = this.stripedVolume.queryChildren();
 
         MappedExecutor sqLiteExecutor = this.getExecutor();
 
@@ -71,7 +71,7 @@ public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
         Hydrarum hydrarum = this.volumeManager.getHydrarum();
         MasterVolumeGram masterVolumeGram = new MasterVolumeGram( this.stripedVolume.getGuid().toString(), hydrarum );
         hydrarum.getTaskManager().add( masterVolumeGram );
-        List<LogicVolume> volumes = this.stripedVolume.getChildren();
+        List<LogicVolume> volumes = this.stripedVolume.queryChildren();
 
         MappedExecutor sqLiteExecutor = this.getExecutor();
 

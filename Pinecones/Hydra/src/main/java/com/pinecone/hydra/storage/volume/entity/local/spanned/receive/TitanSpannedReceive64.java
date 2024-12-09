@@ -64,7 +64,7 @@ public class TitanSpannedReceive64 implements SpannedReceive64{
     }
 
     private StorageIOResponse receiveInternal(Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        List<LogicVolume> volumes = this.spannedVolume.getChildren();
+        List<LogicVolume> volumes = this.spannedVolume.queryChildren();
         UnifiedTransmitConstructor constructor = new UnifiedTransmitConstructor();
         GUID physicsGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume( this.spannedVolume.getGuid() );
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);

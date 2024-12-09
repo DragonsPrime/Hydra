@@ -5,16 +5,7 @@ import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
 import java.time.LocalDateTime;
 
-public interface Account extends TreeNode {
-    long getEnumId();
-    void setEnumId( long enumId );
-
-    String getUserName();
-    void setUserName( String userName );
-
-    GUID getGuid();
-    void setGuid( GUID guid );
-
+public interface Account extends ElementNode {
     String getNickName();
     void setNickName( String nickName );
 

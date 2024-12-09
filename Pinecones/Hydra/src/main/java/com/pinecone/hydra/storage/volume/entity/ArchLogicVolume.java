@@ -30,7 +30,7 @@ public abstract class ArchLogicVolume extends ArchVolume implements LogicVolume{
 
 
     @Override
-    public List<LogicVolume> getChildren() {
+    public List<LogicVolume> queryChildren() {
         if ( this.children == null || this.children.isEmpty() ){
             ArrayList<LogicVolume> logicVolumes = new ArrayList<>();
             List<TreeNode> nodes = this.volumeManager.getChildren( this.guid );

@@ -41,7 +41,7 @@ public class TitanSpannedExport64 implements SpannedExport64{
     @Override
     public StorageIOResponse export() throws IOException, SQLException {
         //先查找冲突表中是否存在该文件
-        List<LogicVolume> volumes = this.spannedVolume.getChildren();
+        List<LogicVolume> volumes = this.spannedVolume.queryChildren();
         GUID physicsVolumeGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.spannedVolume.getGuid());
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsVolumeGuid);
         SQLiteExecutor sqLiteExecutor = this.getSQLiteExecutor(physicalVolume);

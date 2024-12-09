@@ -4,12 +4,14 @@ import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
+import java.sql.SQLException;
+
 public interface TreeNodeOperator extends Pinenut {
     GUID insert( TreeNode treeNode );
 
     void purge( GUID guid );
 
-    TreeNode get( GUID guid );
+    TreeNode get( GUID guid ) ;
 
     TreeNode get( GUID guid, int depth );
 

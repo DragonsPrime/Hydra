@@ -1,7 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.receive.stream;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
-import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.rdb.MappedExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
@@ -16,7 +15,6 @@ import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.StripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.entity.local.striped.LocalStripedTaskThread;
-import com.pinecone.hydra.storage.volume.entity.local.striped.ReceiveBufferOutStatus;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripReceiveBufferInJob;
 import com.pinecone.hydra.storage.volume.entity.local.striped.TitanStripReceiveBufferOutJob;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
@@ -56,7 +54,7 @@ public class TitanStripedStreamReceive64 implements StripedStreamReceive64{
     @Override
     public StorageIOResponse streamReceive() throws IOException, SQLException {
         Hydrarum hydrarum = this.volumeManager.getHydrarum();
-        List<LogicVolume> volumes = this.stripedVolume.getChildren();
+        List<LogicVolume> volumes = this.stripedVolume.queryChildren();
         MasterVolumeGram masterVolumeGram = new MasterVolumeGram( this.stripedVolume.getGuid().toString(), hydrarum, volumes.size(), 1, this.volumeManager.getConfig().getDefaultStripSize().intValue() );
         hydrarum.getTaskManager().add( masterVolumeGram );
         MappedExecutor executor = this.getExecutor();

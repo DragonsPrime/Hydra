@@ -7,7 +7,11 @@ import com.pinecone.hydra.account.source.GroupNodeManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
+
 @IbatisDataAccessObject
 public interface GroupNodeMapper extends GroupNodeManipulator {
     @Insert("INSERT INTO `hydra_account_group_node` (`default_privilege_policy_guid`, `guid`, `name`) VALUES (#{defaultPrivilegePolicyGuid},#{guid},#{name})")
@@ -18,4 +22,9 @@ public interface GroupNodeMapper extends GroupNodeManipulator {
 
     @Select("SELECT `id`, `default_privilege_policy_guid`, `guid`, `name` FROM `hydra_account_group_node` WHERE `guid` = #{groupGuid}")
     Account queryGroup(GUID groupGuid );
+
+    @Select("SELECT `guid` FROM hydra_account_group_node WHERE `name` = #{name}")
+    List<GUID > getGuidsByName(String name );
+    @Select("SELECT `guid` FROM hydra_account_group_node WHERE `name` = #{name} AND guid = #{guid}")
+    List<GUID > getGuidsByNameID(@Param("name") String name, @Param("guid") GUID guid );
 }

@@ -3,26 +3,20 @@ package com.pinecone.hydra.storage.volume.entity.local.simple;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.framework.util.rdb.MappedExecutor;
-import com.pinecone.framework.util.rdb.RDBHost;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
-import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
-import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.ExporterEntity;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
-import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
-import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.channel.TitanSimpleChannelReceiverEntity64;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
@@ -31,18 +25,12 @@ import java.util.List;
 public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimpleVolume {
     protected SimpleVolumeManipulator simpleVolumeManipulator;
 
-
     protected MappedExecutor          mappedExecutor;
 
 
     public TitanLocalSimpleVolume(VolumeManager volumeManager, SimpleVolumeManipulator simpleVolumeManipulator) {
         super(volumeManager);
         this.simpleVolumeManipulator = simpleVolumeManipulator;
-        try {
-            this.mappedExecutor = this.getSQLiteExecutor();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public TitanLocalSimpleVolume( VolumeManager volumeManager){
@@ -57,8 +45,8 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     }
 
     @Override
-    public List<LogicVolume> getChildren() {
-        return super.getChildren();
+    public List<LogicVolume> queryChildren() {
+        return super.queryChildren();
     }
 
 
@@ -143,6 +131,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
         String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + config.getPathSeparator() + this.guid + config.getSqliteFileExtension();
         SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
+        this.mappedExecutor = sqLiteExecutor;
         this.kenVolumeFileSystem.createSimpleTargetMappingTab( sqLiteExecutor );
         this.volumeManager.put( this );
         this.kenVolumeFileSystem.insertSimpleTargetMappingTab( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
@@ -156,9 +145,17 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     public SQLiteExecutor getSQLiteExecutor() throws SQLException {
         VolumeConfig config = this.volumeManager.getConfig();
         GUID physicsGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.guid);
+        if( physicsGuid == null ){
+            return null;
+        }
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
+
         String url = physicalVolume.getMountPoint().getMountPoint()+ config.getPathSeparator() +this.guid+ config.getSqliteFileExtension();
         SQLiteHost sqLiteHost = new SQLiteHost(url);
         return new SQLiteExecutor( sqLiteHost );
+    }
+
+    public void assembleSQLiteExecutor() throws SQLException {
+        this.mappedExecutor = this.getSQLiteExecutor();
     }
 }

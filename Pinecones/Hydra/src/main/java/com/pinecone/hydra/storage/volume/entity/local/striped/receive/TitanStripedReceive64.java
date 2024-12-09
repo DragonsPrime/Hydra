@@ -60,7 +60,7 @@ public class TitanStripedReceive64 implements StripedReceive64{
         Hydrarum hydrarum = this.volumeManager.getHydrarum();
         MasterVolumeGram masterVolumeGram = new MasterVolumeGram( this.stripedVolume.getGuid().toString(), hydrarum );
         hydrarum.getTaskManager().add( masterVolumeGram );
-        List<LogicVolume> volumes = this.stripedVolume.getChildren();
+        List<LogicVolume> volumes = this.stripedVolume.queryChildren();
 
 
         int index = 0;
@@ -82,7 +82,7 @@ public class TitanStripedReceive64 implements StripedReceive64{
         Hydrarum hydrarum = this.volumeManager.getHydrarum();
         MasterVolumeGram masterVolumeGram = new MasterVolumeGram( this.stripedVolume.getGuid().toString(), hydrarum );
         hydrarum.getTaskManager().add( masterVolumeGram );
-        List<LogicVolume> volumes = this.stripedVolume.getChildren();
+        List<LogicVolume> volumes = this.stripedVolume.queryChildren();
 
 
         int index = 0;

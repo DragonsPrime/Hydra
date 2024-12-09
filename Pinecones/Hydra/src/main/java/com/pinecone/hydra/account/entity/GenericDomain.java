@@ -1,24 +1,17 @@
 package com.pinecone.hydra.account.entity;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.account.AccountManager;
 
-public class GenericDomain implements Domain{
-    protected long          enumId;
+public class GenericDomain extends ArchElementNode  implements Domain{
+    protected String domainName;
 
-    protected String        domainName;
-
-    protected GUID          domainGuid;
-
-    protected String        name;
-
-    @Override
-    public Long getEnumId() {
-        return this.enumId;
+    public GenericDomain(){
+        super();
     }
 
-    @Override
-    public void setEnumId(long enumId) {
-        this.enumId = enumId;
+    public GenericDomain(AccountManager accountManager){
+        super(accountManager);
     }
 
     @Override
@@ -29,30 +22,5 @@ public class GenericDomain implements Domain{
     @Override
     public void setDomainName(String domainName) {
         this.domainName = domainName;
-    }
-
-    @Override
-    public GUID getDomainGuid() {
-        return this.domainGuid;
-    }
-
-    @Override
-    public void setDomainGuid(GUID domainGuid) {
-        this.domainGuid = domainGuid;
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public GUID getGuid() {
-        return this.domainGuid;
-    }
-
-    @Override
-    public void setName(String name) {
-        this.name = name;
     }
 }
