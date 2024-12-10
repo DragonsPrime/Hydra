@@ -39,4 +39,5 @@ public interface AppointClient extends AppointNode {
 
     Object invokeInform( String szMethodAddress, Object... args ) throws IlleagalResponseException, IOException ;
 
+    <T> T getIface( Class<T> iface );
 }

@@ -13,6 +13,7 @@ import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
 import com.pinecone.hydra.umct.MessageHandler;
 import com.pinecone.hydra.umct.appoint.WolfAppointClient;
 import com.pinecone.hydra.umct.appoint.WolfAppointServer;
+import com.pinecone.hydra.umct.appoint.proxy.GenericIfaceProxyFactory;
 import com.pinecone.hydra.umct.protocol.compiler.BytecodeIfacCompiler;
 import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
 import com.pinecone.hydra.umct.protocol.compiler.MethodDigest;
@@ -33,7 +34,9 @@ class Jeff extends JesusChrist {
     public void vitalize () throws Exception {
         this.testProtoRPCServer();
 
-        this.testProtoRPCClient();
+        //this.testProtoRPCClient();
+
+        this.testIfaceProxy();
     }
 
     private void testProtoRPCServer() throws Exception {
@@ -113,6 +116,23 @@ class Jeff extends JesusChrist {
 
         this.getTaskManager().add( wolf );
         this.getTaskManager().syncWaitingTerminated();
+    }
+
+    protected void testIfaceProxy() throws Exception {
+        WolfAppointClient wolf = new WolfAppointClient( new WolfMCClient( "", this, this.getMiddlewareManager().getMiddlewareConfig().queryJSONObject( "Messagers.Messagers.WolfMCKingpin" ) ) );
+        wolf.execute();
+
+        wolf.compile( Raccoon.class, false );
+
+        Raccoon pRaccoon = wolf.getIface( Raccoon.class );
+        Debug.trace( pRaccoon.scratch( "tree ", 9133 ) );
+        Debug.trace( pRaccoon.scratch( "tref ", 9132 ) );
+        Debug.trace( pRaccoon.scratch( "treg ", 9131 ) );
+        Debug.trace( pRaccoon.scratch( "treh ", 9130 ) );
+
+        this.getTaskManager().add( wolf );
+        this.getTaskManager().syncWaitingTerminated();
+
     }
 }
 

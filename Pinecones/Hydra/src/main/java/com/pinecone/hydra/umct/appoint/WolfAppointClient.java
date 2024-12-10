@@ -22,6 +22,8 @@ import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 import com.pinecone.hydra.umc.wolfmc.client.UlfClient;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umct.IlleagalResponseException;
+import com.pinecone.hydra.umct.appoint.proxy.GenericIfaceProxyFactory;
+import com.pinecone.hydra.umct.appoint.proxy.IfaceProxyFactory;
 import com.pinecone.hydra.umct.protocol.compiler.BytecodeIfacCompiler;
 import com.pinecone.hydra.umct.protocol.compiler.CompilerEncoder;
 import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
@@ -33,11 +35,14 @@ import io.netty.channel.ChannelHandlerContext;
 import javassist.ClassPool;
 
 public class WolfAppointClient extends ArchAppointNode implements AppointClient {
-    protected UlfClient mMessenger;
+    protected UlfClient         mMessenger;
+
+    protected IfaceProxyFactory mIfaceProxyFactory;
 
     public WolfAppointClient( UlfClient messenger, InterfacialCompiler compiler ){
         super( (Servgramium) messenger ,compiler, new GenericFieldProtobufDecoder() );
-        this.mMessenger = messenger;
+        this.mMessenger         = messenger;
+        this.mIfaceProxyFactory = new GenericIfaceProxyFactory( this );
     }
 
     public WolfAppointClient( UlfClient messenger, CompilerEncoder encoder ){
@@ -251,6 +256,11 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
     @Override
     public Object invokeInform( String szMethodAddress, Object... args ) throws IlleagalResponseException, IOException {
         return this.invokeInform( this.queryMethodPrototype( szMethodAddress ), args );
+    }
+
+    @Override
+    public <T> T getIface( Class<T> iface ) {
+        return this.mIfaceProxyFactory.createProxy( iface );
     }
 
 }

@@ -129,8 +129,6 @@ class Appleby extends JesusChrist {
         //this.testStructure();
 
         //this.testIfacInspector();
-
-        this.testIfaceProxy();
     }
 
     private void testDynamic() throws Exception {
@@ -468,13 +466,7 @@ class Appleby extends JesusChrist {
     }
 
 
-    protected void testIfaceProxy(){
-        GenericIfaceProxyFactory factory = new GenericIfaceProxyFactory();
 
-        Beaver redBeaver = new RedBeaver();
-        Beaver pBeaver = factory.createProxy( Beaver.class );
-        Debug.trace( pBeaver.cutting( "tree" ) );
-    }
 
 }
 

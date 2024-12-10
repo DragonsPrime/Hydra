@@ -7,49 +7,64 @@ import org.springframework.cglib.proxy.MethodProxy;
 import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.pinecone.framework.system.prototype.Pinenut;
-import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.umct.stereotype.Iface;
+import com.pinecone.framework.util.name.Namespace;
+import com.pinecone.hydra.umct.appoint.AppointClient;
+import com.pinecone.hydra.umct.protocol.compiler.ClassDigest;
+import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
+import com.pinecone.hydra.umct.stereotype.IfaceUtils;
 
-public class GenericIfaceProxyFactory {
+public class GenericIfaceProxyFactory implements IfaceProxyFactory {
+    protected final ConcurrentHashMap<Class<?>, Enhancer> mEnhancerCache = new ConcurrentHashMap<>();
 
-    // Thread-safe cache for Enhancer instances
-    private final ConcurrentHashMap<Class<?>, Enhancer> enhancerCache = new ConcurrentHashMap<>();
+    protected AppointClient mClient;
 
-    public <T> T createProxy( Class<T> iface ) {
+    public GenericIfaceProxyFactory( AppointClient client ) {
+        this.mClient = client;
+    }
+
+    @Override
+    public <T> T createProxy( AppointClient client, ClassDigest classDigest, Class<T> iface ) {
 //        if (!iface.isInterface()) {
 //            throw new IllegalArgumentException("The provided class must be an interface.");
 //        }
 
-        Enhancer enhancer = enhancerCache.computeIfAbsent(iface, clazz -> {
+        Enhancer enhancer = this.mEnhancerCache.computeIfAbsent(iface, clazz -> {
             Enhancer e = new Enhancer();
-            //e.setSuperclass(impl.getClass());
-            e.setSuperclass(EmptyDummy.class);
+            e.setSuperclass(UMCTHub.class);
             if( iface != null ) {
-                e.setInterfaces(new Class[]{iface});
+                e.setInterfaces( new Class[]{iface} );
             }
 
-            e.setCallback((MethodInterceptor) (obj, method, args, proxy) -> {
-//                // Example: Process @Iface annotations on methods
-//                Iface ifaceAnnotation = method.getAnnotation(Iface.class);
-//                if (ifaceAnnotation != null) {
-//                    String ifaceName = ifaceAnnotation.name().isEmpty() ? method.getName() : ifaceAnnotation.name();
-//                    System.out.println("Intercepted @Iface method: " + ifaceName);
-//                    System.out.println("Arguments: " + java.util.Arrays.toString(args));
-//                }
+            e.setCallback(new MethodInterceptor() {
+                private DynamicMethodPrototype methodPrototype;
 
-                // Invoke the original method on the implementation
-
-                Debug.trace( method.getName() );
-
-                return "pp";
-                //return proxy.invoke(impl, args) + " proxy ";
+                @Override
+                public Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable {
+                    if ( this.methodPrototype == null ) {
+                        String methodName = IfaceUtils.getIfaceMethodName( method );
+                        this.methodPrototype = (DynamicMethodPrototype) client.queryMethodDigest(
+                                classDigest.getClassName() + Namespace.DEFAULT_SEPARATOR + methodName
+                        );
+                    }
+                    return client.invokeInform( this.methodPrototype, args );
+                }
             });
             return e;
         });
 
-        return (T)(enhancer.create());
-        //return iface.cast(enhancer.create());
+        return iface.cast( enhancer.create() );
+    }
+
+    @Override
+    public <T> T createProxy( AppointClient client, Class<T> iface ) {
+        ClassDigest classDigest = client.queryClassDigest( iface.getName() );
+
+        return this.createProxy( client, classDigest, iface );
+    }
+
+    @Override
+    public <T> T createProxy( Class<T> iface ) {
+        return this.createProxy( this.mClient, iface );
     }
 
 }

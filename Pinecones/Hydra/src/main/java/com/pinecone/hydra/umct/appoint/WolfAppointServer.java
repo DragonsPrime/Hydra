@@ -22,6 +22,7 @@ import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
 import com.pinecone.hydra.umct.protocol.compiler.InterfacialCompiler;
 import com.pinecone.hydra.umct.protocol.compiler.MethodDigest;
 import com.pinecone.hydra.umct.stereotype.Iface;
+import com.pinecone.hydra.umct.stereotype.IfaceUtils;
 import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 
 import javassist.ClassPool;
@@ -101,16 +102,7 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
     }
 
 
-    public static String getIfaceMethodName( Method method ){
-        String ifaceName = method.getName();
 
-        Iface annotation = method.getAnnotation(Iface.class);
-        if ( annotation != null && !annotation.name().isEmpty() ) {
-            ifaceName = annotation.name();
-        }
-
-        return ifaceName;
-    }
 
     protected void registerInstance( MessageDeliver deliver, Object instance, Class<?> iface ) {
         if ( !iface.isInterface() ) {
@@ -123,7 +115,7 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
 
         Method[] methods = iface.getMethods();
         for ( Method method : methods ) {
-            String methodName = WolfAppointServer.getIfaceMethodName( method );
+            String methodName = IfaceUtils.getIfaceMethodName( method );
 
             DynamicMethodPrototype digest = (DynamicMethodPrototype)digestMap.get( methodName );
 
