@@ -14,6 +14,8 @@ import com.pinecone.hydra.umct.MessageHandler;
 import com.pinecone.hydra.umct.appoint.WolfAppointClient;
 import com.pinecone.hydra.umct.appoint.WolfAppointServer;
 import com.pinecone.hydra.umct.appoint.proxy.GenericIfaceProxyFactory;
+import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
+import com.pinecone.hydra.umct.mapping.MappingDigest;
 import com.pinecone.hydra.umct.protocol.compiler.BytecodeIfacCompiler;
 import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
 import com.pinecone.hydra.umct.protocol.compiler.MethodDigest;
@@ -32,11 +34,13 @@ class Jeff extends JesusChrist {
 
     @Override
     public void vitalize () throws Exception {
-        this.testProtoRPCServer();
+        //this.testProtoRPCServer();
 
         //this.testProtoRPCClient();
 
-        this.testIfaceProxy();
+        //this.testIfaceProxy();
+
+        this.testController();
     }
 
     private void testProtoRPCServer() throws Exception {
@@ -47,10 +51,10 @@ class Jeff extends JesusChrist {
         WolfAppointServer wolf = new WolfAppointServer( wolf1 );
 
 
-//        BytecodeIfacCompiler inspector = new BytecodeIfacCompiler( ClassPool.getDefault() );
-//        List<MethodDigest> digests = inspector.compile( Raccoon.class, false ).getMethodDigests();
-//        MethodDigest digest = digests.get( 0 );
-//        DynamicMethodPrototype prototype = (DynamicMethodPrototype) digest;
+        BytecodeIfacCompiler inspector = new BytecodeIfacCompiler( ClassPool.getDefault() );
+        List<MethodDigest> digests = inspector.compile( Raccoon.class, false ).getMethodDigests();
+        MethodDigest digest = digests.get( 0 );
+        DynamicMethodPrototype prototype = (DynamicMethodPrototype) digest;
 //
 //
 //        wolf.getDefaultDeliver().registerController("com.protobuf.Raccoon.scratch", new MessageHandler() {
@@ -133,6 +137,13 @@ class Jeff extends JesusChrist {
         this.getTaskManager().add( wolf );
         this.getTaskManager().syncWaitingTerminated();
 
+    }
+
+    protected void testController() throws Exception {
+        BytecodeControllerInspector inspector = new BytecodeControllerInspector( ClassPool.getDefault() );
+
+        List<MappingDigest > digests = inspector.characterize( FoxController.class );
+        Debug.greenf( digests );
     }
 }
 

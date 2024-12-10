@@ -19,9 +19,9 @@ public interface MethodDigest extends Pinenut {
 
     Class<?> getReturnType();
 
-    List<ParamsDigest> getParamsDigests();
+    List<IfaceParamsDigest> getParamsDigests();
 
-    void apply( List<ParamsDigest> paramsDigests );
+    void apply( List<IfaceParamsDigest> ifaceParamsDigests);
 
     List<String> getArgumentsKey();
 }

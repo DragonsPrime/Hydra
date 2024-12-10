@@ -4,17 +4,18 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pinecone.hydra.umct.mapping.ArchMappingInspector;
+import com.pinecone.hydra.umct.mapping.ParamsDigest;
 import com.pinecone.hydra.umct.stereotype.Iface;
-import com.pinecone.ulf.util.lang.GenericPreloadClassInspector;
 
 import javassist.ClassPool;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
 
-public abstract class ArchIfaceInspector extends GenericPreloadClassInspector implements IfaceInspector {
-    public ArchIfaceInspector( ClassPool classPool ) {
-        super( classPool );
+public abstract class ArchIfaceInspector extends ArchMappingInspector implements IfaceInspector {
+    public ArchIfaceInspector( ClassPool classPool, ClassLoader classLoader ) {
+        super( classPool, classLoader );
     }
 
     @Override
@@ -53,5 +54,17 @@ public abstract class ArchIfaceInspector extends GenericPreloadClassInspector im
         }
 
         return ifaceName;
+    }
+
+    @SuppressWarnings( "unchecked" )
+    protected List<IfaceParamsDigest> inspectArgIfaceParams( Object methodDigest, CtMethod method ) {
+        return (List<IfaceParamsDigest> ) (List) this.inspectArgParams( methodDigest, method );
+    }
+
+    @Override
+    protected ParamsDigest newParamsDigest( Object methodDigest, int parameterIndex, String name, String value, String defaultValue, boolean required ) {
+        return new GenericIfaceParamsDigest(
+                (MethodDigest) methodDigest, parameterIndex, this.annotationKeyNormalize(name), this.annotationKeyNormalize(value), this.annotationKeyNormalize(defaultValue), required
+        );
     }
 }

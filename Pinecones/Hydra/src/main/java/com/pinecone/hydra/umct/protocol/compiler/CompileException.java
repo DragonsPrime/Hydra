@@ -1,8 +1,8 @@
 package com.pinecone.hydra.umct.protocol.compiler;
 
-import com.pinecone.framework.system.PineRuntimeException;
+import com.pinecone.hydra.umct.mapping.InspectException;
 
-public class CompileException extends PineRuntimeException {
+public class CompileException extends InspectException {
     public CompileException    () {
         super();
     }

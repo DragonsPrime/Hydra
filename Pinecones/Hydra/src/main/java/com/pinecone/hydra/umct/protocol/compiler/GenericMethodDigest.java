@@ -1,34 +1,33 @@
 package com.pinecone.hydra.umct.protocol.compiler;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import com.pinecone.framework.lang.field.DataStructureEntity;
 import com.pinecone.framework.unit.KeyValue;
-import com.pinecone.framework.util.StringUtils;
 import com.pinecone.framework.util.json.JSONEncoder;
 import com.pinecone.framework.util.name.Namespace;
+import com.pinecone.hydra.umct.mapping.MethodDigestUtils;
 import com.pinecone.hydra.umct.protocol.function.MethodTemplates;
 
 public class GenericMethodDigest implements MethodDigest {
-    protected ClassDigest          mClassDigest;
+    protected ClassDigest             mClassDigest;
 
-    protected String               mszName;
+    protected String                  mszName;
 
-    protected String               mszRawName;
+    protected String                  mszRawName;
 
-    protected DataStructureEntity  mArgumentTemplate;
+    protected DataStructureEntity     mArgumentTemplate;
 
-    protected Class<?>             mReturnType;
+    protected Class<?>                mReturnType;
 
-    protected List<ParamsDigest>   mParamsDigests;
+    protected List<IfaceParamsDigest> mIfaceParamsDigests;
 
-    public GenericMethodDigest( ClassDigest classDigest, String szName, String szRawName, Class<?>[] parameters, Class<?> returnType, List<ParamsDigest> paramsDigests ) {
+    public GenericMethodDigest( ClassDigest classDigest, String szName, String szRawName, Class<?>[] parameters, Class<?> returnType, List<IfaceParamsDigest> ifaceParamsDigests) {
         this.mClassDigest        = classDigest;
         this.mszName             = szName;
         this.mszRawName          = szRawName;
         this.mReturnType         = returnType;
-        this.mParamsDigests      = paramsDigests;
+        this.mIfaceParamsDigests = ifaceParamsDigests;
 
         if( parameters == null || parameters.length == 0 ) {
             this.mArgumentTemplate   = null;
@@ -38,30 +37,18 @@ public class GenericMethodDigest implements MethodDigest {
         }
     }
 
-    public GenericMethodDigest( ClassDigest classDigest, String szName, Class<?>[] parameters, Class<?> returnType, List<ParamsDigest> paramsDigests ) {
-        this( classDigest, szName, szName, parameters, returnType, paramsDigests );
+    public GenericMethodDigest( ClassDigest classDigest, String szName, Class<?>[] parameters, Class<?> returnType, List<IfaceParamsDigest> ifaceParamsDigests) {
+        this( classDigest, szName, szName, parameters, returnType, ifaceParamsDigests);
     }
 
     @Override
-    public void apply( List<ParamsDigest> paramsDigests ) {
-        this.mParamsDigests = paramsDigests;
+    public void apply( List<IfaceParamsDigest> ifaceParamsDigests) {
+        this.mIfaceParamsDigests = ifaceParamsDigests;
     }
 
     @Override
     public List<String> getArgumentsKey() {
-        if ( this.getParamsDigests() == null || this.getParamsDigests().isEmpty() || this.getParamsDigests().size() != this.getArgumentTemplate().size() ) {
-            return null;
-        }
-
-        List<String> keys = new ArrayList<>( this.mParamsDigests.size() );
-        for ( ParamsDigest digest : this.mParamsDigests ) {
-            String n = digest.getName();
-            if ( StringUtils.isEmpty( n ) ) {
-                return null;
-            }
-            keys.add( n );
-        }
-        return keys;
+        return MethodDigestUtils.getArgumentsKey( this.getParamsDigests(), this.getArgumentTemplate() );
     }
 
     @Override
@@ -95,8 +82,8 @@ public class GenericMethodDigest implements MethodDigest {
     }
 
     @Override
-    public List<ParamsDigest> getParamsDigests() {
-        return this.mParamsDigests;
+    public List<IfaceParamsDigest> getParamsDigests() {
+        return this.mIfaceParamsDigests;
     }
 
     @Override

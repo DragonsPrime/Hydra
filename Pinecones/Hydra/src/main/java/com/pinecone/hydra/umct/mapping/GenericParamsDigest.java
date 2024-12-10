@@ -1,11 +1,9 @@
-package com.pinecone.hydra.umct.protocol.compiler;
+package com.pinecone.hydra.umct.mapping;
 
 import com.pinecone.framework.unit.KeyValue;
 import com.pinecone.framework.util.json.JSONEncoder;
 
 public class GenericParamsDigest implements ParamsDigest {
-    protected MethodDigest mMethodDigest;
-
     protected int          mParameterIndex;
 
     protected String       mszName;
@@ -16,19 +14,12 @@ public class GenericParamsDigest implements ParamsDigest {
 
     protected boolean      mRequired;
 
-    public GenericParamsDigest( MethodDigest methodDigest, int parameterIndex, String name, String value, String defaultValue, boolean required ) {
-        this.mMethodDigest   = methodDigest;
+    public GenericParamsDigest( int parameterIndex, String name, String value, String defaultValue, boolean required ) {
         this.mParameterIndex = parameterIndex;
         this.mszName         = name;
         this.mszValue        = value;
         this.mRequired       = required;
         this.mszDefaultValue = defaultValue;
-    }
-
-
-    @Override
-    public MethodDigest getMethodDigest() {
-        return this.mMethodDigest;
     }
 
     @Override
