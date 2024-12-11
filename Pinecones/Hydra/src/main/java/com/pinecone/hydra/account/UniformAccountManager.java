@@ -164,6 +164,38 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
         return (Domain) this.affirmTreeNodeByPath( path, null, GenericDomain.class );
     }
 
+    @Override
+    public void addChildren( GUID parentGuid, GUID childrenGuid ) {
+        this.treeMasterManipulator.getTrieTreeManipulator().addChild( childrenGuid, parentGuid );
+    }
+
+    @Override
+    public boolean containsChild(GUID parentGuid, String childName) {
+        for( GUIDNameManipulator manipulator : this.fileManipulators ) {
+            if( this.containsChild( manipulator, parentGuid, childName ) ) {
+                return true;
+            }
+        }
+
+        for( GUIDNameManipulator manipulator : this.folderManipulators ) {
+            if( this.containsChild( manipulator, parentGuid, childName ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    protected boolean containsChild( GUIDNameManipulator manipulator, GUID parentGuid, String childName ) {
+        List<GUID > guids = manipulator.getGuidsByName( childName );
+        for( GUID guid : guids ) {
+            List<GUID > ps = this.distributedTrieTree.fetchParentGuids( guid );
+            if( ps.contains( parentGuid ) ){
+                return true;
+            }
+        }
+        return false;
+    }
+
     protected String getNS(GUID guid, String szSeparator ){
         String path = this.distributedTrieTree.getCachePath(guid);
         if ( path != null ) {

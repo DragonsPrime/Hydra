@@ -23,7 +23,7 @@ public class BucketMasterManipulatorImpl implements BucketMasterManipulator {
     }
 
     public BucketMasterManipulatorImpl( KOIMappingDriver driver ) {
-        driver.autoConstruct( RegistryMasterManipulatorImpl.class, Map.of(), this );
+        driver.autoConstruct( BucketMasterManipulatorImpl.class, Map.of(), this );
     }
     @Override
     public BucketManipulator getBucketManipulator() {

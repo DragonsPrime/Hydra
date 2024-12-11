@@ -2,6 +2,9 @@ package com.walnuts.sparta.uofs.service.api.controller.v2;
 
 import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.TitanFileChannelChanface;
+import com.pinecone.hydra.storage.bucket.BucketInstrument;
+import com.pinecone.hydra.storage.bucket.entity.Bucket;
+import com.pinecone.hydra.storage.bucket.entity.GenericBucket;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
@@ -14,7 +17,10 @@ import com.walnuts.sparta.uofs.service.domain.dto.DownloadObjectByChannelDTO;
 import com.walnuts.sparta.uofs.service.domain.dto.UpdateObjectByChannelDTO;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +32,7 @@ import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.apache.commons.io.FilenameUtils.getExtension;
@@ -37,126 +44,92 @@ public class BucketController {
     private KOMFileSystem primaryFileSystem;
 
     @Resource
-    private UniformVolumeManager primaryVolume;
+    private BucketInstrument bucketInstrument;
+    @Resource
+    private TransmitController transmitController;
+
+
 
     /**
-     * 使用channel上传对象
-     * @param dto 上传所需数据
-     * @return 返回操作结果
-     * @throws IOException
-     * @throws SQLException
+     * 创建bucket
+     * @param bucketName 桶名
+     * @param accountGuid 用户Guid
+     * @return 返回bucketGuid
      */
-    @PostMapping("/channel/update")
-    public BasicResultResponse<String> updateObjectByChannel( UpdateObjectByChannelDTO dto ) throws IOException, SQLException {
-        MultipartFile object = dto.getObject();
-        File file = File.createTempFile( "uofs","."+ getExtension(object.getOriginalFilename()) );
-        object.transferTo( file );
-        Chanface chanface = this.getKChannel(file);
+    @PutMapping("/{bucketName}")
+    public BasicResultResponse<String> createBucket(@PathVariable String bucketName, @RequestBody String accountGuid ){
+        Folder folder = this.primaryFileSystem.affirmFolder(bucketName);
+        GenericBucket bucket = new GenericBucket();
+        bucket.setBucketName( bucketName );
+        bucket.setCreateTime(LocalDateTime.now());
+        bucket.setMountPoint( folder.getGuid() );
+        bucket.setUserGuid( GUIDs.GUID72( accountGuid ) );
+        this.bucketInstrument.createBucket( bucket );
+        return BasicResultResponse.success( bucket.getBucketGuid().toString() );
+    }
 
-        FSNodeAllotment fsNodeAllotment = this.primaryFileSystem.getFSNodeAllotment();
-        FileNode fileNode = fsNodeAllotment.newFileNode();
-        fileNode.setDefinitionSize( file.length() );
-        fileNode.setName( file.getName() );
+    /**
+     * 获取账号下的所有桶
+     * @param accountGuid 用户账号guid
+     * @return 返回所有桶信息
+     */
+    @GetMapping("/")
+    public String listBuckets(@RequestBody String accountGuid ){
+        List<Bucket> buckets = this.bucketInstrument.queryBucketsByUserGuid(GUIDs.GUID72(accountGuid));
+        return BasicResultResponse.success(buckets).toJSONString();
+    }
 
-//        GenericChannelFileReceiveEntity receiveEntity = new GenericChannelFileReceiveEntity(this.primaryFileSystem, dto.getDestDirPath(), fileNode, kChannel);
-//        this.primaryFileSystem.receive( primaryVolume.get(GUIDs.GUID72( dto.getVolumeGuid() ) ), receiveEntity );
+    /**
+     * 删除桶
+     * @param bucketName 桶名
+     * @param accountGuid 账号Guid
+     * @return  返回操作结果
+     */
+    @DeleteMapping("/{bucketName}")
+    public BasicResultResponse<String> deleteBucket( @PathVariable String bucketName, @RequestBody String accountGuid ){
+        this.bucketInstrument.removeBucketByAccountAndBucketName( GUIDs.GUID72(accountGuid), bucketName  );
         return BasicResultResponse.success();
     }
 
     /**
-     * 使用channel将对象下载到本地
-     * @param dto 下载所需的数据
-     * @return 返回操作结果
-     * @throws IOException
-     * @throws SQLException
+     * 获取存储对象
+     * @param bucketName 桶名
+     * @param objectName 对象名
+     * @return 返回储存对象
      */
-    @PostMapping("/channel/download")
-    public BasicResultResponse<String> downloadObjectByChannel( DownloadObjectByChannelDTO dto ) throws IOException, SQLException {
-        File file = new File( dto.getTargetPath());
-        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-        TitanFileChannelChanface titanFileChannelKChannel = new TitanFileChannelChanface( channel );
-
-//        FileNode fileNode = (FileNode) this.primaryFileSystem.get(this.primaryFileSystem.queryGUIDByPath(dto.getDestDirPath()));
-//        GenericChannelFileExporterEntity exporterEntity = new GenericChannelFileExporterEntity(this.primaryFileSystem, fileNode, titanFileChannelKChannel);
-//        this.primaryFileSystem.export( this.primaryVolume, exporterEntity );
-
+    @GetMapping("/{bucketName}/{objectName}")
+    public BasicResultResponse<MultipartFile> getObject(@PathVariable String bucketName, @PathVariable String objectName){
         return BasicResultResponse.success();
     }
 
     /**
-     * 获取文件夹下所有内容
-     * @param folderGuid 文件夹guid
-     * @returnS
+     * 上传储存对象
+     * @param bucketName 桶名
+     * @param objectName 对象名
+     * @return
      */
-    @GetMapping("/folder/listItem")
-    public String listItem(@RequestParam String folderGuid ){
-        Folder folder = this.primaryFileSystem.getFolder(GUIDs.GUID72(folderGuid));
-        List<FileTreeNode> fileTreeNodes = folder.listItem();
-        return  BasicResultResponse.success(fileTreeNodes).toJSONString() ;
-    }
-
-    /**
-     * 创建文件夹
-     * @param destDirPath 文件夹路径
-     * @return 返回操作状态
-     */
-    @GetMapping("/creat/folder")
-    public BasicResultResponse<String> createFolder( @RequestParam String destDirPath ){
-        this.primaryFileSystem.affirmFolder( destDirPath );
+    @PutMapping("/{bucketName}/{objectName}")
+    public BasicResultResponse<String> putObject(@PathVariable String bucketName, @PathVariable String objectName){
         return BasicResultResponse.success();
     }
 
     /**
-     * 创建文件
-     * @param filePath 文件路径
-     * @return 返回操作状态
+     * 删除存储对象
+     * @param bucketName 桶名
+     * @param objectName 存储对象名
+     * @return 返回操作信息
      */
-    @GetMapping("/creat/file")
-    public BasicResultResponse<String> createFile( @RequestParam String filePath ){
-        this.primaryFileSystem.affirmFileNode( filePath );
+    @DeleteMapping("/{bucketName}/{objectName}")
+    public BasicResultResponse<String> deleteObject( @PathVariable String bucketName, @PathVariable String objectName ){
         return BasicResultResponse.success();
     }
 
     /**
-     * 获取所有根文件夹
-     * @return 返回根信息
+     * 列出储存桶中的对象
+     * @param bucketName 桶名
+     * @return 返回对象列表
      */
-    @GetMapping("/list/root")
-    public String listRoot(){
-        List<FileTreeNode> roots = this.primaryFileSystem.fetchRoot();
-        return BasicResultResponse.success( roots ).toJSONString();
-    }
-
-    /**
-     * 获取文件或文件夹属性
-     * @param nodeGuid 文件或文件夹guid
-     * @return 返回属性信息
-     */
-    @GetMapping("/attribute")
-    public BasicResultResponse< FileTreeNode > attribute( @RequestParam("nodeGuid") String nodeGuid ){
-        FileTreeNode fileTreeNode = this.primaryFileSystem.get(GUIDs.GUID72(nodeGuid));
-        return BasicResultResponse.success( fileTreeNode );
-    }
-
-    /**
-     * 移除文件夹或者文件
-     * @param fileGuid 文件夹或者文件guid
-     * @return 返回操作结果
-     */
-    @DeleteMapping("/remove/file")
-    public BasicResultResponse<String> removeFile( String fileGuid ){
-        this.primaryFileSystem.remove( GUIDs.GUID72( fileGuid ) );
+    public BasicResultResponse<List<FileNode>> listObjects( @PathVariable String bucketName ){
         return BasicResultResponse.success();
     }
-
-
-    
-
-
-    private Chanface getKChannel(File file ) throws IOException {
-        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-        return new TitanFileChannelChanface( channel );
-    }
-
-
 }

@@ -1,6 +1,8 @@
 package com.pinecone.hydra.storage.bucket.entity;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.ulf.util.id.impl.GenericGuidAllocator;
 
 import java.time.LocalDateTime;
 
@@ -15,7 +17,14 @@ public class GenericBucket implements Bucket{
 
     protected GUID userGuid;
 
-    protected String mountPoint;
+    protected GUID mountPoint;
+
+    protected GuidAllocator guidAllocator;
+
+    public GenericBucket(){
+        this.guidAllocator = new GenericGuidAllocator();
+        this.bucketGuid = this.guidAllocator.nextGUID72();
+    }
 
     @Override
     public int getEnumId() {
@@ -53,12 +62,12 @@ public class GenericBucket implements Bucket{
     }
 
     @Override
-    public String getMountPoint() {
+    public GUID getMountPoint() {
         return this.mountPoint;
     }
 
     @Override
-    public void setMountPoint(String mountPoint) {
+    public void setMountPoint(GUID mountPoint) {
         this.mountPoint = mountPoint;
     }
 

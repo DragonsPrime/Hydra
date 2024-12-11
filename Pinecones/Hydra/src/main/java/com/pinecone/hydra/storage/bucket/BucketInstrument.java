@@ -11,6 +11,8 @@ public interface BucketInstrument extends Pinenut {
 
     void removeBucket( GUID bucketGuid );
 
+    void removeBucketByAccountAndBucketName( GUID accountGuid, String bucketName );
+
     Bucket queryBucketByBucketGuid( GUID bucketGuid );
 
     List<Bucket> queryBucketsByUserGuid( GUID userGuid );

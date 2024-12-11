@@ -3,7 +3,9 @@ package com.pinecone.hydra.account.entity;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.account.AccountManager;
 
-public class GenericDomain extends ArchElementNode  implements Domain{
+import java.util.List;
+
+public class GenericDomain extends ArchFolderElementNode  implements Domain{
     protected String domainName;
 
     public GenericDomain(){
@@ -23,4 +25,5 @@ public class GenericDomain extends ArchElementNode  implements Domain{
     public void setDomainName(String domainName) {
         this.domainName = domainName;
     }
+
 }

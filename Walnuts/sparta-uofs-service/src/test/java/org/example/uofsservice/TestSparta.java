@@ -4,7 +4,10 @@ import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.system.functions.Executor;
 import com.pinecone.framework.util.Debug;
+import com.pinecone.hydra.bucket.ibatis.hydranium.BucketMappingDriver;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
+import com.pinecone.hydra.storage.bucket.BucketInstrument;
+import com.pinecone.hydra.storage.bucket.TitanBucketInstrument;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
@@ -47,9 +50,15 @@ class JesusChrist extends Radium {
         KOIMappingDriver koiFileMappingDriver = new FileMappingDriver(
                 this, (IbatisClient)this.getMiddlewareManager().getRDBManager().getRDBClientByName( "MySQLKingHydranium" ), this.getDispenserCenter()
         );
+        KOIMappingDriver koiBucketMappingDriver = new BucketMappingDriver(
+                this, (IbatisClient)this.getMiddlewareManager().getRDBManager().getRDBClientByName( "MySQLKingHydranium" ), this.getDispenserCenter()
+        );
+
+
 
         KOMFileSystem fileSystem = new UniformObjectFileSystem( koiFileMappingDriver );
         UniformVolumeManager volumeTree = new UniformVolumeManager( koiMappingDriver );
+        TitanBucketInstrument bucketInstrument = new TitanBucketInstrument( koiBucketMappingDriver );
 
 
         sparta.setPrimarySources( SpartaBoot.class );
@@ -63,6 +72,7 @@ class JesusChrist extends Radium {
                         GenericApplicationContext genericApplicationContext = (GenericApplicationContext) applicationContext;
                         genericApplicationContext.registerBean("primaryFileSystem", UniformObjectFileSystem.class, () -> (UniformObjectFileSystem)fileSystem);
                         genericApplicationContext.registerBean("primaryVolume", UniformVolumeManager.class, () -> (UniformVolumeManager) volumeTree);
+                        genericApplicationContext.registerBean("primaryBucket", TitanBucketInstrument.class, () -> (TitanBucketInstrument) bucketInstrument);
                     }
                 });
             }

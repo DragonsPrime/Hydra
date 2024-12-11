@@ -9,6 +9,8 @@ import java.util.List;
 public interface BucketManipulator extends Pinenut {
     void insert( Bucket bucket );
     void remove( GUID bucketGuid );
+
+    void removeByAccountAndBucketName( GUID accountGuid, String bucketName );
     Bucket queryBucketByBucketGuid( GUID bucketGuid );
     List<Bucket> queryBucketsByUserGuid( GUID userGuid );
 }

@@ -55,6 +55,11 @@ public class TitanBucketInstrument implements BucketInstrument {
     }
 
     @Override
+    public void removeBucketByAccountAndBucketName(GUID accountGuid, String bucketName) {
+
+    }
+
+    @Override
     public Bucket queryBucketByBucketGuid(GUID bucketGuid) {
         return this.bucketManipulator.queryBucketByBucketGuid( bucketGuid );
     }

@@ -17,8 +17,8 @@ public interface Bucket extends Pinenut {
     GUID getUserGuid();
     void setUserGuid( GUID userGuid );
 
-    String getMountPoint();
-    void setMountPoint( String mountPoint );
+    GUID getMountPoint();
+    void setMountPoint( GUID mountPoint );
 
     LocalDateTime  getCreateTime();
     void setCreateTime( LocalDateTime createTime );

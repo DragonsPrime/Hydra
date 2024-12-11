@@ -1,5 +1,6 @@
 package com.pinecone.hydra.account;
 
+import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.account.entity.Account;
 import com.pinecone.hydra.account.entity.Domain;
 import com.pinecone.hydra.account.entity.ElementNode;
@@ -16,5 +17,9 @@ public interface AccountManager extends KOMInstrument {
     Domain  affirmDomain( String path );
 
     ElementNode queryElement( String path );
+
+    void addChildren(GUID parentGuid, GUID childrenGuid);
+
+    boolean containsChild( GUID parentGuid, String childName );
 
 }

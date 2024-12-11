@@ -5,7 +5,7 @@ import com.pinecone.hydra.unit.udtt.entity.TreeNode;
 
 import java.time.LocalDateTime;
 
-public interface Account extends ElementNode {
+public interface Account extends FileElement {
     String getNickName();
     void setNickName( String nickName );
 
