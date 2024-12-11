@@ -12,7 +12,7 @@ import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.hydra.umc.msg.ExtraEncode;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
-import com.pinecone.hydra.umct.protocol.compiler.CompilerEncoder;
+import com.pinecone.hydra.umct.husky.compiler.CompilerEncoder;
 
 public class PrototypeDecipher implements HeaderDecipher {
     protected volatile static Descriptors.Descriptor PathDescriptor = null;

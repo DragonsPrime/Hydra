@@ -7,7 +7,7 @@ import com.pinecone.framework.lang.field.DataStructureEntity;
 import com.pinecone.framework.unit.KeyValue;
 import com.pinecone.framework.util.json.JSONEncoder;
 import com.pinecone.hydra.umc.msg.UMCMethod;
-import com.pinecone.hydra.umct.protocol.function.MethodTemplates;
+import com.pinecone.hydra.umct.husky.function.MethodTemplates;
 
 public class GenericMappingDigest implements MappingDigest {
     protected String[]                mszAddresses;

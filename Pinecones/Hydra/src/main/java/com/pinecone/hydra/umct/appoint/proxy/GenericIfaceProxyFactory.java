@@ -9,8 +9,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.pinecone.framework.util.name.Namespace;
 import com.pinecone.hydra.umct.appoint.AppointClient;
-import com.pinecone.hydra.umct.protocol.compiler.ClassDigest;
-import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
+import com.pinecone.hydra.umct.husky.compiler.ClassDigest;
+import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
 import com.pinecone.hydra.umct.stereotype.IfaceUtils;
 
 public class GenericIfaceProxyFactory implements IfaceProxyFactory {
@@ -31,9 +31,7 @@ public class GenericIfaceProxyFactory implements IfaceProxyFactory {
         Enhancer enhancer = this.mEnhancerCache.computeIfAbsent(iface, clazz -> {
             Enhancer e = new Enhancer();
             e.setSuperclass(UMCTHub.class);
-            if( iface != null ) {
-                e.setInterfaces( new Class[]{iface} );
-            }
+            e.setInterfaces( new Class[]{iface} );
 
             e.setCallback(new MethodInterceptor() {
                 private DynamicMethodPrototype methodPrototype;

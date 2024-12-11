@@ -3,7 +3,6 @@ package com.pinecone.hydra.umct.appoint;
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -24,10 +23,13 @@ import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umct.IlleagalResponseException;
 import com.pinecone.hydra.umct.appoint.proxy.GenericIfaceProxyFactory;
 import com.pinecone.hydra.umct.appoint.proxy.IfaceProxyFactory;
-import com.pinecone.hydra.umct.protocol.compiler.BytecodeIfacCompiler;
-import com.pinecone.hydra.umct.protocol.compiler.CompilerEncoder;
-import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
-import com.pinecone.hydra.umct.protocol.compiler.InterfacialCompiler;
+import com.pinecone.hydra.umct.husky.compiler.BytecodeIfacCompiler;
+import com.pinecone.hydra.umct.husky.compiler.CompilerEncoder;
+import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
+import com.pinecone.hydra.umct.husky.compiler.InterfacialCompiler;
+import com.pinecone.hydra.umct.husky.machinery.HuskyMarshal;
+import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
+import com.pinecone.hydra.umct.mapping.ControllerInspector;
 import com.pinecone.ulf.util.protobuf.FieldProtobufEncoder;
 import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 
@@ -39,8 +41,8 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
 
     protected IfaceProxyFactory mIfaceProxyFactory;
 
-    public WolfAppointClient( UlfClient messenger, InterfacialCompiler compiler ){
-        super( (Servgramium) messenger ,compiler, new GenericFieldProtobufDecoder() );
+    public WolfAppointClient( UlfClient messenger, InterfacialCompiler compiler, ControllerInspector controllerInspector ){
+        super( (Servgramium) messenger, new HuskyMarshal( compiler, controllerInspector, new GenericFieldProtobufDecoder() ) );
         this.mMessenger         = messenger;
         this.mIfaceProxyFactory = new GenericIfaceProxyFactory( this );
     }
@@ -48,11 +50,15 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
     public WolfAppointClient( UlfClient messenger, CompilerEncoder encoder ){
         this( messenger, new BytecodeIfacCompiler(
                 ClassPool.getDefault(), messenger.getTaskManager().getClassLoader(), encoder
+        ), new BytecodeControllerInspector(
+                ClassPool.getDefault(), messenger.getTaskManager().getClassLoader()
         ) );
     }
 
     public WolfAppointClient( UlfClient messenger ){
         this( messenger, new BytecodeIfacCompiler(
+                ClassPool.getDefault(), messenger.getTaskManager().getClassLoader()
+        ), new BytecodeControllerInspector(
                 ClassPool.getDefault(), messenger.getTaskManager().getClassLoader()
         ) );
     }

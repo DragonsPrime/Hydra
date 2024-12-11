@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.pinecone.hydra.express.Package;
 import com.pinecone.hydra.umct.decipher.PrototypeDecipher;
-import com.pinecone.hydra.umct.protocol.compiler.CompilerEncoder;
+import com.pinecone.hydra.umct.husky.compiler.CompilerEncoder;
 
 public class ProtoletMsgDeliver extends ArchMsgDeliver {
 

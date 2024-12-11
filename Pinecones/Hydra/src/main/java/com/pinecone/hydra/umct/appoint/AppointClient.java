@@ -1,17 +1,10 @@
 package com.pinecone.hydra.umct.appoint;
 
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
-import com.google.protobuf.DynamicMessage;
 import com.pinecone.hydra.umc.msg.UMCMessage;
-import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
-import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umct.IlleagalResponseException;
-import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
+import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
 
 public interface AppointClient extends AppointNode {
     UMCMessage sendSyncMsg( UMCMessage request ) throws IOException;

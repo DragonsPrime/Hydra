@@ -8,17 +8,19 @@ import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.JSONMaptron;
+import com.pinecone.framework.util.lang.DynamicFactory;
+import com.pinecone.framework.util.lang.GenericDynamicFactory;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
-import com.pinecone.hydra.umct.MessageHandler;
 import com.pinecone.hydra.umct.appoint.WolfAppointClient;
 import com.pinecone.hydra.umct.appoint.WolfAppointServer;
+import com.pinecone.hydra.umct.husky.machinery.HuskyMappingLoader;
+import com.pinecone.hydra.umct.husky.machinery.MultiMappingLoader;
 import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
 import com.pinecone.hydra.umct.mapping.MappingDigest;
-import com.pinecone.hydra.umct.protocol.compiler.BytecodeIfacCompiler;
-import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
-import com.pinecone.hydra.umct.protocol.compiler.IfaceMappingDigest;
-import com.pinecone.hydra.umct.protocol.compiler.MethodDigest;
+import com.pinecone.hydra.umct.husky.compiler.BytecodeIfacCompiler;
+import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
+import com.pinecone.hydra.umct.husky.compiler.MethodDigest;
 import com.sauron.radium.messagron.Messagron;
 
 import javassist.ClassPool;
@@ -42,7 +44,9 @@ class Jeff extends JesusChrist {
 
         //this.testController();
 
-        this.testProtoRPCServerController();
+        //this.testProtoRPCServerController();
+
+        this.testClassScanner();
 
     }
 
@@ -165,6 +169,19 @@ class Jeff extends JesusChrist {
         this.getTaskManager().add( wolf );
 
         this.testProtoRPCClient();
+    }
+
+    private void testClassScanner() throws Exception {
+        DynamicFactory factory = new GenericDynamicFactory();
+        WolfMCServer wolf1 = new WolfMCServer( "", this, new JSONMaptron("{host: \"0.0.0.0\",\n" +
+                "port: 5777, SocketTimeout: 800, KeepAliveTimeout: 3600, MaximumConnections: 1e6}") );
+        WolfAppointServer wolf = new WolfAppointServer( wolf1 );
+
+        factory.getClassScope().addScope( "com.protobuf" );
+        MultiMappingLoader mappingLoader = new HuskyMappingLoader( factory, wolf.getPMCTTransformer() );
+        mappingLoader.updateScope();
+
+        Debug.trace( wolf );
     }
 }
 

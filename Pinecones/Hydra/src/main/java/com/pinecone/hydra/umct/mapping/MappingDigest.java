@@ -6,7 +6,6 @@ import java.util.List;
 import com.pinecone.framework.lang.field.DataStructureEntity;
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.hydra.umc.msg.UMCMethod;
-import com.pinecone.hydra.umct.protocol.compiler.IfaceParamsDigest;
 
 public interface MappingDigest extends Pinenut {
     String[] getAddresses();

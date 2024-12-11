@@ -1,8 +1,5 @@
 package com.pinecone.hydra.umct.appoint;
-
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.pinecone.framework.system.GenericMasterTaskManager;
 import com.pinecone.framework.system.executum.ArchProcessum;
@@ -12,49 +9,42 @@ import com.pinecone.hydra.servgram.Servgram;
 import com.pinecone.hydra.servgram.Servgramium;
 import com.pinecone.hydra.umc.msg.MessageNode;
 import com.pinecone.hydra.umct.ServiceException;
-import com.pinecone.hydra.umct.protocol.compiler.ClassDigest;
-import com.pinecone.hydra.umct.protocol.compiler.InterfacialCompiler;
-import com.pinecone.hydra.umct.protocol.compiler.MethodDigest;
+import com.pinecone.hydra.umct.husky.compiler.ClassDigest;
+import com.pinecone.hydra.umct.husky.compiler.InterfacialCompiler;
+import com.pinecone.hydra.umct.husky.compiler.MethodDigest;
+import com.pinecone.hydra.umct.husky.machinery.PMCTMarshal;
 import com.pinecone.ulf.util.protobuf.FieldProtobufDecoder;
 import com.pinecone.ulf.util.protobuf.FieldProtobufEncoder;
 
 public abstract class ArchAppointNode extends ArchServgramium implements AppointNode {
-    protected InterfacialCompiler         mInterfacialCompiler;
+    protected PMCTMarshal         mPMCTMarshal;
 
-    protected FieldProtobufEncoder        mFieldProtobufEncoder;
-
-    protected FieldProtobufDecoder        mFieldProtobufDecoder;
-
-    protected Map<String, ClassDigest >   mClassDigests;
-
-    protected Map<String, MethodDigest >  mMethodDigests;
-
-    protected ArchAppointNode( Servgramium sharded, InterfacialCompiler compiler, FieldProtobufDecoder decoder ) {
+    protected ArchAppointNode( Servgramium sharded, PMCTMarshal marshal ) {
         super( sharded, true );
         this.mAffiliateThread       = sharded.getAffiliateThread();
-        this.mInterfacialCompiler   = compiler;
-        this.mClassDigests          = new LinkedHashMap<>();
-        this.mMethodDigests         = new LinkedHashMap<>();
-
-        this.mFieldProtobufEncoder  = compiler.getCompilerEncoder().getEncoder();
-        this.mFieldProtobufDecoder  = decoder;
+        this.mPMCTMarshal           = marshal;
     }
 
     public abstract MessageNode getMessageNode();
 
     @Override
     public InterfacialCompiler getInterfacialCompiler() {
-        return this.mInterfacialCompiler;
+        return this.mPMCTMarshal.getInterfacialCompiler();
+    }
+
+    @Override
+    public PMCTMarshal getPMCTTransformer() {
+        return this.mPMCTMarshal;
     }
 
     @Override
     public FieldProtobufEncoder getFieldProtobufEncoder() {
-        return this.mFieldProtobufEncoder;
+        return this.mPMCTMarshal.getFieldProtobufEncoder();
     }
 
     @Override
     public FieldProtobufDecoder getFieldProtobufDecoder() {
-        return this.mFieldProtobufDecoder;
+        return this.mPMCTMarshal.getFieldProtobufDecoder();
     }
 
     @Override
@@ -112,32 +102,26 @@ public abstract class ArchAppointNode extends ArchServgramium implements Appoint
 
     @Override
     public ClassDigest queryClassDigest( String name ) {
-        return this.mClassDigests.get( name );
+        return this.mPMCTMarshal.queryClassDigest( name );
     }
 
     @Override
     public MethodDigest queryMethodDigest( String name ) {
-        return this.mMethodDigests.get( name );
+        return this.mPMCTMarshal.queryMethodDigest( name );
     }
 
     @Override
     public void addClassDigest( ClassDigest that ) {
-        this.mClassDigests.put( that.getClassName(), that );
-        List<MethodDigest> digests = that.getMethodDigests();
-        for ( MethodDigest digest : digests ) {
-            this.addMethodDigest( digest );
-        }
+        this.mPMCTMarshal.addClassDigest( that );
     }
 
     @Override
     public void addMethodDigest( MethodDigest that ) {
-        this.mMethodDigests.put( that.getFullName(), that );
+        this.mPMCTMarshal.addMethodDigest( that );
     }
 
     @Override
     public ClassDigest compile( Class<? > clazz, boolean bAsIface ) {
-        ClassDigest neo = this.mInterfacialCompiler.compile( clazz, bAsIface );
-        this.addClassDigest( neo );
-        return neo;
+        return this.mPMCTMarshal.compile( clazz, bAsIface );
     }
 }

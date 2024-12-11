@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.express.Deliver;
 import com.pinecone.hydra.servgram.Servgramium;
 import com.pinecone.hydra.umc.wolfmc.server.UlfServer;
@@ -16,16 +15,17 @@ import com.pinecone.hydra.umct.MessageHandler;
 import com.pinecone.hydra.umct.ProtoletMsgDeliver;
 import com.pinecone.hydra.umct.UMCTExpress;
 import com.pinecone.hydra.umct.WolfMCExpress;
+import com.pinecone.hydra.umct.husky.machinery.HuskyMarshal;
 import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
 import com.pinecone.hydra.umct.mapping.ControllerInspector;
 import com.pinecone.hydra.umct.mapping.InspectException;
 import com.pinecone.hydra.umct.mapping.MappingDigest;
-import com.pinecone.hydra.umct.protocol.compiler.BytecodeIfacCompiler;
-import com.pinecone.hydra.umct.protocol.compiler.CompilerEncoder;
-import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
-import com.pinecone.hydra.umct.protocol.compiler.IfaceMappingDigest;
-import com.pinecone.hydra.umct.protocol.compiler.InterfacialCompiler;
-import com.pinecone.hydra.umct.protocol.compiler.MethodDigest;
+import com.pinecone.hydra.umct.husky.compiler.BytecodeIfacCompiler;
+import com.pinecone.hydra.umct.husky.compiler.CompilerEncoder;
+import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
+import com.pinecone.hydra.umct.husky.compiler.IfaceMappingDigest;
+import com.pinecone.hydra.umct.husky.compiler.InterfacialCompiler;
+import com.pinecone.hydra.umct.husky.compiler.MethodDigest;
 import com.pinecone.hydra.umct.stereotype.IfaceUtils;
 import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 
@@ -36,19 +36,15 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
     protected UlfServer                     mRecipient;
     protected UMCTExpress                   mUMCTExpress;
     protected MessageDeliver                mDefaultDeliver;
-    protected Map<String, MessageHandler >  mMessageHandlerMap;
-    protected ControllerInspector           mControllerInspector;
 
     public WolfAppointServer( UlfServer messenger, InterfacialCompiler compiler, ControllerInspector controllerInspector, UMCTExpress express ){
-        super( (Servgramium) messenger ,compiler, new GenericFieldProtobufDecoder() );
+        super( (Servgramium) messenger, new HuskyMarshal( compiler, controllerInspector, new GenericFieldProtobufDecoder() ) );
         this.mRecipient   = messenger;
         this.mUMCTExpress = express;
         this.mRecipient.apply( express );
 
         this.mDefaultDeliver      = new ProtoletMsgDeliver( AppointServer.DefaultEntityName, this.mUMCTExpress, compiler.getCompilerEncoder() );
         this.mUMCTExpress.register( this.mDefaultDeliver  );
-        this.mMessageHandlerMap   = new HashMap<>();
-        this.mControllerInspector = controllerInspector;
     }
 
     public WolfAppointServer( UlfServer messenger, CompilerEncoder encoder, UMCTExpress express ){
@@ -162,7 +158,7 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
             };
 
             deliver.registerHandler( fullPath, handler );
-            this.mMessageHandlerMap.put( fullPath, handler );
+            this.mPMCTMarshal.getMessageHandlerMap().put( fullPath, handler );
         }
     }
 
@@ -183,8 +179,8 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
 
     protected void registerController( MessageDeliver deliver, Object instance, Class<?> controllerType ) {
         try{
-            List<MappingDigest> digests   = this.mControllerInspector.characterize( controllerType );
-            List<IfaceMappingDigest>  ifs = this.mInterfacialCompiler.compile( digests );
+            List<MappingDigest> digests   = this.mPMCTMarshal.getControllerInspector().characterize( controllerType );
+            List<IfaceMappingDigest>  ifs = this.getInterfacialCompiler().compile( digests );
 
             for ( IfaceMappingDigest imd : ifs ) {
                 String[] addresses = imd.getAddresses();
@@ -220,7 +216,7 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
                     };
 
                     deliver.registerHandler( address, handler );
-                    this.mMessageHandlerMap.put( address, handler );
+                    this.mPMCTMarshal.getMessageHandlerMap().put( address, handler );
                 }
             }
         }
