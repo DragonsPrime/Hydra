@@ -21,4 +21,15 @@ public interface AppointServer extends AppointNode {
 
     MessageDeliver getDefaultDeliver ();
 
+    void registerInstance( String deliverName, Object instance, Class<?> iface ) ;
+
+    void registerInstance( Object instance, Class<?> iface ) ;
+
+    void registerController( String deliverName, Object instance, Class<?> controllerType ) ;
+
+    void registerController( Object instance, Class<?> controllerType ) ;
+
+    default void registerController( Object instance ) {
+        this.registerController( instance, instance.getClass() );
+    }
 }

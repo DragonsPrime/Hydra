@@ -6,10 +6,13 @@ import java.util.List;
 import com.pinecone.framework.lang.field.DataStructureEntity;
 import com.pinecone.framework.unit.KeyValue;
 import com.pinecone.framework.util.json.JSONEncoder;
+import com.pinecone.hydra.umc.msg.UMCMethod;
 import com.pinecone.hydra.umct.protocol.function.MethodTemplates;
 
 public class GenericMappingDigest implements MappingDigest {
-    protected String                  mszAddress;
+    protected String[]                mszAddresses;
+
+    protected UMCMethod[]             mInterceptMethods;
 
     protected DataStructureEntity     mArgumentTemplate;
 
@@ -21,18 +24,34 @@ public class GenericMappingDigest implements MappingDigest {
 
     protected List<ParamsDigest>      mParamsDigests;
 
-    public GenericMappingDigest( String szAddress, Class<?>[] parameters, Class<?> returnType, Class<?> classType, Method method, List<ParamsDigest> paramsDigests ) {
-        this.mszAddress          = szAddress;
+    protected GenericMappingDigest() {
+
+    }
+
+    public GenericMappingDigest(
+            String[] szAddresses, Class<?>[] parameters, Class<?> returnType, Class<?> classType, Method method, List<ParamsDigest> paramsDigests, UMCMethod[] interceptMethods
+    ) {
+        this.mszAddresses        = szAddresses;
         this.mReturnType         = returnType;
         this.mParamsDigests      = paramsDigests;
         this.mClassType          = classType;
         this.mMappedMethod       = method;
+        this.mInterceptMethods   = interceptMethods;
 
         if( parameters == null || parameters.length == 0 ) {
             this.mArgumentTemplate   = null;
         }
         else {
-            this.mArgumentTemplate   = MethodTemplates.from( null, szAddress, parameters );
+            String szDominatedAddress;
+            if ( szAddresses.length > 0 ) {
+                szDominatedAddress = szAddresses[0];
+            }
+            else {
+                szDominatedAddress = "";
+                // Using anonymous address. In fact, there is pointless for this argument template, which the address is for Iface only.
+            }
+
+            this.mArgumentTemplate   = MethodTemplates.from( null, szDominatedAddress, parameters );
         }
     }
 
@@ -47,8 +66,13 @@ public class GenericMappingDigest implements MappingDigest {
     }
 
     @Override
-    public String getAddress() {
-        return this.mszAddress;
+    public String[] getAddresses() {
+        return this.mszAddresses;
+    }
+
+    @Override
+    public UMCMethod[] getInterceptMethods() {
+        return this.mInterceptMethods;
     }
 
     @Override
@@ -79,8 +103,8 @@ public class GenericMappingDigest implements MappingDigest {
     @Override
     public String toJSONString() {
         return JSONEncoder.stringifyMapFormat( new KeyValue[]{
-                new KeyValue<>( "address"      , this.getAddress()                              ),
-                new KeyValue<>( "return"       , this.getReturnType()                           ),
+                new KeyValue<>( "addresses"    , this.getAddresses()                            ),
+                new KeyValue<>( "return"       , this.getReturnType().getName()                 ),
                 new KeyValue<>( "mappedClass"  , this.getClassType().getName()                  ),
                 new KeyValue<>( "mappedMethod" , this.getMappedMethod().getName()               ),
         } );

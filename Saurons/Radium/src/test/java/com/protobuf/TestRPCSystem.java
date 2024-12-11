@@ -13,11 +13,11 @@ import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
 import com.pinecone.hydra.umct.MessageHandler;
 import com.pinecone.hydra.umct.appoint.WolfAppointClient;
 import com.pinecone.hydra.umct.appoint.WolfAppointServer;
-import com.pinecone.hydra.umct.appoint.proxy.GenericIfaceProxyFactory;
 import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
 import com.pinecone.hydra.umct.mapping.MappingDigest;
 import com.pinecone.hydra.umct.protocol.compiler.BytecodeIfacCompiler;
 import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
+import com.pinecone.hydra.umct.protocol.compiler.IfaceMappingDigest;
 import com.pinecone.hydra.umct.protocol.compiler.MethodDigest;
 import com.sauron.radium.messagron.Messagron;
 
@@ -40,7 +40,10 @@ class Jeff extends JesusChrist {
 
         //this.testIfaceProxy();
 
-        this.testController();
+        //this.testController();
+
+        this.testProtoRPCServerController();
+
     }
 
     private void testProtoRPCServer() throws Exception {
@@ -142,8 +145,26 @@ class Jeff extends JesusChrist {
     protected void testController() throws Exception {
         BytecodeControllerInspector inspector = new BytecodeControllerInspector( ClassPool.getDefault() );
 
-        List<MappingDigest > digests = inspector.characterize( FoxController.class );
+        List<MappingDigest > digests = inspector.characterize( RaccoonController.class );
         Debug.greenf( digests );
+    }
+
+    private void testProtoRPCServerController() throws Exception {
+        Messagron messagron = new Messagron( "", this, new JSONMaptron() );
+
+        WolfMCServer wolf1 = new WolfMCServer( "", this, new JSONMaptron("{host: \"0.0.0.0\",\n" +
+                "port: 5777, SocketTimeout: 800, KeepAliveTimeout: 3600, MaximumConnections: 1e6}") );
+        WolfAppointServer wolf = new WolfAppointServer( wolf1 );
+
+        RaccoonController controller  = new RaccoonController();
+
+        wolf.registerController( controller );
+
+        wolf.execute();
+
+        this.getTaskManager().add( wolf );
+
+        this.testProtoRPCClient();
     }
 }
 

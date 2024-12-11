@@ -14,4 +14,6 @@ public @interface AddressMapping {
     boolean relative() default true; // Only for methods.
 
     UMCMethod[] method() default {};
+
+    boolean selfMappable() default true; // True for using self-method name if value is not given.
 }

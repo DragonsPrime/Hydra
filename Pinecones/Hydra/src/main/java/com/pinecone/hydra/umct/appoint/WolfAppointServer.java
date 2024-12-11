@@ -16,42 +16,53 @@ import com.pinecone.hydra.umct.MessageHandler;
 import com.pinecone.hydra.umct.ProtoletMsgDeliver;
 import com.pinecone.hydra.umct.UMCTExpress;
 import com.pinecone.hydra.umct.WolfMCExpress;
+import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
+import com.pinecone.hydra.umct.mapping.ControllerInspector;
+import com.pinecone.hydra.umct.mapping.InspectException;
+import com.pinecone.hydra.umct.mapping.MappingDigest;
 import com.pinecone.hydra.umct.protocol.compiler.BytecodeIfacCompiler;
 import com.pinecone.hydra.umct.protocol.compiler.CompilerEncoder;
 import com.pinecone.hydra.umct.protocol.compiler.DynamicMethodPrototype;
+import com.pinecone.hydra.umct.protocol.compiler.IfaceMappingDigest;
 import com.pinecone.hydra.umct.protocol.compiler.InterfacialCompiler;
 import com.pinecone.hydra.umct.protocol.compiler.MethodDigest;
-import com.pinecone.hydra.umct.stereotype.Iface;
 import com.pinecone.hydra.umct.stereotype.IfaceUtils;
 import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 
 import javassist.ClassPool;
+import javassist.NotFoundException;
 
 public class WolfAppointServer extends ArchAppointNode implements AppointServer {
     protected UlfServer                     mRecipient;
     protected UMCTExpress                   mUMCTExpress;
     protected MessageDeliver                mDefaultDeliver;
     protected Map<String, MessageHandler >  mMessageHandlerMap;
+    protected ControllerInspector           mControllerInspector;
 
-    public WolfAppointServer( UlfServer messenger, InterfacialCompiler compiler, UMCTExpress express ){
+    public WolfAppointServer( UlfServer messenger, InterfacialCompiler compiler, ControllerInspector controllerInspector, UMCTExpress express ){
         super( (Servgramium) messenger ,compiler, new GenericFieldProtobufDecoder() );
         this.mRecipient   = messenger;
         this.mUMCTExpress = express;
         this.mRecipient.apply( express );
 
-        this.mDefaultDeliver = new ProtoletMsgDeliver( AppointServer.DefaultEntityName, this.mUMCTExpress, compiler.getCompilerEncoder() );
+        this.mDefaultDeliver      = new ProtoletMsgDeliver( AppointServer.DefaultEntityName, this.mUMCTExpress, compiler.getCompilerEncoder() );
         this.mUMCTExpress.register( this.mDefaultDeliver  );
-        this.mMessageHandlerMap = new HashMap<>();
+        this.mMessageHandlerMap   = new HashMap<>();
+        this.mControllerInspector = controllerInspector;
     }
 
     public WolfAppointServer( UlfServer messenger, CompilerEncoder encoder, UMCTExpress express ){
         this( messenger, new BytecodeIfacCompiler(
                 ClassPool.getDefault(), messenger.getTaskManager().getClassLoader(), encoder
+        ), new BytecodeControllerInspector(
+                ClassPool.getDefault(), messenger.getTaskManager().getClassLoader()
         ), express );
     }
 
     public WolfAppointServer( UlfServer messenger, UMCTExpress express ){
         this( messenger, new BytecodeIfacCompiler(
+                ClassPool.getDefault(), messenger.getTaskManager().getClassLoader()
+        ), new BytecodeControllerInspector(
                 ClassPool.getDefault(), messenger.getTaskManager().getClassLoader()
         ), express );
     }
@@ -60,6 +71,7 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
         this(
                 messenger,
                 new BytecodeIfacCompiler( ClassPool.getDefault(), messenger.getTaskManager().getClassLoader() ),
+                new BytecodeControllerInspector( ClassPool.getDefault(), messenger.getTaskManager().getClassLoader() ),
                 new WolfMCExpress( AppointServer.DefaultEntityName, messenger.getSystem() )
         );
     }
@@ -134,7 +146,7 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
 
                 @Override
                 public List<String> getArgumentsKey() {
-                    return null;
+                    return digest.getArgumentsKey();
                 }
 
                 @Override
@@ -149,11 +161,12 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
 
             };
 
-            deliver.registerController( fullPath, handler );
+            deliver.registerHandler( fullPath, handler );
             this.mMessageHandlerMap.put( fullPath, handler );
         }
     }
 
+    @Override
     public void registerInstance( String deliverName, Object instance, Class<?> iface ) {
         MessageDeliver deliver = this.getDeliver( deliverName );
         if ( deliver == null ) {
@@ -163,7 +176,71 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
         this.registerInstance( deliver, instance, iface );
     }
 
+    @Override
     public void registerInstance( Object instance, Class<?> iface ) {
         this.registerInstance( this.mDefaultDeliver, instance, iface );
+    }
+
+    protected void registerController( MessageDeliver deliver, Object instance, Class<?> controllerType ) {
+        try{
+            List<MappingDigest> digests   = this.mControllerInspector.characterize( controllerType );
+            List<IfaceMappingDigest>  ifs = this.mInterfacialCompiler.compile( digests );
+
+            for ( IfaceMappingDigest imd : ifs ) {
+                String[] addresses = imd.getAddresses();
+                for ( int i = 0; i < addresses.length; ++i ) {
+                    String address = addresses[ i ];
+
+                    MessageHandler handler = new MessageHandler() {
+                        @Override
+                        public String getAddressMapping() {
+                            return address;
+                        }
+
+                        @Override
+                        public Object invoke( Object... args ) throws Exception {
+                            return imd.getMappedMethod().invoke( instance, args );
+                        }
+
+                        @Override
+                        public List<String> getArgumentsKey() {
+                            return imd.getArgumentsKey();
+                        }
+
+                        @Override
+                        public Object getReturnDescriptor() {
+                            return imd.getReturnDescriptor();
+                        }
+
+                        @Override
+                        public Object getArgumentsDescriptor() {
+                            return imd.getArgumentsDescriptor();
+                        }
+
+                    };
+
+                    deliver.registerHandler( address, handler );
+                    this.mMessageHandlerMap.put( address, handler );
+                }
+            }
+        }
+        catch ( NotFoundException e ) {
+            throw new InspectException( e );
+        }
+    }
+
+    @Override
+    public void registerController( String deliverName, Object instance, Class<?> controllerType ) {
+        MessageDeliver deliver = this.getDeliver( deliverName );
+        if ( deliver == null ) {
+            throw new IllegalArgumentException( "No such deliver: " + deliverName );
+        }
+
+        this.registerController( deliver, instance, controllerType );
+    }
+
+    @Override
+    public void registerController( Object instance, Class<?> controllerType ) {
+        this.registerController( this.mDefaultDeliver, instance, controllerType );
     }
 }

@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.pinecone.hydra.umc.msg.UMCMethod;
 import com.pinecone.hydra.umct.AddressMapping;
 import com.pinecone.hydra.umct.stereotype.Controller;
 
@@ -73,8 +74,15 @@ public class BytecodeControllerInspector extends ArchMappingInspector implements
                 }
 
                 AddressMapping methodMapping = this.getAnnotation( method, AddressMapping.class );
-                String[] methodLevelMappings = methodMapping != null ? methodMapping.value() : new String[]{};
-                boolean isRelative = methodMapping != null && methodMapping.relative();
+                if ( methodMapping == null ) {
+                    continue; // Method must have an explicit `AddressMapping`.
+                }
+                String[] methodLevelMappings = methodMapping.value();
+                boolean isRelative = methodMapping.relative();
+
+                if ( methodLevelMappings.length == 0 && methodMapping.selfMappable() ) {
+                    methodLevelMappings = new String[]{ method.getName() };
+                }
 
                 List<String > fullAddresses = new ArrayList<>();
                 for ( String classMappingValue : classLevelMappings ) {
@@ -88,22 +96,20 @@ public class BytecodeControllerInspector extends ArchMappingInspector implements
                     }
                 }
 
-                if ( fullAddresses.isEmpty() && methodLevelMappings.length == 0 ) {
-                    continue;
-                }
-
                 List<ParamsDigest> paramsDigests = this.inspectArgParams( null, method );
                 Class<? >[] parameters = this.getParameters( method );
 
-                Class<? > auth       = this.reinterpretClass( className );
-                Method mappedMethod  = auth.getMethod( method.getName(), parameters );
-                MappingDigest digest = new GenericMappingDigest(
-                        fullAddresses.isEmpty() ? methodLevelMappings[ 0 ] : fullAddresses.get( 0 ),
+                Class<? > auth         = this.reinterpretClass( className );
+                Method mappedMethod    = auth.getMethod( method.getName(), parameters );
+                UMCMethod[] intMethods = methodMapping.method();
+                MappingDigest digest   = new GenericMappingDigest(
+                        fullAddresses.isEmpty() ? methodLevelMappings : fullAddresses.toArray( new String[ 0 ] ),
                         parameters,
                         this.reinterpretClass( method.getReturnType().getName() ),
                         auth,
                         mappedMethod,
-                        paramsDigests
+                        paramsDigests,
+                        intMethods
                 );
 
                 digest.apply( paramsDigests );

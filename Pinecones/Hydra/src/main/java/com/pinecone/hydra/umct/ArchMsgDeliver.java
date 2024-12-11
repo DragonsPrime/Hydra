@@ -75,7 +75,7 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     }
 
     @Override
-    public void registerController( String addr, MessageHandler controller ){
+    public void registerHandler( String addr, MessageHandler controller ){
         this.mRoutingTable.put( addr, controller );
     }
 
