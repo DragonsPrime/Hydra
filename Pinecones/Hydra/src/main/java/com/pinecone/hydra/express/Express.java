@@ -4,8 +4,6 @@ import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.hydra.system.Hydrarum;
 
 public interface Express extends Pinenut {
-    Hydrarum getSystem();
-
     Deliver  recruit ( String szName );
 
     Express  register( Deliver deliver );

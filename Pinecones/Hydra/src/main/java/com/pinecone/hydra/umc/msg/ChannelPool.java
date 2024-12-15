@@ -24,4 +24,8 @@ public interface ChannelPool extends Pinenut {
     void deactivate ( ChannelControlBlock ccb );
 
     ChannelPool setIdleChannel( ChannelControlBlock block );
+
+    ChannelPool add( ChannelControlBlock block );
+
+    ChannelControlBlock depriveIdleChannel();
 }

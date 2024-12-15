@@ -2,6 +2,7 @@ package com.pinecone.hydra.umc.wolfmc.client;
 
 import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
+import com.pinecone.hydra.umc.msg.ChannelPool;
 import com.pinecone.hydra.umc.msg.FairChannelPool;
 import com.pinecone.hydra.umc.msg.UMCChannel;
 import com.pinecone.framework.unit.LinkedTreeMap;
@@ -95,6 +96,30 @@ public class ProactiveParallelFairChannelPool<ID > extends ArchChannelPool imple
     }
 
     @Override
+    public ChannelControlBlock depriveIdleChannel() {
+        this.mPoolIOLock.writeLock().lock();
+        try{
+            ChannelControlBlock qualified = null;
+            for ( Map.Entry<ID, ChannelControlBlock> kv : this.mChannelMapQueue.entrySet() ) {
+                ChannelControlBlock block = kv.getValue();
+                if( block.getChannelStatus().isIdle() )  {
+                    qualified = block;
+                    break;
+                }
+            }
+
+            if ( qualified != null ) {
+                this.onlyRemove( qualified.getChannel().getChannelID() );
+            }
+
+            return qualified;
+        }
+        finally {
+            this.mPoolIOLock.writeLock().unlock();
+        }
+    }
+
+    @Override
     public ProactiveParallelFairChannelPool setIdleChannel( ChannelControlBlock block ) {
         this.mPoolIOLock.writeLock().lock();
         try{
@@ -108,7 +133,19 @@ public class ProactiveParallelFairChannelPool<ID > extends ArchChannelPool imple
         return this;
     }
 
-    protected ChannelControlBlock queryNextChannel( long nMillisTimeout, boolean bEager, boolean bSync ) {
+    @Override
+    public ChannelPool add( ChannelControlBlock block ) {
+        this.mPoolIOLock.writeLock().lock();
+        try{
+            this.pushBack( block );
+        }
+        finally {
+            this.mPoolIOLock.writeLock().unlock();
+        }
+        return this;
+    }
+
+    protected ChannelControlBlock queryNextChannel(long nMillisTimeout, boolean bEager, boolean bSync ) {
         ChannelControlBlock nextChannel     = null;
 
         if( this.mChannelMapQueue.isEmpty() ) {

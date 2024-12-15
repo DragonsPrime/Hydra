@@ -2,13 +2,12 @@ package com.pinecone.hydra.umc.wolfmc.server;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.unit.LinkedTreeMap;
+import com.pinecone.hydra.umc.msg.ChannelPool;
 import com.pinecone.hydra.umc.msg.RegisterChannelPool;
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
 import com.pinecone.hydra.umc.wolfmc.ArchChannelPool;
 import com.pinecone.hydra.umc.wolfmc.InternalErrors;
-import com.pinecone.hydra.umc.wolfmc.UlfChannelStatus;
 import com.pinecone.hydra.umc.wolfmc.UlfIOLoadBalanceStrategy;
-import io.netty.channel.ChannelId;
 
 import java.io.IOException;
 import java.util.Map;
@@ -56,6 +55,10 @@ public class PassiveRegisterChannelPool<ID > extends ArchChannelPool implements 
         }
     }
 
+    @Override
+    public ChannelControlBlock depriveIdleChannel() {
+        throw new UnsupportedOperationException( "Method `depriveIdleChannel` is inapplicable for `PassiveRegisterChannelPool`." );
+    }
 
     @SuppressWarnings( "unchecked" )
     protected ID warpKey( Object id ) {
@@ -159,4 +162,9 @@ public class PassiveRegisterChannelPool<ID > extends ArchChannelPool implements 
         return this;
     }
 
+    @Override
+    public ChannelPool add( ChannelControlBlock block ) {
+        this.addChannel( block );
+        return null;
+    }
 }

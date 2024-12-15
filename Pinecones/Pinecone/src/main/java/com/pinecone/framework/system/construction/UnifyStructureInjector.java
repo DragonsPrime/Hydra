@@ -15,9 +15,9 @@ import java.util.Collection;
 import java.util.Map;
 
 public class UnifyStructureInjector extends ObjectInjector {
-    protected InstanceDispenser mInstanceDispenser;
+    protected StructureInstanceDispenser mInstanceDispenser;
 
-    public UnifyStructureInjector( Class type, InstanceDispenser instanceDispenser ) {
+    public UnifyStructureInjector( Class type, StructureInstanceDispenser instanceDispenser ) {
         super( type );
         this.mInstanceDispenser = instanceDispenser;
     }

@@ -16,7 +16,7 @@ public class GenericUMCByteMessageDecoder extends ByteToMessageDecoder {
     private long           byteSum;
     private long           bodyBytes;
 
-    public GenericUMCByteMessageDecoder(ExtraHeadCoder extraHeadCoder) {
+    public GenericUMCByteMessageDecoder( ExtraHeadCoder extraHeadCoder ) {
         this.extraHeadCoder = extraHeadCoder;
         this.byteSum   = -1;
         this.bodyBytes = 0;

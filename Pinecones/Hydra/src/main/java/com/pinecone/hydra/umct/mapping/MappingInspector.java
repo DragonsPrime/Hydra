@@ -8,4 +8,6 @@ import javassist.CtMethod;
 
 public interface MappingInspector extends HierarchyClassInspector {
     List<ParamsDigest> inspectArgParams( Object methodDigest, CtMethod method );
+
+    ClassLoader getClassLoader();
 }

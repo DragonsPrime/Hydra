@@ -1,15 +1,23 @@
 package com.pinecone.hydra.umc.wolfmc.client;
 
-import com.pinecone.hydra.umc.msg.*;
-import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
-import com.pinecone.hydra.umc.wolfmc.*;
 import io.netty.channel.ChannelId;
 import io.netty.util.AttributeKey;
+import com.pinecone.framework.system.executum.Processum;
+import com.pinecone.hydra.umc.msg.AsyncMessenger;
+import com.pinecone.hydra.umc.msg.ChannelAllocateException;
+import com.pinecone.hydra.umc.msg.ChannelControlBlock;
+import com.pinecone.hydra.umc.msg.UMCMessage;
+import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 import com.pinecone.framework.system.ProvokeHandleException;
-import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.system.Hydrarum;
+import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
+import com.pinecone.hydra.umc.wolfmc.UlfIdleFirstBalanceStrategy;
+import com.pinecone.hydra.umc.wolfmc.UlfMessageNode;
+import com.pinecone.hydra.umc.wolfmc.WolfMCNode;
+import com.pinecone.hydra.umc.wolfmc.WolfMCStandardConstants;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -18,15 +26,15 @@ public abstract class ArchAsyncMessenger extends WolfMCNode implements AsyncMess
     protected ProactiveParallelFairChannelPool<ChannelId >     mChannelPool     ;
     //protected BlockingDeque<UMCMessage>                        mSyncRetMsgQueue = new LinkedBlockingDeque<>();
 
-    public ArchAsyncMessenger( String szName, Hydrarum system, UlfMessageNode parent, JSONObject joConf, ExtraHeadCoder extraHeadCoder ) {
-        super( szName, system, parent, joConf, extraHeadCoder );
+    public ArchAsyncMessenger( long nodeId, String szName, Processum parentProcess, UlfMessageNode parent, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
+        super( nodeId, szName, parentProcess, parent, joConf, extraHeadCoder );
 
         this.mChannelPool   = new ProactiveParallelFairChannelPool<>( this, new UlfIdleFirstBalanceStrategy() ); //TODO
         //this.makeNameAndId();
     }
 
-    public ArchAsyncMessenger( String szName, Hydrarum system, JSONObject joConf, ExtraHeadCoder extraHeadCoder ) {
-        this( szName, system, null, joConf, extraHeadCoder );
+    public ArchAsyncMessenger( long nodeId, String szName, Hydrarum system, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
+        this( nodeId, szName, system, null, joConf, extraHeadCoder );
     }
 
 

@@ -1,6 +1,6 @@
 package com.pinecone.hydra.system.component;
 
-import com.pinecone.framework.system.construction.InstanceDispenser;
+import com.pinecone.framework.system.construction.StructureInstanceDispenser;
 import com.pinecone.framework.system.construction.UnifyCentralInstanceDispenser;
 import com.pinecone.framework.util.name.Namespace;
 import com.pinecone.hydra.system.ArchSystemCascadeComponent;
@@ -8,7 +8,7 @@ import com.pinecone.hydra.system.HyComponent;
 import com.pinecone.hydra.system.Hydrarum;
 
 public class GenericResourceDispenserCenter extends ArchSystemCascadeComponent implements ResourceDispenserCenter {
-    protected InstanceDispenser mInstanceDispenser;
+    protected StructureInstanceDispenser mInstanceDispenser;
 
     public GenericResourceDispenserCenter( Namespace name, Hydrarum system, HyComponent parent ) {
         super( name, system, system.getComponentManager(), parent );
@@ -25,7 +25,7 @@ public class GenericResourceDispenserCenter extends ArchSystemCascadeComponent i
     }
 
     @Override
-    public InstanceDispenser getInstanceDispenser() {
+    public StructureInstanceDispenser getInstanceDispenser() {
         return this.mInstanceDispenser;
     }
 

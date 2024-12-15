@@ -5,4 +5,6 @@ import com.pinecone.hydra.umc.msg.CascadeMessageNode;
 
 public interface UlfMessageNode extends CascadeMessageNode {
     ChannelPool          getChannelPool();
+
+    void                 close();
 }

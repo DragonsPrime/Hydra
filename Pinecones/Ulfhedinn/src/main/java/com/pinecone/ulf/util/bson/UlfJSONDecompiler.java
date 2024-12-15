@@ -9,8 +9,8 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 
-public class WolfJSONDecompiler extends ArchJSONDecompiler implements JSONDecompiler {
-    public WolfJSONDecompiler( InputStream is ) {
+public class UlfJSONDecompiler extends ArchJSONDecompiler implements JSONDecompiler {
+    public UlfJSONDecompiler(InputStream is ) {
         super( is );
     }
 

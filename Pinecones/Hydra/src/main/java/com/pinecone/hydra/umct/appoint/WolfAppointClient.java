@@ -1,7 +1,9 @@
 package com.pinecone.hydra.umct.appoint;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -12,6 +14,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.pinecone.framework.lang.field.FieldEntity;
 import com.pinecone.hydra.servgram.Servgramium;
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
+import com.pinecone.hydra.umc.msg.ChannelPool;
 import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.umc.msg.UMCReceiver;
@@ -34,17 +37,21 @@ import com.pinecone.ulf.util.protobuf.FieldProtobufEncoder;
 import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelId;
 import javassist.ClassPool;
 
-public class WolfAppointClient extends ArchAppointNode implements AppointClient {
-    protected UlfClient         mMessenger;
+public class WolfAppointClient extends ArchAppointNode implements DuplexAppointClient {
+    protected UlfClient              mMessenger;
 
-    protected IfaceProxyFactory mIfaceProxyFactory;
+    protected IfaceProxyFactory      mIfaceProxyFactory;
+
+    protected Map<ChannelId, ChannelControlBlock > mInstructedChannels;  // Standby controlled channels, waiting for server to instruct.
 
     public WolfAppointClient( UlfClient messenger, InterfacialCompiler compiler, ControllerInspector controllerInspector ){
         super( (Servgramium) messenger, new HuskyMarshal( compiler, controllerInspector, new GenericFieldProtobufDecoder() ) );
-        this.mMessenger         = messenger;
-        this.mIfaceProxyFactory = new GenericIfaceProxyFactory( this );
+        this.mMessenger          = messenger;
+        this.mIfaceProxyFactory  = new GenericIfaceProxyFactory( this );
+        this.mInstructedChannels = new ConcurrentHashMap<>();
     }
 
     public WolfAppointClient( UlfClient messenger, CompilerEncoder encoder ){
@@ -61,6 +68,46 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
         ), new BytecodeControllerInspector(
                 ClassPool.getDefault(), messenger.getTaskManager().getClassLoader()
         ) );
+    }
+
+    @Override
+    public boolean supportDuplex() {
+        return !this.mInstructedChannels.isEmpty();
+    }
+
+    @Override
+    public void joinEmbraces( int nLine ) {
+        // Join us, embracing uniformity.
+
+        this.createEmbraces( nLine );
+        for ( Map.Entry<ChannelId, ChannelControlBlock > kv : this.mInstructedChannels.entrySet() ) {
+            //kv.getValue().getTransmit().sendMsg( new UlfInformMessage() );
+        }
+    }
+
+    @Override
+    public void createEmbraces( int nLine ) {
+        ChannelPool pool = this.getMessageNode().getChannelPool();
+
+        ChannelControlBlock[] cbs = new ChannelControlBlock[ nLine ];
+        for ( int i = 0; i < nLine; ++i ) {
+            ChannelControlBlock ccb = pool.depriveIdleChannel();
+            if ( ccb == null ) {
+                for ( int j = 0; j < nLine; ++j ) {
+                    if ( cbs[ j ] == null ) {
+                        break;
+                    }
+                    ChannelId id = (ChannelId)cbs[ j ].getChannel().getChannelID();
+                    this.mInstructedChannels.remove( id );
+                    pool.add( cbs[ j ] );
+                }
+                throw new IllegalArgumentException( "Creating `embraces` is compromised due to insufficient free channels. Consider setting up sufficient parallel channels." );
+            }
+
+            ChannelId id = (ChannelId)ccb.getChannel().getChannelID();
+            cbs[ i ] = ccb;
+            this.mInstructedChannels.put( id, ccb );
+        }
     }
 
     @Override

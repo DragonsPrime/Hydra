@@ -17,7 +17,7 @@ public interface MessageExpress extends Express {
 
     String getName();
 
-    ArchMessagram getMessagram();
+    MessageJunction getJunction();
 
     MessageDeliver  recruit     ( String szName );
 

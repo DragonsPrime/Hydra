@@ -1,6 +1,5 @@
 package com.pinecone.hydra.umct;
 
-import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.umc.msg.UMCReceiver;
 import com.pinecone.hydra.umc.msg.UMCTransmit;
 import com.pinecone.framework.util.json.JSONObject;
@@ -10,7 +9,6 @@ import java.io.IOException;
 import java.util.Map;
 
 public abstract class ArchMessagelet implements Messagelet {
-    protected Hydrarum                  mSystem;
     protected Map<String, Object >      mConfig;
     protected ArchMessagram             mMessagelet;
     protected UMCConnection mMsgPackage;
@@ -18,9 +16,8 @@ public abstract class ArchMessagelet implements Messagelet {
     protected UMCTransmit               mUMCTransmit;
     protected UMCReceiver               mUMCReceiver;
 
-    public ArchMessagelet(UMCConnection msgPackage, ArchMessagram servtron ) {
+    public ArchMessagelet( UMCConnection msgPackage, ArchMessagram servtron ) {
         this.mMsgPackage   = msgPackage;
-        this.mSystem       = this.getMessageDeliver().getSystem();
         this.mMessagelet   = servtron;
         this.mConfig       = new JSONMaptron(); //TODO
     }
@@ -35,11 +32,6 @@ public abstract class ArchMessagelet implements Messagelet {
     @Override
     public UMCConnection getMessagePackage() {
         return this.mMsgPackage;
-    }
-
-    @Override
-    public Hydrarum getSystem() {
-        return this.mSystem;
     }
 
     @Override

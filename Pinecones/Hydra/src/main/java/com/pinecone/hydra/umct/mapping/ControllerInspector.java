@@ -2,12 +2,10 @@ package com.pinecone.hydra.umct.mapping;
 
 import java.util.List;
 
-import com.pinecone.framework.system.prototype.Pinenut;
-
 import javassist.CtMethod;
 import javassist.NotFoundException;
 
-public interface ControllerInspector extends Pinenut {
+public interface ControllerInspector extends MappingInspector {
     List<CtMethod> inspect( String className ) throws NotFoundException;
 
     List<CtMethod > inspect( Class<?> clazz ) throws NotFoundException;

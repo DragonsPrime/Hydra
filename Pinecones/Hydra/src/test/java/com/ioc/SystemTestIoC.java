@@ -28,7 +28,7 @@ public class SystemTestIoC {
         PeriodicAutomatron modSpawnner = new PeriodicAutomaton( null, 500 );
         modSpawnner.start();
 
-        InstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
+        StructureInstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
         UnifyStructureInjector injector = new UnifyStructureInjector( SpawnInstruct.class, dispenser );
 
         Thread elderBrain = new Thread(()->{

@@ -1,9 +1,7 @@
 package com.pinecone.hydra.umct;
 
-import java.io.IOException;
 import java.util.Map;
 
-import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.Status;
 import com.pinecone.hydra.umc.msg.UMCMessage;
@@ -17,15 +15,11 @@ import com.pinecone.hydra.umc.msg.UMCTransmit;
  *  Copyright © 2008 - 2028 Bean Nuts Foundation All rights reserved.
  */
 public class WolfMCExpress extends ArchMsgExpress implements UMCTExpress {
-    public WolfMCExpress( String name, Hydrarum system ) {
-        super( name, system );
-    }
-
-    public WolfMCExpress( String name, ArchMessagram messagram ) {
+    public WolfMCExpress( String name, MessageJunction messagram ) {
         super( name, messagram );
     }
 
-    public WolfMCExpress( ArchMessagram messagram ) {
+    public WolfMCExpress( MessageJunction messagram ) {
         this( null, messagram );
     }
 

@@ -1,10 +1,8 @@
 package com.pinecone.hydra.umct;
 
-import com.pinecone.hydra.servgram.Servgram;
-
 import java.util.Map;
 
-public interface Messagram extends Servgram {
+public interface Messagram extends MessageJunction {
     Messagram addExpress( MessageExpress express );
 
     MessageExpress getExpressByName( String name );

@@ -9,8 +9,6 @@ import com.pinecone.hydra.system.Hydrarum;
 import java.util.Map;
 
 public interface Messagelet extends Pinenut {
-    Hydrarum getSystem();
-
     UMCMessage getReceivedMessage();
 
     UMCTransmit getTransmit();

@@ -1,7 +1,6 @@
 package com.pinecone.hydra.umct.appoint;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,6 +12,7 @@ import com.pinecone.hydra.umct.MessageDeliver;
 import com.pinecone.hydra.umct.MessageExpress;
 import com.pinecone.hydra.umct.MessageHandler;
 import com.pinecone.hydra.umct.ProtoletMsgDeliver;
+import com.pinecone.hydra.umct.SergeantExpress;
 import com.pinecone.hydra.umct.UMCTExpress;
 import com.pinecone.hydra.umct.WolfMCExpress;
 import com.pinecone.hydra.umct.husky.machinery.HuskyMarshal;
@@ -32,19 +32,27 @@ import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 import javassist.ClassPool;
 import javassist.NotFoundException;
 
-public class WolfAppointServer extends ArchAppointNode implements AppointServer {
+public class WolfAppointServer extends ArchAppointNode implements DuplexAppointServer {
     protected UlfServer                     mRecipient;
     protected UMCTExpress                   mUMCTExpress;
     protected MessageDeliver                mDefaultDeliver;
 
-    public WolfAppointServer( UlfServer messenger, InterfacialCompiler compiler, ControllerInspector controllerInspector, UMCTExpress express ){
-        super( (Servgramium) messenger, new HuskyMarshal( compiler, controllerInspector, new GenericFieldProtobufDecoder() ) );
-        this.mRecipient   = messenger;
+    protected void applyExpress( InterfacialCompiler compiler, UMCTExpress express ) {
         this.mUMCTExpress = express;
         this.mRecipient.apply( express );
 
         this.mDefaultDeliver      = new ProtoletMsgDeliver( AppointServer.DefaultEntityName, this.mUMCTExpress, compiler.getCompilerEncoder() );
         this.mUMCTExpress.register( this.mDefaultDeliver  );
+    }
+
+    protected WolfAppointServer( UlfServer messenger, InterfacialCompiler compiler, ControllerInspector controllerInspector ){
+        super( (Servgramium) messenger, new HuskyMarshal( compiler, controllerInspector, new GenericFieldProtobufDecoder() ) );
+        this.mRecipient   = messenger;
+    }
+
+    public WolfAppointServer( UlfServer messenger, InterfacialCompiler compiler, ControllerInspector controllerInspector, UMCTExpress express ){
+        this( messenger, compiler, controllerInspector );
+        this.applyExpress( compiler, express );
     }
 
     public WolfAppointServer( UlfServer messenger, CompilerEncoder encoder, UMCTExpress express ){
@@ -67,8 +75,11 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
         this(
                 messenger,
                 new BytecodeIfacCompiler( ClassPool.getDefault(), messenger.getTaskManager().getClassLoader() ),
-                new BytecodeControllerInspector( ClassPool.getDefault(), messenger.getTaskManager().getClassLoader() ),
-                new WolfMCExpress( AppointServer.DefaultEntityName, messenger.getSystem() )
+                new BytecodeControllerInspector( ClassPool.getDefault(), messenger.getTaskManager().getClassLoader() )
+        );
+
+        this.applyExpress(
+                this.mPMCTMarshal.getInterfacialCompiler(), new WolfMCExpress( AppointServer.DefaultEntityName, this )
         );
     }
 
@@ -109,8 +120,10 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
         return this.mDefaultDeliver;
     }
 
-
-
+    @Override
+    public boolean supportDuplex() {
+        return this.mUMCTExpress instanceof SergeantExpress;
+    }
 
     protected void registerInstance( MessageDeliver deliver, Object instance, Class<?> iface ) {
         if ( !iface.isInterface() ) {

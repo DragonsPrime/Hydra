@@ -35,7 +35,9 @@ public class ProtoletMsgDeliver extends ArchMsgDeliver {
 
     @Override
     protected void doMessagelet( String szMessagelet, Package that ) {
-        this.getMessagram().contriveByScheme( szMessagelet, (UMCConnection) that ).dispatch();
+        if ( this.getJunction() instanceof ArchMessagram ) {
+            ( (ArchMessagram)this.getJunction() ).contriveByScheme( szMessagelet, (UMCConnection) that ).dispatch();
+        }
     }
 
 }

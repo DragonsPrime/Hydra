@@ -5,7 +5,6 @@ import com.pinecone.framework.unit.trie.TrieSegmentor;
 import com.pinecone.framework.unit.trie.UniTrieMaptron;
 
 import com.pinecone.framework.util.StringUtils;
-import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.express.Package;
 import com.pinecone.hydra.umc.msg.Status;
 import com.pinecone.hydra.umc.msg.UMCHead;
@@ -18,18 +17,16 @@ import java.util.List;
 
 public abstract class ArchMsgDeliver implements MessageDeliver {
     protected String                                      mszName;
-    protected Hydrarum                                    mSystem;
     protected MessageExpress                              mExpress;
-    protected ArchMessagram                               mMessagram;
+    protected MessageJunction                             mJunction;
     protected TrieMap<String, MessageHandler>             mRoutingTable;
     protected HeaderDecipher                              mHeaderDecipher;
     protected String                                      mszServicePathKey;
 
-    public ArchMsgDeliver(String szName, MessageExpress express, HeaderDecipher headerDecipher, String szServicePathKey ) {
+    public ArchMsgDeliver( String szName, MessageExpress express, HeaderDecipher headerDecipher, String szServicePathKey ) {
         this.mszName           = szName;
         this.mExpress          = express;
-        this.mSystem           = this.mExpress.getSystem();
-        this.mMessagram        = this.mExpress.getMessagram();
+        this.mJunction         = this.mExpress.getJunction();
         this.mHeaderDecipher   = headerDecipher;
         this.mszServicePathKey = szServicePathKey;
         this.mRoutingTable     = new UniTrieMaptron<>(HashMap::new, new TrieSegmentor() {
@@ -56,17 +53,12 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     }
 
     @Override
-    public Hydrarum getSystem() {
-        return this.mSystem;
-    }
-
-    @Override
     public MessageExpress  getExpress() {
         return this.mExpress;
     }
 
-    public ArchMessagram getMessagram(){
-        return this.mMessagram;
+    public MessageJunction getJunction(){
+        return this.mJunction;
     }
 
     @Override
@@ -134,7 +126,7 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
                 }
             }
             else {
-                if ( this.mMessagram != null ) {
+                if ( this.mJunction != null ) {
                     this.doMessagelet( szAddr, that );
                 }
 

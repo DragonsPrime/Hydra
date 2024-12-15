@@ -115,7 +115,7 @@ public class TestIoC {
     }
 
     public static void testUnifyStructureInjector_Simple( )  throws Exception {
-        InstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
+        StructureInstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
         UnifyStructureInjector injector = new UnifyStructureInjector( Actor.class, dispenser );
         Actor actor = new Actor();
 
@@ -125,7 +125,7 @@ public class TestIoC {
     }
 
     public static void testUnifyStructureInjector_List( )  throws Exception {
-        InstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
+        StructureInstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
         UnifyStructureInjector injector = new UnifyStructureInjector( Team.class, dispenser );
         Team team = new Team();
 
@@ -139,7 +139,7 @@ public class TestIoC {
     }
 
     public static void testUnifyStructureInjector_Sophisticate( )  throws Exception {
-        InstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
+        StructureInstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
         UnifyStructureInjector injector = new UnifyStructureInjector( Tale.class, dispenser );
         Tale tale = new Tale();
 

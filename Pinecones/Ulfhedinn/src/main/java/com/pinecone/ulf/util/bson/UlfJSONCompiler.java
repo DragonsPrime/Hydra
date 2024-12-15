@@ -17,8 +17,8 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Map;
 
-public class WolfJSONCompiler implements JSONCompiler {
-    public WolfJSONCompiler() { }
+public class UlfJSONCompiler implements JSONCompiler {
+    public UlfJSONCompiler() { }
 
     protected OutputStream compileUnidentifiedObject ( Object that, OutputStream outputStream ) throws IOException {
         // Ignore them

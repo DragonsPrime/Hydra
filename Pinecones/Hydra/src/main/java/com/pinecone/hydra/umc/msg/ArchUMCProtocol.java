@@ -145,6 +145,9 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         byteBuffer.putLong( head.sessionId );
         nBufLength += Long.BYTES;
 
+        byteBuffer.putLong( head.identityId );
+        nBufLength += Long.BYTES;
+
         byteBuffer.put( head.extraHead );
         nBufLength += head.getExtraHeadLength();
 
@@ -222,6 +225,9 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         nReadAt += Long.BYTES;
 
         head.sessionId        = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHead.BinByteOrder ).getLong();
+        nReadAt += Long.BYTES;
+
+        head.identityId       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHead.BinByteOrder ).getLong();
         nReadAt += Long.BYTES;
 
         return head;

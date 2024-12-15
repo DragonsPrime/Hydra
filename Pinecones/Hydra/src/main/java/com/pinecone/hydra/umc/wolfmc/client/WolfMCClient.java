@@ -1,10 +1,5 @@
 package com.pinecone.hydra.umc.wolfmc.client;
 
-import com.pinecone.hydra.umc.msg.ChannelControlBlock;
-import com.pinecone.hydra.umc.msg.Medium;
-import com.pinecone.hydra.umc.msg.UMCMessage;
-import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
-import com.pinecone.hydra.umc.wolfmc.*;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 
@@ -21,14 +16,29 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.AttributeKey;
 import com.pinecone.framework.system.ProvokeHandleException;
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.Debug;
-import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.hydra.system.Hydrarum;
+import com.pinecone.hydra.umc.wolfmc.AsyncUlfMedium;
+import com.pinecone.hydra.umc.wolfmc.ChannelUtils;
+import com.pinecone.hydra.umc.wolfmc.GenericUMCByteMessageDecoder;
+import com.pinecone.hydra.umc.wolfmc.MCSecurityAuthentication;
+import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
+import com.pinecone.hydra.umc.wolfmc.UlfChannel;
+import com.pinecone.hydra.umc.wolfmc.UlfChannelStatus;
+import com.pinecone.hydra.umc.wolfmc.UlfMCReceiver;
+import com.pinecone.hydra.umc.wolfmc.UlfMessageNode;
+import com.pinecone.hydra.umc.wolfmc.UnsetUlfAsyncMsgHandleAdapter;
+import com.pinecone.hydra.umc.wolfmc.WolfMCStandardConstants;
+import com.pinecone.hydra.umc.msg.ChannelControlBlock;
+import com.pinecone.hydra.umc.msg.Medium;
+import com.pinecone.hydra.umc.msg.UMCMessage;
+import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 
 import java.io.IOException;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
@@ -56,29 +66,51 @@ public class WolfMCClient extends ArchAsyncMessenger implements UlfClient {
 
     protected UlfAsyncMsgHandleAdapter             mPrimeAsyncMessageHandler = new UnsetUlfAsyncMsgHandleAdapter( this ); // For all channels.
 
-    public WolfMCClient( String szName, Hydrarum system, UlfMessageNode parent, JSONObject joConf, ExtraHeadCoder extraHeadCoder ){
-        super( szName, system, parent, joConf, extraHeadCoder );
+    public WolfMCClient( long nodeId, String szName, Processum parentProcess, UlfMessageNode parent, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ){
+        super( nodeId, szName, parentProcess, parent, joConf, extraHeadCoder );
 
         this.apply( joConf );
     }
 
-    public WolfMCClient( String szName, Hydrarum system, JSONObject joConf, ExtraHeadCoder extraHeadCoder ){
-        this( szName, system, null, joConf, extraHeadCoder );
+    public WolfMCClient( String szName, Processum parentProcess, UlfMessageNode parent, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ){
+        super( -1, szName, parentProcess, parent, joConf, extraHeadCoder );
+
+        this.apply( joConf );
     }
 
-    public WolfMCClient( String szName, Hydrarum system, JSONObject joConf ){
-        this( szName, system, joConf, null );
+    public WolfMCClient( long nodeId, String szName, Processum parentProcess, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ){
+        this( nodeId, szName, parentProcess, null, joConf, extraHeadCoder );
     }
 
-    public WolfMCClient( String szName, UlfMessageNode parent, Hydrarum system, JSONObject joConf ){
-        this( szName, system, parent, joConf, null );
+    public WolfMCClient( String szName, Processum parentProcess, Map<String, Object>  joConf, ExtraHeadCoder extraHeadCoder ){
+        this( -1, szName, parentProcess, null, joConf, extraHeadCoder );
+    }
+
+    public WolfMCClient( long nodeId, String szName, Processum parentProcess, Map<String, Object>  joConf ){
+        this( nodeId, szName, parentProcess, joConf, null );
+    }
+
+    public WolfMCClient( String szName, Processum parentProcess, Map<String, Object>  joConf ){
+        this( -1, szName, parentProcess, joConf, null );
+    }
+
+    public WolfMCClient( long nodeId, String szName, UlfMessageNode parent, Processum parentProcess, Map<String, Object>  joConf ){
+        this( nodeId, szName, parentProcess, parent, joConf, null );
+    }
+
+    public WolfMCClient( String szName, UlfMessageNode parent, Processum parentProcess, Map<String, Object>  joConf ){
+        this( -1, szName, parentProcess, parent, joConf, null );
+    }
+
+    protected WolfMCClient( Builder builder ){
+        this( builder.nodeId, builder.szName, builder.parentProcess, builder.parent, builder.joConf, builder.extraHeadCoder );
     }
 
 
     @Override
-    public WolfMCClient                   apply( JSONObject joConf ) {
+    public WolfMCClient                   apply( Map<String, Object>  joConf ) {
         super.apply( joConf );
-        this.mConnectionArguments = new ClientConnectionArguments( joConf );
+        this.mConnectionArguments = new ClientConnectionArguments( this.getSectionConf() );
 
         return this;
     }
@@ -110,7 +142,8 @@ public class WolfMCClient extends ArchAsyncMessenger implements UlfClient {
         this.mChannelPool.clear();
     }
 
-    public void                           close() throws ProvokeHandleException{
+    @Override
+    public void                           close() throws ProvokeHandleException {
         this.mStateMutex.lock();
         try{
             if( this.mExecutorGroup != null ) {
@@ -150,7 +183,10 @@ public class WolfMCClient extends ArchAsyncMessenger implements UlfClient {
         ChannelFuture future                  = ccb.getChannel().toConnect(
                 new InetSocketAddress( this.getConnectionArguments().getHost(), this.getConnectionArguments().getPort() )
         ).getLastChannelFuture();
-        ccb.getChannel().getNativeHandle().attr( AttributeKey.valueOf( WolfMCStandardConstants.CB_CONTROL_BLOCK_KEY ) ).set( ccb );
+        UlfChannel channel = ccb.getChannel();
+        channel.getNativeHandle().attr( AttributeKey.valueOf( WolfMCStandardConstants.CB_CONTROL_BLOCK_KEY ) ).set( ccb );
+        ChannelUtils.setChannelIdentityID( channel, this.mnMessageNodeId );
+
         this.getTaskManager().add( ccb );
 
         future.addListener(new ChannelFutureListener() {
@@ -386,5 +422,66 @@ public class WolfMCClient extends ArchAsyncMessenger implements UlfClient {
     public void                           sendAsynMsg( UMCMessage request, UlfAsyncMsgHandleAdapter handler ) throws IOException {
         this.sendAsynMsg( request, false, handler );
     }
+
+
+
+
+    public static class Builder {
+        private long                nodeId = -1;
+        private String              szName;
+        private Processum           parentProcess;
+        private UlfMessageNode      parent;
+        private Map<String, Object> joConf;
+        private ExtraHeadCoder      extraHeadCoder;
+
+        public Builder setNodeId( long nodeId ) {
+            this.nodeId = nodeId;
+            return this;
+        }
+
+        public Builder setName( String szName ) {
+            this.szName = szName;
+            return this;
+        }
+
+        public Builder setParentProcess( Processum parentProcess ) {
+            this.parentProcess = parentProcess;
+            return this;
+        }
+
+        public Builder setParent( UlfMessageNode parent ) {
+            this.parent = parent;
+            return this;
+        }
+
+        public Builder setJoConf( Map<String, Object> joConf ) {
+            this.joConf = joConf;
+            return this;
+        }
+
+        public Builder setExtraHeadCoder( ExtraHeadCoder extraHeadCoder ) {
+            this.extraHeadCoder = extraHeadCoder;
+            return this;
+        }
+
+        public WolfMCClient build() {
+            this.validate();
+            return new WolfMCClient(this);
+        }
+
+        private void validate() {
+            if ( this.szName == null || this.szName.isEmpty() ) {
+                long nId = this.nodeId;
+                if ( nId == -1 ) {
+                    nId = System.nanoTime();
+                }
+                this.szName = WolfMCClient.class.getSimpleName() + "_" + nId;
+            }
+            if ( this.joConf == null ) {
+                throw new IllegalArgumentException( "Configuration (Conf) cannot be null" );
+            }
+        }
+    }
+
 
 }

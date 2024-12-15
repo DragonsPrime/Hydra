@@ -2,8 +2,8 @@ package com.pinecone.hydra.umct;
 
 import com.pinecone.hydra.system.component.Slf4jTraceable;
 import com.pinecone.hydra.express.Deliver;
-import com.pinecone.hydra.system.Hydrarum;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -24,26 +24,20 @@ import java.util.concurrent.locks.ReadWriteLock;
  *  *****************************************************************************************
  */
 public abstract class ArchMsgExpress implements MessageExpress, Slf4jTraceable {
-    protected String        mszName      ;
-    protected Hydrarum      mSystem      ;
-    protected ArchMessagram mMessagram   ;
-    protected Logger        mLogger      ;
+    protected String           mszName      ;
+    protected MessageJunction  mJunction    ;
+    protected Logger           mLogger      ;
     protected Map<String, MessageDeliver > mDeliverPool = new LinkedHashMap<>();
     protected ReadWriteLock                mPoolLock    = new ReentrantReadWriteLock();
 
-    public ArchMsgExpress( String name, Hydrarum system ) {
+    public ArchMsgExpress( String name, MessageJunction junction ) {
         this.mszName      = name;
-        this.mSystem      = system;
-        this.mLogger      = this.getSystem().getTracerScope().newLogger( this.className() );
+        this.mLogger      = LoggerFactory.getLogger(  this.className() );
+        this.mJunction    = junction;
 
         if( this.mszName == null ){
             this.mszName = this.className();
         }
-    }
-
-    public ArchMsgExpress( String name, ArchMessagram messagram ) {
-        this( name, messagram.getSystem() );
-        this.mMessagram   = messagram;
     }
 
     public ArchMsgExpress( ArchMessagram messagram ) {
@@ -56,13 +50,8 @@ public abstract class ArchMsgExpress implements MessageExpress, Slf4jTraceable {
     }
 
     @Override
-    public Hydrarum getSystem() {
-        return this.mSystem;
-    }
-
-    @Override
-    public ArchMessagram getMessagram() {
-        return this.mMessagram;
+    public MessageJunction getJunction() {
+        return this.mJunction;
     }
 
     @Override

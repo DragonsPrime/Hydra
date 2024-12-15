@@ -161,4 +161,8 @@ public abstract class ArchMappingInspector extends GenericPreloadClassInspector 
         return parameters;
     }
 
+    @Override
+    public ClassLoader getClassLoader() {
+        return this.mClassLoader;
+    }
 }

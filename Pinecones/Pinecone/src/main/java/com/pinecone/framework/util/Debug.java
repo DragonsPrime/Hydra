@@ -69,12 +69,28 @@ public class Debug {
         return Debug.purplef( Anything, objects );
     }
 
+    public static Tracer redf( Object Anything, Object...objects ){
+        return Debug.console.colorf( 31, Anything, objects );
+    }
+
+    public synchronized static Tracer redfs( Object Anything, Object...objects ){
+        return Debug.redf( Anything, objects );
+    }
+
     public static Tracer greenf( Object Anything, Object...objects ){
         return Debug.console.colorf( 32, Anything, objects );
     }
 
     public synchronized static Tracer greenfs( Object Anything, Object...objects ){
         return Debug.greenf( Anything, objects );
+    }
+
+    public static Tracer bluef( Object Anything, Object...objects ){
+        return Debug.console.colorf( 34, Anything, objects );
+    }
+
+    public synchronized static Tracer bluefs( Object Anything, Object...objects ){
+        return Debug.bluef( Anything, objects );
     }
 
     public static Tracer whitef( Object Anything, Object...objects ){

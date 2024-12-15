@@ -8,6 +8,8 @@ import com.pinecone.hydra.umc.msg.handler.ErrorMessageAudit;
 public interface MessageNode extends Processum {
     Hydrarum             getSystem();
 
+    long                 getMessageNodeId();
+
     ExtraHeadCoder       getExtraHeadCoder();
 
     ErrorMessageAudit    getErrorMessageAudit();

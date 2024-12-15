@@ -103,6 +103,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
 
     @Override
     public void sendMsg( UMCMessage msg, boolean bNoneBuffered ) throws IOException {
+        msg.getHead().setIdentityId( this.getMessageSource().getMessageNode().getMessageNodeId() );
         this.mHead = msg.getHead();
         this.mHead.setSignature( this.mszSignature );
 

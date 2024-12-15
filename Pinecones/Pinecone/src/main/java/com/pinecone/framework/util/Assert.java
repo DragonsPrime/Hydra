@@ -146,4 +146,8 @@ public abstract class Assert {
     public static void state( boolean expression ) {
         Assert.state( expression, "[Assertion failed] - this state invariant must be true" );
     }
+
+    public static void provokeIrrationally( Throwable bad ) {
+        throw new IllegalArgumentException( bad );
+    }
 }

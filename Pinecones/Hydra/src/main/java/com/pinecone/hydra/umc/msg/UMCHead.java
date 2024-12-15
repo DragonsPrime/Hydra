@@ -16,7 +16,7 @@ import java.util.Map;
 public class UMCHead implements Pinenut {
     public static final String     ProtocolVersion   = "1.1";
     public static final String     ProtocolSignature = "UMC/" + UMCHead.ProtocolVersion;
-    public static final int        StructBlockSize   = Byte.BYTES + Integer.BYTES + Long.BYTES + Long.BYTES + Short.BYTES + Byte.BYTES + Long.BYTES + Long.BYTES;
+    public static final int        StructBlockSize   = Byte.BYTES + Integer.BYTES + Long.BYTES + Long.BYTES + Short.BYTES + Byte.BYTES + Long.BYTES + Long.BYTES + Long.BYTES;
     public static final int        HeadBlockSize     = UMCHead.ProtocolSignature.length() + 1 + UMCHead.StructBlockSize;
     public static final ByteOrder  BinByteOrder      = ByteOrder.LITTLE_ENDIAN ;// Using x86, C/C++
 
@@ -29,6 +29,7 @@ public class UMCHead implements Pinenut {
     protected ExtraEncode            extraEncode       = ExtraEncode.Undefined  ; // sizeof( ExtraEncode/byte ) = 1
     protected long                   controlBits                                ; // sizeof( int64 ) = 8, Custom control bytes.
     protected long                   sessionId         = 0                      ; // sizeof( int64 ) = 8
+    protected long                   identityId        = 0                      ; // sizeof( int64 ) = 8, Client / Node ID
     protected byte[]                 extraHead         = {}                     ;
     protected Object                 dyExtraHead                                ;
 
@@ -71,53 +72,57 @@ public class UMCHead implements Pinenut {
     }
 
 
-    void setSignature        ( String signature       ) {
+    void setSignature            ( String signature       ) {
         this.szSignature = signature;
     }
 
-    void setBodyLength       ( long length            ) {
+    void setBodyLength           ( long length            ) {
         this.nBodyLength = length;
     }
 
-    public void setKeepAlive ( long nKeepAlive        ) {
+    public void setKeepAlive     ( long nKeepAlive        ) {
         this.nKeepAlive = nKeepAlive;
     }
 
-    void setMethod           ( UMCMethod umcMethod    ) {
+    void setMethod               ( UMCMethod umcMethod    ) {
         this.method = umcMethod;
         if ( this.method == UMCMethod.INFORM ) {
             this.nBodyLength = 0;
         }
     }
 
-    void setExtraEncode      ( ExtraEncode encode     ) {
+    void setExtraEncode          ( ExtraEncode encode     ) {
         this.extraEncode = encode;
     }
 
-    void setControlBits      ( long controlBits       ) {
+    public void setControlBits   ( long controlBits       ) {
         this.controlBits = controlBits;
     }
 
-    public void setSessionId ( long sessionId         ) {
+    public void setSessionId     ( long sessionId         ) {
         this.sessionId = sessionId;
     }
 
-    void setExtraHead        ( JSONObject jo          ) {
+    public void setIdentityId    ( long identityId        ) {
+        this.identityId = identityId;
+    }
+
+    void setExtraHead            ( JSONObject jo          ) {
         this.dyExtraHead = jo.getMap();
     }
 
-    void setExtraHead        ( Map<String,Object > jo ) {
+    void setExtraHead            ( Map<String,Object > jo ) {
         this.dyExtraHead = jo;
     }
 
-    void setExtraHead        ( Object o               ) {
+    void setExtraHead            ( Object o               ) {
         this.dyExtraHead = o;
         if( o == null ) {
             this.nExtraHeadLength = 0;
         }
     }
 
-    void transApplyExHead    (                        ) {
+    void transApplyExHead        (                        ) {
         if ( this.dyExtraHead != null ) {
             this.extraHead         = this.extraHeadCoder.getEncoder().encode( this, this.dyExtraHead );
             this.nExtraHeadLength  = this.extraHead.length;
@@ -140,7 +145,7 @@ public class UMCHead implements Pinenut {
         this.nExtraHeadLength  = this.extraHead.length;
     }
 
-    void applyExtraHeadCoder ( ExtraHeadCoder coder   ) {
+    void applyExtraHeadCoder     ( ExtraHeadCoder coder   ) {
         this.extraHeadCoder = coder;
 
         if( this.extraEncode == ExtraEncode.Undefined ) {
@@ -195,6 +200,10 @@ public class UMCHead implements Pinenut {
 
     public long            getControlBits() {
         return this.controlBits;
+    }
+
+    public long            getIdentityId() {
+        return this.identityId;
     }
 
     public byte[]          getExtraHeadBytes() {
@@ -293,6 +302,8 @@ public class UMCHead implements Pinenut {
                 new KeyValue<>( "Status"         , this.getStatus().getName()                              ),
                 new KeyValue<>( "ExtraEncode"    , this.getExtraEncode().getName()                         ),
                 new KeyValue<>( "ControlBits"    , "0x" + Long.toString( this.getControlBits(),16 )  ),
+                new KeyValue<>( "SessionId"      , this.getSessionId()                                     ),
+                new KeyValue<>( "IdentityId"     , this.getIdentityId()                                    ),
                 new KeyValue<>( "ExtraHead"      , szExtraHead                                             ),
         } );
     }
