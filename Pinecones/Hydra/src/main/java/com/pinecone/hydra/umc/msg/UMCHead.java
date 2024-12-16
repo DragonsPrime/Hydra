@@ -299,17 +299,17 @@ public class UMCHead implements Pinenut {
             szExtraHead = JSON.stringify( this.getMapExtraHead() );
         }
         return JSONEncoder.stringifyMapFormat( new KeyValue[]{
-                new KeyValue<>( "Signature"      , this.getSignature()                                     ),
-                new KeyValue<>( "Method"         , this.getMethod()                                        ),
-                new KeyValue<>( "ExtraHeadLength", this.getExtraHeadLength()                               ),
-                new KeyValue<>( "BodyLength"     , this.getBodyLength()                                    ),
-                new KeyValue<>( "KeepAlive"      , this.getKeepAlive()                                     ),
-                new KeyValue<>( "Status"         , this.getStatus().getName()                              ),
-                new KeyValue<>( "ExtraEncode"    , this.getExtraEncode().getName()                         ),
-                new KeyValue<>( "ControlBits"    , "0x" + Long.toString( this.getControlBits(),16 )  ),
-                new KeyValue<>( "SessionId"      , this.getSessionId()                                     ),
-                new KeyValue<>( "IdentityId"     , this.getIdentityId()                                    ),
-                new KeyValue<>( "ExtraHead"      , szExtraHead                                             ),
+                new KeyValue<>( "Signature"      , this.getSignature()                                             ),
+                new KeyValue<>( "Method"         , this.getMethod()                                                ),
+                new KeyValue<>( "ExtraHeadLength", this.getExtraHeadLength()                                       ),
+                new KeyValue<>( "BodyLength"     , this.getBodyLength()                                            ),
+                new KeyValue<>( "KeepAlive"      , this.getKeepAlive()                                             ),
+                new KeyValue<>( "Status"         , this.getStatus().getName()                                      ),
+                new KeyValue<>( "ExtraEncode"    , this.getExtraEncode().getName()                                 ),
+                new KeyValue<>( "ControlBits"    , "0x" + Long.toUnsignedString( this.getControlBits(),16 )  ),
+                new KeyValue<>( "SessionId"      , this.getSessionId()                                             ),
+                new KeyValue<>( "IdentityId"     , this.getIdentityId()                                            ),
+                new KeyValue<>( "ExtraHead"      , szExtraHead                                                     ),
         } );
     }
 }

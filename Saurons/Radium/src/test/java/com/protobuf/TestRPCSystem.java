@@ -12,6 +12,7 @@ import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.lang.GenericDynamicFactory;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
+import com.pinecone.hydra.umct.appoint.HuskySergeantExpress;
 import com.pinecone.hydra.umct.appoint.WolfAppointClient;
 import com.pinecone.hydra.umct.appoint.WolfAppointServer;
 import com.pinecone.hydra.umct.husky.HuskyCTPConstants;
@@ -190,9 +191,10 @@ class Jeff extends JesusChrist {
     private void testDuplex() throws Exception {
         Messagron messagron = new Messagron( "", this, new JSONMaptron() );
 
-        WolfMCServer wolf1 = new WolfMCServer( "", this, new JSONMaptron("{host: \"0.0.0.0\",\n" +
+        WolfMCServer wolfKing = new WolfMCServer( "", this, new JSONMaptron("{host: \"0.0.0.0\",\n" +
                 "port: 5777, SocketTimeout: 800, KeepAliveTimeout: 3600, MaximumConnections: 1e6}") );
-        WolfAppointServer wolf = new WolfAppointServer( wolf1 );
+
+        WolfAppointServer wolf = new WolfAppointServer( wolfKing, HuskySergeantExpress.class );
 
         RaccoonController controller  = new RaccoonController();
 

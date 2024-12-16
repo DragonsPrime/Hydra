@@ -12,6 +12,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pinecone.framework.lang.field.FieldEntity;
+import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.servgram.Servgramium;
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
 import com.pinecone.hydra.umc.msg.ChannelPool;
@@ -22,6 +23,8 @@ import com.pinecone.hydra.umc.msg.UMCTransmit;
 import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
 import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 import com.pinecone.hydra.umc.wolfmc.UlfInstructMessage;
+import com.pinecone.hydra.umc.wolfmc.WolfMCStandardConstants;
+import com.pinecone.hydra.umc.wolfmc.client.UlfAsyncMessengerChannelControlBlock;
 import com.pinecone.hydra.umc.wolfmc.client.UlfClient;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umct.IlleagalResponseException;
@@ -40,6 +43,7 @@ import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelId;
+import io.netty.util.AttributeKey;
 import javassist.ClassPool;
 
 public class WolfAppointClient extends ArchAppointNode implements DuplexAppointClient {
@@ -85,7 +89,16 @@ public class WolfAppointClient extends ArchAppointNode implements DuplexAppointC
         for ( Map.Entry<ChannelId, ChannelControlBlock > kv : this.mInstructedChannels.entrySet() ) {
             UlfInstructMessage instructMessage = new UlfInstructMessage( HuskyCTPConstants.HCTP_DUP_CONTROL_REGISTER );
             instructMessage.getHead().setIdentityId( this.mMessenger.getMessageNodeId() );
-            kv.getValue().getTransmit().sendMsg( instructMessage );
+
+            ChannelControlBlock ccb = kv.getValue();
+            UlfAsyncMessengerChannelControlBlock cb = (UlfAsyncMessengerChannelControlBlock) ccb;
+            cb.getChannel().getNativeHandle().attr( AttributeKey.valueOf( WolfMCStandardConstants.CB_ASYNC_MSG_HANDLE_KEY ) ).set(new UlfAsyncMsgHandleAdapter() {
+                @Override
+                public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
+                    Debug.trace( msg );
+                }
+            });
+            cb.sendAsynMsg( instructMessage, true );
         }
     }
 

@@ -1,5 +1,7 @@
 package com.pinecone.hydra.umct.appoint;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import com.pinecone.hydra.umc.wolfmc.server.UlfServer;
 import com.pinecone.hydra.umct.MessageDeliver;
 import com.pinecone.hydra.umct.MessageExpress;
 import com.pinecone.hydra.umct.MessageHandler;
+import com.pinecone.hydra.umct.MessageJunction;
 import com.pinecone.hydra.umct.ProtoletMsgDeliver;
 import com.pinecone.hydra.umct.SergeantExpress;
 import com.pinecone.hydra.umct.UMCTExpress;
@@ -71,16 +74,28 @@ public class WolfAppointServer extends ArchAppointNode implements DuplexAppointS
         ), express );
     }
 
-    public WolfAppointServer( UlfServer messenger ){
+    public WolfAppointServer( UlfServer messenger, Class<?> expressType ){
         this(
                 messenger,
                 new BytecodeIfacCompiler( ClassPool.getDefault(), messenger.getTaskManager().getClassLoader() ),
                 new BytecodeControllerInspector( ClassPool.getDefault(), messenger.getTaskManager().getClassLoader() )
         );
 
-        this.applyExpress(
-                this.mPMCTMarshal.getInterfacialCompiler(), new WolfMCExpress( AppointServer.DefaultEntityName, this )
-        );
+        try{
+            Constructor<?> constructor = expressType.getConstructor( String.class, MessageJunction.class );
+            UMCTExpress express = (UMCTExpress) constructor.newInstance(AppointServer.DefaultEntityName, this);
+
+            this.applyExpress(
+                    this.mPMCTMarshal.getInterfacialCompiler(), express
+            );
+        }
+        catch ( NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e ) {
+            throw new IllegalArgumentException( "`" + expressType.getSimpleName() + "` is not UMCTExpress calibre qualified." );
+        }
+    }
+
+    public WolfAppointServer( UlfServer messenger ){
+        this( messenger, WolfMCExpress.class );
     }
 
     @Override
