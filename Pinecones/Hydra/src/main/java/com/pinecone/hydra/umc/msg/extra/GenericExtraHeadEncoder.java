@@ -29,6 +29,7 @@ public class GenericExtraHeadEncoder implements ExtraHeadEncoder {
 
                 return os.toByteArray();
             }
+            case Iussum:
             case Prototype: {
                 return (byte[]) raw;
             }

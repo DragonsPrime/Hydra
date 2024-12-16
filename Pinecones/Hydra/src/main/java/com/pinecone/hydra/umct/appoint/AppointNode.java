@@ -12,6 +12,10 @@ import com.pinecone.ulf.util.protobuf.FieldProtobufEncoder;
 public interface AppointNode extends UMCTNode {
     MessageNode getMessageNode();
 
+    default long getMessageNodeId() {
+        return getMessageNode().getMessageNodeId();
+    }
+
     PMCTMarshal getPMCTTransformer();
 
     InterfacialCompiler getInterfacialCompiler();

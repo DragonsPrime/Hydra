@@ -51,7 +51,9 @@ public abstract class ArchUMCReceiver extends ArchUMCProtocol implements UMCRece
             }
             else {
                 if( head.getMethod() != UMCMethod.INFORM ){
-                    throw new IOException( " [UMCProtocol] Unrecognized protocol method." );
+                    if ( !( head.getMethod() == UMCMethod.UNDEFINED && head.extraEncode == ExtraEncode.Iussum ) ) {
+                        throw new IOException( " [UMCProtocol] Unrecognized protocol method." );
+                    }
                 }
                 message = (UMCMessage) stereotypes.putType().getConstructor( UMCHead.class ).newInstance( head );
             }

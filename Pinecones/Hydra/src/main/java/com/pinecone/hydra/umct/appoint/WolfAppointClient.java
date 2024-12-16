@@ -21,11 +21,13 @@ import com.pinecone.hydra.umc.msg.UMCReceiver;
 import com.pinecone.hydra.umc.msg.UMCTransmit;
 import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
 import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
+import com.pinecone.hydra.umc.wolfmc.UlfInstructMessage;
 import com.pinecone.hydra.umc.wolfmc.client.UlfClient;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umct.IlleagalResponseException;
 import com.pinecone.hydra.umct.appoint.proxy.GenericIfaceProxyFactory;
 import com.pinecone.hydra.umct.appoint.proxy.IfaceProxyFactory;
+import com.pinecone.hydra.umct.husky.HuskyCTPConstants;
 import com.pinecone.hydra.umct.husky.compiler.BytecodeIfacCompiler;
 import com.pinecone.hydra.umct.husky.compiler.CompilerEncoder;
 import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
@@ -76,12 +78,14 @@ public class WolfAppointClient extends ArchAppointNode implements DuplexAppointC
     }
 
     @Override
-    public void joinEmbraces( int nLine ) {
+    public void joinEmbraces( int nLine ) throws IOException {
         // Join us, embracing uniformity.
 
         this.createEmbraces( nLine );
         for ( Map.Entry<ChannelId, ChannelControlBlock > kv : this.mInstructedChannels.entrySet() ) {
-            //kv.getValue().getTransmit().sendMsg( new UlfInformMessage() );
+            UlfInstructMessage instructMessage = new UlfInstructMessage( HuskyCTPConstants.HCTP_DUP_CONTROL_REGISTER );
+            instructMessage.getHead().setIdentityId( this.mMessenger.getMessageNodeId() );
+            kv.getValue().getTransmit().sendMsg( instructMessage );
         }
     }
 

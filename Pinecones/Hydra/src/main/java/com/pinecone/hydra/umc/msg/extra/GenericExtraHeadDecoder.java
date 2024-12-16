@@ -36,6 +36,7 @@ public class GenericExtraHeadDecoder implements ExtraHeadDecoder {
                         "Illegal decompiler Binary json, requires Map<String, Object > but " + o.getClass().getSimpleName() + " found."
                 );
             }
+            case Iussum:
             case Prototype: {
                 return raw;
             }

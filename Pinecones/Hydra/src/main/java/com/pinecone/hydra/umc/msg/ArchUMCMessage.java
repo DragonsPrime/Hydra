@@ -36,7 +36,7 @@ public abstract class ArchUMCMessage implements UMCMessage {
 
 
 
-    ArchUMCMessage( Object protoExHead, ExtraEncode encode, UMCMethod method, long controlBits ) {
+    protected ArchUMCMessage( Object protoExHead, ExtraEncode encode, UMCMethod method, long controlBits ) {
         this.mHead = new UMCHead();
         this.mHead.setControlBits( controlBits );
         this.mHead.setMethod( method );
@@ -44,15 +44,15 @@ public abstract class ArchUMCMessage implements UMCMessage {
         this.mHead.setExtraEncode( encode );
     }
 
-    ArchUMCMessage( Object protoExHead, UMCMethod method, long controlBits ) {
+    protected ArchUMCMessage( Object protoExHead, UMCMethod method, long controlBits ) {
         this( protoExHead, ExtraEncode.Prototype, method, controlBits );
     }
 
-    ArchUMCMessage( Object protoExHead, UMCMethod method ) {
+    protected ArchUMCMessage( Object protoExHead, UMCMethod method ) {
         this( protoExHead, method, 0 );
     }
 
-    ArchUMCMessage( Object protoExHead, ExtraEncode encode, UMCMethod method ) {
+    protected ArchUMCMessage( Object protoExHead, ExtraEncode encode, UMCMethod method ) {
         this( protoExHead, encode, method, 0 );
     }
 

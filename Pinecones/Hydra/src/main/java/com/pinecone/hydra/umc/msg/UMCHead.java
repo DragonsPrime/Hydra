@@ -136,6 +136,11 @@ public class UMCHead implements Pinenut {
                 this.nExtraHeadLength  = 0;
                 return;
             }
+            else if( this.extraEncode == ExtraEncode.Iussum ) {
+                this.extraHead         = new byte[ 0 ];
+                this.nExtraHeadLength  = 0;
+                return;
+            }
             else {
                 this.dyExtraHead = this.extraHeadCoder.newExtraHead();
                 this.extraHead   = this.extraHeadCoder.getEncoder().encode( this, this.dyExtraHead );

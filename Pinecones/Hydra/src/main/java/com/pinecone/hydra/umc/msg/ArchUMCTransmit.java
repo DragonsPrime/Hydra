@@ -107,7 +107,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
         this.mHead = msg.getHead();
         this.mHead.setSignature( this.mszSignature );
 
-        if( msg.getMethod() == UMCMethod.INFORM ) {
+        if( msg.getMethod() == UMCMethod.INFORM || msg.getMethod() == UMCMethod.UNDEFINED ) {
             this.sendMsgHead( this.mHead );
         }
         else if( msg.getMethod() == UMCMethod.TRANSFER ) {
