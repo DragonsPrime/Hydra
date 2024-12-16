@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.channels.FileChannel;
 import java.nio.file.StandardOpenOption;
@@ -80,6 +82,14 @@ public class TransmitController {
         TitanFileExportEntity64 exportEntity = new TitanFileExportEntity64( this.primaryFileSystem, this.primaryVolume, fileNode, titanFileChannelKChannel );
         primaryFileSystem.export( exportEntity );
         return BasicResultResponse.success();
+    }
+
+    @PostMapping("/stream")
+    public String handleStreamUpload(HttpServletRequest request) throws IOException {
+        try (InputStream inputStream = request.getInputStream()) {
+            // 处理输入流
+            return "File stream processed.";
+        }
     }
 
     private Chanface getKChannel(File file ) throws IOException {
