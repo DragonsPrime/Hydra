@@ -410,7 +410,7 @@ public class WolfMCClient extends ArchAsyncMessenger implements UlfClient {
 
     @Override
     public UMCMessage                     sendSyncMsg( UMCMessage request, boolean bNoneBuffered ) throws IOException {
-        return this.sendSyncMsg( request, bNoneBuffered, this.getConnectionArguments().getKeepAliveTimeout() * 1000 );
+        return this.sendSyncMsg( request, bNoneBuffered, this.getConnectionArguments().getKeepAliveTimeout() * 1000L );
     }
 
     @Override

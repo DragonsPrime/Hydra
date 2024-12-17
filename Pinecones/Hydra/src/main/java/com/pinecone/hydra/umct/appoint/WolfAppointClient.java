@@ -268,7 +268,7 @@ public class WolfAppointClient extends ArchAppointNode implements DuplexAppointC
             Object ret;
             if ( nWaitTimeMil == -1 ) {
                 if ( this.mMessenger instanceof WolfMCClient ) {
-                    nWaitTimeMil = ((WolfMCClient) this.mMessenger).getConnectionArguments().getKeepAliveTimeout() * 1000;
+                    nWaitTimeMil = ((WolfMCClient) this.mMessenger).getConnectionArguments().getKeepAliveTimeout() * 1000L;
                 }
             }
 
