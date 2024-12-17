@@ -4,6 +4,8 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.Frame;
 
+import java.util.zip.CRC32;
+
 public interface StorageIOResponse extends StorageInstructResponse {
     GUID getObjectGuid();
     void setObjectGuid( GUID objectGuid );
@@ -17,8 +19,8 @@ public interface StorageIOResponse extends StorageInstructResponse {
     long getParityCheck();
     void setParityCheck( long parityCheck );
 
-    String getCre32();
-    void setCrc32( String crc32 );
+    CRC32 getCre32();
+    void setCrc32( CRC32 crc32 );
 
     String getSourceName();
     void setSourceName( String name );

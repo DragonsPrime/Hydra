@@ -58,7 +58,7 @@ public class TitanDirectExport64 implements DirectExport64{
             buffer.clear();
 
             titanMiddleStorageObject.setChecksum( checksum );
-            titanMiddleStorageObject.setCrc32( Long.toHexString(crc.getValue()) );
+            titanMiddleStorageObject.setCrc32( crc );
             titanMiddleStorageObject.setParityCheck( parityCheck );
         }
 
@@ -104,7 +104,7 @@ public class TitanDirectExport64 implements DirectExport64{
             }
 
             titanMiddleStorageObject.setChecksum(checksum);
-            titanMiddleStorageObject.setCrc32(Long.toHexString(crc.getValue()));
+            titanMiddleStorageObject.setCrc32(crc);
             titanMiddleStorageObject.setParityCheck(parityCheck);
         }
         catch (IOException e) {

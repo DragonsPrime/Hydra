@@ -199,7 +199,7 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     public PhysicalVolume getPhysicalVolume(GUID guid) {
 //        this.reentrantLock.lock();
 //        try{
-            Debug.trace( Thread.currentThread().getName(), Thread.currentThread().getId() );
+            //Debug.trace( Thread.currentThread().getName(), Thread.currentThread().getId() );
             PhysicalVolume physicalVolume   = this.physicalVolumeManipulator.getPhysicalVolume(guid);
             MountPoint mountPoint           = this.mountPointManipulator.getMountPointByVolumeGuid(guid);
             VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);

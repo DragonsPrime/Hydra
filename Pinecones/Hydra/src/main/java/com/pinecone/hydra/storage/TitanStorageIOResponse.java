@@ -4,11 +4,13 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.Frame;
 
+import java.util.zip.CRC32;
+
 public class TitanStorageIOResponse implements StorageIOResponse {
     private GUID objectGuid;
     private long checksum;
     private long parityCheck;
-    private String crc32;
+    private CRC32 crc32;
     private String sourceName;
     private GUID bottomGuid;
 
@@ -43,12 +45,12 @@ public class TitanStorageIOResponse implements StorageIOResponse {
     }
 
     @Override
-    public String getCre32() {
+    public CRC32 getCre32() {
         return this.crc32;
     }
 
     @Override
-    public void setCrc32(String crc32) {
+    public void setCrc32(CRC32 crc32) {
         this.crc32 = crc32;
     }
 

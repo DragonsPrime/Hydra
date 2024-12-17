@@ -76,9 +76,9 @@ class Alice extends Radium {
         //this.testDirectExport( volumeTree );
         //Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
-        this.testStripedInsert( volumeTree );
+        //this.testStripedInsert( volumeTree );
         //this.testSpannedInsert( volumeTree );
-        //this.testStripedReceive( volumeTree );
+        this.testStripedReceive( volumeTree );
         //this.testStripedExport( volumeTree );
         //this.testHash( volumeTree );
         //this.testSpannedReceive( volumeTree );
@@ -213,7 +213,7 @@ class Alice extends Radium {
         GuidAllocator guidAllocator = volumeManager.getGuidAllocator();
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanStorageReceiveIORequest titanReceiveStorageObject = new TitanStorageReceiveIORequest();
-        File file = new File("K:/undefined/Video/Rick.and.Morty/R&M S3/瑞克和莫蒂第三季-07.mp4");
+        File file = new File("D:/井盖视频块/我的视频.mp4");
         titanReceiveStorageObject.setName( "我的视频" );
         titanReceiveStorageObject.setSize( file.length() );
         titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
@@ -266,16 +266,17 @@ class Alice extends Radium {
 
 
     void testStripedExport( UniformVolumeManager volumeManager ) throws Exception {
-        File file = new File("E:/ram.mp4");
-        File originalFile = new File( "K:/undefined/Video/Rick.and.Morty/R&M S3/瑞克和莫蒂第三季-07.mp4" );
+        File file = new File("D:\\文件系统\\大文件\\我的视频.mp4");
+        File originalFile = new File( "D:/井盖视频块/我的视频.mp4" );
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
         TitanFileChannelChanface kChannel = new TitanFileChannelChanface( channel );
 //        FileOutputStream stream = new FileOutputStream( file );
 //        TitanOutputStreamChanface kChannel = new TitanOutputStreamChanface(stream);
         LogicVolume volume = volumeManager.get(volumeManager.queryGUIDByPath("条带卷"));
         TitanStorageExportIORequest titanExportStorageObject = new TitanStorageExportIORequest();
+        Debug.trace(originalFile.length());
         titanExportStorageObject.setSize( originalFile.length() );
-        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0a2df10-0002df-0001-f4") );
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0ccc7f8-0000fc-0001-3c") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
         //volume.channelExport( titanExportStorageObject, titanFileChannelKChannel);
         UnifiedTransmitConstructor unifiedTransmitConstructor = new UnifiedTransmitConstructor();

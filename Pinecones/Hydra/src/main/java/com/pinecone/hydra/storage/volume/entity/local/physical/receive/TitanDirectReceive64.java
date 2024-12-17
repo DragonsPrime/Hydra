@@ -7,9 +7,11 @@ import com.pinecone.hydra.storage.StorageNaming;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.TitanStorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageNaming;
+import com.pinecone.hydra.storage.file.Verification;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -23,7 +25,7 @@ import java.util.zip.CRC32;
 public class TitanDirectReceive64 implements DirectReceive64{
     protected StorageNaming           storageNaming;
 
-    protected Chanface channel;
+    protected Chanface                channel;
 
     protected StorageReceiveIORequest storageReceiveIORequest;
 
@@ -85,7 +87,7 @@ public class TitanDirectReceive64 implements DirectReceive64{
         }
 
         titanMiddleStorageObject.setChecksum(checksum);
-        titanMiddleStorageObject.setCrc32(Long.toHexString(crc.getValue()));
+        titanMiddleStorageObject.setCrc32(crc);
         titanMiddleStorageObject.setParityCheck(parityCheck);
         titanMiddleStorageObject.setSourceName(path.toString());
 
@@ -130,10 +132,12 @@ public class TitanDirectReceive64 implements DirectReceive64{
         }
 
         titanMiddleStorageObject.setChecksum(checksum);
-        titanMiddleStorageObject.setCrc32(Long.toHexString(crc.getValue()));
+        titanMiddleStorageObject.setCrc32(crc);
         titanMiddleStorageObject.setParityCheck(parityCheck);
         titanMiddleStorageObject.setSourceName(path.toString());
 
         return titanMiddleStorageObject;
     }
+
+
 }

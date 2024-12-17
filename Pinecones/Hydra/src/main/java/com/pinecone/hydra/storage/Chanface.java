@@ -1,11 +1,13 @@
 package com.pinecone.hydra.storage;
 
 import com.pinecone.framework.system.prototype.Pinenut;
+import com.pinecone.hydra.storage.file.Verification;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.zip.CRC32;
 
 public interface Chanface extends Pinenut {
     void position( long position ) throws IOException;
@@ -23,4 +25,5 @@ public interface Chanface extends Pinenut {
     long position() throws IOException;
 
     void close() throws IOException;
+
 }

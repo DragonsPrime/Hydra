@@ -2,8 +2,7 @@ package com.pinecone.hydra.storage.policy.chain;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.policy.PolicyManage;
-import com.pinecone.hydra.storage.policy.entity.Policy;
-import com.pinecone.hydra.storage.policy.source.VersionManipulator;
+import com.pinecone.hydra.storage.version.source.VersionManipulator;
 
 public class VersionPolicyChain implements PolicyChain {
     protected PolicyManage          policyManage;
@@ -12,7 +11,6 @@ public class VersionPolicyChain implements PolicyChain {
 
     public VersionPolicyChain( PolicyManage policyManage ){
         this.policyManage = policyManage;
-        this.versionManipulator = policyManage.getMasterManipulator().getVersionManipulator();
     }
     @Override
     public GUID execution( String filePath, String version ) {

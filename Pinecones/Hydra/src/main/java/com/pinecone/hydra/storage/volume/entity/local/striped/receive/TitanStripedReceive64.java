@@ -26,7 +26,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class TitanStripedReceive64 implements StripedReceive64{
-    protected Chanface channel;
+    protected Chanface                  channel;
 
     protected VolumeManager             volumeManager;
 
@@ -74,6 +74,7 @@ public class TitanStripedReceive64 implements StripedReceive64{
         }
         this.mSqLiteHost.close();
         this.waitForTaskCompletion( masterVolumeGram );
+        masterVolumeGram.kill();
         return null;
     }
 
@@ -96,6 +97,7 @@ public class TitanStripedReceive64 implements StripedReceive64{
         }
 
         this.waitForTaskCompletion( masterVolumeGram );
+        masterVolumeGram.kill();
         return null;
     }
 

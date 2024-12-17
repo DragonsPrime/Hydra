@@ -1,7 +1,7 @@
-package com.pinecone.hydra.policy.ibatis;
+package com.pinecone.hydra.version.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.policy.source.VersionManipulator;
+import com.pinecone.hydra.storage.version.source.VersionManipulator;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;

@@ -1,12 +1,11 @@
 package com.pinecone.hydra.storage.policy;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.bucket.source.BucketMasterManipulator;
 import com.pinecone.hydra.storage.policy.entity.Policy;
 import com.pinecone.hydra.storage.policy.source.PolicyFileMappingManipulator;
 import com.pinecone.hydra.storage.policy.source.PolicyManipulator;
 import com.pinecone.hydra.storage.policy.source.PolicyMasterManipulator;
-import com.pinecone.hydra.storage.policy.source.VersionManipulator;
+import com.pinecone.hydra.storage.version.source.VersionManipulator;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.ulf.util.id.GuidAllocator;
@@ -25,7 +24,6 @@ public class TitanPolicyManage implements PolicyManage{
 
     protected PolicyFileMappingManipulator      policyFileMappingManipulator;
 
-    protected VersionManipulator                versionManipulator;
 
 
     public TitanPolicyManage(Hydrarum hydrarum, KOIMasterManipulator masterManipulator, String name ){
@@ -34,7 +32,6 @@ public class TitanPolicyManage implements PolicyManage{
        this.guidAllocator                 = new GenericGuidAllocator();
        this.policyManipulator             = this.masterManipulator.getPolicyManipulator();
        this.policyFileMappingManipulator  = this.masterManipulator.getPolicyFileMappingManipulator();
-       this.versionManipulator            = this.masterManipulator.getVersionManipulator();
     }
 
     @Override

@@ -1,13 +1,17 @@
 package com.pinecone.hydra.storage;
 
+import com.pinecone.framework.util.Bytes;
+import com.pinecone.hydra.storage.file.Verification;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlockStatus;
+import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.zip.CRC32;
 
 public class TitanFileChannelChanface implements Chanface {
     private final FileChannel       channel;
@@ -70,6 +74,8 @@ public class TitanFileChannelChanface implements Chanface {
     public void close() throws IOException {
         this.channel.close();
     }
+
+
 
     private ByteBuffer copyToTemporaryBuffer(byte[] buffer, int startPosition, int endSize ){
         ByteBuffer temporaryBuffer = ByteBuffer.allocate( endSize );
