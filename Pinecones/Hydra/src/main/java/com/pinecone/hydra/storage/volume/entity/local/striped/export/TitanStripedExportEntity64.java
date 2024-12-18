@@ -24,7 +24,7 @@ public class TitanStripedExportEntity64 extends ArchExportEntity implements Stri
 
     @Override
     public StorageIOResponse export() throws IOException, SQLException {
-        return this.stripedExport.export();
+        return this.stripedExport.export(this.channel);
     }
 
     @Override

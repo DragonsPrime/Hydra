@@ -89,6 +89,21 @@ public class TitanLocalMirroredVolume extends ArchLogicVolume implements LocalMi
     }
 
     @Override
+    public StorageIOResponse export(ExporterEntity entity, boolean accessRandom) throws SQLException, IOException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, Number offset, Number endSize, boolean accessRandom) {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer, boolean accessRandom) throws SQLException, IOException {
+        return null;
+    }
+
+    @Override
     public boolean existStorageObject(GUID storageObject) throws SQLException {
         return false;
     }

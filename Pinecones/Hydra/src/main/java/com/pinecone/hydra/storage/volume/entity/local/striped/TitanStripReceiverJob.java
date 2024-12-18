@@ -9,8 +9,6 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
-import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
-import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.TitanSimpleReceiveEntity64;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
@@ -25,7 +23,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
     private int                         jobCode;
     private VolumeManager               volumeManager;
     private StorageReceiveIORequest     object;
-    private Chanface fileChannel;
+    private Chanface                    chanface;
     private OnVolumeFileSystem          kenVolumeFileSystem;
     private MappedExecutor              executor;
     private StorageIOResponse           storageIOResponse;
@@ -37,7 +35,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
     public TitanStripReceiverJob(ReceiveEntity entity, Chanface channel, int jobCount, int jobCode, LogicVolume volume, MappedExecutor executor, Number offset, Number ednSize ){
         this.volumeManager          = entity.getVolumeManager();
         this.object                 = entity.getReceiveStorageObject();
-        this.fileChannel            = channel;
+        this.chanface = channel;
         this.jobCount               = jobCount;
         this.jobCode                = jobCode;
         this.volume                 = volume;
@@ -68,7 +66,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
             try {
 //                this.storageIOResponse = this.volume.channelReceive(this.object, this.fileChannel, currentPosition, bufferSize);
 //                TitanSimpleReceiveEntity64 receiveEntity = new TitanSimpleReceiveEntity64( this.volumeManager, this.object, this.fileChannel, (SimpleVolume) volume);
-                ReceiveEntity receiveEntity = this.constructor.getReceiveEntity(this.volume.getClass(), this.volumeManager, this.object, this.fileChannel, volume);
+                ReceiveEntity receiveEntity = this.constructor.getReceiveEntity(this.volume.getClass(), this.volumeManager, this.object, this.chanface, volume);
                 this.storageIOResponse = this.volume.receive( receiveEntity, currentPosition, bufferSize );
             } catch (IOException | SQLException e) {
                 e.printStackTrace();

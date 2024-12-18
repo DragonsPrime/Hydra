@@ -24,7 +24,7 @@ public class TitanSpannedExportEntity64 extends ArchExportEntity implements Span
 
     @Override
     public StorageIOResponse export() throws IOException, SQLException {
-        return this.spannedExport.export();
+        return this.spannedExport.export(this.channel);
     }
 
     @Override

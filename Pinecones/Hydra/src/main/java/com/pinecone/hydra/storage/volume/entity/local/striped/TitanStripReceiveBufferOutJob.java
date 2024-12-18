@@ -2,10 +2,13 @@ package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.rdb.MappedExecutor;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
+import com.pinecone.hydra.storage.volume.UnifiedTransmitConstructor;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
+import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.stream.TitanSimpleStreamReceiveEntity64;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
@@ -15,40 +18,42 @@ import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
 public class TitanStripReceiveBufferOutJob implements StripReceiveBufferOutJob{
-    protected MasterVolumeGram          masterVolumeGram;
+    protected MasterVolumeGram              masterVolumeGram;
 
-    protected byte[]                    buffer;
+    protected byte[]                        buffer;
 
-    protected StripBufferStatus         status;
+    protected StripBufferStatus             status;
 
-    protected InputStream               stream;
+    protected Chanface                      stream;
 
-    protected final Semaphore           blockerLatch;
+    protected final Semaphore               blockerLatch;
 
-    protected List< CacheBlock >        cacheBlocksGroup;
+    protected List< CacheBlock >            cacheBlocksGroup;
 
-    protected LocalStripedTaskThread    parentThread;
+    protected LocalStripedTaskThread        parentThread;
 
-    protected VolumeManager             volumeManager;
+    protected VolumeManager                 volumeManager;
 
-    protected long                      totalSize;
+    protected long                          totalSize;
 
-    protected long                      exportSize;
-
-
-    protected StorageReceiveIORequest   request;
-
-    protected OnVolumeFileSystem        kenVolumeFileSystem;
-
-    protected MappedExecutor            executor;
+    protected long                          exportSize;
 
 
-    public TitanStripReceiveBufferOutJob(MasterVolumeGram masterVolumeGram, VolumeManager volumeManager, InputStream stream, StorageReceiveIORequest request, MappedExecutor executor ){
+    protected StorageReceiveIORequest       request;
+
+    protected OnVolumeFileSystem            kenVolumeFileSystem;
+
+    protected MappedExecutor                executor;
+    protected UnifiedTransmitConstructor    constructor;
+
+
+    public TitanStripReceiveBufferOutJob(MasterVolumeGram masterVolumeGram, VolumeManager volumeManager, Chanface stream, StorageReceiveIORequest request, MappedExecutor executor ){
         this.masterVolumeGram       = masterVolumeGram;
         this.stream                 = stream;
         this.totalSize              = request.getSize().longValue();
@@ -84,7 +89,8 @@ public class TitanStripReceiveBufferOutJob implements StripReceiveBufferOutJob{
                 int start = currentCacheBlock.getValidByteStart().intValue();
                 int end   = currentCacheBlock.getValidByteEnd().intValue();
                 // todo应该使用适配器，现在默认底层是simpleVolume
-                TitanSimpleStreamReceiveEntity64 entity = new TitanSimpleStreamReceiveEntity64( this.volumeManager,this.request, this.stream, (SimpleVolume) currentCacheBlock.getVolume() );
+//                TitanSimpleStreamReceiveEntity64 entity = new TitanSimpleStreamReceiveEntity64( this.volumeManager,this.request, this.stream, (SimpleVolume) currentCacheBlock.getVolume() );
+                ReceiveEntity entity = this.constructor.getReceiveEntity(currentCacheBlock.getVolume().getClass(), this.volumeManager, request, this.stream, currentCacheBlock.getVolume());
                 StorageIOResponse response = currentCacheBlock.getVolume().receive(entity, currentCacheBlock, this.buffer);
 
                 this.status = ReceiveBufferOutStatus.Suspended;
@@ -107,7 +113,8 @@ public class TitanStripReceiveBufferOutJob implements StripReceiveBufferOutJob{
                         bufferInThread.getBlockerLatch().release();
                     }
                 }
-            } catch (SQLException | IOException | InterruptedException e) {
+            } catch (SQLException | IOException | InterruptedException | InvocationTargetException |
+                     InstantiationException | IllegalAccessException e) {
                 throw new RuntimeException(e);
             }
 

@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage;
 
+import com.pinecone.framework.system.NotImplementedException;
 import com.pinecone.framework.util.Bytes;
 import com.pinecone.hydra.storage.file.Verification;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.zip.CRC32;
 
-public class TitanFileChannelChanface implements Chanface {
+public class TitanFileChannelChanface implements RandomAccessChanface {
     private final FileChannel       channel;
     private final ReentrantLock     reentrantLock;
 
@@ -49,6 +50,11 @@ public class TitanFileChannelChanface implements Chanface {
     }
 
     @Override
+    public int read(byte[] buffer, int size, long offset) throws IOException {
+        return 0;
+    }
+
+    @Override
     public int write( ByteBuffer buffer ) throws IOException {
         return this.channel.write( buffer );
     }
@@ -75,7 +81,15 @@ public class TitanFileChannelChanface implements Chanface {
         this.channel.close();
     }
 
+    @Override
+    public void mark(int readlimit) {
+        throw new NotImplementedException();
+    }
 
+    @Override
+    public void reset() throws IOException {
+        throw new NotImplementedException();
+    }
 
     private ByteBuffer copyToTemporaryBuffer(byte[] buffer, int startPosition, int endSize ){
         ByteBuffer temporaryBuffer = ByteBuffer.allocate( endSize );

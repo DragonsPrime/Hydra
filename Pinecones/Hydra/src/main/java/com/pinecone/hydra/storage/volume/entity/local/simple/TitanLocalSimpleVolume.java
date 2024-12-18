@@ -83,6 +83,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         return response;
     }
 
+
     @Override
     public StorageIOResponse export(ExporterEntity entity) throws SQLException, IOException {
         return entity.export();
@@ -96,6 +97,21 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     @Override
     public StorageIOResponse export(ExporterEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws SQLException, IOException {
         return entity.export( cacheBlock, offset, endSize, buffer );
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, boolean accessRandom) throws SQLException, IOException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, Number offset, Number endSize, boolean accessRandom) {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer, boolean accessRandom) throws SQLException, IOException {
+        return null;
     }
 
     @Override

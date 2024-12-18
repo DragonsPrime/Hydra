@@ -2,6 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.physical.receive;
 
 import com.pinecone.framework.util.Bytes;
 import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.RandomAccessChanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageNaming;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
@@ -14,18 +15,18 @@ import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.sql.SQLException;
 import java.util.zip.CRC32;
 
 public class TitanDirectReceive64 implements DirectReceive64{
     protected StorageNaming           storageNaming;
-
-    protected Chanface                channel;
 
     protected StorageReceiveIORequest storageReceiveIORequest;
 
@@ -34,7 +35,6 @@ public class TitanDirectReceive64 implements DirectReceive64{
     protected String                  destDirPath;
 
     public TitanDirectReceive64( DirectReceiveEntity entity ){
-        this.channel                 = entity.getKChannel();
         this.storageReceiveIORequest = entity.getReceiveStorageObject();
         this.volumeManager           = entity.getVolumeManager();
         this.destDirPath             = entity.getDestDirPath();
@@ -42,17 +42,27 @@ public class TitanDirectReceive64 implements DirectReceive64{
     }
 
     @Override
-    public StorageIOResponse receive() throws IOException {
-        return this.receiveWithOffsetAndSize( 0, this.storageReceiveIORequest.getSize().intValue() );
+    public StorageIOResponse receive(Chanface chanface) throws IOException {
+        return this.receiveWithOffsetAndSize( chanface, 0, this.storageReceiveIORequest.getSize().intValue() );
     }
 
     @Override
-    public StorageIOResponse receive( Number offset, Number endSize) throws IOException {
-        return this.receiveWithOffsetAndSize( offset.intValue(),endSize.intValue() );
+    public StorageIOResponse receive( Chanface chanface, Number offset, Number endSize) throws IOException {
+        return this.receiveWithOffsetAndSize( chanface,offset.intValue(),endSize.intValue() );
     }
 
     @Override
-    public StorageIOResponse receive(CacheBlock cacheBlock, byte[] buffer) throws IOException {
+    public StorageIOResponse receive(RandomAccessChanface randomAccessChanface) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return this.receiveWithOffsetAndSize( randomAccessChanface, 0, this.storageReceiveIORequest.getSize().intValue() );
+    }
+
+    @Override
+    public StorageIOResponse receive(RandomAccessChanface randomAccessChanface, Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return this.receiveWithOffsetAndSize( randomAccessChanface,offset.intValue(),endSize.intValue() );
+    }
+
+    @Override
+    public StorageIOResponse receive(Chanface chanface,CacheBlock cacheBlock, byte[] buffer) throws IOException {
         int start = cacheBlock.getValidByteStart().intValue();
         int end = cacheBlock.getValidByteEnd().intValue();
 
@@ -94,7 +104,7 @@ public class TitanDirectReceive64 implements DirectReceive64{
         return titanMiddleStorageObject;
     }
 
-    private StorageIOResponse receiveWithOffsetAndSize(long offset, int size) throws IOException {
+    private StorageIOResponse receiveWithOffsetAndSize(Chanface chanface,long offset, int size) throws IOException {
         //Debug.trace("缓存的是"+offset+"到"+(offset + size));
 
         int parityCheck = 0;
@@ -107,7 +117,7 @@ public class TitanDirectReceive64 implements DirectReceive64{
         //buffer.clear();
 
         ByteBuffer[] lpBuf = new ByteBuffer[ 1 ];
-        this.channel.read( (out)->{
+        chanface.read( (out)->{
             lpBuf[0] = out;
         }, size, offset );
         ByteBuffer buffer = lpBuf[ 0 ];

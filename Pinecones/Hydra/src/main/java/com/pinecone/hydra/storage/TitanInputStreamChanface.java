@@ -1,13 +1,10 @@
 package com.pinecone.hydra.storage;
 
 import com.pinecone.framework.system.NotImplementedException;
-import com.pinecone.hydra.storage.file.Verification;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
-import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
@@ -43,6 +40,11 @@ public class TitanInputStreamChanface implements Chanface {
         reader.afterRead( buffer );
         //buffer.put(tempBuffer, 0, bytesRead);
         return bytesRead;
+    }
+
+    @Override
+    public int read(byte[] buffer, int size, long offset) throws IOException {
+        return this.stream.read(buffer,(int)offset,size);
     }
 
     @Override

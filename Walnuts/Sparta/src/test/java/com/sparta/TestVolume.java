@@ -78,8 +78,8 @@ class Alice extends Radium {
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
         //this.testStripedInsert( volumeTree );
         //this.testSpannedInsert( volumeTree );
-        this.testStripedReceive( volumeTree );
-        //this.testStripedExport( volumeTree );
+        //this.testStripedReceive( volumeTree );
+        this.testStripedExport( volumeTree );
         //this.testHash( volumeTree );
         //this.testSpannedReceive( volumeTree );
         //this.testSpannedExport( volumeTree );
@@ -276,7 +276,7 @@ class Alice extends Radium {
         TitanStorageExportIORequest titanExportStorageObject = new TitanStorageExportIORequest();
         Debug.trace(originalFile.length());
         titanExportStorageObject.setSize( originalFile.length() );
-        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0ccc7f8-0000fc-0001-3c") );
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0cf9b48-0001a2-0001-e4") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
         //volume.channelExport( titanExportStorageObject, titanFileChannelKChannel);
         UnifiedTransmitConstructor unifiedTransmitConstructor = new UnifiedTransmitConstructor();

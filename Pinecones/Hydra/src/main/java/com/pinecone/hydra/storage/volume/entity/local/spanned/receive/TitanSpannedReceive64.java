@@ -4,6 +4,7 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.framework.util.sqlite.SQLiteHost;
 import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.RandomAccessChanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.UnifiedTransmitConstructor;
@@ -26,8 +27,6 @@ import java.util.List;
 public class TitanSpannedReceive64 implements SpannedReceive64{
     protected SpannedVolume                 spannedVolume;
 
-    protected Chanface channel;
-
     protected VolumeManager                 volumeManager;
 
     protected StorageReceiveIORequest       storageReceiveIORequest;
@@ -36,22 +35,31 @@ public class TitanSpannedReceive64 implements SpannedReceive64{
 
     public TitanSpannedReceive64( SpannedReceiveEntity64 entity ){
         this.spannedVolume           = entity.getSpannedVolume();
-        this.channel                 = entity.getKChannel();
         this.volumeManager           = entity.getVolumeManager();
         this.storageReceiveIORequest = entity.getReceiveStorageObject();
         this.kenVolumeFileSystem     = new KenVolumeFileSystem( this.volumeManager );
     }
     @Override
-    public StorageIOResponse receive() throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        return this.receiveInternal( null, null );
+    public StorageIOResponse receive(Chanface chanface) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return this.receiveInternal(chanface, null, null );
     }
 
     @Override
-    public StorageIOResponse receive(Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        return this.receiveInternal( offset, endSize );
+    public StorageIOResponse receive(Chanface chanface,Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return this.receiveInternal(chanface, offset, endSize );
     }
 
-    private long freeSpace( Volume volume ){
+    @Override
+    public StorageIOResponse receive(RandomAccessChanface randomAccessChanface) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return this.receiveInternal(randomAccessChanface, null, null );
+    }
+
+    @Override
+    public StorageIOResponse receive(RandomAccessChanface randomAccessChanface, Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return this.receiveInternal(randomAccessChanface, offset, endSize );
+    }
+
+    private long freeSpace(Volume volume ){
         VolumeCapacity64 volumeCapacity = volume.getVolumeCapacity();
         return volumeCapacity.getDefinitionCapacity() - volumeCapacity.getUsedSize();
     }
@@ -63,7 +71,7 @@ public class TitanSpannedReceive64 implements SpannedReceive64{
         return new SQLiteExecutor( new SQLiteHost(url) );
     }
 
-    private StorageIOResponse receiveInternal(Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    private StorageIOResponse receiveInternal(Chanface chanface,Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         List<LogicVolume> volumes = this.spannedVolume.queryChildren();
         UnifiedTransmitConstructor constructor = new UnifiedTransmitConstructor();
         GUID physicsGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume( this.spannedVolume.getGuid() );
@@ -83,7 +91,7 @@ public class TitanSpannedReceive64 implements SpannedReceive64{
                     this.kenVolumeFileSystem.insertSpanLinkedVolumeTable(sqLiteExecutor, idx, storageReceiveIORequest.getStorageObjectGuid(), volume.getGuid());
                     //TitanSimpleReceiveEntity64 receiveEntity = new TitanSimpleReceiveEntity64( this.volumeManager, this.storageReceiveIORequest, this.channel, (SimpleVolume) volume);
 
-                    ReceiveEntity receiveEntity = constructor.getReceiveEntity(volume.getClass(), this.volumeManager, this.storageReceiveIORequest, this.channel, volume);
+                    ReceiveEntity receiveEntity = constructor.getReceiveEntity(volume.getClass(), this.volumeManager, this.storageReceiveIORequest, chanface, volume);
                     return offset == null && endSize == null
                             ? volume.receive( receiveEntity )
                             : volume.receive( receiveEntity, offset, endSize );
@@ -91,7 +99,7 @@ public class TitanSpannedReceive64 implements SpannedReceive64{
             }
         } else {
             //TitanSimpleReceiveEntity64 receiveEntity = new TitanSimpleReceiveEntity64( this.volumeManager, this.storageReceiveIORequest, this.channel, (SimpleVolume) targetVolume);
-            ReceiveEntity receiveEntity = constructor.getReceiveEntity(targetVolume.getClass(), this.volumeManager, this.storageReceiveIORequest, this.channel, targetVolume);
+            ReceiveEntity receiveEntity = constructor.getReceiveEntity(targetVolume.getClass(), this.volumeManager, this.storageReceiveIORequest, chanface, targetVolume);
             return offset == null && endSize == null
                     ? targetVolume.receive( receiveEntity )
                     : targetVolume.receive(receiveEntity, offset, endSize);

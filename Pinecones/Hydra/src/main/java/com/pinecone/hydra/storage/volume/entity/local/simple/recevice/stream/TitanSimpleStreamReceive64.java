@@ -1,6 +1,8 @@
 package com.pinecone.hydra.storage.volume.entity.local.simple.recevice.stream;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.RandomAccessChanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
@@ -60,4 +62,24 @@ public class TitanSimpleStreamReceive64 implements SimpleStreamReceiver64{
     }
 
 
+
+    @Override
+    public StorageIOResponse receive(Chanface chanface) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse receive(Chanface chanface, Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse receive(RandomAccessChanface randomAccessChanface) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse receive(RandomAccessChanface randomAccessChanface, Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return null;
+    }
 }

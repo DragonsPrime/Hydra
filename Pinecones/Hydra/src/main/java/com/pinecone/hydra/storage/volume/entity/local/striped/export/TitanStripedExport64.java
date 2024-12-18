@@ -3,6 +3,7 @@ package com.pinecone.hydra.storage.volume.entity.local.striped.export;
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.RandomAccessChanface;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageExportIORequest;
@@ -28,7 +29,7 @@ public class TitanStripedExport64 implements StripedExport64{
 
     protected StorageExportIORequest    storageExportIORequest;
 
-    protected Chanface channel;
+    protected Chanface                  channel;
 
     protected StripedVolume             stripedVolume;
 
@@ -42,7 +43,7 @@ public class TitanStripedExport64 implements StripedExport64{
         this.kenVolumeFileSystem        = new KenVolumeFileSystem( this.volumeManager );
     }
     @Override
-    public StorageIOResponse export() throws IOException, SQLException {
+    public StorageIOResponse export(Chanface chanface) throws IOException, SQLException {
         //初始化参数
         List<LogicVolume> volumes = this.stripedVolume.queryChildren();
         int jobCount = volumes.size();
@@ -66,7 +67,7 @@ public class TitanStripedExport64 implements StripedExport64{
     }
 
     @Override
-    public StorageIOResponse export(Number offset, Number endSize) throws IOException, SQLException {
+    public StorageIOResponse export(Chanface chanface, Number offset, Number endSize) throws IOException, SQLException {
         //初始化参数
         List<LogicVolume> volumes = this.stripedVolume.queryChildren();
         int jobCount = volumes.size();
@@ -86,6 +87,16 @@ public class TitanStripedExport64 implements StripedExport64{
         // 同步等待任务完成并处理异常
         this.waitForTaskCompletion(masterVolumeGram);
 
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(RandomAccessChanface randomAccessChanface) throws IOException, SQLException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(RandomAccessChanface randomAccessChanface, Number offset, Number endSize) throws IOException, SQLException {
         return null;
     }
 

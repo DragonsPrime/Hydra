@@ -3,6 +3,7 @@ package com.pinecone.hydra.storage.volume.entity.local.physical.export;
 import com.pinecone.framework.util.Bytes;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.RandomAccessChanface;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageIOResponse;
@@ -19,20 +20,17 @@ import java.util.zip.CRC32;
 
 public class TitanDirectExport64 implements DirectExport64{
 
-    protected Chanface channel;
-
     protected VolumeManager volumeManager;
 
     protected StorageExportIORequest storageExportIORequest;
 
     public TitanDirectExport64( DirectExportEntity64 entity ){
-        this.channel = entity.getChannel();
         this.volumeManager = entity.getVolumeManager();
         this.storageExportIORequest = entity.getStorageIORequest();
     }
 
     @Override
-    public StorageIOResponse export() throws IOException {
+    public StorageIOResponse export( Chanface chanface ) throws IOException {
         String sourceName = this.storageExportIORequest.getSourceName();
         long size = this.storageExportIORequest.getSize().longValue();
         TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
@@ -54,7 +52,7 @@ public class TitanDirectExport64 implements DirectExport64{
             }
 
             buffer.rewind();
-            this.channel.write(buffer);
+            chanface.write(buffer);
             buffer.clear();
 
             titanMiddleStorageObject.setChecksum( checksum );
@@ -66,7 +64,12 @@ public class TitanDirectExport64 implements DirectExport64{
     }
 
     @Override
-    public StorageIOResponse export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) {
+    public StorageIOResponse export(RandomAccessChanface randomAccessChanface) throws IOException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export( CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) {
         String sourceName = this.storageExportIORequest.getSourceName();
         TitanStorageIOResponse titanMiddleStorageObject = new TitanStorageIOResponse();
 

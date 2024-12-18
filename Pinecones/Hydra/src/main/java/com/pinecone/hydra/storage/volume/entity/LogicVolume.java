@@ -52,6 +52,11 @@ public interface LogicVolume extends Volume, TreeNode {
     StorageIOResponse export( ExporterEntity entity, Number offset, Number endSize );
     StorageIOResponse export( ExporterEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer ) throws SQLException, IOException;
 
+    StorageIOResponse export( ExporterEntity entity, boolean accessRandom ) throws SQLException, IOException;
+    //敬请期待
+    StorageIOResponse export( ExporterEntity entity, Number offset, Number endSize, boolean accessRandom );
+    StorageIOResponse export( ExporterEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer, boolean accessRandom ) throws SQLException, IOException;
+
 
     boolean existStorageObject( GUID storageObject ) throws SQLException;
 

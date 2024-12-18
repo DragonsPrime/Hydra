@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
+import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
@@ -22,7 +23,7 @@ public class TitanStripReceiveBufferInJob implements StripReceiveBufferInJob{
 
     protected StripBufferStatus         status;
 
-    protected InputStream               stream;
+    protected Chanface                  stream;
 
 
     protected final Semaphore           blockerLatch;
@@ -31,7 +32,7 @@ public class TitanStripReceiveBufferInJob implements StripReceiveBufferInJob{
 
     protected Lock                      majorStatusIO;
 
-    public TitanStripReceiveBufferInJob(MasterVolumeGram masterVolumeGram, int jobCode, InputStream stream, LogicVolume volume){
+    public TitanStripReceiveBufferInJob(MasterVolumeGram masterVolumeGram, int jobCode, Chanface stream, LogicVolume volume){
         this.masterVolumeGram         = masterVolumeGram;
         this.buffer                   = this.masterVolumeGram.getBuffer();
         this.jobCode                  = jobCode;

@@ -16,6 +16,10 @@ public interface Chanface extends Pinenut {
 
     int read( ChanfaceReader reader, int size, long offset ) throws IOException;
 
+    int read( byte[] buffer, int size, long offset ) throws IOException;
+
+//    int read( ChanfaceReader reader, int size, long offset ) throws IOException;
+
     int write( ByteBuffer buffer ) throws IOException;
 
     int write( byte[] buffer, int startPosition, int endSize ) throws IOException;

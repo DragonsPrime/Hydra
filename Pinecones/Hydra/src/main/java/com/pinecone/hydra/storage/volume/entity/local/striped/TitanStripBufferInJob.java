@@ -7,7 +7,7 @@ import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.entity.ExporterEntity;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
-import com.pinecone.hydra.storage.volume.entity.local.striped.export.IStripedExport;
+import com.pinecone.hydra.storage.volume.entity.local.striped.export.StripedExport;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
@@ -45,7 +45,7 @@ public class TitanStripBufferInJob implements StripBufferInJob {
 
     protected UnifiedTransmitConstructor    constructor;
 
-    public TitanStripBufferInJob(MasterVolumeGram masterVolumeGram, IStripedExport stripedExport, LogicVolume volume, StorageExportIORequest object, int jobCode ){
+    public TitanStripBufferInJob(MasterVolumeGram masterVolumeGram, StripedExport stripedExport, LogicVolume volume, StorageExportIORequest object, int jobCode ){
         this.masterVolumeGram             = masterVolumeGram;
         this.object                       = object;
         this.jobCount                     = this.masterVolumeGram.getJobCount();

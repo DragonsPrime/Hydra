@@ -20,7 +20,7 @@ public class TitanDirectExportEntity64 extends ArchExportEntity implements Direc
 
     @Override
     public StorageIOResponse export() throws IOException, SQLException {
-        return this.directExport.export();
+        return this.directExport.export(this.channel);
     }
 
     @Override

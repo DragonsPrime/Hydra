@@ -14,6 +14,6 @@ public class VersionPolicyChain implements PolicyChain {
     }
     @Override
     public GUID execution( String filePath, String version ) {
-        return this.versionManipulator.queryObjectGuid(version, filePath);
+        return null;
     }
 }

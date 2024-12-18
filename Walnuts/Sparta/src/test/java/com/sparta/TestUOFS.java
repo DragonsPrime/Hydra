@@ -48,8 +48,8 @@ class Steve extends Radium {
         //this.testInsert( fileSystem );
         //this.testUpload(fileSystem);
         //this.testDelete( fileSystem );
-        this.testChannelReceive( fileSystem, volumeManager );
-        //this.testChannelExport( fileSystem, volumeManager );
+        //this.testChannelReceive( fileSystem, volumeManager );
+        this.testChannelExport( fileSystem, volumeManager );
 
     }
 

@@ -24,11 +24,11 @@ public class TitanSimpleExportEntity64 extends ArchExportEntity implements Simpl
 
     @Override
     public StorageIOResponse export() throws IOException, SQLException {
-        return this.simpleExportEntity.export();
+        return this.simpleExportEntity.export(this.channel);
     }
 
     @Override
     public StorageIOResponse export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
-        return this.simpleExportEntity.export( cacheBlock, offset, endSize, buffer );
+        return this.simpleExportEntity.export( this.channel, cacheBlock, offset, endSize, buffer );
     }
 }
