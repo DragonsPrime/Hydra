@@ -127,7 +127,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
         VolumeConfig config = this.volumeManager.getConfig();
         PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
         String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + config.getPathSeparator() + this.guid + config.getSqliteFileExtension();
-        SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
+        SQLiteExecutor sqLiteExecutor = (SQLiteExecutor) this.volumeManager.getKenusPool().allot(url);
         this.kenVolumeFileSystem.creatSpanLinkedVolumeTable( sqLiteExecutor );
         this.kenVolumeFileSystem.createSpannedIndexTable( sqLiteExecutor );
         List<LogicVolume> volumes = this.queryChildren();

@@ -4,6 +4,7 @@ import com.pinecone.framework.system.prototype.Pinenut;
 
 import java.util.zip.CRC32;
 
+//todo 改成接口
 public class Verification implements Pinenut {
     private CRC32 crc32;
 

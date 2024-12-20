@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.file.transmit.exporter;
 
+import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.JSON;
 import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.TitanStorageExportIORequest;
@@ -49,6 +50,7 @@ public class TitanFileExport64 implements FileExport64{
             ExporterEntity exportEntity = this.constructor.getExportEntity(volume.getClass(), volumeManager, titanExportStorageObject, this.channel, volume);
             volume.export( exportEntity );
         }
+
         this.channel.close();
     }
 }

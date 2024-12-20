@@ -68,7 +68,7 @@ public class TitanSpannedReceive64 implements SpannedReceive64{
         VolumeConfig config = this.volumeManager.getConfig();
         String mountPoint = physicalVolume.getMountPoint().getMountPoint();
         String url = mountPoint + config.getPathSeparator() + this.spannedVolume.getGuid()+ config.getSqliteFileExtension();
-        return new SQLiteExecutor( new SQLiteHost(url) );
+        return (SQLiteExecutor) this.volumeManager.getKenusPool().allot(url);
     }
 
     private StorageIOResponse receiveInternal(Chanface chanface,Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {

@@ -64,6 +64,6 @@ public abstract class ArchLogicVolume extends ArchVolume implements LogicVolume{
         GUID physicsVolumeGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.getGuid());
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsVolumeGuid);
         String url = physicalVolume.getMountPoint().getMountPoint()+ config.getPathSeparator() +this.getGuid()+config.getSqliteFileExtension();
-        return new SQLiteExecutor( new SQLiteHost(url) );
+        return (SQLiteExecutor) this.volumeManager.getKenusPool().allot(url);
     }
 }

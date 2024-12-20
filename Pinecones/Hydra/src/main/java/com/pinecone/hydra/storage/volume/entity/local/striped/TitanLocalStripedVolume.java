@@ -126,7 +126,7 @@ public class TitanLocalStripedVolume extends ArchLogicVolume implements LocalStr
         VolumeConfig config = this.volumeManager.getConfig();
         PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
         String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + config.getPathSeparator() + this.guid + config.getSqliteFileExtension();
-        SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
+        SQLiteExecutor sqLiteExecutor = (SQLiteExecutor) this.volumeManager.getKenusPool().allot(url);
         this.kenVolumeFileSystem.createStripMetaTable( sqLiteExecutor );
         this.volumeManager.put( this );
         this.kenVolumeFileSystem.insertSimpleTargetMappingTab( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );

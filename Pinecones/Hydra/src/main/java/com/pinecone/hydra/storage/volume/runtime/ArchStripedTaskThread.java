@@ -13,6 +13,8 @@ public abstract class ArchStripedTaskThread extends ArchTaskThread implements Ru
         this.mVolumeJob = volumeJob;
 
         Thread affinityThread = new Thread( this );
+        affinityThread.setDaemon(false);
+
         this.setThreadAffinity( affinityThread );
         this.getAffiliateThread().setName( szName );
         this.setName( affinityThread.getName() );

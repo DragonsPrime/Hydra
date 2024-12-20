@@ -10,6 +10,8 @@ import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.TitanVolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
+import com.pinecone.hydra.storage.volume.kvfs.KenusDruid;
+import com.pinecone.hydra.storage.volume.kvfs.KenusPool;
 import com.pinecone.hydra.storage.volume.operator.TitanVolumeOperatorFactory;
 import com.pinecone.hydra.storage.volume.source.LogicVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.MirroredVolumeManipulator;
@@ -53,9 +55,14 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     protected StripedVolumeManipulator          stripedVolumeManipulator;
     protected VolumeCapacityManipulator         volumeCapacityManipulator;
     protected VolumeMasterManipulator           volumeMasterManipulator;
+
     protected VolumeAllocateManipulator         volumeAllocateManipulator;
+
     protected SQLiteVolumeManipulator           sqliteVolumeManipulator;
+
     protected LogicVolumeManipulator            primeLogicVolumeManipulator;
+
+    protected KenusPool                         kenusPool;
 
 
     public UniformVolumeManager( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, VolumeManager parent, String name ) {
@@ -79,6 +86,7 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
         this.sqliteVolumeManipulator       =   this.volumeMasterManipulator.getSQLiteVolumeManipulator();
         this.primeLogicVolumeManipulator   =   this.volumeMasterManipulator.getPrimeLogicVolumeManipulator();
 
+        this.kenusPool                     =   new KenusDruid();
         this.pathSelector                  =   new SimplePathSelector(
                 this.pathResolver, this.distributedTrieTree, this.primeLogicVolumeManipulator, new GUIDNameManipulator[] {}
         );
@@ -298,6 +306,11 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     @Override
     public Hydrarum getHydrarum() {
         return this.hydrarum;
+    }
+
+    @Override
+    public KenusPool getKenusPool() {
+        return this.kenusPool;
     }
 
     private String getNodeName(DistributedTreeNode node ){

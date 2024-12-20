@@ -14,10 +14,15 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -39,22 +44,32 @@ public class ClientController {
     @Resource
     private VersionManage               primaryVersion;
 
-    @GetMapping("/getFile/{filePath}/{version}")
-    public BasicResultResponse<File> getFile(@PathVariable String filePath, @PathVariable String version) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    @GetMapping("/*")
+    public void  getFile(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         // 先通过filePath和version获取到系统内文件
-        GUID guid = this.primaryFileSystem.queryGUIDByPath(filePath);
-        FileNode fileNode = (FileNode)this.primaryFileSystem.get(guid);
+//        GUID guid = this.primaryFileSystem.queryGUIDByPath(filePath);
+//        FileNode fileNode = (FileNode)this.primaryFileSystem.get(guid);
+//
+//        GUID fileGuid = this.primaryVersion.queryObjectGuid(version, fileNode.getGuid());
+//        FileNode fileObject = (FileNode) this.primaryFileSystem.get(fileGuid);
+//
+//        File tempFile = File.createTempFile("temp",".temp");
+//        FileChannel channel = FileChannel.open(tempFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
+//        TitanFileChannelChanface kChannel = new TitanFileChannelChanface(channel);
+//        TitanFileExportEntity64 exportEntity = new TitanFileExportEntity64(this.primaryFileSystem, this.primaryVolume, fileObject, kChannel);
+//        this.primaryFileSystem.export( exportEntity );
 
-        GUID fileGuid = this.primaryVersion.queryObjectGuid(version, fileNode.getGuid());
-        FileNode fileObject = (FileNode) this.primaryFileSystem.get(fileGuid);
+        //此时这是目标路径
+        request.getPathInfo();
+        request.getParameterMap();//例如version = xxx
+        //todo 如果不能用就找替代品，springmvc体系中的不知道是否沿用
+        ServletOutputStream outputStream = response.getOutputStream();//这是目标stream
 
-        File tempFile = File.createTempFile("temp",".temp");
-        FileChannel channel = FileChannel.open(tempFile.toPath(), StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND);
-        TitanFileChannelChanface kChannel = new TitanFileChannelChanface(channel);
-        TitanFileExportEntity64 exportEntity = new TitanFileExportEntity64(this.primaryFileSystem, this.primaryVolume, fileObject, kChannel);
-        this.primaryFileSystem.export( exportEntity );
+    }
 
-        return BasicResultResponse.success( tempFile );
+    @GetMapping("/titan/version")
+    public String queryVersion(){
+        return "undefined";
     }
 
 }

@@ -276,7 +276,7 @@ class Alice extends Radium {
         TitanStorageExportIORequest titanExportStorageObject = new TitanStorageExportIORequest();
         Debug.trace(originalFile.length());
         titanExportStorageObject.setSize( originalFile.length() );
-        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0cf9b48-0001a2-0001-e4") );
+        titanExportStorageObject.setStorageObjectGuid( GUIDs.GUID72("0d239dc-000031-0001-74") );
         //titanExportStorageObject.setSourceName("D:/文件系统/簇1/文件夹/视频_0662cf6-0000cd-0001-10.storage");
         //volume.channelExport( titanExportStorageObject, titanFileChannelKChannel);
         UnifiedTransmitConstructor unifiedTransmitConstructor = new UnifiedTransmitConstructor();

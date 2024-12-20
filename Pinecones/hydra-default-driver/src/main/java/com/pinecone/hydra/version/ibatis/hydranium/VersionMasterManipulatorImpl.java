@@ -8,10 +8,12 @@ import com.pinecone.hydra.storage.version.source.VersionMasterManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
 import com.pinecone.hydra.version.ibatis.VersionMapper;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Map;
 
+@Component
 public class VersionMasterManipulatorImpl implements VersionMasterManipulator {
     @Resource
     @Structure( type = VersionMapper.class )

@@ -73,7 +73,7 @@ public class TitanSpannedExport64 implements SpannedExport64{
         VolumeConfig config = this.volumeManager.getConfig();
         String mountPoint = physicalVolume.getMountPoint().getMountPoint();
         String url = mountPoint + config.getPathSeparator() + this.spannedVolume.getGuid()+ config.getSqliteFileExtension();
-        return new SQLiteExecutor( new SQLiteHost(url) );
+        return (SQLiteExecutor) this.volumeManager.getKenusPool().allot(url);
     }
 
     private String getSource(GUID volumeGuid, GUID storageObjectGuid ) throws SQLException {
@@ -82,7 +82,7 @@ public class TitanSpannedExport64 implements SpannedExport64{
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume( physicsVolumeGuid );
         String mountPoint = physicalVolume.getMountPoint().getMountPoint();
         String url = mountPoint + config.getPathSeparator() + volumeGuid+ config.getSqliteFileExtension();
-        SQLiteExecutor sqLiteExecutor = new SQLiteExecutor(new SQLiteHost(url));
+        SQLiteExecutor sqLiteExecutor = (SQLiteExecutor) this.volumeManager.getKenusPool().allot(url);
         return this.kenVolumeFileSystem.getSimpleStorageObjectSourceName(storageObjectGuid, sqLiteExecutor);
     }
 }

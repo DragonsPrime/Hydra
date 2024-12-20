@@ -41,8 +41,6 @@ public class TitanStripedReceive64 implements StripedReceive64{
 
     protected OnVolumeFileSystem        kenVolumeFileSystem;
 
-    protected SQLiteHost                mSqLiteHost;
-
     protected MappedExecutor            mappedExecutor;
 
     public TitanStripedReceive64( StripedReceiveEntity64 entity ){
@@ -74,7 +72,6 @@ public class TitanStripedReceive64 implements StripedReceive64{
 
             index ++;
         }
-        this.mSqLiteHost.close();
         this.waitForTaskCompletion( masterVolumeGram );
         masterVolumeGram.kill();
         return null;
@@ -142,8 +139,7 @@ public class TitanStripedReceive64 implements StripedReceive64{
         GUID physicsVolumeGuid = this.kenVolumeFileSystem.getKVFSPhysicsVolume(this.stripedVolume.getGuid());
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsVolumeGuid);
         String url = physicalVolume.getMountPoint().getMountPoint()+ config.getPathSeparator() +this.stripedVolume.getGuid()+ config.getSqliteFileExtension();
-        this.mSqLiteHost = new SQLiteHost(url);
-        return new SQLiteExecutor( this.mSqLiteHost );
+        return this.volumeManager.getKenusPool().allot(url);
     }
 
     private void waitForTaskCompletion(MasterVolumeGram masterVolumeGram) throws ProxyProvokeHandleException {

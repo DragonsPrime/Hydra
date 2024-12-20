@@ -146,7 +146,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         VolumeConfig config = this.volumeManager.getConfig();
         PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
         String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + config.getPathSeparator() + this.guid + config.getSqliteFileExtension();
-        SQLiteExecutor sqLiteExecutor = new SQLiteExecutor( new SQLiteHost(url) );
+        SQLiteExecutor sqLiteExecutor = (SQLiteExecutor) this.volumeManager.getKenusPool().allot(url);
         this.mappedExecutor = sqLiteExecutor;
         this.kenVolumeFileSystem.createSimpleTargetMappingTab( sqLiteExecutor );
         this.volumeManager.put( this );
@@ -167,8 +167,7 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
         PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(physicsGuid);
 
         String url = physicalVolume.getMountPoint().getMountPoint()+ config.getPathSeparator() +this.guid+ config.getSqliteFileExtension();
-        SQLiteHost sqLiteHost = new SQLiteHost(url);
-        return new SQLiteExecutor( sqLiteHost );
+        return (SQLiteExecutor) this.volumeManager.getKenusPool().allot(url);
     }
 
     public void assembleSQLiteExecutor() throws SQLException {

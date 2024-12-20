@@ -35,7 +35,6 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
     public void insertSimpleTargetMappingTab( GUID physicsGuid, GUID volumeGuid ) {
         this.sqLiteVolumeManipulator.insert( physicsGuid, volumeGuid );
     }
-
     @Override
     public void createSimpleTargetMappingTab( MappedExecutor mappedExecutor ) throws SQLException {
         mappedExecutor.execute( "CREATE TABLE `kvfs_simple_target_mapping`( `id` INTEGER PRIMARY KEY AUTOINCREMENT, `storage_object_guid` VARCHAR(36) , `storage_object_name` VARCHAR(36), `source_name` VARCHAR(330) );", false );

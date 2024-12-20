@@ -5,6 +5,7 @@ import com.pinecone.hydra.Hydra;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
+import com.pinecone.hydra.storage.volume.kvfs.KenusPool;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.ko.kom.KOMInstrument;
@@ -35,4 +36,6 @@ public interface VolumeManager extends KOMInstrument {
     void storageExpansion( GUID parentGuid, GUID childGuid );
 
     Hydrarum getHydrarum();
+
+    KenusPool getKenusPool();
 }
