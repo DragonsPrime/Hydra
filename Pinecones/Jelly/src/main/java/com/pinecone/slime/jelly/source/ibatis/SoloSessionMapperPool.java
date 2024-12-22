@@ -7,7 +7,7 @@ public class SoloSessionMapperPool implements InstancePool {
     protected SqlSession        mSqlSession;
     protected Class<? >         mType;
 
-    public SoloSessionMapperPool(SqlSession sqlSession, Class<? > type ) {
+    public SoloSessionMapperPool( SqlSession sqlSession, Class<? > type ) {
         this.mSqlSession = sqlSession;
         this.mType       = type;
     }

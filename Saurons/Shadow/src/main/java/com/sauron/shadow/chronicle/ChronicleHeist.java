@@ -22,7 +22,7 @@ import org.apache.ibatis.session.SqlSession;
 import java.util.Map;
 
 
-@Heistlet( "Chronicle" )
+//@Heistlet( "Chronicle" )
 public class ChronicleHeist extends HTTPHeist implements Chronicle {
     protected PeriodicHeistRehearsal       mPeriodicHeistKernel;
 
