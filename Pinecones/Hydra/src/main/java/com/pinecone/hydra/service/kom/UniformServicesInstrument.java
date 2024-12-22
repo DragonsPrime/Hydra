@@ -28,17 +28,17 @@ import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
 import com.pinecone.hydra.system.ko.kom.ArchReparseKOMTree;
 import com.pinecone.hydra.system.ko.kom.GenericReparseKOMTreeAddition;
 import com.pinecone.hydra.system.ko.kom.MultiFolderPathSelector;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.GenericDistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
-import com.pinecone.hydra.unit.udtt.source.TreeMasterManipulator;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
+import com.pinecone.hydra.unit.imperium.RegimentedImperialTree;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.source.TreeMasterManipulator;
 import com.pinecone.ulf.util.id.GUIDs;
 
 public class UniformServicesInstrument extends ArchReparseKOMTree implements ServicesInstrument {
     protected Hydrarum                    hydrarum;
     //GenericDistributedScopeTree
-    protected DistributedTrieTree         distributedTrieTree;
+    protected ImperialTree                imperialTree;
 
     protected ServiceMasterManipulator    serviceMasterManipulator;
 
@@ -64,7 +64,7 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
         this.serviceNodeManipulator      = serviceMasterManipulator.getServiceNodeManipulator();
         KOISkeletonMasterManipulator skeletonMasterManipulator = this.serviceMasterManipulator.getSkeletonMasterManipulator();
         TreeMasterManipulator        treeMasterManipulator     = (TreeMasterManipulator) skeletonMasterManipulator;
-        this.distributedTrieTree         = new GenericDistributedTrieTree(treeMasterManipulator);
+        this.imperialTree = new RegimentedImperialTree(treeMasterManipulator);
         this.guidAllocator               = GUIDs.newGuidAllocator();
         this.operatorFactory             = new GenericElementOperatorFactory(this,(ServiceMasterManipulator) masterManipulator);
 
@@ -74,7 +74,7 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
         this.folderManipulators          = new ArrayList<>( List.of( this.serviceNamespaceManipulator, this.applicationNodeManipulator ) );
         this.fileManipulators            = new ArrayList<>( List.of( this.applicationNodeManipulator, this.serviceNodeManipulator ) );
         this.pathSelector                = new MultiFolderPathSelector(
-                this.pathResolver, this.distributedTrieTree, this.folderManipulators.toArray( new GUIDNameManipulator[]{} ), this.fileManipulators.toArray( new GUIDNameManipulator[]{} )
+                this.pathResolver, this.imperialTree, this.folderManipulators.toArray( new GUIDNameManipulator[]{} ), this.fileManipulators.toArray( new GUIDNameManipulator[]{} )
         );
 
         this.mReparseKOM                 =  new GenericReparseKOMTreeAddition( this );
@@ -177,7 +177,7 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
     protected boolean containsChild( GUIDNameManipulator manipulator, GUID parentGuid, String childName ) {
         List<GUID > guids = manipulator.getGuidsByName( childName );
         for( GUID guid : guids ) {
-            List<GUID > ps = this.distributedTrieTree.fetchParentGuids( guid );
+            List<GUID > ps = this.imperialTree.fetchParentGuids( guid );
             if( ps.contains( parentGuid ) ){
                 return true;
             }
@@ -210,7 +210,7 @@ public class UniformServicesInstrument extends ArchReparseKOMTree implements Ser
      * @return Path
      */
     protected void affirmPathExist( GUID guid ) {
-        this.distributedTrieTree.getCachePath( guid );
+        this.imperialTree.getCachePath( guid );
     }
 
     @Override

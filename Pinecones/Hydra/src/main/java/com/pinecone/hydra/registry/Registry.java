@@ -13,9 +13,9 @@ import com.pinecone.hydra.registry.entity.TextFile;
 import com.pinecone.hydra.registry.entity.TextValue;
 import com.pinecone.hydra.registry.entity.TypeConverter;
 import com.pinecone.hydra.system.ko.KernelObjectInstrument;
-import com.pinecone.hydra.unit.udtt.entity.EntityNode;
-import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.EntityNode;
+import com.pinecone.hydra.unit.imperium.entity.ReparseLinkNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 
 public interface Registry extends KernelObjectInstrument {
     RegistryConfig KernelRegistryConfig = new KernelRegistryConfig();

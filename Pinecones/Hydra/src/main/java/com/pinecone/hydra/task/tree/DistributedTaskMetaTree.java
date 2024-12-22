@@ -2,7 +2,7 @@ package com.pinecone.hydra.task.tree;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 
 public interface DistributedTaskMetaTree extends Pinenut {
     String getPath(GUID guid);

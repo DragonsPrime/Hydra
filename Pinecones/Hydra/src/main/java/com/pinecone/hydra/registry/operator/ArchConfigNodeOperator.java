@@ -8,13 +8,12 @@ import com.pinecone.hydra.registry.entity.ConfigNodeMeta;
 import com.pinecone.hydra.registry.entity.ArchConfigNode;
 import com.pinecone.hydra.registry.entity.Attributes;
 import com.pinecone.hydra.registry.entity.RegistryTreeNode;
-import com.pinecone.hydra.registry.source.RegistryAttributesManipulator;
 import com.pinecone.hydra.registry.source.RegistryMasterManipulator;
 import com.pinecone.hydra.registry.source.RegistryConfigNodeManipulator;
 import com.pinecone.hydra.registry.source.RegistryNodeMetaManipulator;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.lang.reflect.Field;
@@ -45,7 +44,7 @@ public abstract class ArchConfigNodeOperator extends ArchRegistryOperator {
     @Override
     public GUID insert( TreeNode treeNode ) {
         ArchConfigNode configNode   = (ArchConfigNode) treeNode;
-        DistributedTreeNode distributedTreeNode = this.affirmPreinsertionInitialize( treeNode );
+        ImperialTreeNode imperialTreeNode = this.affirmPreinsertionInitialize( treeNode );
         GuidAllocator guidAllocator = this.registry.getGuidAllocator();
         GUID guid72                 = configNode.getGuid();
 
@@ -72,9 +71,9 @@ public abstract class ArchConfigNodeOperator extends ArchRegistryOperator {
         }
 
 
-        distributedTreeNode.setBaseDataGUID( commonDataGuid );
-        distributedTreeNode.setNodeMetadataGUID( configNodeMetaGuid );
-        this.distributedTrieTree.insert( distributedTreeNode );
+        imperialTreeNode.setBaseDataGUID( commonDataGuid );
+        imperialTreeNode.setNodeMetadataGUID( configNodeMetaGuid );
+        this.imperialTree.insert(imperialTreeNode);
         this.registryConfigNodeManipulator.insert( configNode );
         return guid72;
     }
@@ -82,12 +81,12 @@ public abstract class ArchConfigNodeOperator extends ArchRegistryOperator {
     @Override
     public void purge( GUID guid ) {
         //ConfigNode为叶子节点只需要删除节点信息与引用继承关系
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
-        this.distributedTrieTree.purge( guid );
+        GUIDImperialTrieNode node = this.imperialTree.getNode(guid);
+        this.imperialTree.purge( guid );
         this.registryConfigNodeManipulator.remove(guid);
         this.attributesManipulator.remove(node.getAttributesGUID());
         this.configNodeMetaManipulator.remove(node.getNodeMetadataGUID());
-        this.distributedTrieTree.removeCachePath(guid);
+        this.imperialTree.removeCachePath(guid);
     }
 
     @Override
@@ -138,7 +137,7 @@ public abstract class ArchConfigNodeOperator extends ArchRegistryOperator {
     }
 
     protected ConfigNode getConfigNodeWideData( GUID guid ){
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode( guid );
+        GUIDImperialTrieNode node = this.imperialTree.getNode( guid );
         ConfigNode cn = this.registryConfigNodeManipulator.getConfigNode( guid );
         if( cn instanceof ArchConfigNode ) {
             ((ArchConfigNode) cn).apply( this.registry );

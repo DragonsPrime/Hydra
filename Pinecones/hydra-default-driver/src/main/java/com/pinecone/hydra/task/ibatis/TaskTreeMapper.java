@@ -1,8 +1,8 @@
 package com.pinecone.hydra.task.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.source.TrieTreeManipulator;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.source.TrieTreeManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -15,20 +15,20 @@ import java.util.List;
 @IbatisDataAccessObject
 public interface TaskTreeMapper extends TrieTreeManipulator {
     @Insert("INSERT INTO `hydra_task_node_map` (`guid`, `type`, `base_data_guid`, `node_meta_guid`) VALUES (#{guid},#{type},#{baseDataGUID},#{nodeMetadataGUID})")
-    void insert(GUIDDistributedTrieNode node);
+    void insert(GUIDImperialTrieNode node);
 
     @Select("SELECT COUNT( `id` ) FROM hydra_task_node_map WHERE guid=#{guid}")
     boolean contains( GUID key );
 
-    default GUIDDistributedTrieNode getNode(GUID guid){
-        GUIDDistributedTrieNode nodeMeta = this.getNodeMeta(guid);
+    default GUIDImperialTrieNode getNode(GUID guid){
+        GUIDImperialTrieNode nodeMeta = this.getNodeMeta(guid);
         List<GUID> parentNodes = this.fetchParentGuids(guid);
         nodeMeta.setParentGUID(parentNodes);
         return nodeMeta;
     }
 
     @Select("SELECT `id` AS `enumId`, `guid`, `type`, `base_data_guid` AS baseDataGuid, `node_meta_guid` AS nodeMetadataGuid FROM `hydra_task_node_map` WHERE `guid`=#{guid}")
-    GUIDDistributedTrieNode getNodeMeta(GUID guid);
+    GUIDImperialTrieNode getNodeMeta(GUID guid);
 
     default void remove(GUID guid){
         this.removeNode(guid);
@@ -54,12 +54,12 @@ public interface TaskTreeMapper extends TrieTreeManipulator {
     void insertOwnedNode(@Param("nodeGuid") GUID nodeGUID, @Param("parentGuid") GUID parentGUID);
 
     @Select("SELECT `guid` FROM `hydra_task_node_tree` WHERE `parent_guid`=#{guid}")
-    List<GUIDDistributedTrieNode> getChild(GUID guid);
+    List<GUIDImperialTrieNode> getChild(GUID guid);
 
     @Delete("DELETE FROM `hydra_task_node_path` WHERE `guid`=#{guid}")
     void removePath(GUID guid);
 
-    void putNode(GUID guid, GUIDDistributedTrieNode distributedTreeNode);
+    void putNode(GUID guid, GUIDImperialTrieNode distributedTreeNode);
 
     long size();
 

@@ -6,7 +6,7 @@ import com.pinecone.hydra.service.kom.entity.ElementNode;
 import com.pinecone.hydra.service.kom.entity.Namespace;
 import com.pinecone.hydra.service.kom.entity.ServiceElement;
 import com.pinecone.hydra.system.ko.kom.ReparseKOMTree;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 
 public interface ServicesInstrument extends ReparseKOMTree {
 

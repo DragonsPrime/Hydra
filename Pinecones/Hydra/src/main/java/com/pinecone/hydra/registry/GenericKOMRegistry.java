@@ -28,16 +28,16 @@ import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.system.ko.kom.StandardPathSelector;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.hydra.registry.operator.GenericRegistryOperatorFactory;
 import com.pinecone.hydra.registry.operator.RegistryOperatorFactory;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 import com.pinecone.hydra.registry.source.RegistryMasterManipulator;
 import com.pinecone.hydra.registry.source.RegistryConfigNodeManipulator;
 import com.pinecone.hydra.registry.source.RegistryNSNodeManipulator;
 import com.pinecone.hydra.registry.source.RegistryPropertiesManipulator;
 import com.pinecone.hydra.registry.source.RegistryTextFileManipulator;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
 import com.pinecone.ulf.util.id.GUIDs;
 
 import java.io.StringReader;
@@ -84,7 +84,7 @@ public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistr
 
         // Phase [4] Construct selectors.
         this.pathSelector                  =  new StandardPathSelector(
-                this.pathResolver, this.distributedTrieTree, this.namespaceNodeManipulator, new GUIDNameManipulator[] { this.configNodeManipulator }
+                this.pathResolver, this.imperialTree, this.namespaceNodeManipulator, new GUIDNameManipulator[] { this.configNodeManipulator }
         );
         // Warning: ReparseKOMTreeAddition must be constructed only after `pathSelector` has been constructed.
         this.mReparseKOM                   =  new GenericReparseKOMTreeAddition( this );
@@ -332,8 +332,8 @@ public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistr
         GUID sourceGuid      = pair[ 0 ];
         GUID destinationGuid = pair[ 1 ];
 
-        this.distributedTrieTree.moveTo( sourceGuid, destinationGuid );
-        this.distributedTrieTree.removeCachePath( sourceGuid );
+        this.imperialTree.moveTo( sourceGuid, destinationGuid );
+        this.imperialTree.removeCachePath( sourceGuid );
     }
 
     @Override
@@ -367,7 +367,7 @@ public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistr
                 destinationPath.endsWith( this.getConfig().getPathNameSeparator() ) || destinationPath.endsWith( "." ) )
         ) {
             Namespace target = this.affirmNamespace( destinationPath );
-            this.distributedTrieTree.moveTo( sourceGuid, target.getGuid() );
+            this.imperialTree.moveTo( sourceGuid, target.getGuid() );
         }
         // Case3: Move "game/terraria/npc" => "game/minecraft/character", move all children therein.
         //    game/terraria/npc/f1 => game/minecraft/character/f1
@@ -380,22 +380,22 @@ public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistr
             // Eq.Case2: Move "game/terraria/npc" => "game/minecraft/character",
             if( !this.namespaceNodeManipulator.isNamespaceNode( sourceGuid ) ) {
                 Namespace target = this.affirmNamespace( destinationPath );
-                this.distributedTrieTree.moveTo( sourceGuid, target.getGuid() );
+                this.imperialTree.moveTo( sourceGuid, target.getGuid() );
             }
             else {
                 List<TreeNode > children = this.getChildren( sourceGuid );
                 if( !children.isEmpty() ) {
                     Namespace target = this.affirmNamespace( destinationPath );
                     for( TreeNode node : children ) {
-                        this.distributedTrieTree.moveTo( node.getGuid(), target.getGuid() );
+                        this.imperialTree.moveTo( node.getGuid(), target.getGuid() );
                     }
                 }
             }
 
-            this.distributedTrieTree.removeTreeNodeOnly( sourceGuid );
+            this.imperialTree.removeTreeNodeOnly( sourceGuid );
         }
 
-        this.distributedTrieTree.removeCachePath( sourceGuid );
+        this.imperialTree.removeCachePath( sourceGuid );
     }
 
     @Override
@@ -591,7 +591,7 @@ public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistr
         return null;
     }
 
-    private String getNodeName( DistributedTreeNode node ) {
+    private String getNodeName( ImperialTreeNode node ) {
         UOI type = node.getType();
         TreeNode newInstance = (TreeNode)type.newInstance();
         TreeNodeOperator operator = this.operatorFactory.getOperator(newInstance.getMetaType());

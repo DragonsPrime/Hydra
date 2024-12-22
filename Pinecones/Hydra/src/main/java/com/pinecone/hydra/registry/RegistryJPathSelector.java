@@ -243,7 +243,7 @@ public class RegistryJPathSelector extends ReparseLinkSelector implements KOMSel
             }
             else {
                 // Case3: For middle and last parts, retrieve children GUIDs using distributedTrieTree
-                guids = this.distributedTrieTree.fetchChildrenGuids( parentGuid );
+                guids = this.imperialTree.fetchChildrenGuids( parentGuid );
             }
 
             this.getNextToken();

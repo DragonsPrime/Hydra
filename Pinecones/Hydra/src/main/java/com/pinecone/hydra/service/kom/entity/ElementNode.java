@@ -2,7 +2,7 @@ package com.pinecone.hydra.service.kom.entity;
 
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.service.kom.ServiceFamilyNode;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 
 public interface ElementNode extends ServiceTreeNode, ServiceFamilyNode {
     default Namespace evinceNamespace() {
@@ -17,9 +17,9 @@ public interface ElementNode extends ServiceTreeNode, ServiceFamilyNode {
         return null;
     }
 
-    GUIDDistributedTrieNode getDistributedTreeNode();
+    GUIDImperialTrieNode getDistributedTreeNode();
 
-    void setDistributedTreeNode( GUIDDistributedTrieNode distributedTreeNode );
+    void setDistributedTreeNode( GUIDImperialTrieNode distributedTreeNode );
 
     JSONObject toJSONObject();
 

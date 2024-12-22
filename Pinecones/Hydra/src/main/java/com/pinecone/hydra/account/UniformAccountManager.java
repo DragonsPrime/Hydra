@@ -9,9 +9,6 @@ import com.pinecone.hydra.account.entity.GenericAccount;
 import com.pinecone.hydra.account.entity.GenericDomain;
 import com.pinecone.hydra.account.entity.GenericGroup;
 import com.pinecone.hydra.account.entity.Group;
-import com.pinecone.hydra.service.kom.entity.Namespace;
-import com.pinecone.hydra.service.kom.entity.ServiceTreeNode;
-import com.pinecone.hydra.service.kom.entity.ServoElement;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
@@ -19,10 +16,9 @@ import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.system.ko.kom.ArchKOMTree;
 import com.pinecone.hydra.system.ko.kom.MultiFolderPathSelector;
-import com.pinecone.hydra.system.ko.kom.SimplePathSelector;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 import com.pinecone.hydra.account.operator.GenericAccountOperatorFactory;
 import com.pinecone.hydra.account.source.DomainNodeManipulator;
 import com.pinecone.hydra.account.source.GroupNodeManipulator;
@@ -65,7 +61,7 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
         this.fileManipulators   = new ArrayList<>(List.of(this.userNodeManipulator));
 
         this.pathSelector                = new MultiFolderPathSelector(
-                this.pathResolver, this.distributedTrieTree, this.folderManipulators.toArray( new GUIDNameManipulator[]{} ), this.fileManipulators.toArray( new GUIDNameManipulator[]{} )
+                this.pathResolver, this.imperialTree, this.folderManipulators.toArray( new GUIDNameManipulator[]{} ), this.fileManipulators.toArray( new GUIDNameManipulator[]{} )
         );
     }
 
@@ -188,7 +184,7 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
     protected boolean containsChild( GUIDNameManipulator manipulator, GUID parentGuid, String childName ) {
         List<GUID > guids = manipulator.getGuidsByName( childName );
         for( GUID guid : guids ) {
-            List<GUID > ps = this.distributedTrieTree.fetchParentGuids( guid );
+            List<GUID > ps = this.imperialTree.fetchParentGuids( guid );
             if( ps.contains( parentGuid ) ){
                 return true;
             }
@@ -197,29 +193,29 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
     }
 
     protected String getNS(GUID guid, String szSeparator ){
-        String path = this.distributedTrieTree.getCachePath(guid);
+        String path = this.imperialTree.getCachePath(guid);
         if ( path != null ) {
             return path;
         }
 
-        DistributedTreeNode node = this.distributedTrieTree.getNode(guid);
+        ImperialTreeNode node = this.imperialTree.getNode(guid);
         String assemblePath = this.getNodeName(node);
         while ( !node.getParentGUIDs().isEmpty() && this.allNonNull( node.getParentGUIDs() ) ){
             List<GUID> parentGuids = node.getParentGUIDs();
             for( int i = 0; i < parentGuids.size(); ++i ){
                 if ( parentGuids.get(i) != null ){
-                    node = this.distributedTrieTree.getNode( parentGuids.get(i) );
+                    node = this.imperialTree.getNode( parentGuids.get(i) );
                     break;
                 }
             }
             String nodeName = this.getNodeName(node);
             assemblePath = nodeName + szSeparator + assemblePath;
         }
-        this.distributedTrieTree.insertCachePath( guid, assemblePath );
+        this.imperialTree.insertCachePath( guid, assemblePath );
         return assemblePath;
     }
 
-    private String getNodeName(DistributedTreeNode node ){
+    private String getNodeName(ImperialTreeNode node ){
         UOI type = node.getType();
         TreeNode newInstance = (TreeNode)type.newInstance();
         TreeNodeOperator operator = this.operatorFactory.getOperator( newInstance.getMetaType() );

@@ -1,8 +1,8 @@
 package com.pinecone.hydra.deploy.operator;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 
 public class VirtualOperator implements TreeNodeOperator {
     @Override

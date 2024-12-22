@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.file.entity;
 
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 
 public interface FileTreeNode extends TreeNode {
     default FileNode evinceFileNode(){

@@ -5,7 +5,7 @@ import com.pinecone.hydra.registry.entity.GenericNamespace;
 import com.pinecone.hydra.registry.entity.GenericProperties;
 import com.pinecone.hydra.registry.entity.GenericTextFile;
 import com.pinecone.hydra.registry.source.RegistryMasterManipulator;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -36,9 +36,9 @@ import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.system.ko.kom.ArchReparseKOMTree;
 import com.pinecone.hydra.system.ko.kom.GenericReparseKOMTreeAddition;
 import com.pinecone.hydra.system.ko.kom.StandardPathSelector;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 import com.pinecone.ulf.util.id.GUIDs;
 
 import java.io.IOException;
@@ -101,7 +101,7 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
 
         // Phase [4] Construct selectors.
         this.pathSelector                  =  new StandardPathSelector(
-                this.pathResolver, this.distributedTrieTree, this.folderManipulator, new GUIDNameManipulator[] { this.fileManipulator }
+                this.pathResolver, this.imperialTree, this.folderManipulator, new GUIDNameManipulator[] { this.fileManipulator }
         );
         // Warning: ReparseKOMTreeAddition must be constructed only after `pathSelector` has been constructed.
         this.mReparseKOM                   =  new GenericReparseKOMTreeAddition( this );
@@ -295,8 +295,8 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         GUID sourceGuid      = pair[ 0 ];
         GUID destinationGuid = pair[ 1 ];
 
-        this.distributedTrieTree.moveTo( sourceGuid, destinationGuid );
-        this.distributedTrieTree.removeCachePath( sourceGuid );
+        this.imperialTree.moveTo( sourceGuid, destinationGuid );
+        this.imperialTree.removeCachePath( sourceGuid );
     }
 
     @Override
@@ -330,7 +330,7 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
                 destinationPath.endsWith( this.getConfig().getPathNameSeparator() ) || destinationPath.endsWith( "." ) )
         ) {
             Folder target = this.affirmFolder( destinationPath );
-            this.distributedTrieTree.moveTo( sourceGuid, target.getGuid() );
+            this.imperialTree.moveTo( sourceGuid, target.getGuid() );
         }
         // Case3: Move "game/terraria/npc" => "game/minecraft/character", move all children therein.
         //    game/terraria/npc/f1 => game/minecraft/character/f1
@@ -343,22 +343,22 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
             // Eq.Case2: Move "game/terraria/npc" => "game/minecraft/character",
             if( !this.folderManipulator.isFolder( sourceGuid ) ) {
                 Folder target = this.affirmFolder( destinationPath );
-                this.distributedTrieTree.moveTo( sourceGuid, target.getGuid() );
+                this.imperialTree.moveTo( sourceGuid, target.getGuid() );
             }
             else {
                 List<TreeNode > children = this.getChildren( sourceGuid );
                 if( !children.isEmpty() ) {
                     Folder target = this.affirmFolder( destinationPath );
                     for( TreeNode node : children ) {
-                        this.distributedTrieTree.moveTo( node.getGuid(), target.getGuid() );
+                        this.imperialTree.moveTo( node.getGuid(), target.getGuid() );
                     }
                 }
             }
 
-            this.distributedTrieTree.removeTreeNodeOnly( sourceGuid );
+            this.imperialTree.removeTreeNodeOnly( sourceGuid );
         }
 
-        this.distributedTrieTree.removeCachePath( sourceGuid );
+        this.imperialTree.removeCachePath( sourceGuid );
     }
 
     @Override
@@ -444,7 +444,7 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     }
 
 
-    private String getNodeName(DistributedTreeNode node ){
+    private String getNodeName(ImperialTreeNode node ){
         UOI type = node.getType();
         TreeNode newInstance = (TreeNode)type.newInstance();
         TreeNodeOperator operator = this.getOperatorFactory().getOperator(newInstance.getMetaType());

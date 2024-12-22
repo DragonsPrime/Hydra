@@ -1,9 +1,9 @@
 package com.pinecone.hydra.account.operator;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.hydra.account.AccountManager;
 import com.pinecone.hydra.account.entity.Group;
 import com.pinecone.hydra.account.source.GroupNodeManipulator;
@@ -27,10 +27,10 @@ public class GenericGroupOperator extends ArchAccountServiceOperator implements 
     @Override
     public GUID insert(TreeNode treeNode) {
         Group group = (Group) treeNode;
-        DistributedTreeNode distributedTreeNode = this.affirmPreinsertionInitialize(group);
+        ImperialTreeNode imperialTreeNode = this.affirmPreinsertionInitialize(group);
         GUID guid = group.getGuid();
 
-        this.distributedTrieTree.insert( distributedTreeNode );
+        this.imperialTree.insert(imperialTreeNode);
         this.groupNodeManipulator.insert( group );
 
         return guid;
@@ -38,8 +38,8 @@ public class GenericGroupOperator extends ArchAccountServiceOperator implements 
 
     @Override
     public void purge(GUID guid) {
-        List<GUIDDistributedTrieNode> children = this.distributedTrieTree.getChildren(guid);
-        for( GUIDDistributedTrieNode node : children ){
+        List<GUIDImperialTrieNode> children = this.imperialTree.getChildren(guid);
+        for( GUIDImperialTrieNode node : children ){
             TreeNode newInstance = (TreeNode)node.getType().newInstance( new Class<? >[]{this.getClass()}, this );
             AccountServiceOperator operator = this.factory.getOperator(this.getUserMetaType(newInstance));
             operator.purge( node.getGuid() );
@@ -72,8 +72,8 @@ public class GenericGroupOperator extends ArchAccountServiceOperator implements 
 
     }
     private void removeNode( GUID guid ){
-        this.distributedTrieTree.purge( guid );
-        this.distributedTrieTree.removeCachePath( guid );
+        this.imperialTree.purge( guid );
+        this.imperialTree.removeCachePath( guid );
         this.groupNodeManipulator.remove( guid );
     }
 }

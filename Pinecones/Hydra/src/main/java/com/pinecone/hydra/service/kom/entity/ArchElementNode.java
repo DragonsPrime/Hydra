@@ -11,13 +11,13 @@ import com.pinecone.framework.util.json.homotype.BeanMapDecoder;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.hydra.service.ArchServiceFamilyMeta;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 public abstract class ArchElementNode extends ArchServiceFamilyMeta implements ElementNode {
     protected long                       enumId;
 
-    protected GUIDDistributedTrieNode    distributedTreeNode;
+    protected GUIDImperialTrieNode distributedTreeNode;
     protected ServicesInstrument         servicesInstrument;
 
     public ArchElementNode() {
@@ -104,12 +104,12 @@ public abstract class ArchElementNode extends ArchServiceFamilyMeta implements E
     }
 
     @Override
-    public GUIDDistributedTrieNode getDistributedTreeNode() {
+    public GUIDImperialTrieNode getDistributedTreeNode() {
         return this.distributedTreeNode;
     }
 
     @Override
-    public void setDistributedTreeNode( GUIDDistributedTrieNode distributedTreeNode ) {
+    public void setDistributedTreeNode( GUIDImperialTrieNode distributedTreeNode ) {
         this.distributedTreeNode = distributedTreeNode;
     }
 

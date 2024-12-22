@@ -6,7 +6,7 @@ import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.hydra.system.ko.UOIUtils;
 import com.pinecone.hydra.task.entity.GenericTaskCommonData;
 import com.pinecone.hydra.task.entity.GenericTaskNode;
@@ -16,11 +16,11 @@ import com.pinecone.hydra.task.source.TaskCommonDataManipulator;
 import com.pinecone.hydra.task.source.TaskMasterManipulator;
 import com.pinecone.hydra.task.source.TaskNodeManipulator;
 import com.pinecone.hydra.task.source.TaskNodeMetaManipulator;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.GenericDistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.source.TreeMasterManipulator;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.RegimentedImperialTree;
+import com.pinecone.hydra.unit.imperium.source.TreeMasterManipulator;
 import com.pinecone.ulf.util.id.GuidAllocator;
 import com.pinecone.ulf.util.id.GUIDs;
 
@@ -29,7 +29,7 @@ import java.util.List;
 
 public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
     protected Hydrarum                      hydrarum;
-    private DistributedTrieTree             distributedTrieTree;
+    private ImperialTree                    imperialTree;
 
     private TaskNodeManipulator             taskNodeManipulator;
 
@@ -46,7 +46,7 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
         this.taskCommonDataManipulator = taskMasterManipulator.getTaskCommonDataManipulator();
         this.taskNodeMetaManipulator   = taskMasterManipulator.getTaskNodeMetaManipulator();
         this.taskNodeManipulator       = taskMasterManipulator.getTaskNodeManipulator();
-        this.distributedTrieTree = new GenericDistributedTrieTree(treeMasterManipulator);
+        this.imperialTree = new RegimentedImperialTree(treeMasterManipulator);
     }
 
     public GenericDistributedTaskMetaTree( Hydrarum hydrarum ) {
@@ -62,18 +62,18 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
 
     @Override
     public String getPath(GUID guid) {
-        String path = this.distributedTrieTree.getCachePath(guid);
+        String path = this.imperialTree.getCachePath(guid);
         if (path!=null) return path;
-        DistributedTreeNode node = this.distributedTrieTree.getNode(guid);
+        ImperialTreeNode node = this.imperialTree.getNode(guid);
         Debug.trace(node.toString());
         String assemblePath = this.getNodeName(node);
         while (!node.getParentGUIDs().isEmpty()){
             List<GUID> parentGuids = node.getParentGUIDs();
-            node = this.distributedTrieTree.getNode(parentGuids.get(0));
+            node = this.imperialTree.getNode(parentGuids.get(0));
             String nodeName = this.getNodeName(node);
             assemblePath = nodeName + "." + assemblePath;
         }
-        this.distributedTrieTree.insertCachePath(guid, assemblePath);
+        this.imperialTree.insertCachePath(guid, assemblePath);
         return assemblePath;
     }
 
@@ -92,7 +92,7 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
         genericTaskCommonData.setCreateTime(LocalDateTime.now());
         genericTaskCommonData.setUpdateTime(LocalDateTime.now());
 
-        GUIDDistributedTrieNode guidDistributedTrieNode = new GUIDDistributedTrieNode();
+        GUIDImperialTrieNode guidDistributedTrieNode = new GUIDImperialTrieNode();
         GUID nodeGuid = guidAllocator.nextGUID72();
         guidDistributedTrieNode.setGuid(nodeGuid);
         guidDistributedTrieNode.setNodeMetadataGUID(TaskNodeMetaGuid);
@@ -100,7 +100,7 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
         guidDistributedTrieNode.setType(UOIUtils.createLocalJavaClass(taskNode.getClass().getName()));
         taskNode.setGuid(nodeGuid);
 
-        this.distributedTrieTree.insert(guidDistributedTrieNode);
+        this.imperialTree.insert(guidDistributedTrieNode);
         this.taskNodeManipulator.insert(taskNode);
         this.taskNodeMetaManipulator.insert(genericTaskNodeMeta);
         this.taskCommonDataManipulator.insert(genericTaskCommonData);
@@ -109,7 +109,7 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
 
     @Override
     public TreeNode get(GUID guid) {
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
+        GUIDImperialTrieNode node = this.imperialTree.getNode(guid);
         TaskNode taskNode = this.taskNodeManipulator.getTaskNode(guid);
         GenericTaskNodeMeta taskNodeMeta = (GenericTaskNodeMeta) this.taskNodeMetaManipulator.getTaskNodeMeta(node.getNodeMetadataGUID());
         GenericTaskCommonData taskCommonData = (GenericTaskCommonData) this.taskCommonDataManipulator.getTaskCommonData(node.getAttributesGUID());
@@ -120,7 +120,7 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
 
     @Override
     public TreeNode parsePath(String path) {
-        GUID guid = this.distributedTrieTree.queryGUIDByPath( path );
+        GUID guid = this.imperialTree.queryGUIDByPath( path );
         if (guid != null){
             return this.get(guid);
         }
@@ -138,15 +138,15 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
 
     @Override
     public void remove(GUID guid) {
-        List<GUIDDistributedTrieNode> childNodes = this.distributedTrieTree.getChildren(guid);
+        List<GUIDImperialTrieNode> childNodes = this.imperialTree.getChildren(guid);
         if (childNodes == null || childNodes.isEmpty()){
             this.removeNode(guid);
         }
         else {
-            for(GUIDDistributedTrieNode childNode : childNodes){
-                List<GUID> parentNodes = this.distributedTrieTree.fetchParentGuids(childNode.getGuid());
+            for(GUIDImperialTrieNode childNode : childNodes){
+                List<GUID> parentNodes = this.imperialTree.fetchParentGuids(childNode.getGuid());
                 if (parentNodes.size() > 1){
-                    this.distributedTrieTree.removeInheritance(childNode.getGuid(),guid);
+                    this.imperialTree.removeInheritance(childNode.getGuid(),guid);
                 }else {
                     this.remove(childNode.getGuid());
                 }
@@ -160,7 +160,7 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
         return null;
     }
 
-    private String getNodeName(DistributedTreeNode node){
+    private String getNodeName(ImperialTreeNode node){
         return this.taskNodeManipulator.getTaskNode(node.getGuid()).getName();
     }
 
@@ -170,9 +170,9 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
     }
 
     private void removeNode(GUID guid){
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
-        this.distributedTrieTree.purge(guid);
-        this.distributedTrieTree.removeCachePath( guid );
+        GUIDImperialTrieNode node = this.imperialTree.getNode(guid);
+        this.imperialTree.purge(guid);
+        this.imperialTree.removeCachePath( guid );
         this.taskNodeManipulator.remove(guid);
         this.taskNodeMetaManipulator.remove(node.getNodeMetadataGUID());
         this.taskCommonDataManipulator.remove(node.getAttributesGUID());

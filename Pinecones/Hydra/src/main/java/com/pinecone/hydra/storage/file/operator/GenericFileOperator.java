@@ -11,9 +11,9 @@ import com.pinecone.hydra.storage.file.entity.GenericFileNode;
 import com.pinecone.hydra.storage.file.source.FileManipulator;
 import com.pinecone.hydra.storage.file.source.FileMasterManipulator;
 import com.pinecone.hydra.storage.file.source.FileMetaManipulator;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.ulf.util.id.GuidAllocator;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -40,7 +40,7 @@ public class GenericFileOperator extends ArchFileSystemOperator{
     @Override
     public GUID insert(TreeNode treeNode) {
         FileNode file = (FileNode) treeNode;
-        DistributedTreeNode distributedTreeNode = this.affirmPreinsertionInitialize( treeNode );
+        ImperialTreeNode imperialTreeNode = this.affirmPreinsertionInitialize( treeNode );
         GuidAllocator guidAllocator = this.fileSystem.getGuidAllocator();
         GUID guid = file.getGuid();
 
@@ -64,9 +64,9 @@ public class GenericFileOperator extends ArchFileSystemOperator{
             fileMetaGuid = null;
         }
 
-        distributedTreeNode.setBaseDataGUID(attrbutesGuid);
-        distributedTreeNode.setNodeMetadataGUID(fileMetaGuid);
-        this.distributedTrieTree.insert( distributedTreeNode );
+        imperialTreeNode.setBaseDataGUID(attrbutesGuid);
+        imperialTreeNode.setNodeMetadataGUID(fileMetaGuid);
+        this.imperialTree.insert(imperialTreeNode);
         this.fileManipulator.insert(file);
 
         return guid;
@@ -74,12 +74,12 @@ public class GenericFileOperator extends ArchFileSystemOperator{
 
     @Override
     public void purge(GUID guid) {
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
-        this.distributedTrieTree.purge( guid );
+        GUIDImperialTrieNode node = this.imperialTree.getNode(guid);
+        this.imperialTree.purge( guid );
         this.fileManipulator.remove(guid);
         this.fileMetaManipulator.remove(node.getNodeMetadataGUID());
         //this.fileSystemAttributeManipulator.remove(node.getAttributesGUID());
-        this.distributedTrieTree.removeCachePath(guid);
+        this.imperialTree.removeCachePath(guid);
     }
 
     @Override
@@ -125,7 +125,7 @@ public class GenericFileOperator extends ArchFileSystemOperator{
     }
 
     protected FileTreeNode getFileTreeNodeWideData(GUID guid ){
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode( guid );
+        GUIDImperialTrieNode node = this.imperialTree.getNode( guid );
         FileNode cn = this.fileManipulator.getFileNodeByGuid( guid );
         if( cn instanceof GenericFileNode) {
             ((GenericFileNode) cn).apply( this.fileSystem );

@@ -2,8 +2,8 @@ package com.pinecone.hydra.system.ko.kom;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.system.ko.CascadeInstrument;
-import com.pinecone.hydra.unit.udtt.entity.EntityNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.EntityNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 
 import java.util.List;
 

@@ -2,35 +2,35 @@ package com.pinecone.hydra.account.operator;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.system.ko.UOIUtils;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.hydra.account.AccountManager;
 import com.pinecone.hydra.account.source.UserMasterManipulator;
 
 public abstract class ArchAccountServiceOperator implements AccountServiceOperator {
-    protected AccountManager accountManager;
+    protected AccountManager                accountManager;
 
     protected AccountServiceOperatorFactory factory;
 
-    protected DistributedTrieTree       distributedTrieTree;
+    protected ImperialTree                  imperialTree;
 
-    protected UserMasterManipulator     userMasterManipulator;
+    protected UserMasterManipulator         userMasterManipulator;
 
     public ArchAccountServiceOperator(UserMasterManipulator masterManipulator, AccountManager accountManager){
         this.accountManager = accountManager;
         this.userMasterManipulator = masterManipulator;
-        this.distributedTrieTree = this.accountManager.getMasterTrieTree();
+        this.imperialTree = this.accountManager.getMasterTrieTree();
     }
 
-    protected DistributedTreeNode affirmPreinsertionInitialize(TreeNode node ){
+    protected ImperialTreeNode affirmPreinsertionInitialize(TreeNode node ){
         GUID guid = node.getGuid();
-        DistributedTreeNode distributedTreeNode = new GUIDDistributedTrieNode();
-        distributedTreeNode.setGuid( guid );
-        distributedTreeNode.setType( UOIUtils.createLocalJavaClass( node.getClass().getName() ) );
+        ImperialTreeNode imperialTreeNode = new GUIDImperialTrieNode();
+        imperialTreeNode.setGuid( guid );
+        imperialTreeNode.setType( UOIUtils.createLocalJavaClass( node.getClass().getName() ) );
 
-        return distributedTreeNode;
+        return imperialTreeNode;
     }
 
     public AccountServiceOperatorFactory getUserOperatorFactory(){

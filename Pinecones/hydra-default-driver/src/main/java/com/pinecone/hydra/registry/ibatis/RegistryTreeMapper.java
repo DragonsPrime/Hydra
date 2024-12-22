@@ -2,11 +2,11 @@ package com.pinecone.hydra.registry.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.LinkedType;
-import com.pinecone.hydra.unit.udtt.entity.TreeReparseLinkNode;
-import com.pinecone.hydra.unit.udtt.source.TireOwnerManipulator;
-import com.pinecone.hydra.unit.udtt.source.TrieTreeManipulator;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.LinkedType;
+import com.pinecone.hydra.unit.imperium.entity.TreeReparseLinkNode;
+import com.pinecone.hydra.unit.imperium.source.TireOwnerManipulator;
+import com.pinecone.hydra.unit.imperium.source.TrieTreeManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 
 import org.apache.ibatis.annotations.Delete;
@@ -23,7 +23,7 @@ public interface RegistryTreeMapper extends TrieTreeManipulator {
     void insertRootNode( @Param("guid")  GUID guid, @Param("linkedType") LinkedType linkedType );
 
     @Override
-    default void insert ( TireOwnerManipulator ownerManipulator, GUIDDistributedTrieNode node ){
+    default void insert ( TireOwnerManipulator ownerManipulator, GUIDImperialTrieNode node ){
         this.insertTreeNode( node.getGuid(), node.getType(), node.getAttributesGUID(), node.getNodeMetadataGUID() );
         ownerManipulator.insertRootNode( node.getGuid() );
     }
@@ -32,11 +32,11 @@ public interface RegistryTreeMapper extends TrieTreeManipulator {
     void insertTreeNode( @Param("guid") GUID guid, @Param("type") UOI type, @Param("baseDataGuid") GUID baseDataGuid, @Param("nodeMetaGuid") GUID nodeMetaGuid );
 
     @Select("SELECT `id` AS `enumId`, `guid`, `type`, base_data_guid AS baseDataGUID, node_meta_guid AS nodeMetadataGUID FROM hydra_registry_nodes WHERE guid=#{guid}")
-    GUIDDistributedTrieNode getNodeExtendsFromMeta( GUID guid );
+    GUIDImperialTrieNode getNodeExtendsFromMeta(GUID guid );
 
     @Override
-    default GUIDDistributedTrieNode getNode( GUID guid ) {
-        GUIDDistributedTrieNode node = this.getNodeExtendsFromMeta( guid );
+    default GUIDImperialTrieNode getNode(GUID guid ) {
+        GUIDImperialTrieNode node = this.getNodeExtendsFromMeta( guid );
         List<GUID > parent = this.fetchParentGuids( guid );
         node.setParentGUID( parent );
         return node;
@@ -46,7 +46,7 @@ public interface RegistryTreeMapper extends TrieTreeManipulator {
     boolean contains( GUID key );
 
     @Select("SELECT id, guid, parent_guid, linked_type FROM hydra_registry_node_tree WHERE guid = #{guid} AND parent_guid = #{parentGuid}")
-    GUIDDistributedTrieNode getTreeNodeOnly( @Param("guid") GUID guid, @Param("parentGuid") GUID parentGuid );
+    GUIDImperialTrieNode getTreeNodeOnly(@Param("guid") GUID guid, @Param("parentGuid") GUID parentGuid );
 
     @Select("SELECT count( * ) FROM hydra_registry_node_tree WHERE guid = #{guid} AND parent_guid = #{parentGuid}")
     long countNode( GUID guid, GUID parentGuid );
@@ -82,7 +82,7 @@ public interface RegistryTreeMapper extends TrieTreeManipulator {
     void removeInheritance( @Param("chileGuid") GUID childGuid, @Param("parentGuid") GUID parentGuid );
 
     @Select("SELECT `id` AS `enumId`, `guid`, `parent_guid` AS parentGuid FROM `hydra_registry_node_tree` WHERE `parent_guid`=#{guid}")
-    List<GUIDDistributedTrieNode > getChildren( GUID guid );
+    List<GUIDImperialTrieNode> getChildren(GUID guid );
 
     @Select("SELECT `guid` FROM `hydra_registry_node_tree` WHERE `parent_guid` = #{parentGuid}")
     List<GUID > fetchChildrenGuids( @Param("parentGuid") GUID parentGuid );

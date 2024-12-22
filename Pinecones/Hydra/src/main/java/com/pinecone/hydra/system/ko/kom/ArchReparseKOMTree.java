@@ -5,8 +5,8 @@ import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.KernelObjectConfig;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
-import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
-import com.pinecone.hydra.unit.udtt.operator.OperatorFactory;
+import com.pinecone.hydra.unit.imperium.entity.ReparseLinkNode;
+import com.pinecone.hydra.unit.imperium.operator.OperatorFactory;
 
 public abstract class ArchReparseKOMTree extends ArchKOMTree implements ReparseKOMTree {
     protected ReparseKOMTreeAddition mReparseKOM;

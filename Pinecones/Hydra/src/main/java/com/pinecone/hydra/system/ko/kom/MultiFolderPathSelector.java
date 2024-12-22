@@ -9,17 +9,17 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.JSON;
 import com.pinecone.framework.util.name.path.PathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
 
 public class MultiFolderPathSelector implements PathSelector {
     protected PathResolver                    pathResolver;
-    protected DistributedTrieTree             distributedTrieTree;
+    protected ImperialTree                    imperialTree;
     protected GUIDNameManipulator[]           dirManipulators;
     protected GUIDNameManipulator[]           fileManipulators;
 
-    public MultiFolderPathSelector( PathResolver pathResolver, DistributedTrieTree trieTree, GUIDNameManipulator[] dirMans, GUIDNameManipulator[] fileMans ) {
+    public MultiFolderPathSelector(PathResolver pathResolver, ImperialTree trieTree, GUIDNameManipulator[] dirMans, GUIDNameManipulator[] fileMans ) {
         this.pathResolver         = pathResolver;
-        this.distributedTrieTree  = trieTree;
+        this.imperialTree = trieTree;
         this.dirManipulators      = dirMans;
         this.fileManipulators     = fileMans;
     }
@@ -119,7 +119,7 @@ public class MultiFolderPathSelector implements PathSelector {
             }
             else {
                 // Case3: For middle and last parts, retrieve children GUIDs using distributedTrieTree
-                guids = this.distributedTrieTree.fetchChildrenGuids( parentGuid );
+                guids = this.imperialTree.fetchChildrenGuids( parentGuid );
             }
 
             if ( guids == null || guids.isEmpty() ) {
@@ -158,7 +158,7 @@ public class MultiFolderPathSelector implements PathSelector {
         }
         else {
             // Case3: For middle and last parts, retrieve children GUIDs using distributedTrieTree
-            guids = this.distributedTrieTree.fetchChildrenGuids( parentGuid );
+            guids = this.imperialTree.fetchChildrenGuids( parentGuid );
         }
 
         if ( guids == null || guids.isEmpty() ) {
@@ -216,7 +216,7 @@ public class MultiFolderPathSelector implements PathSelector {
     }
 
     protected List<GUID > searchLinks ( GUID guid, String partName ) {
-        GUID linkGuid = this.distributedTrieTree.getOriginalGuidByNodeGuid( partName, guid );
+        GUID linkGuid = this.imperialTree.getOriginalGuidByNodeGuid( partName, guid );
         if( linkGuid != null ) {
             return List.of( linkGuid );
         }
@@ -235,7 +235,7 @@ public class MultiFolderPathSelector implements PathSelector {
     }
 
     protected List<GUID > searchLinksFirstCase ( String partName ) {
-        return this.distributedTrieTree.fetchOriginalGuidRoot( partName );
+        return this.imperialTree.fetchOriginalGuidRoot( partName );
     }
 
     protected List<GUID > searchDirAndLinksFirstCase ( String partName ) {
@@ -255,7 +255,7 @@ public class MultiFolderPathSelector implements PathSelector {
             for ( int i = 1; i < this.dirManipulators.length; ++i ) {
                 guids.addAll( this.dirManipulators[ i ].getGuidsByName( partName ) );
             }
-            guids.removeIf( guid -> !this.distributedTrieTree.isRoot( guid ) );
+            guids.removeIf( guid -> !this.imperialTree.isRoot( guid ) );
             return guids;
         }
 
@@ -263,7 +263,7 @@ public class MultiFolderPathSelector implements PathSelector {
     }
 
     protected void fetchAllOriginalGuidsRootCase( List<GUID > guids, String partName ) {
-        guids.addAll( this.distributedTrieTree.fetchOriginalGuidRoot( partName ) );
+        guids.addAll( this.imperialTree.fetchOriginalGuidRoot( partName ) );
     }
 
     protected List<GUID > fetchAllGuidsRootCase( String partName ) {
@@ -273,7 +273,7 @@ public class MultiFolderPathSelector implements PathSelector {
         for ( GUIDNameManipulator manipulator : this.fileManipulators ) {
             List<GUID > gs = manipulator.getGuidsByName( partName );
             for( GUID guid : gs ) {
-                if( this.distributedTrieTree.isRoot( guid ) ) {
+                if( this.imperialTree.isRoot( guid ) ) {
                     guids.add( guid );
                 }
             }

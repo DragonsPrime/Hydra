@@ -1,8 +1,8 @@
 package com.pinecone.hydra.service.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.LinkedType;
-import com.pinecone.hydra.unit.udtt.source.TireOwnerManipulator;
+import com.pinecone.hydra.unit.imperium.LinkedType;
+import com.pinecone.hydra.unit.imperium.source.TireOwnerManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;

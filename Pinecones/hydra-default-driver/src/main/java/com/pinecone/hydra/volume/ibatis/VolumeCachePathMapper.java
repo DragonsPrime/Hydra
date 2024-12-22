@@ -1,7 +1,7 @@
 package com.pinecone.hydra.volume.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.source.TriePathCacheManipulator;
+import com.pinecone.hydra.unit.imperium.source.TriePathCacheManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;

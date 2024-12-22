@@ -6,35 +6,35 @@ import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.source.VolumeCapacityManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
 import com.pinecone.hydra.system.ko.UOIUtils;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 
 import java.time.LocalDateTime;
 
 public abstract class ArchVolumeOperator implements VolumeOperator{
     protected VolumeManager                 volumeManager;
     protected VolumeOperatorFactory         factory;
-    protected DistributedTrieTree           distributedTrieTree;
+    protected ImperialTree                  imperialTree;
     protected VolumeMasterManipulator       volumeMasterManipulator;
     protected VolumeCapacityManipulator     volumeCapacityManipulator;
 
-    public ArchVolumeOperator( VolumeMasterManipulator masterManipulator, VolumeManager volumeManager){
-        this.distributedTrieTree       =  volumeManager.getMasterTrieTree();
+    public ArchVolumeOperator( VolumeMasterManipulator masterManipulator, VolumeManager volumeManager ){
+        this.imperialTree =  volumeManager.getMasterTrieTree();
         this.volumeManager = volumeManager;
         this.volumeMasterManipulator   =  masterManipulator;
         this.volumeCapacityManipulator =  masterManipulator.getVolumeCapacityManipulator();
     }
 
-    protected DistributedTreeNode affirmPreinsertionInitialize( LogicVolume volume ){
+    protected ImperialTreeNode affirmPreinsertionInitialize(LogicVolume volume ){
         GUID guid = volume.getGuid();
         volume.setUpdateTime( LocalDateTime.now() );
-        DistributedTreeNode distributedTreeNode = new GUIDDistributedTrieNode();
-        distributedTreeNode.setGuid( guid );
-        distributedTreeNode.setType( UOIUtils.createLocalJavaClass( volume.getClass().getName() ) );
+        ImperialTreeNode imperialTreeNode = new GUIDImperialTrieNode();
+        imperialTreeNode.setGuid( guid );
+        imperialTreeNode.setType( UOIUtils.createLocalJavaClass( volume.getClass().getName() ) );
 
-        return distributedTreeNode;
+        return imperialTreeNode;
     }
 
     public VolumeOperatorFactory  getVolumeOperatorFactory(){

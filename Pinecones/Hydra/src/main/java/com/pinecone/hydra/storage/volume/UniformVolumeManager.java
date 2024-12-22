@@ -1,6 +1,5 @@
 package com.pinecone.hydra.storage.volume;
 
-import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
@@ -31,18 +30,17 @@ import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.system.ko.kom.ArchKOMTree;
 import com.pinecone.hydra.system.ko.kom.SimplePathSelector;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.EntityNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.EntityNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     protected Hydrarum                          hydrarum;
@@ -88,7 +86,7 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
 
         this.kenusPool                     =   new KenusDruid();
         this.pathSelector                  =   new SimplePathSelector(
-                this.pathResolver, this.distributedTrieTree, this.primeLogicVolumeManipulator, new GUIDNameManipulator[] {}
+                this.pathResolver, this.imperialTree, this.primeLogicVolumeManipulator, new GUIDNameManipulator[] {}
         );
     }
 
@@ -110,8 +108,8 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     }
 
     @Override
-    public DistributedTrieTree getMasterTrieTree() {
-        return this.distributedTrieTree;
+    public ImperialTree getMasterTrieTree() {
+        return this.imperialTree;
     }
 
     @Override
@@ -124,25 +122,25 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     }
 
     protected String getNS( GUID guid, String szSeparator ){
-        String path = this.distributedTrieTree.getCachePath(guid);
+        String path = this.imperialTree.getCachePath(guid);
         if ( path != null ) {
             return path;
         }
 
-        DistributedTreeNode node = this.distributedTrieTree.getNode(guid);
+        ImperialTreeNode node = this.imperialTree.getNode(guid);
         String assemblePath = this.getNodeName(node);
         while ( !node.getParentGUIDs().isEmpty() && this.allNonNull( node.getParentGUIDs() ) ){
             List<GUID> parentGuids = node.getParentGUIDs();
             for( int i = 0; i < parentGuids.size(); ++i ){
                 if ( parentGuids.get(i) != null ){
-                    node = this.distributedTrieTree.getNode( parentGuids.get(i) );
+                    node = this.imperialTree.getNode( parentGuids.get(i) );
                     break;
                 }
             }
             String nodeName = this.getNodeName(node);
             assemblePath = nodeName + szSeparator + assemblePath;
         }
-        this.distributedTrieTree.insertCachePath( guid, assemblePath );
+        this.imperialTree.insertCachePath( guid, assemblePath );
         return assemblePath;
     }
 
@@ -168,7 +166,7 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     }
 
     protected TreeNodeOperator getOperatorByGuid( GUID guid ) {
-        DistributedTreeNode node = this.distributedTrieTree.getNode( guid );
+        ImperialTreeNode node = this.imperialTree.getNode( guid );
         TreeNode newInstance = (TreeNode)node.getType().newInstance( new Class<? >[]{this.getClass()}, this );
         return this.operatorFactory.getOperator( this.getVolumeMetaType( newInstance ) );
     }
@@ -190,7 +188,7 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
 
     @Override
     public void remove(GUID guid) {
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode( guid );
+        GUIDImperialTrieNode node = this.imperialTree.getNode( guid );
         TreeNode newInstance = (TreeNode)node.getType().newInstance();
         TreeNodeOperator operator = this.operatorFactory.getOperator( this.getVolumeMetaType( newInstance ) );
         operator.purge( guid );
@@ -313,7 +311,7 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
         return this.kenusPool;
     }
 
-    private String getNodeName(DistributedTreeNode node ){
+    private String getNodeName(ImperialTreeNode node ){
         UOI type = node.getType();
         TreeNode newInstance = (TreeNode)type.newInstance();
         TreeNodeOperator operator = this.operatorFactory.getOperator(this.getVolumeMetaType( newInstance ));

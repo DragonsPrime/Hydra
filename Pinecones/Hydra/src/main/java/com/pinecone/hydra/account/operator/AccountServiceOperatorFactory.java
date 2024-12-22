@@ -3,12 +3,9 @@ package com.pinecone.hydra.account.operator;
 import com.pinecone.hydra.account.entity.Account;
 import com.pinecone.hydra.account.entity.Domain;
 import com.pinecone.hydra.account.entity.Group;
-import com.pinecone.hydra.unit.udtt.operator.OperatorFactory;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.operator.OperatorFactory;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 import com.pinecone.hydra.account.AccountManager;
-import com.pinecone.hydra.account.entity.GenericDomain;
-import com.pinecone.hydra.account.entity.GenericGroup;
-import com.pinecone.hydra.account.entity.GenericAccount;
 import com.pinecone.hydra.account.source.UserMasterManipulator;
 
 public interface AccountServiceOperatorFactory extends OperatorFactory {

@@ -7,10 +7,10 @@ import com.pinecone.hydra.storage.file.source.FileSystemAttributeManipulator;
 import com.pinecone.hydra.storage.file.source.FileMasterManipulator;
 
 import com.pinecone.hydra.system.ko.UOIUtils;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.time.LocalDateTime;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 public abstract class ArchFileSystemOperator implements FileSystemOperator{
     protected KOMFileSystem                     fileSystem;
     protected FileSystemOperatorFactory         factory;
-    protected DistributedTrieTree               distributedTrieTree;
+    protected ImperialTree                      imperialTree;
     protected FileSystemAttributeManipulator    fileSystemAttributeManipulator;
     protected FileMasterManipulator             fileMasterManipulator;
 
@@ -28,13 +28,13 @@ public abstract class ArchFileSystemOperator implements FileSystemOperator{
     }
 
     public ArchFileSystemOperator( FileMasterManipulator masterManipulator, KOMFileSystem fileSystem ) {
-        this.distributedTrieTree            =  fileSystem.getMasterTrieTree();
+        this.imperialTree =  fileSystem.getMasterTrieTree();
         this.fileSystemAttributeManipulator =  masterManipulator.getAttributeManipulator();
         this.fileSystem                     =  fileSystem;
         this.fileMasterManipulator          =  masterManipulator;
     }
 
-    protected DistributedTreeNode affirmPreinsertionInitialize( TreeNode treeNode ) {
+    protected ImperialTreeNode affirmPreinsertionInitialize(TreeNode treeNode ) {
         ArchElementNode entityNode   = (ArchElementNode) treeNode;
 
         GUID guid72 = entityNode.getGuid();
@@ -47,11 +47,11 @@ public abstract class ArchFileSystemOperator implements FileSystemOperator{
         }
         entityNode.setUpdateTime( LocalDateTime.now() );
 
-        DistributedTreeNode distributedTreeNode = new GUIDDistributedTrieNode();
-        distributedTreeNode.setGuid( guid72 );
-        distributedTreeNode.setType( UOIUtils.createLocalJavaClass( entityNode.getClass().getName() ) );
+        ImperialTreeNode imperialTreeNode = new GUIDImperialTrieNode();
+        imperialTreeNode.setGuid( guid72 );
+        imperialTreeNode.setType( UOIUtils.createLocalJavaClass( entityNode.getClass().getName() ) );
 
-        return distributedTreeNode;
+        return imperialTreeNode;
     }
 
     public FileSystemOperatorFactory getOperatorFactory() {

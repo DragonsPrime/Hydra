@@ -1,6 +1,6 @@
 package com.pinecone.hydra.service.kom.entity;
 
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 
 public interface ServiceTreeNode extends TreeNode {
     String getName();

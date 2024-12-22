@@ -5,8 +5,8 @@ import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
-import com.pinecone.hydra.unit.udtt.operator.OperatorFactory;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.operator.OperatorFactory;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 
 public interface VolumeOperatorFactory extends OperatorFactory {
     String DefaultSimpleVolume         = LocalSimpleVolume.class.getSimpleName();
