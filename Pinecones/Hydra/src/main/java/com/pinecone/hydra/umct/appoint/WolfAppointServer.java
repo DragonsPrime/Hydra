@@ -15,7 +15,7 @@ import com.pinecone.hydra.umct.MessageExpress;
 import com.pinecone.hydra.umct.MessageHandler;
 import com.pinecone.hydra.umct.MessageJunction;
 import com.pinecone.hydra.umct.ProtoletMsgDeliver;
-import com.pinecone.hydra.umct.SergeantExpress;
+import com.pinecone.hydra.umct.DuplexExpress;
 import com.pinecone.hydra.umct.UMCTExpress;
 import com.pinecone.hydra.umct.WolfMCExpress;
 import com.pinecone.hydra.umct.husky.machinery.HuskyMarshal;
@@ -137,7 +137,7 @@ public class WolfAppointServer extends ArchAppointNode implements DuplexAppointS
 
     @Override
     public boolean supportDuplex() {
-        return this.mUMCTExpress instanceof SergeantExpress;
+        return this.mUMCTExpress instanceof DuplexExpress;
     }
 
     protected void registerInstance( MessageDeliver deliver, Object instance, Class<?> iface ) {

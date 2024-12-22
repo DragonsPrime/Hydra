@@ -3,7 +3,6 @@ package com.pinecone.hydra.umct.appoint;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -12,6 +11,7 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pinecone.framework.lang.field.FieldEntity;
+import com.pinecone.framework.unit.LinkedTreeMap;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.servgram.Servgramium;
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
@@ -57,7 +57,7 @@ public class WolfAppointClient extends ArchAppointNode implements DuplexAppointC
         super( (Servgramium) messenger, new HuskyMarshal( compiler, controllerInspector, new GenericFieldProtobufDecoder() ) );
         this.mMessenger          = messenger;
         this.mIfaceProxyFactory  = new GenericIfaceProxyFactory( this );
-        this.mInstructedChannels = new ConcurrentHashMap<>();
+        this.mInstructedChannels = new LinkedTreeMap<>();
     }
 
     public WolfAppointClient( UlfClient messenger, CompilerEncoder encoder ){
@@ -95,7 +95,7 @@ public class WolfAppointClient extends ArchAppointNode implements DuplexAppointC
             cb.getChannel().getNativeHandle().attr( AttributeKey.valueOf( WolfMCStandardConstants.CB_ASYNC_MSG_HANDLE_KEY ) ).set(new UlfAsyncMsgHandleAdapter() {
                 @Override
                 public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
-                    Debug.trace( msg );
+                    Debug.redf( msg );
                 }
             });
             cb.sendAsynMsg( instructMessage, true );

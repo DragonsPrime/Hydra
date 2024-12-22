@@ -1,16 +1,16 @@
 package com.pinecone.hydra.umct.appoint;
 
 import com.pinecone.hydra.umct.MessageJunction;
-import com.pinecone.hydra.umct.SergeantExpress;
+import com.pinecone.hydra.umct.DuplexExpress;
 import com.pinecone.hydra.umct.UMCConnection;
 import com.pinecone.hydra.umct.WolfMCExpress;
 
-public class HuskySergeantExpress extends WolfMCExpress implements SergeantExpress {
-    public HuskySergeantExpress( String name, MessageJunction messagram ) {
+public class HuskyDuplexExpress extends WolfMCExpress implements DuplexExpress {
+    public HuskyDuplexExpress(String name, MessageJunction messagram ) {
         super( name, messagram );
     }
 
-    public HuskySergeantExpress( MessageJunction messagram ) {
+    public HuskyDuplexExpress(MessageJunction messagram ) {
         this( null, messagram );
     }
 

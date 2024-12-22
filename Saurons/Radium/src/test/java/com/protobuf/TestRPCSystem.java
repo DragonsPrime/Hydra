@@ -12,10 +12,9 @@ import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.lang.GenericDynamicFactory;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
-import com.pinecone.hydra.umct.appoint.HuskySergeantExpress;
+import com.pinecone.hydra.umct.appoint.HuskyDuplexExpress;
 import com.pinecone.hydra.umct.appoint.WolfAppointClient;
 import com.pinecone.hydra.umct.appoint.WolfAppointServer;
-import com.pinecone.hydra.umct.husky.HuskyCTPConstants;
 import com.pinecone.hydra.umct.husky.machinery.HuskyMappingLoader;
 import com.pinecone.hydra.umct.husky.machinery.MultiMappingLoader;
 import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
@@ -194,7 +193,7 @@ class Jeff extends JesusChrist {
         WolfMCServer wolfKing = new WolfMCServer( "", this, new JSONMaptron("{host: \"0.0.0.0\",\n" +
                 "port: 5777, SocketTimeout: 800, KeepAliveTimeout: 3600, MaximumConnections: 1e6}") );
 
-        WolfAppointServer wolf = new WolfAppointServer( wolfKing, HuskySergeantExpress.class );
+        WolfAppointServer wolf = new WolfAppointServer( wolfKing, HuskyDuplexExpress.class );
 
         RaccoonController controller  = new RaccoonController();
 
