@@ -2,8 +2,10 @@ package com.pinecone.hydra.storage.bucket;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.bucket.entity.Bucket;
+import com.pinecone.hydra.storage.bucket.entity.Site;
 import com.pinecone.hydra.storage.bucket.source.BucketManipulator;
 import com.pinecone.hydra.storage.bucket.source.BucketMasterManipulator;
+import com.pinecone.hydra.storage.bucket.source.SiteManipulator;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
@@ -11,6 +13,7 @@ import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.ulf.util.id.GuidAllocator;
 import com.pinecone.ulf.util.id.impl.GenericGuidAllocator;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class TitanBucketInstrument implements BucketInstrument {
@@ -20,6 +23,8 @@ public class TitanBucketInstrument implements BucketInstrument {
 
     protected BucketManipulator         bucketManipulator;
 
+    protected SiteManipulator           siteManipulator;
+
     protected GuidAllocator             guidAllocator;
 
     public TitanBucketInstrument(Hydrarum hydrarum, KOIMasterManipulator masterManipulator, String name ){
@@ -28,6 +33,7 @@ public class TitanBucketInstrument implements BucketInstrument {
         this.guidAllocator     = new GenericGuidAllocator();
 
         this.bucketManipulator = this.masterManipulator.getBucketManipulator();
+        this.siteManipulator   = this.masterManipulator.getSiteManipulator();
     }
 
     public TitanBucketInstrument(Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
@@ -67,5 +73,39 @@ public class TitanBucketInstrument implements BucketInstrument {
     @Override
     public List<Bucket> queryBucketsByUserGuid(GUID userGuid) {
         return this.bucketManipulator.queryBucketsByUserGuid( userGuid );
+    }
+
+    @Override
+    public SiteManipulator getSiteManipulator() {
+        return this.siteManipulator;
+    }
+
+    @Override
+    public GUID createSite(Site site) {
+        GUID guid = this.guidAllocator.nextGUID72();
+        site.setSiteGuid(guid);
+        site.setCreateTime(LocalDateTime.now());
+        this.siteManipulator.insert(site);
+        return guid;
+    }
+
+    @Override
+    public void removeSite(GUID siteGuid) {
+        this.siteManipulator.remove(siteGuid);
+    }
+
+    @Override
+    public void removeSite(String siteName) {
+        this.siteManipulator.removeByName( siteName );
+    }
+
+    @Override
+    public Site querySite(GUID siteGuid) {
+        return this.siteManipulator.querySite(siteGuid);
+    }
+
+    @Override
+    public List<Site> listSite() {
+        return this.siteManipulator.listSite();
     }
 }
