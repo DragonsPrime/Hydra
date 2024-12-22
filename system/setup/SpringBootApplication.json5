@@ -7,6 +7,13 @@
   },
 
   "spring": {
+    "servlet": {
+      "multipart": {
+        "max-file-size": "4096MB",
+        "max-request-size": "4096MB"
+      }
+    },
+
     "datasource": {
 //        "url": "jdbc:mysql://localhost:3306/hydranium?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true",
 //        "username": "root",

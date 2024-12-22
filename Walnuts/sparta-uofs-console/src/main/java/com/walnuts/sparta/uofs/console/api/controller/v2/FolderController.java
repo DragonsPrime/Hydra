@@ -49,7 +49,7 @@ public class FolderController {
      * @return 返回属性信息
      */
     @GetMapping("/attribute")
-    public BasicResultResponse< FileTreeNode > attribute( @RequestParam("nodeGuid") String nodeGuid ){
+    public             BasicResultResponse< FileTreeNode > attribute( @RequestParam("nodeGuid") String nodeGuid ){
         FileTreeNode fileTreeNode = this.primaryFileSystem.get(GUIDs.GUID72(nodeGuid));
         return BasicResultResponse.success( fileTreeNode );
     }

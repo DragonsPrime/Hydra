@@ -16,7 +16,7 @@ import com.pinecone.hydra.system.ko.KernelObjectInstrument;
  *  信息、控制分离架构，枢密是中央情报编组数据库，原则上没有具体对象的实际控制权。
  *  其核心职能为：中心化收集所有对象的信息，便于统一统筹决策、分析和控制。
  *
- *  e.g. \Device\HarddiskVolume3\Users\undefined\AppData\Local\ => {name: xxx, handle: 123, typeId: 37}
+ *  e.g. \Device\HarddiskVolume3\Users\dragonking\AppData\Local\ => {name: xxx, handle: 123, typeId: 37}
  *  e.g. /proc/137/status                                       => {name: scsi_eh_26, State: S, Pid: 137}
  *  *****************************************************************************************
  */

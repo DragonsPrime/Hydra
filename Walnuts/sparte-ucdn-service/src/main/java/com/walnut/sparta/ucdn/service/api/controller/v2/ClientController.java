@@ -54,20 +54,18 @@ public class ClientController {
     }
 
     @GetMapping("/**")
-    public void  getFile(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public void  getFile(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException,IllegalPathException {
         String servletPath = request.getServletPath();
         String[] pathPart = servletPath.split(PolicyConstants.FORWARD_SLASH);
 
         if( pathPart.length < 3 ){
-            try {
-                throw new IllegalPathException();
-            } catch (IllegalPathException e) {
-                e.printStackTrace();
-            }
+            //todo 路径500问题
+            throw new IllegalPathException();
         }
 
         String siteName = pathPart[1];
 
+        //todo 统一路径解析
         StringBuilder filePath = new StringBuilder();
         for( int i = 2; i < pathPart.length; i++ ){
             if( i == pathPart.length - 1 ){

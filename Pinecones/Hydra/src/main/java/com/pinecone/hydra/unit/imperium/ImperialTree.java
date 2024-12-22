@@ -23,7 +23,7 @@ import java.util.List;
  *  与其他操作系统内核对象管理类似，使得系统中的内核对象和欲控对象，整整齐齐的被编组和统一URL式访问。
  *  该数据结构基于前缀树和GUID身份证体系，是一类通用数据结构，也可用于其他编组目的的实现。
  *
- *  e.g. \Device\HarddiskVolume3\Users\undefined\AppData\Local\
+ *  e.g. \Device\HarddiskVolume3\Users\dragonking\AppData\Local\
  *  e.g. /proc/137/task
  *  *****************************************************************************************
  */
