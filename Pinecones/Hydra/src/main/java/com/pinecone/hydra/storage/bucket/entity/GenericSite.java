@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.bucket.entity;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 
 import java.time.LocalDateTime;
 
@@ -73,5 +74,14 @@ public class GenericSite implements Site{
     @Override
     public void setMountPointGuid(GUID mountPointGuid) {
         this.mountPointGuid = mountPointGuid;
+    }
+    @Override
+    public String toJSONString() {
+        return BeanJSONEncoder.BasicEncoder.encode( this );
+    }
+
+    @Override
+    public String toString() {
+        return this.toJSONString();
     }
 }

@@ -62,12 +62,14 @@ public class ConsoleController {
         if( site == null ){
             return BasicResultResponse.error("站点不存在");
         }
-
-        String realFilePath = this.primaryFileSystem.getPath(site.getMountPointGuid()) + PolicyConstants.FORWARD_SLASH + filePath;
+        int dotIndex = filePath.lastIndexOf(PolicyConstants.PERIOD);
+        String baseName = filePath.substring(0, dotIndex);
+        String extension = filePath.substring(dotIndex + 1);
+        String realFilePath = this.primaryFileSystem.getPath(site.getMountPointGuid()) + PolicyConstants.FORWARD_SLASH + baseName;
 
         FSNodeAllotment fsNodeAllotment = this.primaryFileSystem.getFSNodeAllotment();
         Folder node = this.primaryFileSystem.affirmFolder(realFilePath);
-        String storageObjectPath = realFilePath + PolicyConstants.VERSION_PREFIX+ PolicyConstants.FORWARD_SLASH + version;
+        String storageObjectPath = realFilePath + PolicyConstants.VERSION_PREFIX+ PolicyConstants.FORWARD_SLASH + version +PolicyConstants.PERIOD+ extension;
         File tempFile = File.createTempFile("upload",".temp");
         file.transferTo(tempFile);
 

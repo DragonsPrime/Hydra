@@ -7,6 +7,7 @@ import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.TitanVolumeAllotment;
+import com.pinecone.hydra.storage.volume.entity.Volume;
 import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.kvfs.KenusDruid;
@@ -39,6 +40,7 @@ import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -207,6 +209,9 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
 //        try{
             //Debug.trace( Thread.currentThread().getName(), Thread.currentThread().getId() );
             PhysicalVolume physicalVolume   = this.physicalVolumeManipulator.getPhysicalVolume(guid);
+            if( physicalVolume == null ){
+                return null;
+            }
             MountPoint mountPoint           = this.mountPointManipulator.getMountPointByVolumeGuid(guid);
             VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
             physicalVolume.setMountPoint( mountPoint );
@@ -309,6 +314,21 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     @Override
     public KenusPool getKenusPool() {
         return this.kenusPool;
+    }
+
+    @Override
+    public List<Volume> queryAllVolumes() {
+        List<Volume> physicalVolumes = this.physicalVolumeManipulator.queryAllPhysicalVolumes();
+        List<Volume> simpleVolumes = this.simpleVolumeManipulator.queryAllSimpleVolumes();
+        List<Volume> spannedVolumes = this.spannedVolumeManipulator.queryAllSpannedVolume();
+        List<Volume> stripedVolumes = this.stripedVolumeManipulator.queryAllStripedVolume();
+
+        ArrayList<Volume> volumes = new ArrayList<>();
+        volumes.addAll( physicalVolumes );
+        volumes.addAll(simpleVolumes);
+        volumes.addAll(spannedVolumes);
+        volumes.addAll(stripedVolumes);
+        return volumes;
     }
 
     private String getNodeName(ImperialTreeNode node ){

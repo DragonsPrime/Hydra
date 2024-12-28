@@ -4,18 +4,23 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
+import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
+import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
+import com.pinecone.hydra.storage.volume.entity.Volume;
 import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalPhysicalVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
+import com.pinecone.hydra.storage.volume.entity.local.simple.TitanLocalSimpleVolume;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.walnuts.sparta.uofs.console.api.response.BasicResultResponse;
 import com.walnuts.sparta.uofs.console.domain.dto.PhysicalVolumeDTO;
 import com.walnuts.sparta.uofs.console.domain.dto.LogicVolumeDTO;
 import com.walnuts.sparta.uofs.console.domain.dto.StorageExpansionDTO;
 import com.walnuts.sparta.uofs.console.infrastructure.UOFSConsoleContents;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +35,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping( "/api/v2/uofs/volume" )
+@CrossOrigin
 public class VolumeController {
     @Resource
     private UniformVolumeManager primaryVolume;
@@ -135,6 +141,28 @@ public class VolumeController {
     }
 
     /**
+     *获取物理卷
+     * @param guid 物理卷guid
+     * @return 返回物理卷详细信息
+     */
+    @GetMapping("/query/physical")
+    public String queryPhysicalVolume( @RequestParam("guid") String guid ){
+        PhysicalVolume physicalVolume = this.primaryVolume.getPhysicalVolume(GUIDs.GUID72(guid));
+        return BasicResultResponse.success(physicalVolume).toJSONString();
+    }
+
+    /**
+     * 获取逻辑卷
+     * @param guid 逻辑卷guid
+     * @return 返回逻辑卷详细信息
+     */
+    @GetMapping("/query/logic")
+    public String queryLogicVolume( @RequestParam("guid") String guid ){
+        LogicVolume logicVolume = this.primaryVolume.get(GUIDs.GUID72(guid));
+        return BasicResultResponse.success(logicVolume).toJSONString();
+    }
+
+    /**
      * 逻辑卷扩容
      * @param dto 扩容所需参数
      * @return 返回操作结果
@@ -157,15 +185,34 @@ public class VolumeController {
      */
     @GetMapping("/getChildren")
     public String getChildren(@RequestParam("volumeGuid") String volumeGuid){
-        LogicVolume logicVolume = this.primaryVolume.get(GUIDs.GUID72(volumeGuid));
-        if(logicVolume == null){
-            return "物理卷不存在子集";
-        }
+        PhysicalVolume physicalVolume = this.primaryVolume.getPhysicalVolume(GUIDs.GUID72(volumeGuid));
 
+        if(physicalVolume != null){
+            return BasicResultResponse.error("物理卷不存在子卷").toJSONString();
+        }
+        LogicVolume logicVolume = this.primaryVolume.get(GUIDs.GUID72(volumeGuid));
+        if( logicVolume instanceof TitanLocalSimpleVolume){
+            SimpleVolume simpleVolume = (SimpleVolume) logicVolume;
+            List<GUID> guids = simpleVolume.listPhysicalVolume();
+            PhysicalVolume volumePhysicalVolume = this.primaryVolume.getPhysicalVolume(guids.get(0));
+            ArrayList<Volume> volumes = new ArrayList<>();
+            volumes.add(volumePhysicalVolume);
+            return BasicResultResponse.success(volumes).toJSONString();
+        }
         List<LogicVolume> volumes = logicVolume.queryChildren();
         ArrayList<LogicVolume> arrayList = new ArrayList<>(volumes);
 
         return BasicResultResponse.success(arrayList).toJSONString();
+    }
+
+    /**
+     * 获取全部卷
+     * @return 返回卷信息
+     */
+    @GetMapping("/queryAllVolumes")
+    public String queryAllVolumes(){
+        List<Volume> volumes = this.primaryVolume.queryAllVolumes();
+        return BasicResultResponse.success(volumes).toJSONString();
     }
 
 }

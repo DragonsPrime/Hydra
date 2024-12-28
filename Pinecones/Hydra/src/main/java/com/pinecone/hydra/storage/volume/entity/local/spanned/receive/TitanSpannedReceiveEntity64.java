@@ -24,14 +24,12 @@ public class TitanSpannedReceiveEntity64 extends ArchReceiveEntity implements Sp
 
     @Override
     public StorageIOResponse receive() throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
-//        return this.spannedReceive.receive();
-        return null;
+        return this.spannedReceive.receive(this.channel);
     }
 
     @Override
     public StorageIOResponse receive(Number offset, Number endSize) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
-//        return this.spannedReceive.receive( offset, endSize );
-        return null;
+        return this.spannedReceive.receive(this.channel, offset, endSize );
     }
 
     @Override

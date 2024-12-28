@@ -4,6 +4,7 @@ import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.walnuts.sparta.uofs.console.api.response.BasicResultResponse;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import javax.annotation.Resource;
 
 @RestController
 @RequestMapping( "/api/v2/uofs/bucket" )
+@CrossOrigin
 public class FileController {
     @Resource
     private KOMFileSystem primaryFileSystem;

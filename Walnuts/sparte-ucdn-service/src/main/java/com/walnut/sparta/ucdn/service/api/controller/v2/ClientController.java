@@ -69,7 +69,9 @@ public class ClientController {
         StringBuilder filePath = new StringBuilder();
         for( int i = 2; i < pathPart.length; i++ ){
             if( i == pathPart.length - 1 ){
-                filePath.append(pathPart[i]);
+                int dotIndex = pathPart[i].lastIndexOf(PolicyConstants.PERIOD);
+                String baseName = pathPart[i].substring(0, dotIndex);
+                filePath.append(baseName);
             }else {
                 filePath.append(pathPart[i]).append(PolicyConstants.FORWARD_SLASH);
             }

@@ -106,7 +106,7 @@ public class KenVolumeFileSystem implements OnVolumeFileSystem {
 
     @Override
     public GUID getSpanLinkedVolumeTableTargetGuid(MappedExecutor mappedExecutor, GUID keyGuid) throws SQLException {
-        ResultSession query = mappedExecutor.query("SELECT `target_volume_guid` FROM `collision_table` WHERE `key_guid` = '" + keyGuid + "' ");
+        ResultSession query = mappedExecutor.query("SELECT `target_volume_guid` FROM `kvfs_span_linked_volume` WHERE `key_guid` = '" + keyGuid + "' ");
         ResultSet resultSet = query.getResultSet();
         if ( resultSet.next() ){
             String targetVolumeGuid = resultSet.getString("target_volume_guid");

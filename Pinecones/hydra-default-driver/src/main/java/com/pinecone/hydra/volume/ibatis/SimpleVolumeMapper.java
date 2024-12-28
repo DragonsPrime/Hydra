@@ -2,6 +2,7 @@ package com.pinecone.hydra.volume.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
+import com.pinecone.hydra.storage.volume.entity.Volume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.TitanLocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.source.SimpleVolumeManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
@@ -10,6 +11,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @IbatisDataAccessObject
@@ -35,4 +37,11 @@ public interface SimpleVolumeMapper extends SimpleVolumeManipulator, PrimeLogicV
 
     @Select("SELECT `physical_guid` FROM `hydra_volume_physical_logic` WHERE `logic_guid` = #{logicGuid}")
     List<GUID> listPhysicalVolume(GUID logicGuid );
+
+    default List<Volume> queryAllSimpleVolumes(){
+        List<TitanLocalSimpleVolume> titanLocalSimpleVolumes = this.queryAllSimpleVolumes0();
+        return new ArrayList<>(titanLocalSimpleVolumes);
+    }
+    @Select("SELECT `id` AS enumId, `guid`, `create_time` AS createTime, `update_time` AS updateTime, `name`,  `type`, `ext_config` AS extConfig FROM `hydra_uofs_volumes` WHERE type = 'SimpleVolume'")
+    List<TitanLocalSimpleVolume> queryAllSimpleVolumes0();
 }

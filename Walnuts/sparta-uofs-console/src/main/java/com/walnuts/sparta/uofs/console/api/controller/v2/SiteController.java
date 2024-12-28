@@ -1,13 +1,12 @@
-package com.walnut.sparta.ucdn.service.api.controller.v2;
+package com.walnuts.sparta.uofs.console.api.controller.v2;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.hydra.storage.bucket.BucketInstrument;
 import com.pinecone.hydra.storage.bucket.entity.GenericSite;
 import com.pinecone.hydra.storage.bucket.entity.Site;
-import com.pinecone.hydra.storage.bucket.source.SiteManipulator;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.Folder;
-import com.walnut.sparta.ucdn.service.api.response.BasicResultResponse;
+import com.walnuts.sparta.uofs.console.api.response.BasicResultResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +19,7 @@ import javax.annotation.Resource;
 import java.util.List;
 
 @RestController
-@RequestMapping( "/api/v2/ucdn/site" )
+@RequestMapping( "/api/v2/uofs/site" )
 @CrossOrigin
 public class SiteController implements Pinenut {
     @Resource
@@ -61,7 +60,7 @@ public class SiteController implements Pinenut {
      * 获取全部站点
      * @return 返回全部站点
      */
-    @GetMapping("/listSize")
+    @GetMapping("/listSite")
     public String listSite(){
         List<Site> sites = this.bucketInstrument.listSite();
         return BasicResultResponse.success(sites).toJSONString();

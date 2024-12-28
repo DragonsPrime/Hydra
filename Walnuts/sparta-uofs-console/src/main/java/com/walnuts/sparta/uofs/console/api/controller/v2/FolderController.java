@@ -5,6 +5,7 @@ import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.file.entity.Folder;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.walnuts.sparta.uofs.console.api.response.BasicResultResponse;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping( "/api/v2/uofs/folder" )
+@CrossOrigin
 public class FolderController {
     @Resource
     private KOMFileSystem primaryFileSystem;
