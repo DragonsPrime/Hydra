@@ -11,53 +11,41 @@ import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.pinecone.framework.lang.field.FieldEntity;
-import com.pinecone.framework.unit.LinkedTreeMap;
-import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.servgram.Servgramium;
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
-import com.pinecone.hydra.umc.msg.ChannelPool;
 import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.umc.msg.UMCReceiver;
 import com.pinecone.hydra.umc.msg.UMCTransmit;
 import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
 import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
-import com.pinecone.hydra.umc.wolfmc.UlfInstructMessage;
-import com.pinecone.hydra.umc.wolfmc.WolfMCStandardConstants;
-import com.pinecone.hydra.umc.wolfmc.client.UlfAsyncMessengerChannelControlBlock;
 import com.pinecone.hydra.umc.wolfmc.client.UlfClient;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umct.IlleagalResponseException;
 import com.pinecone.hydra.umct.appoint.proxy.GenericIfaceProxyFactory;
 import com.pinecone.hydra.umct.appoint.proxy.IfaceProxyFactory;
-import com.pinecone.hydra.umct.husky.HuskyCTPConstants;
 import com.pinecone.hydra.umct.husky.compiler.BytecodeIfacCompiler;
 import com.pinecone.hydra.umct.husky.compiler.CompilerEncoder;
 import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
 import com.pinecone.hydra.umct.husky.compiler.InterfacialCompiler;
-import com.pinecone.hydra.umct.husky.machinery.HuskyMarshal;
+import com.pinecone.hydra.umct.husky.machinery.HuskyContextMachinery;
 import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
 import com.pinecone.hydra.umct.mapping.ControllerInspector;
 import com.pinecone.ulf.util.protobuf.FieldProtobufEncoder;
 import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelId;
-import io.netty.util.AttributeKey;
 import javassist.ClassPool;
 
-public class WolfAppointClient extends ArchAppointNode implements DuplexAppointClient {
+public class WolfAppointClient extends ArchAppointNode implements AppointClient {
     protected UlfClient              mMessenger;
 
     protected IfaceProxyFactory      mIfaceProxyFactory;
 
-    protected Map<ChannelId, ChannelControlBlock > mInstructedChannels;  // Standby controlled channels, waiting for server to instruct.
-
     public WolfAppointClient( UlfClient messenger, InterfacialCompiler compiler, ControllerInspector controllerInspector ){
-        super( (Servgramium) messenger, new HuskyMarshal( compiler, controllerInspector, new GenericFieldProtobufDecoder() ) );
+        super( (Servgramium) messenger, new HuskyContextMachinery( compiler, controllerInspector, new GenericFieldProtobufDecoder() ) );
         this.mMessenger          = messenger;
         this.mIfaceProxyFactory  = new GenericIfaceProxyFactory( this );
-        this.mInstructedChannels = new LinkedTreeMap<>();
     }
 
     public WolfAppointClient( UlfClient messenger, CompilerEncoder encoder ){
@@ -76,56 +64,7 @@ public class WolfAppointClient extends ArchAppointNode implements DuplexAppointC
         ) );
     }
 
-    @Override
-    public boolean supportDuplex() {
-        return !this.mInstructedChannels.isEmpty();
-    }
 
-    @Override
-    public void joinEmbraces( int nLine ) throws IOException {
-        // Join us, embracing uniformity.
-
-        this.createEmbraces( nLine );
-        for ( Map.Entry<ChannelId, ChannelControlBlock > kv : this.mInstructedChannels.entrySet() ) {
-            UlfInstructMessage instructMessage = new UlfInstructMessage( HuskyCTPConstants.HCTP_DUP_CONTROL_REGISTER );
-            instructMessage.getHead().setIdentityId( this.mMessenger.getMessageNodeId() );
-
-            ChannelControlBlock ccb = kv.getValue();
-            UlfAsyncMessengerChannelControlBlock cb = (UlfAsyncMessengerChannelControlBlock) ccb;
-            cb.getChannel().getNativeHandle().attr( AttributeKey.valueOf( WolfMCStandardConstants.CB_ASYNC_MSG_HANDLE_KEY ) ).set(new UlfAsyncMsgHandleAdapter() {
-                @Override
-                public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
-                    Debug.redf( msg );
-                }
-            });
-            cb.sendAsynMsg( instructMessage, true );
-        }
-    }
-
-    @Override
-    public void createEmbraces( int nLine ) {
-        ChannelPool pool = this.getMessageNode().getChannelPool();
-
-        ChannelControlBlock[] cbs = new ChannelControlBlock[ nLine ];
-        for ( int i = 0; i < nLine; ++i ) {
-            ChannelControlBlock ccb = pool.depriveIdleChannel();
-            if ( ccb == null ) {
-                for ( int j = 0; j < nLine; ++j ) {
-                    if ( cbs[ j ] == null ) {
-                        break;
-                    }
-                    ChannelId id = (ChannelId)cbs[ j ].getChannel().getChannelID();
-                    this.mInstructedChannels.remove( id );
-                    pool.add( cbs[ j ] );
-                }
-                throw new IllegalArgumentException( "Creating `embraces` is compromised due to insufficient free channels. Consider setting up sufficient parallel channels." );
-            }
-
-            ChannelId id = (ChannelId)ccb.getChannel().getChannelID();
-            cbs[ i ] = ccb;
-            this.mInstructedChannels.put( id, ccb );
-        }
-    }
 
     @Override
     public UlfClient getMessageNode() {

@@ -18,7 +18,10 @@ import com.pinecone.hydra.umct.ProtoletMsgDeliver;
 import com.pinecone.hydra.umct.DuplexExpress;
 import com.pinecone.hydra.umct.UMCTExpress;
 import com.pinecone.hydra.umct.WolfMCExpress;
-import com.pinecone.hydra.umct.husky.machinery.HuskyMarshal;
+import com.pinecone.hydra.umct.husky.machinery.HuskyContextMachinery;
+import com.pinecone.hydra.umct.husky.machinery.HuskyRouteDispatcher;
+import com.pinecone.hydra.umct.husky.machinery.HuskyRouteDispatcherFabricator;
+import com.pinecone.hydra.umct.husky.machinery.RouteDispatcher;
 import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
 import com.pinecone.hydra.umct.mapping.ControllerInspector;
 import com.pinecone.hydra.umct.mapping.InspectException;
@@ -35,59 +38,44 @@ import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 import javassist.ClassPool;
 import javassist.NotFoundException;
 
-public class WolfAppointServer extends ArchAppointNode implements DuplexAppointServer {
+public class WolfAppointServer extends ArchAppointNode implements AppointServer {
     protected UlfServer                     mRecipient;
-    protected UMCTExpress                   mUMCTExpress;
-    protected MessageDeliver                mDefaultDeliver;
+    protected RouteDispatcher               mRouteDispatcher;
 
-    protected void applyExpress( InterfacialCompiler compiler, UMCTExpress express ) {
-        this.mUMCTExpress = express;
+    protected void applyExpress( UMCTExpress express ) {
         this.mRecipient.apply( express );
-
-        this.mDefaultDeliver      = new ProtoletMsgDeliver( AppointServer.DefaultEntityName, this.mUMCTExpress, compiler.getCompilerEncoder() );
-        this.mUMCTExpress.register( this.mDefaultDeliver  );
     }
 
-    protected WolfAppointServer( UlfServer messenger, InterfacialCompiler compiler, ControllerInspector controllerInspector ){
-        super( (Servgramium) messenger, new HuskyMarshal( compiler, controllerInspector, new GenericFieldProtobufDecoder() ) );
-        this.mRecipient   = messenger;
+    protected WolfAppointServer( UlfServer messenger, RouteDispatcher dispatcher ){
+        super( (Servgramium) messenger, dispatcher.getContextMachinery() );
+        this.mRecipient       = messenger;
+        this.mRouteDispatcher = dispatcher;
     }
 
     public WolfAppointServer( UlfServer messenger, InterfacialCompiler compiler, ControllerInspector controllerInspector, UMCTExpress express ){
-        this( messenger, compiler, controllerInspector );
-        this.applyExpress( compiler, express );
+        this( messenger, new HuskyRouteDispatcher( compiler, controllerInspector, express ) );
+        this.apply( express );
     }
 
     public WolfAppointServer( UlfServer messenger, CompilerEncoder encoder, UMCTExpress express ){
-        this( messenger, new BytecodeIfacCompiler(
-                ClassPool.getDefault(), messenger.getTaskManager().getClassLoader(), encoder
-        ), new BytecodeControllerInspector(
-                ClassPool.getDefault(), messenger.getTaskManager().getClassLoader()
-        ), express );
+        this( messenger, new HuskyRouteDispatcher( encoder, express, messenger.getTaskManager().getClassLoader() ) );
+        this.apply( express );
     }
 
     public WolfAppointServer( UlfServer messenger, UMCTExpress express ){
-        this( messenger, new BytecodeIfacCompiler(
-                ClassPool.getDefault(), messenger.getTaskManager().getClassLoader()
-        ), new BytecodeControllerInspector(
-                ClassPool.getDefault(), messenger.getTaskManager().getClassLoader()
-        ), express );
+        this( messenger, new HuskyRouteDispatcher( express, messenger.getTaskManager().getClassLoader() ) );
+        this.apply( express );
     }
 
     public WolfAppointServer( UlfServer messenger, Class<?> expressType ){
-        this(
-                messenger,
-                new BytecodeIfacCompiler( ClassPool.getDefault(), messenger.getTaskManager().getClassLoader() ),
-                new BytecodeControllerInspector( ClassPool.getDefault(), messenger.getTaskManager().getClassLoader() )
-        );
+        this( messenger, new HuskyRouteDispatcher( messenger.getTaskManager().getClassLoader(), true ) );
 
         try{
             Constructor<?> constructor = expressType.getConstructor( String.class, MessageJunction.class );
-            UMCTExpress express = (UMCTExpress) constructor.newInstance(AppointServer.DefaultEntityName, this);
+            UMCTExpress express = (UMCTExpress) constructor.newInstance( AppointServer.DefaultEntityName, this );
 
-            this.applyExpress(
-                    this.mPMCTMarshal.getInterfacialCompiler(), express
-            );
+            this.applyExpress( express );
+            HuskyRouteDispatcherFabricator.afterConstructed( (HuskyRouteDispatcher)this.mRouteDispatcher, express );
         }
         catch ( NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e ) {
             throw new IllegalArgumentException( "`" + expressType.getSimpleName() + "` is not UMCTExpress calibre qualified." );
@@ -98,6 +86,9 @@ public class WolfAppointServer extends ArchAppointNode implements DuplexAppointS
         this( messenger, WolfMCExpress.class );
     }
 
+
+
+
     @Override
     public UlfServer getMessageNode() {
         return this.mRecipient;
@@ -105,166 +96,53 @@ public class WolfAppointServer extends ArchAppointNode implements DuplexAppointS
 
     @Override
     public WolfAppointServer apply( UMCTExpress handler ) {
-        this.mUMCTExpress = handler;
+        this.mRouteDispatcher.setUMCTExpress( handler );
         this.mRecipient.apply( handler );
         return this;
     }
 
     @Override
     public UMCTExpress getUMCTExpress() {
-        return this.mUMCTExpress;
+        return this.mRouteDispatcher.getUMCTExpress();
     }
 
     @Override
     public MessageExpress register( Deliver deliver ) {
-        return this.mUMCTExpress.register( deliver );
+        return this.mRouteDispatcher.register( deliver );
     }
 
     @Override
     public MessageExpress  fired   ( Deliver deliver ) {
-        return this.mUMCTExpress.fired( deliver );
+        return this.mRouteDispatcher.fired( deliver );
     }
 
     @Override
     public MessageDeliver getDeliver( String name ) {
-        return this.mUMCTExpress.getDeliver( name );
+        return this.mRouteDispatcher.getDeliver( name );
     }
 
     @Override
     public MessageDeliver getDefaultDeliver() {
-        return this.mDefaultDeliver;
-    }
-
-    @Override
-    public boolean supportDuplex() {
-        return this.mUMCTExpress instanceof DuplexExpress;
-    }
-
-    protected void registerInstance( MessageDeliver deliver, Object instance, Class<?> iface ) {
-        if ( !iface.isInterface() ) {
-            throw new IllegalArgumentException( "The provided class is not an interface: " + iface.getName() );
-        }
-
-        List<MethodDigest> digests = this.compile( iface, false ).getMethodDigests();
-        Map<String, MethodDigest > digestMap = digests.stream()
-                .collect( Collectors.toMap(MethodDigest::getName, digest -> digest) );
-
-        Method[] methods = iface.getMethods();
-        for ( Method method : methods ) {
-            String methodName = IfaceUtils.getIfaceMethodName( method );
-
-            DynamicMethodPrototype digest = (DynamicMethodPrototype)digestMap.get( methodName );
-
-            String fullPath = digest.getFullName();
-
-            MessageHandler handler = new MessageHandler() {
-                @Override
-                public String getAddressMapping() {
-                    return digest.getFullName();
-                }
-
-                @Override
-                public Object invoke( Object... args ) throws Exception {
-                    return method.invoke( instance, args );
-                }
-
-                @Override
-                public List<String> getArgumentsKey() {
-                    return digest.getArgumentsKey();
-                }
-
-                @Override
-                public Object getReturnDescriptor() {
-                    return digest.getReturnDescriptor();
-                }
-
-                @Override
-                public Object getArgumentsDescriptor() {
-                    return digest.getArgumentsDescriptor();
-                }
-
-            };
-
-            deliver.registerHandler( fullPath, handler );
-            this.mPMCTMarshal.getMessageHandlerMap().put( fullPath, handler );
-        }
+        return this.mRouteDispatcher.getDefaultDeliver();
     }
 
     @Override
     public void registerInstance( String deliverName, Object instance, Class<?> iface ) {
-        MessageDeliver deliver = this.getDeliver( deliverName );
-        if ( deliver == null ) {
-            throw new IllegalArgumentException( "No such deliver: " + deliverName );
-        }
-
-        this.registerInstance( deliver, instance, iface );
+        this.mRouteDispatcher.registerInstance( deliverName, instance, iface );
     }
 
     @Override
     public void registerInstance( Object instance, Class<?> iface ) {
-        this.registerInstance( this.mDefaultDeliver, instance, iface );
-    }
-
-    protected void registerController( MessageDeliver deliver, Object instance, Class<?> controllerType ) {
-        try{
-            List<MappingDigest> digests   = this.mPMCTMarshal.getControllerInspector().characterize( controllerType );
-            List<IfaceMappingDigest>  ifs = this.getInterfacialCompiler().compile( digests );
-
-            for ( IfaceMappingDigest imd : ifs ) {
-                String[] addresses = imd.getAddresses();
-                for ( int i = 0; i < addresses.length; ++i ) {
-                    String address = addresses[ i ];
-
-                    MessageHandler handler = new MessageHandler() {
-                        @Override
-                        public String getAddressMapping() {
-                            return address;
-                        }
-
-                        @Override
-                        public Object invoke( Object... args ) throws Exception {
-                            return imd.getMappedMethod().invoke( instance, args );
-                        }
-
-                        @Override
-                        public List<String> getArgumentsKey() {
-                            return imd.getArgumentsKey();
-                        }
-
-                        @Override
-                        public Object getReturnDescriptor() {
-                            return imd.getReturnDescriptor();
-                        }
-
-                        @Override
-                        public Object getArgumentsDescriptor() {
-                            return imd.getArgumentsDescriptor();
-                        }
-
-                    };
-
-                    deliver.registerHandler( address, handler );
-                    this.mPMCTMarshal.getMessageHandlerMap().put( address, handler );
-                }
-            }
-        }
-        catch ( NotFoundException e ) {
-            throw new InspectException( e );
-        }
+        this.mRouteDispatcher.registerInstance( instance, iface );
     }
 
     @Override
     public void registerController( String deliverName, Object instance, Class<?> controllerType ) {
-        MessageDeliver deliver = this.getDeliver( deliverName );
-        if ( deliver == null ) {
-            throw new IllegalArgumentException( "No such deliver: " + deliverName );
-        }
-
-        this.registerController( deliver, instance, controllerType );
+        this.mRouteDispatcher.registerController( deliverName, instance, controllerType );
     }
 
     @Override
     public void registerController( Object instance, Class<?> controllerType ) {
-        this.registerController( this.mDefaultDeliver, instance, controllerType );
+        this.mRouteDispatcher.registerController( instance, controllerType );
     }
 }

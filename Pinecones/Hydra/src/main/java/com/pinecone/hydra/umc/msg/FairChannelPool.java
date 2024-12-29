@@ -2,7 +2,7 @@ package com.pinecone.hydra.umc.msg;
 
 import java.util.Queue;
 
-public interface FairChannelPool extends ChannelPool {
+public interface FairChannelPool extends AsynChannelAllocator {
     long getMajorWaitTimeout();
 
     FairChannelPool setMajorWaitTimeout( long nMillisTimeout );
@@ -12,27 +12,20 @@ public interface FairChannelPool extends ChannelPool {
 
     ChannelControlBlock pop();
 
+    @Override
     FairChannelPool setIdleChannel( ChannelControlBlock block );
 
-    ChannelControlBlock nextSyncChannel( long nMillisTimeout, boolean bEager ) ;
-
+    @Override
     ChannelControlBlock nextAsynChannel( long nMillisTimeout, boolean bEager ) ;
 
-
-    default ChannelControlBlock nextSyncChannel( long nMillisTimeout ) {
-        return this.nextSyncChannel( nMillisTimeout, true );
-    }
-
+    @Override
     default ChannelControlBlock nextAsynChannel( long nMillisTimeout ) {
-        return this.nextSyncChannel( nMillisTimeout, true );
+        return this.nextAsynChannel( nMillisTimeout, true );
     }
 
-    default ChannelControlBlock nextSyncChannel() {
-        return this.nextSyncChannel( 5000 );
-    }
-
+    @Override
     default ChannelControlBlock nextAsynChannel() {
-        return this.nextSyncChannel( 5000 );
+        return this.nextAsynChannel( 5000 );
     }
 
     Queue getMajorQueue();

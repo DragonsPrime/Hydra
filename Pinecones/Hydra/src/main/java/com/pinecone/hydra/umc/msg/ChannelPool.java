@@ -1,8 +1,8 @@
 package com.pinecone.hydra.umc.msg;
 
-import com.pinecone.framework.system.prototype.Pinenut;
+import java.util.Collection;
 
-import java.util.Map;
+import com.pinecone.framework.system.prototype.Pinenut;
 
 public interface ChannelPool extends Pinenut {
     ChannelControlBlock queryChannelById( Object id ) ;
@@ -15,7 +15,7 @@ public interface ChannelPool extends Pinenut {
 
     boolean isEmpty();
 
-    Map getPooledMap();
+    Collection getPooledChannels();
 
     ChannelControlBlock terminate( Object id ) throws InterruptedException;
 

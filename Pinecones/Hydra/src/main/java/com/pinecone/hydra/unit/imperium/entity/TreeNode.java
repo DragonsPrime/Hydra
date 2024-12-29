@@ -12,6 +12,6 @@ public interface TreeNode extends EntityNode {
     }
 
     default TreeNode evinceTreeNode(){
-        return null;
+        return this;
     }
 }

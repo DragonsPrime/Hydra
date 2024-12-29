@@ -5,7 +5,7 @@ import com.pinecone.hydra.umct.UMCTNode;
 import com.pinecone.hydra.umct.husky.compiler.ClassDigest;
 import com.pinecone.hydra.umct.husky.compiler.InterfacialCompiler;
 import com.pinecone.hydra.umct.husky.compiler.MethodDigest;
-import com.pinecone.hydra.umct.husky.machinery.PMCTMarshal;
+import com.pinecone.hydra.umct.husky.machinery.PMCTContextMachinery;
 import com.pinecone.ulf.util.protobuf.FieldProtobufDecoder;
 import com.pinecone.ulf.util.protobuf.FieldProtobufEncoder;
 
@@ -16,7 +16,7 @@ public interface AppointNode extends UMCTNode {
         return getMessageNode().getMessageNodeId();
     }
 
-    PMCTMarshal getPMCTTransformer();
+    PMCTContextMachinery getPMCTTransformer();
 
     InterfacialCompiler getInterfacialCompiler();
 

@@ -15,6 +15,8 @@ import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
 import com.pinecone.hydra.umct.appoint.HuskyDuplexExpress;
 import com.pinecone.hydra.umct.appoint.WolfAppointClient;
 import com.pinecone.hydra.umct.appoint.WolfAppointServer;
+import com.pinecone.hydra.umct.appoint.WolvesAppointClient;
+import com.pinecone.hydra.umct.appoint.WolvesAppointServer;
 import com.pinecone.hydra.umct.husky.machinery.HuskyMappingLoader;
 import com.pinecone.hydra.umct.husky.machinery.MultiMappingLoader;
 import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
@@ -193,7 +195,7 @@ class Jeff extends JesusChrist {
         WolfMCServer wolfKing = new WolfMCServer( "", this, new JSONMaptron("{host: \"0.0.0.0\",\n" +
                 "port: 5777, SocketTimeout: 800, KeepAliveTimeout: 3600, MaximumConnections: 1e6}") );
 
-        WolfAppointServer wolf = new WolfAppointServer( wolfKing, HuskyDuplexExpress.class );
+        WolvesAppointServer wolf = new WolvesAppointServer( wolfKing, HuskyDuplexExpress.class );
 
         RaccoonController controller  = new RaccoonController();
 
@@ -211,7 +213,7 @@ class Jeff extends JesusChrist {
 
 
     private void testDuplexClient() throws Exception {
-        WolfAppointClient wolf = new WolfAppointClient( new WolfMCClient( 2048, "", this, this.getMiddlewareManager().getMiddlewareConfig().queryJSONObject( "Messagers.Messagers.WolfMCKingpin" ) ) );
+        WolvesAppointClient wolf = new WolvesAppointClient( new WolfMCClient( 2048, "", this, this.getMiddlewareManager().getMiddlewareConfig().queryJSONObject( "Messagers.Messagers.WolfMCKingpin" ) ) );
         wolf.execute();
 
         wolf.compile( Raccoon.class, false );
@@ -219,7 +221,7 @@ class Jeff extends JesusChrist {
 
         Debug.sleep( 200 );
 
-        wolf.joinEmbraces(1);
+        wolf.embraces(2);
 
         //Debug.greenf( wolf.invokeInform(digest, "fuck you", 2024 ) );
 

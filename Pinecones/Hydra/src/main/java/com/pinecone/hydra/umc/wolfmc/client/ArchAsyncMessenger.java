@@ -22,14 +22,14 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class ArchAsyncMessenger extends WolfMCNode implements AsyncMessenger, UlfMessageNode {
-    protected final ReentrantLock                              mSynRequestLock  = new ReentrantLock();
-    protected ProactiveParallelFairChannelPool<ChannelId >     mChannelPool     ;
-    //protected BlockingDeque<UMCMessage>                        mSyncRetMsgQueue = new LinkedBlockingDeque<>();
+    protected final ReentrantLock                                  mSynRequestLock  = new ReentrantLock();
+    protected ProactiveParallelFairSyncChannelPool<ChannelId >     mChannelPool     ;
+    //protected BlockingDeque<UMCMessage>                            mSyncRetMsgQueue = new LinkedBlockingDeque<>();
 
     public ArchAsyncMessenger( long nodeId, String szName, Processum parentProcess, UlfMessageNode parent, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
         super( nodeId, szName, parentProcess, parent, joConf, extraHeadCoder );
 
-        this.mChannelPool   = new ProactiveParallelFairChannelPool<>( this, new UlfIdleFirstBalanceStrategy() ); //TODO
+        this.mChannelPool   = new ProactiveParallelFairSyncChannelPool<>( this.mSynRequestLock, new UlfIdleFirstBalanceStrategy() ); //TODO
         //this.makeNameAndId();
     }
 
@@ -39,7 +39,7 @@ public abstract class ArchAsyncMessenger extends WolfMCNode implements AsyncMess
 
 
     @Override
-    public ProactiveParallelFairChannelPool   getChannelPool() {
+    public ProactiveParallelFairSyncChannelPool   getChannelPool() {
         return this.mChannelPool;
     }
 

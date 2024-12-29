@@ -12,11 +12,11 @@ import javassist.NotFoundException;
 
 public class ExcludeHuskyMappingFilters implements TypeFilter {
     protected HierarchyClassInspector mClassInspector;
-    protected PMCTMarshal             mPMCTMarshal;
+    protected PMCTContextMachinery mPMCTContextMachinery;
 
-    public ExcludeHuskyMappingFilters( HierarchyClassInspector inspector, PMCTMarshal marshal ) {
+    public ExcludeHuskyMappingFilters( HierarchyClassInspector inspector, PMCTContextMachinery marshal ) {
         this.mClassInspector = inspector;
-        this.mPMCTMarshal    = marshal;
+        this.mPMCTContextMachinery = marshal;
     }
 
     @Override
@@ -31,9 +31,9 @@ public class ExcludeHuskyMappingFilters implements TypeFilter {
     }
 
     protected boolean scanIface( String szClassName, Object pool ) throws IOException {
-        ClassDigest classDigest = this.mPMCTMarshal.getInterfacialCompiler().compile( szClassName, false );
+        ClassDigest classDigest = this.mPMCTContextMachinery.getInterfacialCompiler().compile( szClassName, false );
         if ( classDigest != null ) {
-            this.mPMCTMarshal.addClassDigest( classDigest );
+            this.mPMCTContextMachinery.addClassDigest( classDigest );
             return true;
         }
         return false;
@@ -41,9 +41,9 @@ public class ExcludeHuskyMappingFilters implements TypeFilter {
 
     protected boolean scanController( String szClassName, Object pool ) throws IOException {
         try{
-            List<MappingDigest > mappingDigests = this.mPMCTMarshal.getControllerInspector().characterize( szClassName );
+            List<MappingDigest > mappingDigests = this.mPMCTContextMachinery.getControllerInspector().characterize( szClassName );
             if ( mappingDigests != null && !mappingDigests.isEmpty() ) {
-                this.mPMCTMarshal.addAll( mappingDigests );
+                this.mPMCTContextMachinery.addAll( mappingDigests );
                 return true;
             }
         }

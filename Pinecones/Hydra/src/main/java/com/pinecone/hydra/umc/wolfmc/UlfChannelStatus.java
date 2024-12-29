@@ -22,42 +22,52 @@ public enum UlfChannelStatus implements ChannelStatus {
         this.name  = name;
     }
 
+    @Override
     public String getName(){
         return this.name;
     }
 
+    @Override
     public int getValue() {
         return this.value;
     }
 
+    @Override
     public byte getByteValue() {
         return (byte) this.value;
     }
 
+    @Override
     public boolean isIdle() {
         return this == UlfChannelStatus.IDLE;
     }
 
+    @Override
     public boolean isTerminated() {
         return this.value >= UlfChannelStatus.WAITING_FOR_SHUTDOWN.value;
     }
 
+    @Override
     public boolean isWaitingForIOCompleted(){
         return this.value >= UlfChannelStatus.WAITING_FOR_SEND.value && this.value <= UlfChannelStatus.WAITING_FOR_RECEIVE.value;
     }
 
+    @Override
     public boolean isWaitingForLocalCompleted(){
         return this.value >= UlfChannelStatus.WAITING_FOR_RECALL_FUN.value && this.value <= UlfChannelStatus.WAITING_THREAD_RESUME.value;
     }
 
+    @Override
     public boolean isAsynAvailable() {
         return !this.isTerminated() && this != UlfChannelStatus.FORCE_SYNCHRONIZED;
     }
 
+    @Override
     public boolean isSyncAvailable() {
         return !this.isTerminated() || this.isIdle();
     }
 
+    @Override
     public String toString() {
         return this.getName();
     }
