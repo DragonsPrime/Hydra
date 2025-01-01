@@ -2,6 +2,7 @@ package com.pinecone.framework.util.json;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map;
 
@@ -37,5 +38,5 @@ public interface JSONDecoder extends Pinenut {
     };
 
 
-    void decode( Object self, Object parent, Object indexKey, ArchCursorParser x ) ;
+    void decode( Object self, Object parent, Object indexKey, ArchCursorParser x, Type genericTypes ) ;
 }

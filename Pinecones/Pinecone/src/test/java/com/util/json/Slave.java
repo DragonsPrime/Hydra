@@ -3,7 +3,7 @@ package com.util.json;
 import java.util.List;
 import java.util.Map;
 
-import com.pinecone.framework.util.json.hometype.DirectJSONInjector;
+import com.pinecone.framework.util.json.homotype.StructJSONEncoder;
 
 public class Slave {
     public String    name  ;
@@ -11,7 +11,20 @@ public class Slave {
     public int       emnus;
     public Parasite  parasite;
     public Map       atts;
-    public Object[]      li;
+    public Object[]  li;
+
+    //public Slave     child;
+    public List<Slave>    children;
+    //public Slave[]    children2;
+    //public Object[]    children;
+    //public Map[]    children;
+    //public List<JSONObject>    children;
+    //public List<Map>    children;
+    //public List<TreeMap>    children;
+    //public List<Object>    children;
+
+
+    public Map<String, Slave > ms;
 
     public Slave() {
 
@@ -37,11 +50,19 @@ public class Slave {
         this.parasite = parasite;
     }
 
+//    public void setChildren( List<Slave> slaves ) {
+//        this.children = slaves;
+//    }
+
+//    public List<Slave> getChildren() {
+//        return this.children;
+//    }
+
     public String toJSONString() {
-        return DirectJSONInjector.instance().inject( this ).toString();
+        return StructJSONEncoder.BasicEncoder.encode( this );
     }
 
     public String toString(){
-        return DirectJSONInjector.instance().inject( this ).toString();
+        return StructJSONEncoder.BasicEncoder.encode( this );
     }
 }

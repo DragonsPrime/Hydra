@@ -1,16 +1,30 @@
 package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.system.prototype.Pinenut;
+import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.StorageIOResponse;
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
+
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 
 public interface ReceiveEntity extends Pinenut {
     VolumeManager getVolumeManager();
     void setVolumeManager(VolumeManager volumeManager);
 
-    ReceiveStorageObject getReceiveStorageObject();
-    void setReceiveStorageObject( ReceiveStorageObject receiveStorageObject );
+    StorageReceiveIORequest getReceiveStorageObject();
+    void setReceiveStorageObject( StorageReceiveIORequest storageReceiveIORequest);
 
-    String getDestDirPath();
-    void setDestDirPath( String destDirPath );
+    Chanface getKChannel();
+    void setKChannel( Chanface channel);
+
+    StorageIOResponse receive() throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException;
+
+    StorageIOResponse receive(Number offset, Number endSize ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException;
+
+    StorageIOResponse receive(CacheBlock cacheBlock, byte[] buffer ) throws IOException, SQLException;
 
 }

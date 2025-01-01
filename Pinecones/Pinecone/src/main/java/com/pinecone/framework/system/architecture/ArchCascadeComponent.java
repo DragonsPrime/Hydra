@@ -21,7 +21,7 @@ public abstract class ArchCascadeComponent extends ArchComponent implements Casc
         this.mChildren = new LinkedTreeMap<>();
 
         if( name == null ) {
-            this.setName( this.className() );
+            this.setTargetingName( this.className() );
         }
         this.setParent( parent );
     }
@@ -35,23 +35,23 @@ public abstract class ArchCascadeComponent extends ArchComponent implements Casc
     public void setParent( CascadeComponent parent ) {
         this.mParent = parent;
         if( parent != null ) {
-            this.mName.setParent( parent.getName() );
+            this.mName.setParent( parent.getTargetingName() );
         }
     }
 
     @Override
-    public Namespace getName() {
+    public Namespace getTargetingName() {
         return this.mName;
     }
 
     @Override
-    public void setName( Namespace name ) {
+    public void setTargetingName( Namespace name ) {
         this.mName = name;
     }
 
     @Override
-    public void setName( String name ) {
-        CascadeComponent.super.setName( name );
+    public void setTargetingName( String name ) {
+        CascadeComponent.super.setTargetingName( name );
     }
 
     @Override
@@ -131,7 +131,7 @@ public abstract class ArchCascadeComponent extends ArchComponent implements Casc
     public void purge() {
         this.purgeChildren();
 
-        String                szFN = this.getName().getFullName();
+        String                szFN = this.getTargetingName().getFullName();
         if ( this.mParent != null ) {
             this.mParent.removeChildComponent( szFN );
         }

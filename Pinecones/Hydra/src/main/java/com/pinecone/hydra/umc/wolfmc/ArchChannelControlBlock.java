@@ -5,26 +5,26 @@ import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.MessageNode;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.framework.system.executum.ArchThreadum;
-import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.JSONMaptron;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.concurrent.locks.Lock;
 
 public abstract class ArchChannelControlBlock extends ArchThreadum implements NettyChannelControlBlock {
-    protected UlfChannel        mChannel;
-    protected MessageNode       mMessageNode;
+    protected UlfChannel             mChannel;
+    protected MessageNode            mMessageNode;
 
     // For Load Balance.
-    protected IOCounter         mIOCounter;
+    protected IOCounter              mIOCounter;
 
-    protected boolean           mbForceSyncMode;
-    protected boolean           mbInSyncMode;
+    protected boolean                mbForceSyncMode;
+    protected boolean                mbInSyncMode;
 
-    protected UlfMCTransmit     mTransmit;
-    protected UlfMCReceiver     mReceiver;
+    protected UlfMCTransmit          mTransmit;
+    protected UlfMCReceiver          mReceiver;
 
-    protected JSONObject        mAttributesMap = new JSONMaptron();
+    protected Map<String, Object >   mAttributesMap = new TreeMap<>();
 
     protected ArchChannelControlBlock( MessageNode parentNode, UlfChannel channel, boolean bForceSyncMode ) {
         super( null, parentNode );
@@ -36,7 +36,7 @@ public abstract class ArchChannelControlBlock extends ArchThreadum implements Ne
 
 
     @Override
-    public JSONObject        getAttributes(){
+    public Map<String, Object >        getAttributes(){
         return this.mAttributesMap;
     }
 

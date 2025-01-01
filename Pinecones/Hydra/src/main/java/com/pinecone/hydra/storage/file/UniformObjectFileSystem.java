@@ -20,11 +20,14 @@ import com.pinecone.hydra.storage.file.source.FileMasterManipulator;
 import com.pinecone.hydra.storage.file.source.FileMetaManipulator;
 import com.pinecone.hydra.storage.file.source.FolderManipulator;
 import com.pinecone.hydra.storage.file.source.FolderMetaManipulator;
+import com.pinecone.hydra.storage.file.source.FolderVolumeMappingManipulator;
 import com.pinecone.hydra.storage.file.source.LocalFrameManipulator;
 import com.pinecone.hydra.storage.file.source.RemoteFrameManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicMetaManipulator;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
+import com.pinecone.hydra.storage.file.transmit.exporter.FileExportEntity;
+import com.pinecone.hydra.storage.file.transmit.receiver.FileReceiveEntity;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
@@ -33,11 +36,14 @@ import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.system.ko.kom.ArchReparseKOMTree;
 import com.pinecone.hydra.system.ko.kom.GenericReparseKOMTreeAddition;
 import com.pinecone.hydra.system.ko.kom.StandardPathSelector;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 import com.pinecone.ulf.util.id.GUIDs;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -68,6 +74,7 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     protected RemoteFrameManipulator            remoteFrameManipulator;
     protected SymbolicManipulator               symbolicManipulator;
     protected SymbolicMetaManipulator           symbolicMetaManipulator;
+    protected FolderVolumeMappingManipulator folderVolumeMappingManipulator;
 
 
     public UniformObjectFileSystem( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, KOMFileSystem parent, String name ){
@@ -80,20 +87,21 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         this.guidAllocator                 =  GUIDs.newGuidAllocator();
 
         // Phase [3] Construct manipulators.
-        this.operatorFactory                =  new GenericFileSystemOperatorFactory( this, (FileMasterManipulator) masterManipulator );
-        this.fileSystemAttributeManipulator =  this.fileMasterManipulator.getAttributeManipulator();
-        this.fileManipulator                =  this.fileMasterManipulator.getFileManipulator();
-        this.fileMetaManipulator            =  this.fileMasterManipulator.getFileMetaManipulator();
-        this.folderManipulator              =  this.fileMasterManipulator.getFolderManipulator();
-        this.folderMetaManipulator          =  this.fileMasterManipulator.getFolderMetaManipulator();
-        this.localFrameManipulator          =  this.fileMasterManipulator.getLocalFrameManipulator();
-        this.remoteFrameManipulator         =  this.fileMasterManipulator.getRemoteFrameManipulator();
-        this.symbolicManipulator            =  this.fileMasterManipulator.getSymbolicManipulator();
-        this.symbolicMetaManipulator        =  this.fileMasterManipulator.getSymbolicMetaManipulator();
+        this.operatorFactory                 =  new GenericFileSystemOperatorFactory( this, (FileMasterManipulator) masterManipulator );
+        this.fileSystemAttributeManipulator  =  this.fileMasterManipulator.getAttributeManipulator();
+        this.fileManipulator                 =  this.fileMasterManipulator.getFileManipulator();
+        this.fileMetaManipulator             =  this.fileMasterManipulator.getFileMetaManipulator();
+        this.folderManipulator               =  this.fileMasterManipulator.getFolderManipulator();
+        this.folderMetaManipulator           =  this.fileMasterManipulator.getFolderMetaManipulator();
+        this.localFrameManipulator           =  this.fileMasterManipulator.getLocalFrameManipulator();
+        this.remoteFrameManipulator          =  this.fileMasterManipulator.getRemoteFrameManipulator();
+        this.symbolicManipulator             =  this.fileMasterManipulator.getSymbolicManipulator();
+        this.symbolicMetaManipulator         =  this.fileMasterManipulator.getSymbolicMetaManipulator();
+        this.folderVolumeMappingManipulator =  this.fileMasterManipulator.getFolderVolumeRelationManipulator();
 
         // Phase [4] Construct selectors.
         this.pathSelector                  =  new StandardPathSelector(
-                this.pathResolver, this.distributedTrieTree, this.folderManipulator, new GUIDNameManipulator[] { this.fileManipulator }
+                this.pathResolver, this.imperialTree, this.folderManipulator, new GUIDNameManipulator[] { this.fileManipulator }
         );
         // Warning: ReparseKOMTreeAddition must be constructed only after `pathSelector` has been constructed.
         this.mReparseKOM                   =  new GenericReparseKOMTreeAddition( this );
@@ -136,6 +144,12 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     @Override
     public FileTreeNode get( GUID guid ) {
         return (FileTreeNode) super.get( guid );
+    }
+
+    @Override
+    public void update(FileTreeNode node) {
+        TreeNodeOperator operator = this.operatorFactory.getOperator(node.getMetaType());
+        operator.update( node );
     }
 
     @Override
@@ -243,12 +257,16 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
 
     @Override
     public FileNode affirmFileNode(String path) {
-        return ( FileNode ) this.affirmTreeNodeByPath(path,GenericFileNode.class, GenericFolder.class);
+        FileNode fileNode = (FileNode) this.affirmTreeNodeByPath(path, GenericFileNode.class, GenericFolder.class);
+        this.initVolume( path );
+        return fileNode;
     }
 
     @Override
     public Folder affirmFolder(String path) {
-        return ( Folder ) this.affirmTreeNodeByPath(path, null,GenericFolder.class);
+        Folder folder = (Folder) this.affirmTreeNodeByPath(path, null, GenericFolder.class);
+        this.initVolume( path );
+        return folder;
     }
 
     @Override
@@ -277,8 +295,8 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         GUID sourceGuid      = pair[ 0 ];
         GUID destinationGuid = pair[ 1 ];
 
-        this.distributedTrieTree.moveTo( sourceGuid, destinationGuid );
-        this.distributedTrieTree.removeCachePath( sourceGuid );
+        this.imperialTree.moveTo( sourceGuid, destinationGuid );
+        this.imperialTree.removeCachePath( sourceGuid );
     }
 
     @Override
@@ -312,7 +330,7 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
                 destinationPath.endsWith( this.getConfig().getPathNameSeparator() ) || destinationPath.endsWith( "." ) )
         ) {
             Folder target = this.affirmFolder( destinationPath );
-            this.distributedTrieTree.moveTo( sourceGuid, target.getGuid() );
+            this.imperialTree.moveTo( sourceGuid, target.getGuid() );
         }
         // Case3: Move "game/terraria/npc" => "game/minecraft/character", move all children therein.
         //    game/terraria/npc/f1 => game/minecraft/character/f1
@@ -325,22 +343,22 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
             // Eq.Case2: Move "game/terraria/npc" => "game/minecraft/character",
             if( !this.folderManipulator.isFolder( sourceGuid ) ) {
                 Folder target = this.affirmFolder( destinationPath );
-                this.distributedTrieTree.moveTo( sourceGuid, target.getGuid() );
+                this.imperialTree.moveTo( sourceGuid, target.getGuid() );
             }
             else {
                 List<TreeNode > children = this.getChildren( sourceGuid );
                 if( !children.isEmpty() ) {
                     Folder target = this.affirmFolder( destinationPath );
                     for( TreeNode node : children ) {
-                        this.distributedTrieTree.moveTo( node.getGuid(), target.getGuid() );
+                        this.imperialTree.moveTo( node.getGuid(), target.getGuid() );
                     }
                 }
             }
 
-            this.distributedTrieTree.removeTreeNodeOnly( sourceGuid );
+            this.imperialTree.removeTreeNodeOnly( sourceGuid );
         }
 
-        this.distributedTrieTree.removeCachePath( sourceGuid );
+        this.imperialTree.removeCachePath( sourceGuid );
     }
 
     @Override
@@ -425,7 +443,8 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         }
     }
 
-    private String getNodeName(DistributedTreeNode node ){
+
+    private String getNodeName(ImperialTreeNode node ){
         UOI type = node.getType();
         TreeNode newInstance = (TreeNode)type.newInstance();
         TreeNodeOperator operator = this.getOperatorFactory().getOperator(newInstance.getMetaType());
@@ -459,94 +478,58 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         return new GUID[] { sourceGuid, destinationGuid };
     }
 
-//    protected void upload0(FileNode file, String destDirPath, long startChunkIndex) {
-//        long chunkSize = 10 * 1024 * 1024; // 每片的大小
-//        File sourceFile = new File(file.getSourceName());
-//        Path sourcePath = sourceFile.toPath();
-//
-//        try (FileChannel sourceChannel = FileChannel.open(sourcePath, StandardOpenOption.READ)) {
-//            ByteBuffer buffer = ByteBuffer.allocateDirect((int) chunkSize);
-//
-//            long chunkIndex = startChunkIndex; // 从指定的分片开始
-//            long bytesRead = chunkIndex * chunkSize; // 计算读取的初始位置
-//            long totalBytesRead = bytesRead; // 总读取的字节数
-//
-//            // 获取上一次的分片信息
-//            if (!file.getFrames().isEmpty()) {
-//                LocalFrame lastFrame = (LocalFrame) file.getFrames().lastEntry().getValue();
-//                bytesRead += lastFrame.getSize();
-//            }
-//
-//            sourceChannel.position(bytesRead); // 设置 FileChannel 的起始位置
-//
-//            while (bytesRead < file.getSize()) {
-//                LocalFrame localFrame = this.fileSystemCreator.dummyLocalFrame();
-//                GUID frameGuid = this.guidAllocator.nextGUID72();
-//                localFrame.setSegGuid(frameGuid);
-//                localFrame.setFileGuid(file.getGuid());
-//                localFrame.setSegId(chunkIndex);
-//
-//                buffer.clear();
-//                int readBytes = sourceChannel.read(buffer);
-//                int actualBytesRead = 0; // 实际写入的字节数
-//
-//                if (readBytes == -1) {
-//                    break;
-//                }
-//
-//                buffer.flip();
-//
-//                // 如果读到的字节小于 chunkSize，说明这是最后一片
-//                if (bytesRead + readBytes > file.getSize()) {
-//                    readBytes = (int)(file.getSize() - bytesRead);
-//                }
-//
-//                try {
-//                    // 计算当前分片的 CRC32 校验值
-//                    CRC32 crc = new CRC32();
-//                    while (buffer.hasRemaining()) {
-//                        crc.update(buffer.get());
-//                        actualBytesRead++; // 记录已经读取的字节
-//                    }
-//
-//                    long crcValue = crc.getValue(); // 获取CRC32值
-//                    localFrame.setCrc32(String.valueOf(crcValue)); // 将CRC32值设置在LocalFrame中
-//
-//                    buffer.rewind(); // 重置buffer的位置以便再次写入文件
-//
-//                    // 创建分片文件路径，确保分片的命名和索引一致
-//                    Path chunkFile = Path.of(destDirPath, file.getName() + "_" + chunkIndex);
-//                    localFrame.setSourceName(chunkFile.toString());
-//
-//                    // 设置实际的分片大小
-//                    localFrame.setSize(actualBytesRead);
-//
-//                    // 写入分片文件
-//                    try (FileChannel chunkChannel = FileChannel.open(chunkFile, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
-//                        chunkChannel.write(buffer);
-//                    }
-//
-//                    localFrame.save();
-//                    bytesRead += actualBytesRead;
-//                    chunkIndex++;
-//
-//                } catch (IOException e) {
-//                    // 发生异常时，记录当前已写入的字节数
-//                    localFrame.setSize(actualBytesRead);
-//                    file.getFrames().put(chunkIndex, localFrame); // 记录这个 frame 的大小
-//                    this.put(file); // 保存上传状态
-//                    throw new RuntimeException("文件传输中断", e);
-//                }
-//
-//                totalBytesRead += actualBytesRead;
-//            }
-//
-//            // 上传完成，更新状态
-//            file.setIsUploadSuccessful(true);
-//            this.put(file);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
+    @Override
+    public void receive( FileReceiveEntity entity) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        entity.receive();
+    }
 
+    @Override
+    public void receive( FileReceiveEntity entity, Number offset, Number endSize) throws IOException {
+        entity.receive(offset, endSize );
+    }
+
+    @Override
+    public void export( FileExportEntity entity ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        entity.export();
+    }
+
+    @Override
+    public void export( FileExportEntity entity, Number offset, Number endSize ) {
+
+    }
+
+    @Override
+    public void setFolderVolumeMapping(GUID folderGuid, GUID volumeGuid) {
+        this.folderVolumeMappingManipulator.insert( folderGuid, volumeGuid );
+    }
+
+    @Override
+    public GUID getMappingVolume(GUID folderGuid) {
+        return this.folderVolumeMappingManipulator.getVolumeGuid( folderGuid );
+    }
+
+    @Override
+    public GUID getMappingVolume(String path) {
+        String[] parts = this.pathResolver.segmentPathParts( path );
+        GUID currentVolumeGuid = null;
+        String currentPath = "";
+        for( int i = 0; i < parts.length - 1; i++ ){
+            currentPath = currentPath + ( i > 0 ? this.getConfig().getPathNameSeparator() : "" ) + parts[ i ];
+            ElementNode elementNode = this.queryElement(currentPath);
+            Folder folder = this.getFolder(elementNode.getGuid());
+            GUID relationVolume = folder.getRelationVolume();
+            if ( relationVolume != null ){
+                currentVolumeGuid = relationVolume;
+            }
+        }
+        return currentVolumeGuid;
+    }
+
+    private void initVolume(String path ){
+        String[] parts = this.pathResolver.segmentPathParts( path );
+        Folder root = this.getFolder(this.queryGUIDByPath(parts[0]));
+        if( root.getRelationVolume() == null ){
+            root.applyVolume( GUIDs.GUID72( this.getConfig().getDefaultVolume() ) );
+        }
+    }
 }

@@ -3,9 +3,9 @@ package com.pinecone.framework.system.construction;
 import com.pinecone.framework.system.functions.Executable;
 import com.pinecone.framework.unit.Units;
 import com.pinecone.framework.util.ReflectionUtils;
-import com.pinecone.framework.util.json.hometype.JSONGet;
-import com.pinecone.framework.util.json.hometype.MapStructure;
-import com.pinecone.framework.util.json.hometype.ObjectInjector;
+import com.pinecone.framework.util.json.homotype.JSONGet;
+import com.pinecone.framework.util.json.homotype.MapStructure;
+import com.pinecone.framework.util.json.homotype.ObjectInjector;
 
 import java.beans.JavaBean;
 import java.lang.annotation.Annotation;
@@ -15,9 +15,9 @@ import java.util.Collection;
 import java.util.Map;
 
 public class UnifyStructureInjector extends ObjectInjector {
-    protected InstanceDispenser mInstanceDispenser;
+    protected StructureInstanceDispenser mInstanceDispenser;
 
-    public UnifyStructureInjector( Class type, InstanceDispenser instanceDispenser ) {
+    public UnifyStructureInjector( Class type, StructureInstanceDispenser instanceDispenser ) {
         super( type );
         this.mInstanceDispenser = instanceDispenser;
     }

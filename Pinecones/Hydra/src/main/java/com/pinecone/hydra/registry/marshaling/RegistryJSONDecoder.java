@@ -16,7 +16,7 @@ import com.pinecone.hydra.registry.entity.Properties;
 import com.pinecone.hydra.registry.entity.RegistryTreeNode;
 import com.pinecone.hydra.registry.entity.TextFile;
 import com.pinecone.hydra.registry.entity.TextValueTypes;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 
 public class RegistryJSONDecoder implements RegistryDecoder {
     protected KOMRegistry registry;

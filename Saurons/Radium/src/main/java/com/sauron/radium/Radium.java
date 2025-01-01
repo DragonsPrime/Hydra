@@ -13,10 +13,10 @@ import com.sauron.radium.system.*;
 import com.pinecone.framework.unit.MultiScopeMap;
 import com.pinecone.framework.util.config.JSONSystemConfig;
 import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.kanina.RabbitMQClient;
+import com.pinecone.hydra.umq.RabbitMQClient;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.io.Tracerson;
-import com.pinecone.framework.util.json.hometype.DirectObjectInjector;
+import com.pinecone.framework.util.json.homotype.DirectObjectInjector;
 import com.pinecone.Pinecone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +38,12 @@ import java.util.Map;
  *  DragonKing.me of Harold
  */
 public class Radium extends Hydradom implements RadiumSystem, Slf4jTraceable {
-    public static final String  NUTLET_NAME         = "Bean Nuts Hazelnut Sauron Nonabyte Radium";
+    public static final String  NUTLET_NAME         = "Bean Nuts Hazelnut Sauron Hydra Radium";
     public static final long    VER_PINE            =  202506L;
     public static final String  VERSION             = "2.1.0";
     public static final String  RELEASE_DATE        = "2025/06/06";
-    public static final String  ROOT_SERVER         = "http://www.rednest.cn/";
-    public static final String  CONTACT_INFO        = "E-Mail:arb#rednest.cn"; // Giving your contact information, if this program interrupt abnormally.
+    public static final String  ROOT_SERVER         = "https://www.dragonking.cn/";
+    public static final String  CONTACT_INFO        = "E-Mail:info#dragonking.cn"; // Giving your contact information, if this program interrupt abnormally.
 
     public static final String  SYSTEM_PATH         = "./system/";
     public static final String  SETUP_PATH          = Radium.SYSTEM_PATH + "setup/";
@@ -151,10 +151,12 @@ public class Radium extends Hydradom implements RadiumSystem, Slf4jTraceable {
     @Override
     protected void traceWelcomeInfo() {
         this.pout().print( "---------------------------------------------------------------\n" );
-        this.pout().print( "\u001B[31m\uD83D\uDE08 Sauron Eyes Radium Framework \uD83D\uDE08 \u001B[0m\n" );
-        this.pout().print( "\u001B[34mBean Sauron Nonabyte, Project.`the Grand Design` \u001B[0m\n" );
-        this.pout().print( "\u001B[32mBean Nuts Digital Datacenter of Cthulhu Databases \u001B[0m\n" );
+        this.pout().print( "\u001B[31m\uD83D\uDE08 Bean Sauron Engine, Project.`Manhattan, the Grand Design` \uD83D\uDE08 \u001B[0m\n" );
+        this.pout().print( "\u001B[34mHydra Kingdom Radium Framework \u001B[0m\n" );
+        this.pout().print( "\u001B[32mCthulhu Data-Platform of Bean Nuts Digital IDC \u001B[0m\n" );
         this.pout().print( "\u001B[32mCopyright(C) 2008-2028 Bean Nuts Foundation. All rights reserved.\u001B[0m\n" );
+        this.pout().print( "---------------------------------------------------------------\n" );
+        this.pout().print( "\u001B[31mDragon King\u001B[0m\n" );
         this.pout().print( "---------------------------------------------------------------\n" );
         this.pout().print( "Greeting! My name is Sauron, I insight omniscience.\n" );
         this.pout().print( "Salve! Nomen Sauron est, omnia perspicio.\n" );
@@ -165,7 +167,7 @@ public class Radium extends Hydradom implements RadiumSystem, Slf4jTraceable {
         this.pout().print( "PineconeAlly : Bean Nuts Walnut Sparta\n" );
         this.pout().print( "PineconeAlly : Bean Nuts Acorn Summer (Pinecone Framework Edition)\n" );
         this.pout().print( "PineconeAlly : Bean Nuts Hazelnut Slime\n"   );
-        this.pout().print( "PineconeAlly : Bean Nuts Hazelnut Sauron Radium\n"   );
+        this.pout().print( "PineconeAlly : Bean Nuts Hazelnut Hydra Radium\n"   );
         this.pout().print( "PineconeAlly : Bean Nuts Acorn Summer Springron (org.springframework.boot 2.4.1)\n"   );
 
         this.traceSubsystemWelcomeInfo();

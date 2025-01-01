@@ -1,9 +1,7 @@
 package com.pinecone.hydra.registry.entity;
 
-import com.pinecone.framework.unit.KeyValue;
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.framework.util.json.JSONEncoder;
-import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 
 public class GenericConfigNodeMeta implements ConfigNodeMeta {
     private long enumId;

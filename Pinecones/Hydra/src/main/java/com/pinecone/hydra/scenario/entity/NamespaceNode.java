@@ -1,7 +1,7 @@
 package com.pinecone.hydra.scenario.entity;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 
 public interface NamespaceNode extends TreeNode {
     long getEnumId();

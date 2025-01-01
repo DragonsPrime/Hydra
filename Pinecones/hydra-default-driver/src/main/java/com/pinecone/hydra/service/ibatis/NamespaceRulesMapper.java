@@ -9,6 +9,8 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
+
 @Mapper
 @IbatisDataAccessObject
 public interface NamespaceRulesMapper extends NamespaceRulesManipulator {
@@ -18,5 +20,12 @@ public interface NamespaceRulesMapper extends NamespaceRulesManipulator {
     void remove(@Param("guid")GUID guid);
     @Select("SELECT `id` AS `enumId`, `guid`, `scope`, `name`, `description` FROM `hydra_service_namespace_rules` WHERE `guid`=#{guid}")
     GenericNamespaceRules getNamespaceRules(@Param("guid")GUID guid);
+    @Update("UPDATE `hydra_service_namespace_rules` SET `scope` = #{scope}, `name` = #{name}, `description` = #{description} WHERE `guid` = #{guid}")
     void update(GenericNamespaceRules classificationRules);
+    @Update("UPDATE `hydra_service_namespace_rules` SET `scope` = #{scope} WHERE `guid` = #{guid}")
+    void updateScope( @Param("scope") String scope, GUID guid );
+    @Update("UPDATE `hydra_service_namespace_rules` SET `name` = #{name} WHERE `guid` = #{guid}")
+    void updateName( @Param("name") String name, GUID guid );
+    @Update("UPDATE `hydra_service_namespace_rules` SET `description` = #{description} WHERE `guid` = #{guid}")
+    void updateDescription( @Param("description") String description, GUID guid );
 }

@@ -1,6 +1,6 @@
 package com.pinecone.hydra.system.ko;
 
-import com.pinecone.hydra.unit.udtt.TrieTreeConstants;
+import com.pinecone.hydra.unit.imperium.ImperialTreeConstants;
 
 public final class KernelObjectConstants {
     public static String PathNameSeparator = "/";
@@ -11,5 +11,5 @@ public final class KernelObjectConstants {
 
     public static String FullNameSepRegex  = "\\.";
 
-    public static int    ShortPathLength   = TrieTreeConstants.DefaultShortPathLength;
+    public static int    ShortPathLength   = ImperialTreeConstants.DefaultShortPathLength;
 }

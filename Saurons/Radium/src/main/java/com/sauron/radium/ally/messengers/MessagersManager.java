@@ -8,10 +8,10 @@ import com.pinecone.framework.unit.LinkedTreeMap;
 import com.pinecone.framework.util.StringUtils;
 import com.pinecone.framework.util.config.JSONConfig;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.JSONGet;
+import com.pinecone.framework.util.json.homotype.JSONGet;
 import com.pinecone.framework.util.name.Namespace;
-import com.pinecone.hydra.messagram.MessageExpress;
-import com.pinecone.hydra.messagram.Messagram;
+import com.pinecone.hydra.umct.MessageExpress;
+import com.pinecone.hydra.umct.Messagram;
 import com.pinecone.hydra.servgram.Servgram;
 import com.pinecone.hydra.system.ArchSystemAutoAssembleComponent;
 import com.pinecone.hydra.system.HyComponent;
@@ -21,6 +21,7 @@ import com.pinecone.hydra.umc.msg.MessageNode;
 import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
 import com.pinecone.hydra.umc.wolfmc.WolfMCNode;
 import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
+import com.pinecone.hydra.umct.UMCTExpressHandler;
 import com.sauron.radium.system.MiddlewareManager;
 import com.sauron.radium.system.RadiumSystem;
 import com.sauron.radium.system.Saunut;
@@ -191,7 +192,13 @@ public class MessagersManager extends ArchSystemAutoAssembleComponent implements
             }
 
             if( node instanceof WolfMCNode ) {
-                ((WolfMCNode) node).apply( (UlfAsyncMsgHandleAdapter)me );
+                if( me instanceof UlfAsyncMsgHandleAdapter ) {
+                    ((WolfMCNode) node).apply( (UlfAsyncMsgHandleAdapter)me );
+                }
+                else {
+                    ((WolfMCNode) node).apply( UlfAsyncMsgHandleAdapter.wrap( (UMCTExpressHandler) me ) );
+                }
+
                 this.infoCriticalOperation(
                         "SetMessageExpress(`" + szMessageHandler + "`) ==> (`" + szInsNam + "`)", LogStatuses.StatusDone
                 );

@@ -86,4 +86,9 @@ public class GUID64 implements GUID {
         }
         return false;
     }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode( this.guid );
+    }
 }

@@ -11,7 +11,7 @@ public abstract class ArchChannelPool implements ChannelPool {
         }
 
         //boolean b = true;
-        for ( Object o : this.getPooledMap().values() ){
+        for ( Object o : this.getPooledChannels() ){
             MessengerNettyChannelControlBlock block = (MessengerNettyChannelControlBlock) o;
             //b = b && block.isShutdown();
             if( !block.isShutdown() ) {

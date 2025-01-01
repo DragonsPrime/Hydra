@@ -11,11 +11,11 @@ public interface UMCMessage extends Message {
         return this.getHead().getExtraHead();
     }
 
-    default PutMessage evincePutMessage() {
+    default InformMessage evinceInformMessage() {
         return null;
     }
 
-    default PostMessage evincePostMessage() {
+    default TransferMessage evinceTransferMessage() {
         return null;
     }
 }

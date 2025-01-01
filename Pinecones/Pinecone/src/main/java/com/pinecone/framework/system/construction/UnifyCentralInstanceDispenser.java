@@ -1,7 +1,6 @@
 package com.pinecone.framework.system.construction;
 
 import com.pinecone.framework.system.Nullable;
-import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.ReflectionUtils;
 import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.lang.GenericDynamicFactory;
@@ -12,7 +11,7 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class UnifyCentralInstanceDispenser implements InstanceDispenser {
+public class UnifyCentralInstanceDispenser implements StructureInstanceDispenser {
     protected final Map<Class<?>, Object >                 mSingletonObjects   = new ConcurrentHashMap<>();
     protected final Map<Class<?>, StructureDefinition >    mObjectDefinitions  = new ConcurrentHashMap<>();
     protected final Map<Class<?>, InstancePool<? > >       mObjectInstancer    = new ConcurrentHashMap<>(); // Pool is immutable.

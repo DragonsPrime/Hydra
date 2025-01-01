@@ -1,33 +1,45 @@
 package com.pinecone.hydra.umc.wolfmc.client;
 
-import com.pinecone.hydra.umc.msg.*;
-import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
-import com.pinecone.hydra.umc.wolfmc.*;
 import io.netty.channel.ChannelId;
 import io.netty.util.AttributeKey;
+import com.pinecone.framework.system.executum.Processum;
+import com.pinecone.hydra.umc.msg.AsyncMessenger;
+import com.pinecone.hydra.umc.msg.ChannelAllocateException;
+import com.pinecone.hydra.umc.msg.ChannelControlBlock;
+import com.pinecone.hydra.umc.msg.UMCMessage;
+import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 import com.pinecone.framework.system.ProvokeHandleException;
-import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.system.Hydrarum;
+import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
+import com.pinecone.hydra.umc.wolfmc.UlfIdleFirstBalanceStrategy;
+import com.pinecone.hydra.umc.wolfmc.UlfMessageNode;
+import com.pinecone.hydra.umc.wolfmc.WolfMCNode;
+import com.pinecone.hydra.umc.wolfmc.WolfMCStandardConstants;
 
 import java.io.IOException;
+import java.util.Map;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public abstract class ArchAsyncMessenger extends WolfMCNode implements AsyncMessenger, UlfMessageNode {
-    protected final ReentrantLock                              mSynRequestLock  = new ReentrantLock();
-    protected ProactiveParallelFairChannelPool<ChannelId >     mChannelPool     ;
-    //protected BlockingDeque<UMCMessage>                        mSyncRetMsgQueue = new LinkedBlockingDeque<>();
+    protected final ReentrantLock                                  mSynRequestLock  = new ReentrantLock();
+    protected ProactiveParallelFairSyncChannelPool<ChannelId >     mChannelPool     ;
+    //protected BlockingDeque<UMCMessage>                            mSyncRetMsgQueue = new LinkedBlockingDeque<>();
 
-    public ArchAsyncMessenger( String szName, Hydrarum parent, JSONObject joConf, ExtraHeadCoder extraHeadCoder ) {
-        super( szName, parent, joConf, extraHeadCoder );
+    public ArchAsyncMessenger( long nodeId, String szName, Processum parentProcess, UlfMessageNode parent, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
+        super( nodeId, szName, parentProcess, parent, joConf, extraHeadCoder );
 
-        this.mChannelPool   = new ProactiveParallelFairChannelPool<>( this, new UlfIdleFirstBalanceStrategy() ); //TODO
+        this.mChannelPool   = new ProactiveParallelFairSyncChannelPool<>( this.mSynRequestLock, new UlfIdleFirstBalanceStrategy() ); //TODO
         //this.makeNameAndId();
+    }
+
+    public ArchAsyncMessenger( long nodeId, String szName, Hydrarum system, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
+        this( nodeId, szName, system, null, joConf, extraHeadCoder );
     }
 
 
     @Override
-    public ProactiveParallelFairChannelPool   getChannelPool() {
+    public ProactiveParallelFairSyncChannelPool   getChannelPool() {
         return this.mChannelPool;
     }
 
@@ -35,7 +47,7 @@ public abstract class ArchAsyncMessenger extends WolfMCNode implements AsyncMess
         return this.mSynRequestLock;
     }
 
-    UlfAsyncMessengerChannelControlBlock      nextSynChannelCB() {
+    UlfAsyncMessengerChannelControlBlock      nextSynChannelCB() throws IOException {
         UlfAsyncMessengerChannelControlBlock block = (UlfAsyncMessengerChannelControlBlock) this.getChannelPool().nextSyncChannel( this.getChannelPool().getMajorWaitTimeout() * 2 );
         if( block == null ) {
             throw new ChannelAllocateException( "Channel allocate failed." );
@@ -44,7 +56,7 @@ public abstract class ArchAsyncMessenger extends WolfMCNode implements AsyncMess
         return block;
     }
 
-    UlfAsyncMessengerChannelControlBlock      nextAsyChannelCB() {
+    UlfAsyncMessengerChannelControlBlock      nextAsyChannelCB() throws IOException  {
         UlfAsyncMessengerChannelControlBlock block = (UlfAsyncMessengerChannelControlBlock) this.getChannelPool().nextAsynChannel( this.getChannelPool().getMajorWaitTimeout() * 2 );
         if( block == null ) {
             throw new ChannelAllocateException( "Channel allocate failed." );
@@ -75,15 +87,10 @@ public abstract class ArchAsyncMessenger extends WolfMCNode implements AsyncMess
         cb.sendAsynMsg( request, bNoneBuffered );
     }
 
-    static void reconnect( ChannelControlBlock block ) throws ProvokeHandleException {
+    static void reconnect( ChannelControlBlock block ) throws IOException {
         if( block.isShutdown() ) {
-            try{
-                block.getChannel().reconnect();
-                ( (UlfMessageNode)block.getParentMessageNode() ).getChannelPool().setIdleChannel( block );
-            }
-            catch ( IOException e ) {
-                throw new ProvokeHandleException( e );
-            }
+            block.getChannel().reconnect();
+            ( (UlfMessageNode)block.getParentMessageNode() ).getChannelPool().setIdleChannel( block );
         }
     }
 

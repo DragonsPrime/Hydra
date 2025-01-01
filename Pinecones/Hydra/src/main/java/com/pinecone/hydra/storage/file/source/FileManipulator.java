@@ -19,4 +19,6 @@ public interface FileManipulator extends GUIDNameManipulator {
 
     List<GUID > dumpGuid();
 
+    void update( FileNode fileNode );
+
 }

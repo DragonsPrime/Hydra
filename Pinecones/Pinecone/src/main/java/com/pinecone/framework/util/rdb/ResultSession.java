@@ -8,7 +8,7 @@ import java.sql.Statement;
 public interface ResultSession {
     RDBHost getHost();
 
-    default Connection getConnection() {
+    default Connection getConnection()  {
         return this.getHost().getConnection();
     }
 

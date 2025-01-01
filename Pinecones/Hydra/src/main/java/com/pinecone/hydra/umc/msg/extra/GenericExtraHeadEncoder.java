@@ -3,7 +3,7 @@ package com.pinecone.hydra.umc.msg.extra;
 import com.pinecone.framework.util.json.JSON;
 import com.pinecone.hydra.umc.msg.ExtraEncode;
 import com.pinecone.hydra.umc.msg.UMCHead;
-import com.pinecone.ulf.util.bson.WolfJSONCompiler;
+import com.pinecone.ulf.util.bson.UlfJSONCompiler;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -17,7 +17,7 @@ public class GenericExtraHeadEncoder implements ExtraHeadEncoder {
                 return JSON.stringify( raw ).getBytes();
             }
             case Binary: {
-                WolfJSONCompiler compiler = new WolfJSONCompiler();
+                UlfJSONCompiler compiler = new UlfJSONCompiler();
                 ByteArrayOutputStream  os = new ByteArrayOutputStream();
 
                 try{
@@ -29,6 +29,7 @@ public class GenericExtraHeadEncoder implements ExtraHeadEncoder {
 
                 return os.toByteArray();
             }
+            case Iussum:
             case Prototype: {
                 return (byte[]) raw;
             }

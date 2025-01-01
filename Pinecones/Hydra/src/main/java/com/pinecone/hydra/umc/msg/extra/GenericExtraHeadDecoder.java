@@ -4,7 +4,7 @@ import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.umc.msg.ExtraEncode;
 import com.pinecone.hydra.umc.msg.UMCHead;
-import com.pinecone.ulf.util.bson.WolfJSONDecompiler;
+import com.pinecone.ulf.util.bson.UlfJSONDecompiler;
 
 import java.io.ByteArrayInputStream;
 import java.util.Map;
@@ -22,7 +22,7 @@ public class GenericExtraHeadDecoder implements ExtraHeadDecoder {
             }
             case Binary: {
                 ByteArrayInputStream       is = new ByteArrayInputStream( raw );
-                WolfJSONDecompiler decompiler = new WolfJSONDecompiler( is );
+                UlfJSONDecompiler decompiler = new UlfJSONDecompiler( is );
 
                 Object o = decompiler.decompile();
                 if( o instanceof JSONObject ) {
@@ -36,6 +36,7 @@ public class GenericExtraHeadDecoder implements ExtraHeadDecoder {
                         "Illegal decompiler Binary json, requires Map<String, Object > but " + o.getClass().getSimpleName() + " found."
                 );
             }
+            case Iussum:
             case Prototype: {
                 return raw;
             }

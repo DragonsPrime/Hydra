@@ -1,18 +1,21 @@
 package com.pinecone.hydra.storage.volume.entity;
 
+import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 
 public abstract class ArchReceiveEntity implements ReceiveEntity{
     protected VolumeManager volumeManager;
 
-    protected ReceiveStorageObject receiveStorageObject;
+    protected StorageReceiveIORequest storageReceiveIORequest;
 
-    protected String     destDirPath;
+    protected Chanface channel;
 
-    public ArchReceiveEntity(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, String destDirPath ){
+
+    public ArchReceiveEntity(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, Chanface channel){
         this.volumeManager = volumeManager;
-        this.receiveStorageObject = receiveStorageObject;
-        this.destDirPath = destDirPath;
+        this.storageReceiveIORequest = storageReceiveIORequest;
+        this.channel = channel;
     }
 
 
@@ -27,22 +30,22 @@ public abstract class ArchReceiveEntity implements ReceiveEntity{
     }
 
     @Override
-    public ReceiveStorageObject getReceiveStorageObject() {
-        return this.receiveStorageObject;
+    public StorageReceiveIORequest getReceiveStorageObject() {
+        return this.storageReceiveIORequest;
     }
 
     @Override
-    public void setReceiveStorageObject(ReceiveStorageObject receiveStorageObject) {
-        this.receiveStorageObject = receiveStorageObject;
+    public void setReceiveStorageObject(StorageReceiveIORequest storageReceiveIORequest) {
+        this.storageReceiveIORequest = storageReceiveIORequest;
     }
 
     @Override
-    public String getDestDirPath() {
-        return this.destDirPath;
+    public Chanface getKChannel() {
+        return this.channel;
     }
 
     @Override
-    public void setDestDirPath(String destDirPath) {
-        this.destDirPath = destDirPath;
+    public void setKChannel(Chanface channel) {
+        this.channel = channel;
     }
 }

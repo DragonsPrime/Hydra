@@ -23,6 +23,8 @@ public interface UMCChannel extends Pinenut {
 
     Object         getChannelID() ;
 
+    long           getIdentityID();
+
     void           release();
 
     void           close();

@@ -7,6 +7,7 @@ import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.TransactionIsolationLevel;
 
 import javax.sql.DataSource;
@@ -30,6 +31,8 @@ public interface IbatisClient extends RDBClient {
     <T> void addMapper( Class<T> type ) ;
 
 
+
+    SqlSessionFactory getSqlSessionFactory();
 
     SqlSession        openSession();
 

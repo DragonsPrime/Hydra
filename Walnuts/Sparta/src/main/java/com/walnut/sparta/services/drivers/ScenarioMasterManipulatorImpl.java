@@ -11,15 +11,15 @@ import org.springframework.stereotype.Component;
 import javax.annotation.Resource;
 @Component
 public class ScenarioMasterManipulatorImpl implements ScenarioMasterManipulator {
-    @Resource
+    //@Resource
     NamespaceNodeManipulator        namespaceNodeManipulator;
-    @Resource
+    //@Resource
     NamespaceNodeMetaManipulator    namespaceNodeMetaManipulator;
-    @Resource
+    //@Resource
     ScenarioCommonDataManipulator   scenarioCommonDataManipulator;
-    @Resource
+    //@Resource
     KOISkeletonMasterManipulator    koiSkeletonMasterManipulator;
-    @Override
+    //@Override
     public NamespaceNodeManipulator getNamespaceNodeManipulator() {
         return this.namespaceNodeManipulator;
     }

@@ -12,4 +12,12 @@ public interface VolumeConfig extends KernelObjectConfig {
     Number getMegaFileStripSizing() ;
 
     Number getDefaultStripSize() ;
+
+    int getStripResidentCacheAllotRatio();
+
+    String getStorageObjectExtension();
+
+    String getSqliteFileExtension();
+
+    String getPathSeparator();
 }

@@ -1,17 +1,12 @@
 package com.pinecone.framework.util.json;
 
-import com.pinecone.framework.system.stereotype.JavaBeans;
 import com.pinecone.framework.unit.LinkedTreeMap;
-import com.pinecone.framework.util.ReflectionUtils;
-import com.pinecone.framework.util.json.hometype.BeanColonist;
+import com.pinecone.framework.util.json.homotype.BeanColonist;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.Writer;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.HashMap;
@@ -147,7 +142,7 @@ public class JSONMaptron extends ArchJSONObject implements JSONObject, Serializa
 
     @Override
     protected void jsonDecode0( ArchCursorParser x ) throws JSONException {
-        JSONObjectDecoder.INNER_JSON_OBJECT_DECODER.decode( this, null, null, x );
+        JSONObjectDecoder.INNER_JSON_OBJECT_DECODER.decode( this, null, null, x, null );
     }
 
     @Override

@@ -11,6 +11,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -33,4 +34,7 @@ public interface FileMapper extends FileManipulator {
 
     @Select("SELECT `guid` FROM hydra_uofs_files ")
     List<GUID > dumpGuid();
+
+    @Update("UPDATE hydra_uofs_files SET checksum = #{checksum}, parity_check = #{parityCheck}, physical_size = #{physicalSize}, logic_size = #{logicSize}, crc32_xor = #{crc32Xor}, definition_size = #{definitionSize} WHERE guid = #{guid}")
+    void update( FileNode fileNode );
 }

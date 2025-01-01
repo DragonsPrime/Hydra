@@ -1,7 +1,7 @@
 package com.pinecone.hydra.file.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.source.TriePathCacheManipulator;
+import com.pinecone.hydra.unit.imperium.source.TriePathCacheManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -22,7 +22,11 @@ public interface FilePathCacheMapper extends TriePathCacheManipulator {
 
 
     default String getPath( GUID guid ){
-        return this.getPath0( guid )+this.getLongPath( guid );
+        String longPath = this.getLongPath(guid);
+        if( longPath != null ){
+            return this.getPath0( guid )+longPath;
+        }
+        return this.getPath0( guid );
     };
     @Select("SELECT `long_path` FROM `hydra_uofs_node_cache_path` WHERE `guid`=#{guid}")
     String getLongPath( GUID guid );

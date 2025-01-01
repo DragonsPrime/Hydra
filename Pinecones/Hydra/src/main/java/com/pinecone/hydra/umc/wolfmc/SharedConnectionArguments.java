@@ -3,8 +3,6 @@ package com.pinecone.hydra.umc.wolfmc;
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.umc.wolfmc.client.ArchAsyncMessenger;
 
-import java.util.Map;
-
 public abstract class SharedConnectionArguments implements MCConnectionArguments {
     protected String         mszHost;
     protected short          mnPort;

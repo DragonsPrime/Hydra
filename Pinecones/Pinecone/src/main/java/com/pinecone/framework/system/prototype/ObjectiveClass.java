@@ -7,7 +7,7 @@ import java.util.Map;
 
 import com.pinecone.framework.unit.Units;
 import com.pinecone.framework.util.ReflectionUtils;
-import com.pinecone.framework.util.json.hometype.DirectJSONInjector;
+import com.pinecone.framework.util.json.homotype.StructJSONEncoder;
 
 public class ObjectiveClass implements Objectom {
     protected Object    mObj;
@@ -142,7 +142,7 @@ public class ObjectiveClass implements Objectom {
 
     @Override
     public String toJSONString() {
-        return DirectJSONInjector.instance().inject( this.mObj ).toString();
+        return StructJSONEncoder.BasicEncoder.encode( this.mObj );
     }
 
     @Override

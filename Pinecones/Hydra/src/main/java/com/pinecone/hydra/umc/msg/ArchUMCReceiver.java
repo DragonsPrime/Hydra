@@ -4,7 +4,6 @@ import com.pinecone.framework.system.ProvokeHandleException;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 
 public abstract class ArchUMCReceiver extends ArchUMCProtocol implements UMCReceiver {
     public ArchUMCReceiver( Medium messageSource ) {
@@ -12,28 +11,28 @@ public abstract class ArchUMCReceiver extends ArchUMCProtocol implements UMCRece
     }
 
     @Override
-    public Object readPutMsg() throws IOException {
+    public Object readInformMsg() throws IOException {
         UMCHead head = this.readMsgHead();
-        if( head.method != UMCMethod.PUT ) {
+        if( head.method != UMCMethod.INFORM ) {
             throw new IOException( "[UMCProtocol] Illegal protocol method." );
         }
         return head.getExtraHead();
     }
 
-    protected UMCHead readPostHead() throws IOException {
+    protected UMCHead readTransferHead() throws IOException {
         UMCHead head = this.readMsgHead();
-        if( head.method != UMCMethod.POST ) {
+        if( head.method != UMCMethod.TRANSFER ) {
             throw new IOException( "[UMCProtocol] Illegal protocol method." );
         }
         return head;
     }
 
-    protected void onlyReadPostBody( PostMessage message, boolean bAllBytes ) throws IOException {
+    protected void onlyReadTransferBody( TransferMessage message, boolean bAllBytes ) throws IOException {
         if( bAllBytes ) {
-            ( (ArchBytesPostMessage)message ).setBody( this.mInputStream.readAllBytes() );
+            ( (ArchBytesTransferMessage)message ).setBody( this.mInputStream.readAllBytes() );
         }
         else {
-            ( (ArchStreamPostMessage)message ).setBody( this.mInputStream );
+            ( (ArchStreamTransferMessage)message ).setBody( this.mInputStream );
         }
     }
 
@@ -41,18 +40,20 @@ public abstract class ArchUMCReceiver extends ArchUMCProtocol implements UMCRece
         try{
             UMCHead head = this.readMsgHead();
             UMCMessage message;
-            if( head.getMethod() == UMCMethod.POST ){
+            if( head.getMethod() == UMCMethod.TRANSFER ){
                 if( bAllBytes ) {
                     message = (UMCMessage) stereotypes.postBytesType().getConstructor( UMCHead.class ).newInstance( head );
                 }
                 else {
                     message = (UMCMessage) stereotypes.postStreamType().getConstructor( UMCHead.class ).newInstance( head );
                 }
-                this.onlyReadPostBody( (PostMessage)message, bAllBytes );
+                this.onlyReadTransferBody( (TransferMessage)message, bAllBytes );
             }
             else {
-                if( head.getMethod() != UMCMethod.PUT ){
-                    throw new IOException( " [UMCProtocol] Unrecognized protocol method." );
+                if( head.getMethod() != UMCMethod.INFORM ){
+                    if ( !( head.getMethod() == UMCMethod.UNDEFINED && head.extraEncode == ExtraEncode.Iussum ) ) {
+                        throw new IOException( " [UMCProtocol] Unrecognized protocol method." );
+                    }
                 }
                 message = (UMCMessage) stereotypes.putType().getConstructor( UMCHead.class ).newInstance( head );
             }

@@ -7,11 +7,16 @@ import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.file.entity.Folder;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
 import com.pinecone.hydra.storage.file.entity.Frame;
+import com.pinecone.hydra.storage.file.transmit.exporter.FileExportEntity;
+import com.pinecone.hydra.storage.file.transmit.receiver.FileReceiveEntity;
 import com.pinecone.hydra.system.ko.kom.ReparseKOMTree;
-import com.pinecone.hydra.unit.udtt.entity.EntityNode;
-import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.EntityNode;
+import com.pinecone.hydra.unit.imperium.entity.ReparseLinkNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 
+import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -32,6 +37,8 @@ public interface KOMFileSystem extends ReparseKOMTree {
 
     @Override
     FileTreeNode get( GUID guid, int depth );
+
+    void update( FileTreeNode node);
 
     @Override
     FileTreeNode getSelf( GUID guid );
@@ -160,4 +167,16 @@ public interface KOMFileSystem extends ReparseKOMTree {
 
     void upload( FileNode file, String destDirPath );
     Frame getLastFrame( GUID guid );
+
+    void setFolderVolumeMapping(GUID folderGuid, GUID volumeGuid );
+    GUID getMappingVolume(GUID folderGuid );
+
+    GUID getMappingVolume(String path );
+
+
+    void receive(  FileReceiveEntity entity ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException;
+    void receive( FileReceiveEntity entity, Number offset, Number endSize )throws IOException;
+
+    void export( FileExportEntity entity ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException;
+    void export( FileExportEntity entity, Number offset, Number endSize );
 }

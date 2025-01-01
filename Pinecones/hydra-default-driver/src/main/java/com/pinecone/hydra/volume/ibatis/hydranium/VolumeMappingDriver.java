@@ -9,9 +9,11 @@ import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
 
 public class VolumeMappingDriver extends ArchMappingDriver implements KOIMappingDriver {
     protected KOIMasterManipulator mKOIMasterManipulator;
+
     public VolumeMappingDriver(Hydrarum system) {
         super(system);
     }
+
     public VolumeMappingDriver(Hydrarum system, IbatisClient ibatisClient, ResourceDispenserCenter dispenserCenter ) {
         super( system, ibatisClient, dispenserCenter, VolumeMappingDriver.class.getPackageName().replace( "hydranium", "" ) );
 

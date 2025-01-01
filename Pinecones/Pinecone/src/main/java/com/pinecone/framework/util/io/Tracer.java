@@ -40,4 +40,8 @@ public interface Tracer extends Pinenut {
 
     Tracer trace( Object Anything, Object...objects ) ;
 
+
+    Tracer colorf( int colorCode, Object that );
+
+    Tracer colorf( int colorCode, Object Anything, Object...objects );
 }

@@ -4,32 +4,32 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.lang.GenericDynamicFactory;
 import com.pinecone.framework.util.name.Namespace;
-import com.pinecone.framework.util.name.UniNamespace;
 import com.pinecone.framework.util.name.path.PathResolver;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.ko.CascadeInstrument;
 import com.pinecone.hydra.system.ko.KernelObjectConfig;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
-import com.pinecone.hydra.unit.udtt.ArchTrieObjectModel;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.EntityNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.hydra.unit.udtt.operator.OperatorFactory;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.ArchRegimentObjectModel;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.EntityNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.operator.OperatorFactory;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInstrument {
+public abstract class ArchKOMTree extends ArchRegimentObjectModel implements KOMInstrument {
     protected Namespace             mThisNamespace;
     protected KOMInstrument         mParentInstrument;
 
     protected Hydrarum              hydrarum;
+
     protected GuidAllocator         guidAllocator;
     protected OperatorFactory       operatorFactory;
 
@@ -57,7 +57,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
         this.hydrarum                      = hydrarum;
         this.dynamicFactory                = new GenericDynamicFactory( hydrarum.getTaskManager().getClassLoader() );
         this.mParentInstrument             = parent;
-        this.setName( name );
+        this.setTargetingName( name );
     }
 
     //************************************** CascadeInstrument **************************************
@@ -72,12 +72,12 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
     }
 
     @Override
-    public Namespace getName() {
+    public Namespace getTargetingName() {
         return this.mThisNamespace;
     }
 
     @Override
-    public void setName( Namespace name ) {
+    public void setTargetingName( Namespace name ) {
         this.mThisNamespace = name;
     }
 
@@ -91,7 +91,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
 
     @Override
     public boolean contains( GUID nodeGuid ) {
-        return this.distributedTrieTree.contains( nodeGuid );
+        return this.imperialTree.contains( nodeGuid );
     }
 
     @Override
@@ -105,38 +105,38 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
     }
 
     protected String getNS( GUID guid, String szSeparator ) {
-        String path = this.distributedTrieTree.getCachePath(guid);
+        String path = this.imperialTree.getCachePath(guid);
         if ( path != null ) {
             return path;
         }
 
-        DistributedTreeNode node = this.distributedTrieTree.getNode(guid);
-        GUID owner = this.distributedTrieTree.getOwner(guid);
+        ImperialTreeNode node = this.imperialTree.getNode(guid);
+        GUID owner = this.imperialTree.getOwner(guid);
         if ( owner == null ){
             String assemblePath = this.getNodeName(node);
             while ( !node.getParentGUIDs().isEmpty() && this.allNonNull( node.getParentGUIDs() ) ){
                 List<GUID> parentGuids = node.getParentGUIDs();
                 for( int i = 0; i < parentGuids.size(); ++i ){
                     if ( parentGuids.get(i) != null ){
-                        node = this.distributedTrieTree.getNode( parentGuids.get(i) );
+                        node = this.imperialTree.getNode( parentGuids.get(i) );
                         break;
                     }
                 }
                 String nodeName = this.getNodeName(node);
                 assemblePath = nodeName + szSeparator + assemblePath;
             }
-            this.distributedTrieTree.insertCachePath( guid, assemblePath );
+            this.imperialTree.insertCachePath( guid, assemblePath );
             return assemblePath;
         }
         else{
             String assemblePath = this.getNodeName( node );
             while ( !node.getParentGUIDs().isEmpty() && this.allNonNull( node.getParentGUIDs() ) ){
-                node = this.distributedTrieTree.getNode( owner );
+                node = this.imperialTree.getNode( owner );
                 String nodeName = this.getNodeName( node );
                 assemblePath = nodeName + szSeparator + assemblePath;
-                owner = this.distributedTrieTree.getOwner( node.getGuid() );
+                owner = this.imperialTree.getOwner( node.getGuid() );
             }
-            this.distributedTrieTree.insertCachePath( guid, assemblePath );
+            this.imperialTree.insertCachePath( guid, assemblePath );
             return assemblePath;
         }
     }
@@ -152,7 +152,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
     }
 
     protected TreeNodeOperator getOperatorByGuid( GUID guid ) {
-        DistributedTreeNode node = this.distributedTrieTree.getNode( guid );
+        ImperialTreeNode node = this.imperialTree.getNode( guid );
         if ( node == null ){
             return null;
         }
@@ -180,7 +180,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
         List<String > resolvedParts = this.pathResolver.resolvePath( parts );
         path = this.pathResolver.assemblePath( resolvedParts );
 
-        GUID guid = this.distributedTrieTree.queryGUIDByPath( path );
+        GUID guid = this.imperialTree.queryGUIDByPath( path );
         if ( guid != null ){
             return guid;
         }
@@ -188,7 +188,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
 
         guid = this.pathSelector.searchGUID( resolvedParts );
         if( guid != null ){
-            this.distributedTrieTree.insertCachePath( guid, path );
+            this.imperialTree.insertCachePath( guid, path );
         }
         return guid;
     }
@@ -200,7 +200,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
 
     @Override
     public void remove( GUID guid ) {
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode( guid );
+        GUIDImperialTrieNode node = this.imperialTree.getNode( guid );
         TreeNode newInstance = (TreeNode)node.getType().newInstance();
         TreeNodeOperator operator = this.operatorFactory.getOperator( newInstance.getMetaType() );
         operator.purge( guid );
@@ -223,9 +223,9 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
 
     @Override
     public List<TreeNode > getChildren( GUID guid ) {
-        List<GUIDDistributedTrieNode > childNodes = this.distributedTrieTree.getChildren( guid );
+        List<GUIDImperialTrieNode> childNodes = this.imperialTree.getChildren( guid );
         ArrayList<TreeNode > nodes = new ArrayList<>();
-        for( GUIDDistributedTrieNode node : childNodes ){
+        for( GUIDImperialTrieNode node : childNodes ){
             TreeNode treeNode =  this.get(node.getGuid());
             nodes.add( treeNode );
         }
@@ -234,7 +234,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
 
     @Override
     public List<GUID > fetchChildrenGuids( GUID guid ) {
-        return this.distributedTrieTree.fetchChildrenGuids( guid );
+        return this.imperialTree.fetchChildrenGuids( guid );
     }
 
     public EntityNode queryNodeByNS(String path, String szBadSep, String szTargetSep ) {
@@ -251,7 +251,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
 
     @Override
     public List<? extends TreeNode > fetchRoot() {
-        List<GUID> guids = this.distributedTrieTree.fetchRoot();
+        List<GUID> guids = this.imperialTree.fetchRoot();
         ArrayList<TreeNode> treeNodes = new ArrayList<>();
         for( GUID guid : guids ){
             TreeNode treeNode = this.get(guid);
@@ -262,12 +262,12 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
 
     @Override
     public void rename( GUID guid, String name ) {
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
+        GUIDImperialTrieNode node = this.imperialTree.getNode(guid);
         TreeNode newInstance = (TreeNode)node.getType().newInstance();
         TreeNodeOperator operator = this.operatorFactory.getOperator( newInstance.getMetaType() );
         operator.updateName( guid, name );
 
-        this.distributedTrieTree.removeCachePath( guid );
+        this.imperialTree.removeCachePath( guid );
     }
 
     @Override
@@ -284,7 +284,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
         );
     }
 
-    private String getNodeName( DistributedTreeNode node ){
+    private String getNodeName( ImperialTreeNode node ){
         UOI type = node.getType();
         TreeNode newInstance = (TreeNode)type.newInstance();
         TreeNodeOperator operator = this.operatorFactory.getOperator(newInstance.getMetaType());
@@ -303,7 +303,7 @@ public abstract class ArchKOMTree extends ArchTrieObjectModel implements KOMInst
     }
 
     @Override
-    public DistributedTrieTree getMasterTrieTree() {
-        return this.distributedTrieTree;
+    public ImperialTree getMasterTrieTree() {
+        return this.imperialTree;
     }
 }

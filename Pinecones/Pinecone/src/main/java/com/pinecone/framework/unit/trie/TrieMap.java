@@ -24,7 +24,7 @@ public interface TrieMap<K, V > extends Map<K, V >, PineUnit {
     @Override
     boolean isEmpty();
 
-    TrieNode getNode( String key );
+    TrieNode<V> queryNode( String path );
 
     String getSeparator();
 

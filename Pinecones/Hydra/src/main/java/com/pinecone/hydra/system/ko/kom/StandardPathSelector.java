@@ -5,10 +5,10 @@ import java.util.List;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.name.path.PathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
 
 public class StandardPathSelector extends MultiFolderPathSelector implements PathSelector {
-    public StandardPathSelector( PathResolver pathResolver, DistributedTrieTree trieTree, GUIDNameManipulator dirMan, GUIDNameManipulator[] fileMans ) {
+    public StandardPathSelector(PathResolver pathResolver, ImperialTree trieTree, GUIDNameManipulator dirMan, GUIDNameManipulator[] fileMans ) {
         super( pathResolver, trieTree, new GUIDNameManipulator[]{ dirMan }, fileMans );
     }
 
@@ -23,7 +23,7 @@ public class StandardPathSelector extends MultiFolderPathSelector implements Pat
             return guids;
         }
 
-        GUID linkGuid = this.distributedTrieTree.getOriginalGuidByNodeGuid( partName, guid );
+        GUID linkGuid = this.imperialTree.getOriginalGuidByNodeGuid( partName, guid );
         if( linkGuid != null ) {
             return List.of( linkGuid );
         }
@@ -37,13 +37,13 @@ public class StandardPathSelector extends MultiFolderPathSelector implements Pat
             return guids;
         }
 
-        return this.distributedTrieTree.fetchOriginalGuidRoot( partName );
+        return this.imperialTree.fetchOriginalGuidRoot( partName );
     }
 
     @Override
     protected List<GUID > fetchDirsAllGuids(String partName ) {
         List<GUID > guids = this.dirManipulators[ 0 ].getGuidsByName( partName );
-        guids.removeIf( guid -> !this.distributedTrieTree.isRoot( guid ) );
+        guids.removeIf( guid -> !this.imperialTree.isRoot( guid ) );
         return guids;
     }
 }

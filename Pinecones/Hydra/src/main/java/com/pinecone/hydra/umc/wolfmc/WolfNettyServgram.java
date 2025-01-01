@@ -1,5 +1,8 @@
 package com.pinecone.hydra.umc.wolfmc;
 
+import com.pinecone.framework.system.IrrationalProvokedException;
+import com.pinecone.framework.system.ProvokeHandleException;
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.hydra.servgram.ArchServgramium;
 import com.pinecone.framework.system.RedirectRuntimeException;
@@ -18,15 +21,10 @@ public abstract class WolfNettyServgram extends ArchServgramium {
     protected ReentrantLock             mStateMutex                     = new ReentrantLock();
     protected boolean                   mShutdown                       = true ;
 
-    public WolfNettyServgram( String szName, Hydrarum parent, Map<String, Object> joConf ) {
-        super( szName, parent );
+    public WolfNettyServgram( String szName, Processum parentProcess, Map<String, Object> joConf ) {
+        super( szName, parentProcess );
 
-        if( joConf instanceof JSONObject ) {
-            this.mjoSectionConf = (JSONObject) joConf;
-        }
-        else {
-            this.mjoSectionConf = new JSONMaptron( joConf, true );
-        }
+        this.setConfig( joConf );
     }
 
     public JSONObject getSectionConf() {
@@ -49,6 +47,14 @@ public abstract class WolfNettyServgram extends ArchServgramium {
         return this.isShutdown();
     }
 
+    protected void setConfig( Map<String, Object> joConf ) {
+        if( joConf instanceof JSONObject ) {
+            this.mjoSectionConf = (JSONObject) joConf;
+        }
+        else {
+            this.mjoSectionConf = new JSONMaptron( joConf, true );
+        }
+    }
 
     protected void unlockOuterThreadDetachMutex() {
         synchronized ( this.mOuterThreadDetachMutex ) {
@@ -70,7 +76,8 @@ public abstract class WolfNettyServgram extends ArchServgramium {
                 // If primary exception thrown, redirected it to parent thread.
             }
             catch ( InterruptedException e ) {
-                this.getSystem().handleLiveException( e );
+                Thread.currentThread().interrupt();
+                throw new ProvokeHandleException( e );
             }
         }
     }
@@ -83,7 +90,7 @@ public abstract class WolfNettyServgram extends ArchServgramium {
             throw new IOException( previousException.getMessage(), previousException );
         }
         else if( previousException != null ){
-            this.getSystem().handleKillException( previousException ); // This should never be happened.
+            throw new IrrationalProvokedException( previousException ); // This should never be happened.
         }
     }
 

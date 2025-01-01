@@ -2,15 +2,15 @@ package com.pinecone.hydra.registry.source;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 
 import java.util.List;
 
 public interface RegistryTreeManipulator extends Pinenut {
-    void insert (DistributedTreeNode distributedConfTreeNode);
+    void insert (ImperialTreeNode distributedConfTreeNode);
 
-    GUIDDistributedTrieNode getNode(GUID guid);
+    GUIDImperialTrieNode getNode(GUID guid);
 
     void remove(GUID guid);
 
@@ -18,5 +18,5 @@ public interface RegistryTreeManipulator extends Pinenut {
 
     List<GUID> fetchParentGuids(GUID guid);
 
-    List<GUIDDistributedTrieNode> getChild(GUID guid);
+    List<GUIDImperialTrieNode> getChild(GUID guid);
 }

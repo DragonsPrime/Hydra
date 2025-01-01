@@ -18,6 +18,6 @@ public class SeparatedSegmentor implements TrieSegmentor {
 
     @Override
     public String getSeparator() {
-        return separator;
+        return this.separator;
     }
 }

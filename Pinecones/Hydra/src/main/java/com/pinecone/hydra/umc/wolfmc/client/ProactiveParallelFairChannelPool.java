@@ -2,7 +2,9 @@ package com.pinecone.hydra.umc.wolfmc.client;
 
 import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
+import com.pinecone.hydra.umc.msg.ChannelPool;
 import com.pinecone.hydra.umc.msg.FairChannelPool;
+import com.pinecone.hydra.umc.msg.MappedChannelPool;
 import com.pinecone.hydra.umc.msg.UMCChannel;
 import com.pinecone.framework.unit.LinkedTreeMap;
 import com.pinecone.hydra.umc.wolfmc.ArchChannelPool;
@@ -13,14 +15,12 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-public class ProactiveParallelFairChannelPool<ID > extends ArchChannelPool implements FairChannelPool {
+public class ProactiveParallelFairChannelPool<ID > extends ArchChannelPool implements FairChannelPool, MappedChannelPool {
     protected ReentrantReadWriteLock   mPoolIOLock = new ReentrantReadWriteLock();
 
     protected ChannelControlBlock      mExclusiveSyncChannelCB; // The exclusive channel only for synchronized messages only.
 
     protected UlfIOLoadBalanceStrategy mLoadBalanceStrategy;
-
-    protected ArchAsyncMessenger       mMessenger;
 
     protected long                     mnMajorWaitTimeout = 5000;
 
@@ -29,8 +29,7 @@ public class ProactiveParallelFairChannelPool<ID > extends ArchChannelPool imple
     protected LinkedTreeMap<ID, ChannelControlBlock >  mChannelIdleQueue;
 
 
-    public ProactiveParallelFairChannelPool( ArchAsyncMessenger messenger, UlfIOLoadBalanceStrategy strategy ) {
-        this.mMessenger            = messenger;
+    public ProactiveParallelFairChannelPool( UlfIOLoadBalanceStrategy strategy ) {
         this.mLoadBalanceStrategy  = strategy;
         this.mChannelMapQueue      = new LinkedTreeMap<>();
         this.mChannelIdleQueue     = new LinkedTreeMap<>();
@@ -65,10 +64,6 @@ public class ProactiveParallelFairChannelPool<ID > extends ArchChannelPool imple
         this.mChannelIdleQueue.remove( this.warpKey( id ) );
     }
 
-    public ArchAsyncMessenger getMessenger() {
-        return this.mMessenger;
-    }
-
     @Override
     public long getMajorWaitTimeout() {
         return this.mnMajorWaitTimeout;
@@ -95,12 +90,48 @@ public class ProactiveParallelFairChannelPool<ID > extends ArchChannelPool imple
     }
 
     @Override
+    public ChannelControlBlock depriveIdleChannel() {
+        this.mPoolIOLock.writeLock().lock();
+        try{
+            ChannelControlBlock qualified = null;
+            for ( Map.Entry<ID, ChannelControlBlock> kv : this.mChannelMapQueue.entrySet() ) {
+                ChannelControlBlock block = kv.getValue();
+                if( block.getChannelStatus().isIdle() )  {
+                    qualified = block;
+                    break;
+                }
+            }
+
+            if ( qualified != null ) {
+                this.onlyRemove( qualified.getChannel().getChannelID() );
+            }
+
+            return qualified;
+        }
+        finally {
+            this.mPoolIOLock.writeLock().unlock();
+        }
+    }
+
+    @Override
     public ProactiveParallelFairChannelPool setIdleChannel( ChannelControlBlock block ) {
         this.mPoolIOLock.writeLock().lock();
         try{
             block.getChannel().setChannelStatus( UlfChannelStatus.IDLE );
             this.mChannelIdleQueue.put( this.warpKey( block.getChannel().getChannelID() ), block );
             //Debug.trace( this.mChannelIdleQueue, this.mChannelIdleQueue.size(), block );
+        }
+        finally {
+            this.mPoolIOLock.writeLock().unlock();
+        }
+        return this;
+    }
+
+    @Override
+    public ChannelPool add( ChannelControlBlock block ) {
+        this.mPoolIOLock.writeLock().lock();
+        try{
+            this.pushBack( block );
         }
         finally {
             this.mPoolIOLock.writeLock().unlock();
@@ -161,6 +192,7 @@ public class ProactiveParallelFairChannelPool<ID > extends ArchChannelPool imple
                     }
                     finally {
                         this.mPoolIOLock.readLock().unlock();
+                        bReadLocked = false;
                     }
                 }
             }
@@ -200,42 +232,13 @@ public class ProactiveParallelFairChannelPool<ID > extends ArchChannelPool imple
     }
 
     @Override
-    public ChannelControlBlock nextSyncChannel( long nMillisTimeout, boolean bEager ) {
-        this.getMessenger().getSynRequestLock().lock();
-
-        if( this.mExclusiveSyncChannelCB != null ) {
-            return this.mExclusiveSyncChannelCB;
-        }
-        else {
-            ChannelControlBlock cb = null;
-            try{
-                cb = this.queryNextChannel( nMillisTimeout, bEager, true );
-            }
-            finally {
-                this.getMessenger().getSynRequestLock().unlock();
-            }
-            return cb;
-        }
-    }
-
-    @Override
     public ChannelControlBlock nextAsynChannel( long nMillisTimeout, boolean bEager ) {
         return this.queryNextChannel( nMillisTimeout, bEager, false );
     }
 
     @Override
-    public ChannelControlBlock nextSyncChannel( long nMillisTimeout ) {
-        return this.nextSyncChannel( nMillisTimeout, true );
-    }
-
-    @Override
     public ChannelControlBlock nextAsynChannel( long nMillisTimeout ) {
         return this.nextAsynChannel( nMillisTimeout, true );
-    }
-
-    @Override
-    public ChannelControlBlock nextSyncChannel() {
-        return this.nextSyncChannel( this.mnMajorWaitTimeout );
     }
 
     @Override

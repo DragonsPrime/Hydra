@@ -8,19 +8,19 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.JSONEncoder;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.BeanColonist;
-import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
+import com.pinecone.framework.util.json.homotype.BeanColonist;
+import com.pinecone.framework.util.json.homotype.BeanMapDecoder;
 import com.pinecone.hydra.service.kom.GenericNamespaceRules;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
 import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 
 public class GenericNamespace extends ArchElementNode implements Namespace {
     protected GUID                        rulesGUID;
 
     protected GUID                        metaGuid;
 
-    protected GUIDDistributedTrieNode     distributedTreeNode;
+    protected GUIDImperialTrieNode distributedTreeNode;
 
     protected GenericNamespaceRules       classificationRules;
 
@@ -33,12 +33,12 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
 
     public GenericNamespace( Map<String, Object > joEntity ) {
         super( joEntity );
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public GenericNamespace( Map<String, Object > joEntity, ServicesInstrument servicesInstrument ) {
         super( joEntity, servicesInstrument );
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public GenericNamespace( ServicesInstrument servicesInstrument ) {
@@ -51,12 +51,12 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
     }
 
     @Override
-    public GUIDDistributedTrieNode getDistributedTreeNode() {
+    public GUIDImperialTrieNode getDistributedTreeNode() {
         return this.distributedTreeNode;
     }
 
     @Override
-    public void setDistributedTreeNode( GUIDDistributedTrieNode distributedTreeNode ) {
+    public void setDistributedTreeNode( GUIDImperialTrieNode distributedTreeNode ) {
         this.distributedTreeNode = distributedTreeNode;
     }
 

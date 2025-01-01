@@ -1,7 +1,6 @@
 package com.pinecone.hydra.system.ko.kom;
 
-import com.pinecone.hydra.system.ko.kom.PathSelector;
-import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
+import com.pinecone.hydra.unit.imperium.entity.ReparseLinkNode;
 
 public interface ReparsePointSelector extends PathSelector {
     ReparseLinkNode searchLinkNode( String[] parts );

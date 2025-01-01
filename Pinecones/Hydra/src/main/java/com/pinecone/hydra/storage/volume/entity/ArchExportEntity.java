@@ -1,15 +1,20 @@
 package com.pinecone.hydra.storage.volume.entity;
 
+import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 
 public abstract  class ArchExportEntity implements ExporterEntity{
     protected VolumeManager volumeManager;
-    protected ExportStorageObject   exportStorageObject;
 
-    public ArchExportEntity(VolumeManager volumeManager, ExportStorageObject exportStorageObject ){
+    protected StorageExportIORequest storageExportIORequest;
+
+    protected Chanface channel;
+
+    public ArchExportEntity(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, Chanface channel){
         this.volumeManager = volumeManager;
-        this.exportStorageObject = exportStorageObject;
-
+        this.storageExportIORequest = storageExportIORequest;
+        this.channel = channel;
     }
     @Override
     public VolumeManager getVolumeManager() {
@@ -22,12 +27,22 @@ public abstract  class ArchExportEntity implements ExporterEntity{
     }
 
     @Override
-    public ExportStorageObject getExportStorageObject() {
-        return this.exportStorageObject;
+    public StorageExportIORequest getStorageIORequest() {
+        return this.storageExportIORequest;
     }
 
     @Override
-    public void setExportStorageObject(ExportStorageObject exportStorageObject) {
-        this.exportStorageObject = exportStorageObject;
+    public void setStorageIORequest(StorageExportIORequest storageExportIORequest) {
+        this.storageExportIORequest = storageExportIORequest;
+    }
+
+    @Override
+    public Chanface getChannel() {
+        return this.channel;
+    }
+
+    @Override
+    public void setChannel(Chanface channel) {
+        this.channel = channel;
     }
 }

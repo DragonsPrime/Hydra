@@ -1,10 +1,16 @@
 package com.pinecone.hydra.storage.file.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
+import com.pinecone.hydra.registry.entity.PropertyJSONEncoder;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.source.FileManipulator;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
+import java.io.IOException;
+import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.util.TreeMap;
 
@@ -15,14 +21,14 @@ public class GenericFileNode extends ArchElementNode implements FileNode{
     private FileMeta                    fileMeta;
 
     private KOMFileSystem               fileSystem;
-    private FileManipulator fileManipulator;
+    private FileManipulator             fileManipulator;
     private TreeMap<Long, Frame>        frames = new TreeMap<>();
     private boolean                     isUploadSuccessful;
     private long                        physicalSize;
     private long                        logicSize;
 
     private long                        definitionSize;
-    private String                     crc32Xor;
+    private String                      crc32Xor;
     private boolean                     integrityCheckEnable;
     private boolean                     disableCluster;
 
@@ -41,8 +47,6 @@ public class GenericFileNode extends ArchElementNode implements FileNode{
     public TreeMap<Long, Frame> getFrames() {
         return this.fileSystem.getFrameByFileGuid( this.guid );
     }
-
-
 
 
     public GenericFileNode() {
@@ -271,7 +275,13 @@ public class GenericFileNode extends ArchElementNode implements FileNode{
         this.disableCluster = disableCluster;
     }
 
+    @Override
+    public String toJSONString() {
+        return BeanJSONEncoder.BasicEncoder.encode( this );
+    }
+
+    @Override
     public String toString() {
-        return "GenericFileNode{enumId = " + enumId + ", guid = " + guid + ", createTime = " + createTime + ", updateTime = " + updateTime + ", name = " + name + ", deletedTime = " + deletedTime + ", checksum = " + checksum + ", parityCheck = " + parityCheck + ", "  + ", fileMeta = " + fileMeta + ", attribute = " + fileSystemAttributes + "}";
+        return this.toJSONString();
     }
 }

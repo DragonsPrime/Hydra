@@ -269,6 +269,12 @@ public final class ReflectionUtils {
 
     }
 
+    public static <T> Constructor<T> accessibleConstructor(Class<T> clazz, Class... parameterTypes) throws NoSuchMethodException {
+        Constructor<T> ctor = clazz.getDeclaredConstructor(parameterTypes);
+        ReflectionUtils.makeAccessible(ctor);
+        return ctor;
+    }
+
     public static void doWithMethods(Class<?> clazz, ReflectionUtils.MethodCallback mc) throws IllegalArgumentException {
         doWithMethods(clazz, mc, (ReflectionUtils.MethodFilter)null);
     }
@@ -476,6 +482,24 @@ public final class ReflectionUtils {
         catch ( IntrospectionException e ) {
             throw new IllegalArgumentException( e );
         }
+    }
+
+    /**
+     * e.g. java.util.List<com.util.json.Test>
+     * e.g. java.util.Map<java.lang.String, com.util.json.Slave>
+     */
+    public static String[] extractGenericClassNames( String input ) {
+        int startIndex = input.indexOf('<');
+        int endIndex   = input.lastIndexOf('>');
+
+        if ( startIndex != -1 && endIndex != -1 && endIndex > startIndex ) {
+            String types = input.substring( startIndex + 1, endIndex ).trim();
+            if( types.indexOf( ", " ) > 0 ) {
+                return types.split( ", " );
+            }
+            return types.split( "," );
+        }
+        return null;
     }
 
 }

@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.List;
 
@@ -25,6 +26,7 @@ public interface ApplicationNodeMapper extends ApplicationNodeManipulator {
     @Select("SELECT `id` AS `enumId`, `guid`, `name` FROM `hydra_service_application_node` WHERE `guid`=#{guid}")
     GenericApplicationElement getApplicationNode(@Param("guid")GUID guid);
 
+    @Update("UPDATE `hydra_service_application_node` SET name = #{name} WHERE guid = #{guid}")
     void update( ApplicationElement applicationElement );
 
     @Override

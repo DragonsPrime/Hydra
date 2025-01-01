@@ -26,10 +26,10 @@ public abstract class ClassUtils {
     private static final char INNER_CLASS_SEPARATOR = '$';
     public static final String CGLIB_CLASS_SEPARATOR = "$$";
     public static final String CLASS_FILE_SUFFIX = ".class";
-    private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new HashMap(8);
-    private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap = new HashMap(8);
-    private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap(32);
-    private static final Map<String, Class<?>> commonClassCache = new HashMap(32);
+    private static final Map<Class<?>, Class<?>> primitiveWrapperTypeMap = new HashMap<>(8);
+    private static final Map<Class<?>, Class<?>> primitiveTypeToWrapperMap = new HashMap<>(8);
+    private static final Map<String, Class<?>> primitiveTypeNameMap = new HashMap<>(32);
+    private static final Map<String, Class<?>> commonClassCache = new HashMap<>(32);
 
     public ClassUtils() {
     }
@@ -304,40 +304,53 @@ public abstract class ClassUtils {
         }
     }
 
-    public static boolean hasMethod(Class<?> clazz, String methodName, Class... paramTypes) {
+    public static boolean hasMethod( Class<?> clazz, String methodName, Class... paramTypes ) {
         return getMethodIfAvailable(clazz, methodName, paramTypes) != null;
     }
 
-    public static Method getMethod(Class<?> clazz, String methodName, Class... paramTypes) {
+    public static Method getMethod( Class<?> clazz, String methodName, Class... paramTypes ) {
         Assert.notNull(clazz, "Class must not be null");
         Assert.notNull(methodName, "Method name must not be null");
-        if (paramTypes != null) {
+        if ( paramTypes != null ) {
             try {
-                return clazz.getMethod(methodName, paramTypes);
-            } catch (NoSuchMethodException var9) {
-                throw new IllegalStateException("Expected method not found: " + var9);
+                return clazz.getMethod( methodName, paramTypes );
             }
-        } else {
-            Set<Method> candidates = new HashSet(1);
+            catch (NoSuchMethodException e) {
+                throw new IllegalStateException( "Expected method not found: " + e );
+            }
+        }
+        else {
+            Set<Method> candidates = new HashSet<>(1);
             Method[] methods = clazz.getMethods();
-            Method[] var5 = methods;
-            int var6 = methods.length;
+            int len = methods.length;
 
-            for(int var7 = 0; var7 < var6; ++var7) {
-                Method method = var5[var7];
+            for( int i = 0; i < len; ++i ) {
+                Method method = methods[i];
                 if (methodName.equals(method.getName())) {
                     candidates.add(method);
                 }
             }
 
-            if (candidates.size() == 1) {
+            if ( candidates.size() == 1 ) {
                 return (Method)candidates.iterator().next();
-            } else if (candidates.isEmpty()) {
+            }
+            else if ( candidates.isEmpty() ) {
                 throw new IllegalStateException("Expected method not found: " + clazz + "." + methodName);
-            } else {
+            }
+            else {
                 throw new IllegalStateException("No unique method found: " + clazz + "." + methodName);
             }
         }
+    }
+
+    public static Method getFirstMethodByName( Class<?> clazz, String methodName ) {
+        Method[] methods = clazz.getMethods();
+        for ( Method method : methods ) {
+            if( method.getName().equals( methodName ) ) {
+                return method;
+            }
+        }
+        return null;
     }
 
     public static Method getMethodIfAvailable(Class<?> clazz, String methodName, Class... paramTypes) {
@@ -505,21 +518,23 @@ public abstract class ClassUtils {
         return clazz.isPrimitive() && clazz != Void.TYPE ? (Class)primitiveTypeToWrapperMap.get(clazz) : clazz;
     }
 
-    public static boolean isAssignable(Class<?> lhsType, Class<?> rhsType) {
+    public static boolean isAssignable( Class<?> lhsType, Class<?> rhsType ) {
         Assert.notNull(lhsType, "Left-hand side type must not be null");
         Assert.notNull(rhsType, "Right-hand side type must not be null");
-        if (lhsType.isAssignableFrom(rhsType)) {
+        if ( lhsType.isAssignableFrom(rhsType) ) {
             return true;
-        } else {
+        }
+        else {
             Class resolvedPrimitive;
-            if (lhsType.isPrimitive()) {
-                resolvedPrimitive = (Class)primitiveWrapperTypeMap.get(rhsType);
-                if (resolvedPrimitive != null && lhsType.equals(resolvedPrimitive)) {
+            if ( lhsType.isPrimitive() ) {
+                resolvedPrimitive = (Class)primitiveWrapperTypeMap.get( rhsType );
+                if ( lhsType.equals( resolvedPrimitive ) ) {
                     return true;
                 }
-            } else {
-                resolvedPrimitive = (Class)primitiveTypeToWrapperMap.get(rhsType);
-                if (resolvedPrimitive != null && lhsType.isAssignableFrom(resolvedPrimitive)) {
+            }
+            else {
+                resolvedPrimitive = (Class)primitiveTypeToWrapperMap.get( rhsType );
+                if ( resolvedPrimitive != null && lhsType.isAssignableFrom( resolvedPrimitive ) ) {
                     return true;
                 }
             }
@@ -706,7 +721,7 @@ public abstract class ClassUtils {
             registerCommonClasses((Class)entry.getKey());
         }
 
-        Set<Class<?>> primitiveTypes = new HashSet(32);
+        Set<Class<?>> primitiveTypes = new HashSet<>(32);
         primitiveTypes.addAll(primitiveWrapperTypeMap.values());
         primitiveTypes.addAll(Arrays.asList(boolean[].class, byte[].class, char[].class, double[].class, float[].class, int[].class, long[].class, short[].class));
         primitiveTypes.add(Void.TYPE);

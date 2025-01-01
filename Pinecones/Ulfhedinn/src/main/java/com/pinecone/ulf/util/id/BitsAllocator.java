@@ -17,7 +17,10 @@ package com.pinecone.ulf.util.id;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
-import org.springframework.util.Assert;
+
+import com.pinecone.framework.system.prototype.Pinenut;
+import com.pinecone.framework.util.Assert;
+
 
 /**
  * Allocate 64 bits for the UID(long)<br>
@@ -25,7 +28,7 @@ import org.springframework.util.Assert;
  * 
  * @author yutianbao
  */
-public class BitsAllocator {
+public class BitsAllocator implements Pinenut {
     /**
      * Total 64 bits
      */

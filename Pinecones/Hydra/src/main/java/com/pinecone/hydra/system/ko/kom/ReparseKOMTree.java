@@ -1,7 +1,7 @@
 package com.pinecone.hydra.system.ko.kom;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
+import com.pinecone.hydra.unit.imperium.entity.ReparseLinkNode;
 
 public interface ReparseKOMTree extends KOMInstrument {
     void newLinkTag( String originalPath, String dirPath, String tagName );

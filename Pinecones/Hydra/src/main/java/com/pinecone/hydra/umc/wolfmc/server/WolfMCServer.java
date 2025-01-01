@@ -1,31 +1,52 @@
 package com.pinecone.hydra.umc.wolfmc.server;
 
-import com.pinecone.framework.system.ProxyProvokeHandleException;
-import com.pinecone.framework.util.lang.DynamicFactory;
-import com.pinecone.hydra.system.component.LogStatuses;
-import com.pinecone.hydra.umc.msg.*;
-import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
-import com.pinecone.hydra.umc.wolfmc.*;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelId;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.AttributeKey;
 import com.pinecone.framework.system.ProvokeHandleException;
-import com.pinecone.framework.util.Debug;
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.StringUtils;
-import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.hydra.system.Hydrarum;
+import com.pinecone.hydra.umc.msg.RecipientChannelControlBlock;
+import com.pinecone.hydra.umc.msg.event.ChannelEventHandler;
+import com.pinecone.hydra.umc.wolfmc.AsyncUlfMedium;
+import com.pinecone.hydra.umc.wolfmc.ChannelUtils;
+import com.pinecone.hydra.umc.wolfmc.GenericUMCByteMessageDecoder;
+import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
+import com.pinecone.hydra.umc.wolfmc.UlfIdleFirstBalanceStrategy;
+import com.pinecone.hydra.umc.wolfmc.UlfMCReceiver;
+import com.pinecone.hydra.umc.wolfmc.UlfMessageNode;
+import com.pinecone.hydra.umc.wolfmc.UnsetUlfAsyncMsgHandleAdapter;
+import com.pinecone.hydra.umc.wolfmc.WolfMCNode;
+import com.pinecone.hydra.umc.wolfmc.WolfMCStandardConstants;
+import com.pinecone.framework.system.ProxyProvokeHandleException;
+import com.pinecone.framework.util.lang.DynamicFactory;
+import com.pinecone.hydra.umc.msg.ChannelControlBlock;
+import com.pinecone.hydra.umc.msg.ChannelPool;
+import com.pinecone.hydra.umc.msg.Medium;
+import com.pinecone.hydra.umc.msg.UMCMessage;
+import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -45,32 +66,65 @@ import java.util.concurrent.locks.ReentrantLock;
  *  etc.
  *  *****************************************************************************************
  */
-public class WolfMCServer extends WolfMCNode implements Recipient {
-    protected ServerConnectArguments                          mConnectionArguments ;
+public class WolfMCServer extends WolfMCNode implements UlfServer {
+    protected ServerConnectArguments                          mConnectionArguments        ;
 
-    protected EventLoopGroup                                  mMasterEventGroup    ;
-    protected EventLoopGroup                                  mWorkersEventGroup   ;
-    protected ServerBootstrap                                 mBootstrap           ;
-    protected ChannelFuture                                   mPrimaryBindFuture   ;
-    protected SocketAddress                                   mPrimaryBindAddress  ;
-    protected PassiveRegisterChannelPool<ChannelId >          mChannelPool         ;
+    protected EventLoopGroup                                  mMasterEventGroup           ;
+    protected EventLoopGroup                                  mWorkersEventGroup          ;
+    protected ServerBootstrap                                 mBootstrap                  ;
+    protected ChannelFuture                                   mPrimaryBindFuture          ;
+    protected SocketAddress                                   mPrimaryBindAddress         ;
+    protected PassiveRegisterChannelPool<ChannelId >          mChannelPool                ;
 
-    protected UlfAsyncMsgHandleAdapter                        mRecipientMsgHandler ;
+    protected UlfAsyncMsgHandleAdapter                        mRecipientMsgHandler        ;
+    protected List<ChannelEventHandler >                      mDataArrivedEventHandlers   ;
 
     private final ReentrantLock                               mSynRequestLock      = new ReentrantLock(); // For inner purposes.
 
-    public WolfMCServer( String szName, Hydrarum parent, JSONObject joConf ) {
-        this( szName, parent, joConf, null );
-    }
-
-    public WolfMCServer( String szName, Hydrarum parent, JSONObject joConf, ExtraHeadCoder extraHeadCoder ) {
-        super( szName, parent, joConf, extraHeadCoder );
+    public WolfMCServer( long nodeId, String szName, Processum parentProcess, UlfMessageNode parent, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
+        super( nodeId, szName, parentProcess, parent, joConf, extraHeadCoder );
+        this.mDataArrivedEventHandlers = new ArrayList<>();
         this.apply( joConf );
     }
 
+    public WolfMCServer( String szName, Processum parentProcess, UlfMessageNode parent, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
+        this( -1, szName, parentProcess, parent, joConf, extraHeadCoder );
+    }
+
+    public WolfMCServer( long nodeId, String szName, Processum parentProcess, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
+        this( nodeId, szName, parentProcess, null, joConf, extraHeadCoder );
+    }
+
+    public WolfMCServer( String szName, Processum parentProcess, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
+        this( -1, szName, parentProcess, null, joConf, extraHeadCoder );
+    }
+
+    public WolfMCServer( long nodeId, String szName, Processum parentProcess, UlfMessageNode parent, Map<String, Object> joConf ) {
+        this( nodeId, szName, parentProcess, parent, joConf, null );
+    }
+
+    public WolfMCServer( String szName, Processum parentProcess, UlfMessageNode parent, Map<String, Object> joConf ) {
+        this( -1, szName, parentProcess, parent, joConf, null );
+    }
+
+    public WolfMCServer( long nodeId, String szName, Processum parentProcess, Map<String, Object> joConf ) {
+        this( nodeId, szName, parentProcess, null, joConf );
+    }
+
+    public WolfMCServer( String szName, Processum parentProcess, Map<String, Object> joConf ) {
+        this( -1, szName, parentProcess, null, joConf );
+    }
+
+    protected WolfMCServer( Builder builder ){
+        this( builder.nodeId, builder.szName, builder.parentProcess, builder.parent, builder.joConf, builder.extraHeadCoder );
+    }
+
+
     @Override
-    public WolfMCServer apply( JSONObject joConf ) {
-        super.apply( joConf );
+    public WolfMCServer apply( Map<String, Object> conf ) {
+        super.apply( conf );
+        JSONObject joConf = this.getSectionConf();
+
         this.mConnectionArguments = new ServerConnectionArguments( joConf );
         this.mChannelPool         = new PassiveRegisterChannelPool<>(
                 this, new UlfIdleFirstBalanceStrategy(), joConf.optInt( "MaximumConnections", (int)1e7 )
@@ -102,10 +156,22 @@ public class WolfMCServer extends WolfMCNode implements Recipient {
     }
 
     @Override
+    public void addDataArrivedEventHandlers( ChannelEventHandler handler ) {
+        this.mDataArrivedEventHandlers.add( handler );
+    }
+
+    protected void notifyDataArrivedEventHandlers( RecipientChannelControlBlock block ) {
+        for( ChannelEventHandler h : this.mDataArrivedEventHandlers ) {
+            h.afterEventTriggered( block );
+        }
+    }
+
+    @Override
     public int getMaximumConnections() {
         return this.mChannelPool.getMaximumPoolSize();
     }
 
+    @Override
     public void close() throws ProvokeHandleException {
         this.mStateMutex.lock();
         try{
@@ -168,7 +234,7 @@ public class WolfMCServer extends WolfMCNode implements Recipient {
                 sc.pipeline().addLast( new ReadTimeoutHandler( 1000, TimeUnit.SECONDS ) );
                 sc.pipeline().addLast( new GenericUMCByteMessageDecoder( WolfMCServer.this.getExtraHeadCoder() ) );
 
-                sc.pipeline().addLast( new ChannelInboundHandlerAdapter (){
+                sc.pipeline().addLast( new ChannelInboundHandlerAdapter(){
                     @Override
                     public void channelActive( ChannelHandlerContext ctx ) throws Exception {
                         super.channelActive(ctx);
@@ -200,10 +266,13 @@ public class WolfMCServer extends WolfMCNode implements Recipient {
                         RecipientNettyChannelControlBlock channelControlBlock = (RecipientNettyChannelControlBlock)ctx.channel().attr(
                                 AttributeKey.valueOf( WolfMCStandardConstants.CB_CONTROL_BLOCK_KEY )
                         ).get();
+                        ChannelUtils.setChannelIdentityID( channelControlBlock.getChannel(), message.getHead().getIdentityId() );
 
                         WolfMCServer.this.handleArrivedMessage(
                                 WolfMCServer.this.mRecipientMsgHandler, medium, channelControlBlock, message, ctx, msg
                         );
+
+                        WolfMCServer.this.notifyDataArrivedEventHandlers( channelControlBlock );
 
                         medium.release();
                         medium = new AsyncUlfMedium( ctx, null, WolfMCServer.this );
@@ -268,7 +337,8 @@ public class WolfMCServer extends WolfMCNode implements Recipient {
                 }
             }
             catch ( InterruptedException e ) {
-                this.getSystem().handleLiveException( e );
+                Thread.currentThread().interrupt();
+                throw new ProvokeHandleException( e );
             }
         }
 
@@ -303,6 +373,7 @@ public class WolfMCServer extends WolfMCNode implements Recipient {
         }
     }
 
+    @Override
     public void execute() throws IOException {
         Exception[] lastException = new Exception[] { null };
         Thread primaryThread      = new Thread( new Runnable() {
@@ -345,4 +416,63 @@ public class WolfMCServer extends WolfMCNode implements Recipient {
     public ChannelPool getChannelPool() {
         return null;
     }
+
+
+    public static class Builder {
+        private long                nodeId = -1;
+        private String              szName;
+        private Processum           parentProcess;
+        private UlfMessageNode      parent;
+        private Map<String, Object> joConf;
+        private ExtraHeadCoder      extraHeadCoder;
+
+        public Builder setNodeId( long nodeId ) {
+            this.nodeId = nodeId;
+            return this;
+        }
+
+        public Builder setName( String szName ) {
+            this.szName = szName;
+            return this;
+        }
+
+        public Builder setParentProcess( Processum parentProcess ) {
+            this.parentProcess = parentProcess;
+            return this;
+        }
+
+        public Builder setParent( UlfMessageNode parent ) {
+            this.parent = parent;
+            return this;
+        }
+
+        public Builder setJoConf( Map<String, Object> joConf ) {
+            this.joConf = joConf;
+            return this;
+        }
+
+        public Builder setExtraHeadCoder( ExtraHeadCoder extraHeadCoder ) {
+            this.extraHeadCoder = extraHeadCoder;
+            return this;
+        }
+
+        public WolfMCServer build() {
+            this.validate();
+            return new WolfMCServer( this );
+        }
+
+        private void validate() {
+            if ( this.szName == null || this.szName.isEmpty() ) {
+                long nId = this.nodeId;
+                if ( nId == -1 ) {
+                    nId = System.nanoTime();
+                }
+                this.szName = WolfMCServer.class.getSimpleName() + "_" + nId;
+            }
+            if ( this.joConf == null ) {
+                throw new IllegalArgumentException( "Configuration (Conf) cannot be null" );
+            }
+        }
+    }
+
 }

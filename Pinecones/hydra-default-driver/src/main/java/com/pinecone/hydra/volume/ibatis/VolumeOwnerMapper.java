@@ -1,16 +1,13 @@
 package com.pinecone.hydra.volume.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.LinkedType;
-import com.pinecone.hydra.unit.udtt.source.TireOwnerManipulator;
+import com.pinecone.hydra.unit.imperium.source.TireOwnerManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
-import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
-import java.util.List;
 @IbatisDataAccessObject
 public interface VolumeOwnerMapper extends TireOwnerManipulator {
     @Insert("INSERT INTO `hydra_uofs_volumes_tree` (`guid`) VALUES ( #{guid} )")

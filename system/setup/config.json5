@@ -45,8 +45,8 @@
             "dbType"     : "mysql",
             "host"       : "b-serverkingpin",
             "username"   : "root",
-            "password"   : "root",
-            "database"   : "nonaron",
+            "password"   : "",
+            "database"   : "hydranium",
             "port"       : 3306,
             "charset"    : "utf8",
             "tablePrefix": "nona_",
@@ -85,7 +85,7 @@
         "Databases": {
           "RedisKingpin": {
             "host"        : "b-serverkingpin",
-            "password"    : "wolf19310918",
+            "password"    : "",
             "port"        : 6379,
             "Enable"      : true
           }
@@ -105,7 +105,7 @@
           "RabbitMQKingpin" : {
             "host"        : "b-serverkingpin",
             "username"    : "undefined",
-            "password"    : "wolf19310918",
+            "password"    : "",
             "port"        : 5672,
             "vhost"       : "/wolf",
             "frame_max"   : 131072,
@@ -118,7 +118,7 @@
             "host"                : "0.0.0.0",
             "port"                : 5777,
             "username"            : "undefined",     // TODO, UMCs
-            "password"            : "wolf19310918",  // TODO, UMCs
+            "password"            : "",  // TODO, UMCs
             "SocketTimeout"       : 800,
             "KeepAliveTimeout"    : 3600,
             "MaximumConnections"  : 1e6,

@@ -2,7 +2,7 @@ package com.pinecone.hydra.system.ko.kom;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
+import com.pinecone.hydra.unit.imperium.entity.ReparseLinkNode;
 
 public interface ReparseKOMTreeAddition extends Pinenut {
     ReparseLinkNode queryReparseLinkByNS( String path, String szBadSep, String szTargetSep ) ;

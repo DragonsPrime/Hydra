@@ -4,8 +4,8 @@ import java.util.Map;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.id.Identification;
-import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
-import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
+import com.pinecone.framework.util.json.homotype.BeanMapDecoder;
+import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.ulf.util.id.GUIDs;
 
 public abstract class ArchServiceFamilyMeta implements ServiceFamilyMeta {
@@ -35,7 +35,7 @@ public abstract class ArchServiceFamilyMeta implements ServiceFamilyMeta {
         if( szGuid != null ) {
             this.guid = GUIDs.GUID72( (String) joEntity.get( "guid" ) );
         }
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
 
         return this;
     }

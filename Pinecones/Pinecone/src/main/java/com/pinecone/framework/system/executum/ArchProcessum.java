@@ -39,7 +39,9 @@ public abstract class ArchProcessum extends ArchExecutum implements Processum {
     @Override
     public void  kill() {
         this.getTaskManager().terminate();
-        this.getAffiliateThread().stop();
+        if( this.getAffiliateThread() != null ) {
+            this.getAffiliateThread().stop();
+        }
     }
 
     @Override

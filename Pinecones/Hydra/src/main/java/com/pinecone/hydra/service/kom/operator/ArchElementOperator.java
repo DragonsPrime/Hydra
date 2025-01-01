@@ -5,11 +5,11 @@ import com.pinecone.hydra.service.kom.entity.CommonMeta;
 import com.pinecone.hydra.service.kom.entity.ElementNode;
 import com.pinecone.hydra.service.kom.source.CommonDataManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
 
 public abstract class ArchElementOperator implements ElementOperator {
     protected ServicesInstrument            servicesInstrument;
-    protected DistributedTrieTree           distributedTrieTree;
+    protected ImperialTree                  imperialTree;
     protected CommonDataManipulator         commonDataManipulator;
     protected ServiceMasterManipulator      serviceMasterManipulator;
     protected ElementOperatorFactory        factory;
@@ -19,7 +19,7 @@ public abstract class ArchElementOperator implements ElementOperator {
         this.factory = factory;
     }
     public ArchElementOperator( ServiceMasterManipulator masterManipulator, ServicesInstrument servicesInstrument ){
-        this.distributedTrieTree      = servicesInstrument.getMasterTrieTree();
+        this.imperialTree = servicesInstrument.getMasterTrieTree();
         this.servicesInstrument       = servicesInstrument;
         this.commonDataManipulator    = masterManipulator.getCommonDataManipulator();
         this.serviceMasterManipulator = masterManipulator;

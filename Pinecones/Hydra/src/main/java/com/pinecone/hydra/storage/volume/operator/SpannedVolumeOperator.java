@@ -8,9 +8,9 @@ import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.VolumeMasterManipulator;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 
 import java.util.HashMap;
 import java.util.List;
@@ -33,14 +33,14 @@ public class SpannedVolumeOperator extends ArchVolumeOperator  implements Volume
     @Override
     public GUID insert(TreeNode treeNode) {
         LocalSpannedVolume simpleVolume = ( LocalSpannedVolume ) treeNode;
-        DistributedTreeNode distributedTreeNode = this.affirmPreinsertionInitialize(simpleVolume);
+        ImperialTreeNode imperialTreeNode = this.affirmPreinsertionInitialize(simpleVolume);
         GUID guid = simpleVolume.getGuid();
         VolumeCapacity64 volumeCapacity = simpleVolume.getVolumeCapacity();
         if ( volumeCapacity.getVolumeGuid() == null ){
             volumeCapacity.setVolumeGuid( guid );
         }
 
-        this.distributedTrieTree.insert( distributedTreeNode );
+        this.imperialTree.insert(imperialTreeNode);
         this.SpannedVolumeManipulator.insert( simpleVolume );
         this.volumeCapacityManipulator.insert( volumeCapacity );
         return guid;
@@ -48,8 +48,8 @@ public class SpannedVolumeOperator extends ArchVolumeOperator  implements Volume
 
     @Override
     public void purge(GUID guid) {
-        List<GUIDDistributedTrieNode> children = this.distributedTrieTree.getChildren(guid);
-        for( GUIDDistributedTrieNode node : children ){
+        List<GUIDImperialTrieNode> children = this.imperialTree.getChildren(guid);
+        for( GUIDImperialTrieNode node : children ){
             TreeNode newInstance = (TreeNode)node.getType().newInstance( new Class<? >[]{this.getClass()}, this );
             VolumeOperator operator = this.factory.getOperator(this.getVolumeMetaType(newInstance));
             operator.purge( node.getGuid() );
@@ -63,6 +63,7 @@ public class SpannedVolumeOperator extends ArchVolumeOperator  implements Volume
         VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
         spannedVolume.setVolumeCapacity( volumeCapacity );
         spannedVolume.setVolumeTree( this.volumeManager);
+        spannedVolume.setKenVolumeFileSystem();
         return spannedVolume;
     }
 
@@ -87,9 +88,9 @@ public class SpannedVolumeOperator extends ArchVolumeOperator  implements Volume
     }
 
     private void removeNode( GUID guid ){
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
-        this.distributedTrieTree.purge( guid );
-        this.distributedTrieTree.removeCachePath( guid );
+        GUIDImperialTrieNode node = this.imperialTree.getNode(guid);
+        this.imperialTree.purge( guid );
+        this.imperialTree.removeCachePath( guid );
         this.SpannedVolumeManipulator.remove( guid );
     }
 }

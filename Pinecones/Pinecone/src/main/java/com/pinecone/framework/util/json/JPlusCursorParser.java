@@ -171,14 +171,14 @@ public class JPlusCursorParser extends JSONCursorParser {
         try{
             // Notice, currently context should be <b>Parent</b> NOT 'this'!
             // Under object context, the parser is sequentially parse from sibling to sibling.
-            return ( new JPlusCursorParser( new FileReader(path.toString()), this.getScopeContext() ) ).nextValue( null, this.getScopeContext().parent() );
+            return ( new JPlusCursorParser( new FileReader(path.toString()), this.getScopeContext() ) ).nextValue( null, this.getScopeContext().parent(), null );
         }
         catch ( IOException e ){
             Path[] parentPaths = this.getScopeContext().getParentPaths();
             Object ret = null;
             for ( int i = 0; i < parentPaths.length; ++i ) {
                 try{
-                    ret = ( new JPlusCursorParser( new FileReader( parentPaths[i].resolve(path.toString()).toFile() ), this.getScopeContext() ) ).nextValue( null, this.getScopeContext().parent() );
+                    ret = ( new JPlusCursorParser( new FileReader( parentPaths[i].resolve(path.toString()).toFile() ), this.getScopeContext() ) ).nextValue( null, this.getScopeContext().parent(), null );
                 }
                 catch ( IOException e1 ) {
                     ret = null;
@@ -307,7 +307,7 @@ public class JPlusCursorParser extends JSONCursorParser {
     }
 
     @Override
-    public Object nextValue( Object indexKey, Object parent ) throws JSONParseException {
+    public Object nextValue( Object indexKey, Object parent, Object[] args ) throws JSONParseException {
         char c = this.nextClean();
         switch(c) {
             case '"':

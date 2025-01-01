@@ -1,10 +1,9 @@
 package com.pinecone.hydra.service.kom.entity;
 
-import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
+import com.pinecone.framework.util.json.homotype.BeanMapDecoder;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
 
 import java.util.Map;
-import java.util.Set;
 
 public class GenericServiceElement extends ArchServoElement implements ServiceElement {
     protected String                     serviceType;
@@ -15,12 +14,12 @@ public class GenericServiceElement extends ArchServoElement implements ServiceEl
 
     public GenericServiceElement( Map<String, Object > joEntity ) {
         super( joEntity );
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public GenericServiceElement( Map<String, Object > joEntity, ServicesInstrument servicesInstrument ) {
         super( joEntity, servicesInstrument );
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public GenericServiceElement( ServicesInstrument servicesInstrument ) {

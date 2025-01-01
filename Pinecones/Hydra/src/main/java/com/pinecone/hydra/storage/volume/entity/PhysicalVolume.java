@@ -1,18 +1,36 @@
 package com.pinecone.hydra.storage.volume.entity;
 
-import com.pinecone.hydra.storage.MiddleStorageObject;
+import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.StorageIOResponse;
+import com.pinecone.hydra.storage.StorageExportIORequest;
+import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.VolumeManager;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 
 public interface PhysicalVolume extends Volume{
     MountPoint getMountPoint();
     void setMountPoint( MountPoint mountPoint );
 
-    MiddleStorageObject channelReceive(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, FileChannel channel, String destDirPath ) throws IOException, SQLException;
-    MiddleStorageObject channelReceive(VolumeManager volumeManager, ReceiveStorageObject receiveStorageObject, FileChannel channel, String destDirPath, Number offset, Number endSize ) throws IOException;
-    MiddleStorageObject channelExport(VolumeManager volumeManager, ExportStorageObject exportStorageObject, FileChannel channel ) throws IOException;
+    GUID getParent();
+
+    StorageIOResponse channelReceive(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, Chanface channel ) throws IOException, SQLException;
+    StorageIOResponse channelReceive(VolumeManager volumeManager, StorageReceiveIORequest storageReceiveIORequest, Chanface channel, Number offset, Number endSize ) throws IOException;
+
+    StorageIOResponse channelExport(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, Chanface channel ) throws IOException;
+    StorageIOResponse channelRaid0Export(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, Chanface channel, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException;
+
+    StorageIOResponse receive( ReceiveEntity entity ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException;
+    StorageIOResponse receive( ReceiveEntity entity, Number offset, Number endSize ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException;
+
+    StorageIOResponse receive( ReceiveEntity entity, CacheBlock cacheBlock, byte[] buffer ) throws SQLException, IOException;
+
+    StorageIOResponse export( ExporterEntity entity ) throws SQLException, IOException;
+    //敬请期待
+    StorageIOResponse export( ExporterEntity entity, Number offset, Number endSize );
 
 }

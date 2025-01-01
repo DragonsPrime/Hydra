@@ -28,6 +28,16 @@ public abstract class ArchServgramium extends ArchProcessum implements Servgrami
         this.infoLifecycle( "MeeseekSpawned", "I'm Mr.Meeseek[" + this.className() + "], look at me !" );
     }
 
+    protected ArchServgramium( Servgramium shared, boolean bs ) {
+        super( shared.getName(), (Processum) shared.parentExecutum() );
+        ArchServgramium that = (ArchServgramium) shared;
+        this.mszGramName     = that.mszGramName;
+        this.mTaskManager    = that.mTaskManager;
+        this.mLogger         = that.mLogger;
+        this.mServgramList   = that.mServgramList;
+        this.mServgramConf   = that.mServgramConf;
+    }
+
     @Override
     public Logger getLogger() {
         return this.mLogger;

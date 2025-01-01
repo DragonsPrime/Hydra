@@ -6,7 +6,7 @@ import com.pinecone.framework.system.prototype.ObjectiveClass;
 import com.pinecone.framework.system.prototype.ObjectiveEvaluator;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.*;
-import com.pinecone.framework.util.json.hometype.*;
+import com.pinecone.framework.util.json.homotype.*;
 
 class Dick {
     @JSONGet( "name" )
@@ -178,8 +178,11 @@ public class TestJSON {
     }
 
     public static void testMarshal() {
-        Object j = JSON.unmarshal( "{ name:Slave, length:1234, parasite:{ name: parasite, length:20241102 }, atts: { key:val }, li:[1,2,3, 'ssss']  }", Slave.class );
-        Debug.trace( j );
+        Slave j = JSON.unmarshal( "{ /*name:Slave, length:1234, parasite:{ name: parasite, length:20241102 }, atts: { key:val }, li:[1,2,3, 'ssss'],*/" +
+                "children: [{ name:Slave, length:1234, parasite:{ name: parasitec, length:20241117 }  } ]," +
+                "ms: { fi: { name:Slave, length:1234, parasite:{ name: parasitec, length:20241117 }  } }" +
+                " }", Slave.class );
+        Debug.fmp( 2, j );
     }
 
 

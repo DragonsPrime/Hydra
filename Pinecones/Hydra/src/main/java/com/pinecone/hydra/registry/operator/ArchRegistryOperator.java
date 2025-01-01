@@ -8,15 +8,15 @@ import com.pinecone.hydra.registry.entity.ArchElementNode;
 import com.pinecone.hydra.registry.source.RegistryAttributesManipulator;
 import com.pinecone.hydra.registry.source.RegistryMasterManipulator;
 import com.pinecone.hydra.system.ko.UOIUtils;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 public abstract class ArchRegistryOperator implements RegistryNodeOperator {
     protected KOMRegistry                    registry;
-    protected DistributedTrieTree            distributedTrieTree;
+    protected ImperialTree                   imperialTree;
     protected RegistryMasterManipulator      registryMasterManipulator;
     protected RegistryAttributesManipulator  attributesManipulator;
 
@@ -29,13 +29,13 @@ public abstract class ArchRegistryOperator implements RegistryNodeOperator {
 
     public ArchRegistryOperator( RegistryMasterManipulator masterManipulator, KOMRegistry registry ){
         this.registryMasterManipulator     = masterManipulator;
-        this.distributedTrieTree           = registry.getMasterTrieTree();
+        this.imperialTree = registry.getMasterTrieTree();
         this.attributesManipulator         = this.registryMasterManipulator.getAttributesManipulator();
 
         this.registry                      = registry;
     }
 
-    protected DistributedTreeNode affirmPreinsertionInitialize( TreeNode treeNode ) {
+    protected ImperialTreeNode affirmPreinsertionInitialize(TreeNode treeNode ) {
         ArchElementNode entityNode   = (ArchElementNode) treeNode;
 
         GUID guid72 = entityNode.getGuid();
@@ -48,11 +48,11 @@ public abstract class ArchRegistryOperator implements RegistryNodeOperator {
         }
         entityNode.setUpdateTime( LocalDateTime.now() );
 
-        DistributedTreeNode distributedTreeNode = new GUIDDistributedTrieNode();
-        distributedTreeNode.setGuid( guid72 );
-        distributedTreeNode.setType( UOIUtils.createLocalJavaClass( entityNode.getClass().getName() ) );
+        ImperialTreeNode imperialTreeNode = new GUIDImperialTrieNode();
+        imperialTreeNode.setGuid( guid72 );
+        imperialTreeNode.setType( UOIUtils.createLocalJavaClass( entityNode.getClass().getName() ) );
 
-        return distributedTreeNode;
+        return imperialTreeNode;
     }
 
     public RegistryOperatorFactory getOperatorFactory() {

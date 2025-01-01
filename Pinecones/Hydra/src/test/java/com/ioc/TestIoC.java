@@ -6,9 +6,9 @@ import com.pinecone.framework.system.prototype.ObjectiveMap;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.DirectJSONInjector;
-import com.pinecone.framework.util.json.hometype.JSONGet;
-import com.pinecone.framework.util.json.hometype.MapStructure;
+import com.pinecone.framework.util.json.homotype.DirectJSONInjector;
+import com.pinecone.framework.util.json.homotype.JSONGet;
+import com.pinecone.framework.util.json.homotype.MapStructure;
 import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.lang.GenericDynamicFactory;
 
@@ -115,7 +115,7 @@ public class TestIoC {
     }
 
     public static void testUnifyStructureInjector_Simple( )  throws Exception {
-        InstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
+        StructureInstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
         UnifyStructureInjector injector = new UnifyStructureInjector( Actor.class, dispenser );
         Actor actor = new Actor();
 
@@ -125,7 +125,7 @@ public class TestIoC {
     }
 
     public static void testUnifyStructureInjector_List( )  throws Exception {
-        InstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
+        StructureInstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
         UnifyStructureInjector injector = new UnifyStructureInjector( Team.class, dispenser );
         Team team = new Team();
 
@@ -139,7 +139,7 @@ public class TestIoC {
     }
 
     public static void testUnifyStructureInjector_Sophisticate( )  throws Exception {
-        InstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
+        StructureInstanceDispenser dispenser = new UnifyCentralInstanceDispenser();
         UnifyStructureInjector injector = new UnifyStructureInjector( Tale.class, dispenser );
         Tale tale = new Tale();
 

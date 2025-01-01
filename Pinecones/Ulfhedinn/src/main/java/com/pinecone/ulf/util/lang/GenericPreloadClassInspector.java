@@ -2,9 +2,11 @@ package com.pinecone.ulf.util.lang;
 
 import javassist.ClassPool;
 import javassist.CtClass;
+import javassist.CtMethod;
 import javassist.NotFoundException;
 import javassist.bytecode.AnnotationsAttribute;
 import javassist.bytecode.ClassFile;
+import javassist.bytecode.MethodInfo;
 import javassist.bytecode.annotation.Annotation;
 
 public class GenericPreloadClassInspector implements HierarchyClassInspector {
@@ -129,19 +131,7 @@ public class GenericPreloadClassInspector implements HierarchyClassInspector {
             return false;
         }
 
-        for ( Class<?> annotationClass : annotationClasses ) {
-            boolean found = false;
-            for ( Annotation annotation : annotations ) {
-                if ( annotation.getTypeName().equals( annotationClass.getName() ) ) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                return false;
-            }
-        }
-        return true;
+        return this.hasOwnAnnotations( annotations, annotationClasses );
     }
 
     @Override
@@ -163,6 +153,71 @@ public class GenericPreloadClassInspector implements HierarchyClassInspector {
             }
         }
         return true;
+    }
+
+    protected boolean hasOwnAnnotations( Annotation[] annotations, Class<?>[] annotationClasses ) {
+        for ( Class<?> annotationClass : annotationClasses ) {
+            boolean found = false;
+            for ( Annotation annotation : annotations ) {
+                if ( annotation.getTypeName().equals( annotationClass.getName() ) ) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public boolean methodHasAnnotations( CtMethod method, Class<?>[] annotationClasses ) {
+        MethodInfo methodInfo = method.getMethodInfo();
+        AnnotationsAttribute attr = (AnnotationsAttribute) methodInfo.getAttribute( AnnotationsAttribute.visibleTag );
+        if ( attr == null ) {
+            return false;
+        }
+
+        return this.hasOwnAnnotations( attr.getAnnotations(), annotationClasses );
+    }
+
+    public boolean methodHasAnnotations( CtMethod method, String[] annotationNames ) {
+        MethodInfo methodInfo = method.getMethodInfo();
+        AnnotationsAttribute attr = (AnnotationsAttribute) methodInfo.getAttribute( AnnotationsAttribute.visibleTag );
+        if ( attr == null ) {
+            return false;
+        }
+
+        for ( String annotationName : annotationNames ) {
+            boolean found = false;
+            for ( Annotation annotation : attr.getAnnotations() ) {
+                if ( annotation.getTypeName().equals( annotationName ) ) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    public boolean methodHasAnnotation( CtMethod method, Class<?> annotationClass ) {
+        return this.methodHasAnnotation( method, annotationClass.getName() );
+    }
+
+    public boolean methodHasAnnotation( CtMethod method, String annotationName ) {
+        MethodInfo methodInfo = method.getMethodInfo();
+        AnnotationsAttribute attr = (AnnotationsAttribute) methodInfo.getAttribute( AnnotationsAttribute.visibleTag );
+        if ( attr != null ) {
+            for ( Annotation annotation : attr.getAnnotations() ) {
+                if ( annotation.getTypeName().equals( annotationName ) ) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override

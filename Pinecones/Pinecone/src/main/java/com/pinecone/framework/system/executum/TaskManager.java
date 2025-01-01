@@ -37,6 +37,10 @@ public interface TaskManager extends Pinenut, Summoner {
 
     void     erase( Executum that );
 
+    Executum addSync   ( Executum that );
+
+    void     eraseSync ( Executum that );
+
     void     purge();
 
     boolean isTerminated();

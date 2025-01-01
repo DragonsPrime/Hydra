@@ -5,19 +5,19 @@ import java.util.List;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.name.path.PathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.entity.ReparseLinkNode;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
+import com.pinecone.hydra.unit.imperium.entity.ReparseLinkNode;
 
 public class ReparseLinkSelector extends MultiFolderPathSelector implements ReparsePointSelector {
     public ReparseLinkSelector( MultiFolderPathSelector pathSelector ) {
-        super( pathSelector.pathResolver, pathSelector.distributedTrieTree, pathSelector.dirManipulators, pathSelector.fileManipulators );
+        super( pathSelector.pathResolver, pathSelector.imperialTree, pathSelector.dirManipulators, pathSelector.fileManipulators );
     }
 
-    public ReparseLinkSelector( PathResolver pathResolver, DistributedTrieTree trieTree, GUIDNameManipulator dirMan, GUIDNameManipulator[] fileMans ) {
+    public ReparseLinkSelector(PathResolver pathResolver, ImperialTree trieTree, GUIDNameManipulator dirMan, GUIDNameManipulator[] fileMans ) {
         super( pathResolver, trieTree, new GUIDNameManipulator[]{ dirMan }, fileMans );
     }
 
-    public ReparseLinkSelector( PathResolver pathResolver, DistributedTrieTree trieTree, GUIDNameManipulator[] dirMans, GUIDNameManipulator[] fileMans ) {
+    public ReparseLinkSelector(PathResolver pathResolver, ImperialTree trieTree, GUIDNameManipulator[] dirMans, GUIDNameManipulator[] fileMans ) {
         super( pathResolver, trieTree, dirMans, fileMans );
     }
 
@@ -38,7 +38,7 @@ public class ReparseLinkSelector extends MultiFolderPathSelector implements Repa
 
     @Override
     protected Object beforeDFSTermination( String currentPart, GUID guid ) {
-        ReparseLinkNode reparseLinkNode = this.distributedTrieTree.getReparseLinkNodeByNodeGuid( currentPart, guid );
+        ReparseLinkNode reparseLinkNode = this.imperialTree.getReparseLinkNodeByNodeGuid( currentPart, guid );
         if ( reparseLinkNode != null ) {
             return reparseLinkNode;
         }

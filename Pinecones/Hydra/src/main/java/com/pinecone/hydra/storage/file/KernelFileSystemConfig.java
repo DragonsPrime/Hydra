@@ -10,6 +10,7 @@ public class KernelFileSystemConfig extends ArchKernelObjectConfig implements Fi
     protected Number mnFrameSize            = FileConstants.DefaultFrameSize;
     protected GUID   mLocalhostGUID         = StorageConstants.LocalhostGUID;
     protected Number TinyFileStripSizing    = VolumeConstants.TinyFileStripSizing;
+    protected String DefaultVolumePath      = StorageConstants.DefaultVolumePath;
 
     @Override
     public String getVersionSignature() {
@@ -27,5 +28,10 @@ public class KernelFileSystemConfig extends ArchKernelObjectConfig implements Fi
     @Override
     public Number getTinyFileStripSizing() {
         return this.TinyFileStripSizing;
+    }
+
+    @Override
+    public String getDefaultVolume() {
+        return this.DefaultVolumePath;
     }
 }

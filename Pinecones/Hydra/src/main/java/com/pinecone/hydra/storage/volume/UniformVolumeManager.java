@@ -5,9 +5,13 @@ import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.entity.MountPoint;
 import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
+import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.TitanVolumeAllotment;
+import com.pinecone.hydra.storage.volume.entity.Volume;
 import com.pinecone.hydra.storage.volume.entity.VolumeAllotment;
 import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
+import com.pinecone.hydra.storage.volume.kvfs.KenusDruid;
+import com.pinecone.hydra.storage.volume.kvfs.KenusPool;
 import com.pinecone.hydra.storage.volume.operator.TitanVolumeOperatorFactory;
 import com.pinecone.hydra.storage.volume.source.LogicVolumeManipulator;
 import com.pinecone.hydra.storage.volume.source.MirroredVolumeManipulator;
@@ -27,19 +31,21 @@ import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.hydra.system.ko.kom.ArchKOMTree;
 import com.pinecone.hydra.system.ko.kom.SimplePathSelector;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.DistributedTrieTree;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.EntityNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.hydra.unit.udtt.operator.TreeNodeOperator;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.ImperialTree;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.EntityNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 import com.pinecone.ulf.util.id.GUIDs;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
+    protected Hydrarum                          hydrarum;
     protected VolumeAllotment                   volumeAllotment;
     protected MirroredVolumeManipulator         mirroredVolumeManipulator;
     protected MountPointManipulator             mountPointManipulator;
@@ -49,14 +55,20 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     protected StripedVolumeManipulator          stripedVolumeManipulator;
     protected VolumeCapacityManipulator         volumeCapacityManipulator;
     protected VolumeMasterManipulator           volumeMasterManipulator;
+
     protected VolumeAllocateManipulator         volumeAllocateManipulator;
+
     protected SQLiteVolumeManipulator           sqliteVolumeManipulator;
+
     protected LogicVolumeManipulator            primeLogicVolumeManipulator;
+
+    protected KenusPool                         kenusPool;
 
 
     public UniformVolumeManager( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, VolumeManager parent, String name ) {
-        super( hydrarum, masterManipulator, VolumeManager.KernelVolumeConfig, parent, name );
 
+        super( hydrarum, masterManipulator, VolumeManager.KernelVolumeConfig, parent, name );
+        this.hydrarum = hydrarum;
         this.volumeMasterManipulator       =   ( VolumeMasterManipulator ) masterManipulator;
         this.pathResolver                  =   new KOPathResolver( this.kernelObjectConfig );
         this.guidAllocator                 =   GUIDs.newGuidAllocator();
@@ -74,8 +86,9 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
         this.sqliteVolumeManipulator       =   this.volumeMasterManipulator.getSQLiteVolumeManipulator();
         this.primeLogicVolumeManipulator   =   this.volumeMasterManipulator.getPrimeLogicVolumeManipulator();
 
+        this.kenusPool                     =   new KenusDruid();
         this.pathSelector                  =   new SimplePathSelector(
-                this.pathResolver, this.distributedTrieTree, this.primeLogicVolumeManipulator, new GUIDNameManipulator[] {}
+                this.pathResolver, this.imperialTree, this.primeLogicVolumeManipulator, new GUIDNameManipulator[] {}
         );
     }
 
@@ -97,8 +110,8 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     }
 
     @Override
-    public DistributedTrieTree getMasterTrieTree() {
-        return this.distributedTrieTree;
+    public ImperialTree getMasterTrieTree() {
+        return this.imperialTree;
     }
 
     @Override
@@ -111,25 +124,25 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     }
 
     protected String getNS( GUID guid, String szSeparator ){
-        String path = this.distributedTrieTree.getCachePath(guid);
+        String path = this.imperialTree.getCachePath(guid);
         if ( path != null ) {
             return path;
         }
 
-        DistributedTreeNode node = this.distributedTrieTree.getNode(guid);
+        ImperialTreeNode node = this.imperialTree.getNode(guid);
         String assemblePath = this.getNodeName(node);
         while ( !node.getParentGUIDs().isEmpty() && this.allNonNull( node.getParentGUIDs() ) ){
             List<GUID> parentGuids = node.getParentGUIDs();
             for( int i = 0; i < parentGuids.size(); ++i ){
                 if ( parentGuids.get(i) != null ){
-                    node = this.distributedTrieTree.getNode( parentGuids.get(i) );
+                    node = this.imperialTree.getNode( parentGuids.get(i) );
                     break;
                 }
             }
             String nodeName = this.getNodeName(node);
             assemblePath = nodeName + szSeparator + assemblePath;
         }
-        this.distributedTrieTree.insertCachePath( guid, assemblePath );
+        this.imperialTree.insertCachePath( guid, assemblePath );
         return assemblePath;
     }
 
@@ -155,7 +168,7 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     }
 
     protected TreeNodeOperator getOperatorByGuid( GUID guid ) {
-        DistributedTreeNode node = this.distributedTrieTree.getNode( guid );
+        ImperialTreeNode node = this.imperialTree.getNode( guid );
         TreeNode newInstance = (TreeNode)node.getType().newInstance( new Class<? >[]{this.getClass()}, this );
         return this.operatorFactory.getOperator( this.getVolumeMetaType( newInstance ) );
     }
@@ -177,7 +190,7 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
 
     @Override
     public void remove(GUID guid) {
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode( guid );
+        GUIDImperialTrieNode node = this.imperialTree.getNode( guid );
         TreeNode newInstance = (TreeNode)node.getType().newInstance();
         TreeNodeOperator operator = this.operatorFactory.getOperator( this.getVolumeMetaType( newInstance ) );
         operator.purge( guid );
@@ -188,14 +201,31 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
 
     }
 
+    //protected ReentrantLock reentrantLock = new ReentrantLock();
+
     @Override
     public PhysicalVolume getPhysicalVolume(GUID guid) {
-        PhysicalVolume physicalVolume = this.physicalVolumeManipulator.getPhysicalVolume(guid);
-        MountPoint mountPoint = this.mountPointManipulator.getMountPointByVolumeGuid(guid);
-        VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
-        physicalVolume.setMountPoint( mountPoint );
-        physicalVolume.setVolumeCapacity( volumeCapacity );
-        return physicalVolume;
+//        this.reentrantLock.lock();
+//        try{
+            //Debug.trace( Thread.currentThread().getName(), Thread.currentThread().getId() );
+            PhysicalVolume physicalVolume   = this.physicalVolumeManipulator.getPhysicalVolume(guid);
+            if( physicalVolume == null ){
+                return null;
+            }
+            MountPoint mountPoint           = this.mountPointManipulator.getMountPointByVolumeGuid(guid);
+            VolumeCapacity64 volumeCapacity = this.volumeCapacityManipulator.getVolumeCapacity(guid);
+            physicalVolume.setMountPoint( mountPoint );
+            physicalVolume.setVolumeCapacity( volumeCapacity );
+            return physicalVolume;
+//        }
+//        finally {
+//            this.reentrantLock.unlock();
+//        }
+    }
+
+    @Override
+    public SimpleVolume getPhysicalVolumeParent(GUID guid) {
+        return null;
     }
 
     @Override
@@ -265,17 +295,43 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
         return this.getPhysicalVolume( smallestCapacityPhysicalVolume.getGuid() );
     }
 
+
     @Override
-    public GUID getSQLitePhysicsVolume(GUID volumeGuid) {
-        return this.sqliteVolumeManipulator.getPhysicsGuid(volumeGuid);
+    public VolumeMasterManipulator getMasterManipulator() {
+        return this.volumeMasterManipulator;
     }
 
     @Override
-    public void insertSQLiteMeta(GUID physicsGuid, GUID volumeGuid) {
-        this.sqliteVolumeManipulator.insert( physicsGuid, volumeGuid );
+    public void storageExpansion(GUID parentGuid, GUID childGuid) {
+        this.treeMasterManipulator.getTrieTreeManipulator().addChild( childGuid, parentGuid );
     }
 
-    private String getNodeName(DistributedTreeNode node ){
+    @Override
+    public Hydrarum getHydrarum() {
+        return this.hydrarum;
+    }
+
+    @Override
+    public KenusPool getKenusPool() {
+        return this.kenusPool;
+    }
+
+    @Override
+    public List<Volume> queryAllVolumes() {
+        List<Volume> physicalVolumes = this.physicalVolumeManipulator.queryAllPhysicalVolumes();
+        List<Volume> simpleVolumes = this.simpleVolumeManipulator.queryAllSimpleVolumes();
+        List<Volume> spannedVolumes = this.spannedVolumeManipulator.queryAllSpannedVolume();
+        List<Volume> stripedVolumes = this.stripedVolumeManipulator.queryAllStripedVolume();
+
+        ArrayList<Volume> volumes = new ArrayList<>();
+        volumes.addAll( physicalVolumes );
+        volumes.addAll(simpleVolumes);
+        volumes.addAll(spannedVolumes);
+        volumes.addAll(stripedVolumes);
+        return volumes;
+    }
+
+    private String getNodeName(ImperialTreeNode node ){
         UOI type = node.getType();
         TreeNode newInstance = (TreeNode)type.newInstance();
         TreeNodeOperator operator = this.operatorFactory.getOperator(this.getVolumeMetaType( newInstance ));

@@ -74,6 +74,7 @@ public class SQLiteHost implements RDBHost {
 
     @Override
     public void close() throws SQLException {
+        Debug.trace("关闭");
         if( this.mGlobalConnection != null ) {
             this.mGlobalConnection.close();
         }

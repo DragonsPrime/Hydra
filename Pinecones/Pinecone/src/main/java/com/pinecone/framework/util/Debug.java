@@ -1,5 +1,7 @@
 package com.pinecone.framework.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.pinecone.framework.system.InstantKillError;
 import com.pinecone.framework.util.io.Tracer;
 import com.pinecone.framework.util.io.Tracerson;
@@ -45,9 +47,62 @@ public class Debug {
         return Debug.console.info( Anything, objects );
     }
 
+    public synchronized static Tracer infoSyn( Object Anything, Object...objects ){
+        return Debug.console.info( Anything, objects );
+    }
+
     public static Tracer warn ( Object Anything, Object...objects ){
         return Debug.console.warn( Anything, objects );
     }
+
+    public synchronized static Tracer warnSyn( Object Anything, Object...objects ){
+        return Debug.console.warn( Anything, objects );
+    }
+
+    public static Tracer colorf( int colorCode, Object Anything, Object...objects ){
+        return Debug.console.colorf( colorCode, Anything, objects );
+    }
+
+    public static Tracer purplef( Object Anything, Object...objects ){
+        return Debug.console.colorf( 35, Anything, objects );
+    }
+
+    public synchronized static Tracer purplefs( Object Anything, Object...objects ){
+        return Debug.purplef( Anything, objects );
+    }
+
+    public static Tracer redf( Object Anything, Object...objects ){
+        return Debug.console.colorf( 31, Anything, objects );
+    }
+
+    public synchronized static Tracer redfs( Object Anything, Object...objects ){
+        return Debug.redf( Anything, objects );
+    }
+
+    public static Tracer greenf( Object Anything, Object...objects ){
+        return Debug.console.colorf( 32, Anything, objects );
+    }
+
+    public synchronized static Tracer greenfs( Object Anything, Object...objects ){
+        return Debug.greenf( Anything, objects );
+    }
+
+    public static Tracer bluef( Object Anything, Object...objects ){
+        return Debug.console.colorf( 34, Anything, objects );
+    }
+
+    public synchronized static Tracer bluefs( Object Anything, Object...objects ){
+        return Debug.bluef( Anything, objects );
+    }
+
+    public static Tracer whitef( Object Anything, Object...objects ){
+        return Debug.console.colorf( 30, Anything, objects );
+    }
+
+    public synchronized static Tracer whitefs( Object Anything, Object...objects ){
+        return Debug.whitef( Anything, objects );
+    }
+
 
     public static Tracer hhf(){
         Debug.console.getOut().println();
@@ -55,11 +110,15 @@ public class Debug {
     }
 
 
-    public static Tracer echo(Object data, Object...objects ) {
+    public static Tracer echo( Object data, Object...objects ) {
         return Debug.console.echo( data, objects );
     }
 
-    public static Tracer cerr(Object data, Object...objects ) {
+    public static Tracer cerr( Object data, Object...objects ) {
+        return Debug.console.cerr( data, objects );
+    }
+
+    public synchronized static Tracer cerrSyn( Object data, Object...objects ) {
         return Debug.console.cerr( data, objects );
     }
 
@@ -79,6 +138,14 @@ public class Debug {
 
     public static void exit() {
         System.exit( -666 );
+    }
+
+
+
+    private static AtomicInteger InvokeCounts = new AtomicInteger();
+
+    public static long invokeCounts() {
+        return Debug.InvokeCounts.getAndIncrement();
     }
 
 }

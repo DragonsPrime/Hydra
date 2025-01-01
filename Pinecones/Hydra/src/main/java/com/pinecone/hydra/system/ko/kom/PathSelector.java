@@ -11,4 +11,11 @@ public interface PathSelector extends KOMSelector {
     GUID searchGUID( String[] parts, @Nullable String[] lpResolvedPath );
 
     GUID searchGUID( List<String > resolvedParts );
+
+
+    GUID searchGUID( GUID parentID, String[] parts );
+
+    GUID searchGUID( GUID parentID, String[] parts, @Nullable String[] lpResolvedPath );
+
+    GUID searchGUID( GUID parentID, List<String > resolvedParts );
 }

@@ -9,6 +9,7 @@ import java.net.SocketAddress;
 
 public abstract class ArchUMCChannel implements NettyUMCChannel {
     protected ChannelId                  mChannelID          ;
+    protected long                       mIdentityID         ;
     protected Thread                     mAffiliateThread    = Thread.currentThread();
     protected MessageNode                mParentMessageNode  ;
     protected ChannelFuture              mLastChannelFuture  ;
@@ -62,31 +63,47 @@ public abstract class ArchUMCChannel implements NettyUMCChannel {
         return this.mAddress;
     }
 
+    @Override
     public Thread            getAffiliateThread(){
         return this.mAffiliateThread;
     }
 
+    @Override
     public ChannelId         getChannelID() {
         return this.mChannelID;
     }
 
+    @Override
+    public long              getIdentityID() {
+        return this.mIdentityID;
+    }
+
+    void                     setIdentityID( long identityID ) {
+        this.mIdentityID = identityID;
+    }
+
+    @Override
     public Channel           getNativeHandle(){
         return this.mChannel;
     }
 
+    @Override
     public UlfChannelStatus  getChannelStatus() {
         return this.mChannelStatus;
     }
 
+    @Override
     public void              setChannelStatus( UlfChannelStatus status ) {
         this.mChannelStatus = status;
     }
 
+    @Override
     public MessageNode       getParentMessageNode() {
         return this.mParentMessageNode;
     }
 
 
+    @Override
     public void              release() {
         this.mAffiliateThread    = null;
         this.mLastChannelFuture  = null;
@@ -95,12 +112,14 @@ public abstract class ArchUMCChannel implements NettyUMCChannel {
         this.mParentMessageNode  = null;
     }
 
+    @Override
     public void              close() {
         this.setChannelStatus( UlfChannelStatus.WAITING_FOR_SHUTDOWN );
         this.getNativeHandle().close();
         this.setChannelStatus( UlfChannelStatus.SHUTDOWN );
     }
 
+    @Override
     public boolean           isShutdown() {
         return this.getChannelStatus().isTerminated();
     }

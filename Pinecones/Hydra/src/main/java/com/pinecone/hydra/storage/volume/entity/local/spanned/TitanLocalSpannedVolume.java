@@ -1,21 +1,23 @@
 package com.pinecone.hydra.storage.volume.entity.local.spanned;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.framework.util.json.hometype.BeanJSONEncoder;
-import com.pinecone.hydra.storage.MiddleStorageObject;
+import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
+import com.pinecone.framework.util.sqlite.SQLiteExecutor;
+import com.pinecone.framework.util.sqlite.SQLiteHost;
+import com.pinecone.hydra.storage.StorageIOResponse;
+import com.pinecone.hydra.storage.volume.VolumeConfig;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.ArchLogicVolume;
-import com.pinecone.hydra.storage.volume.entity.ExportStorageObject;
+import com.pinecone.hydra.storage.volume.entity.ExporterEntity;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
-import com.pinecone.hydra.storage.volume.entity.ReceiveStorageObject;
-import com.pinecone.hydra.storage.volume.entity.VolumeCapacity64;
+import com.pinecone.hydra.storage.volume.entity.PhysicalVolume;
+import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
-import com.pinecone.hydra.storage.volume.entity.local.spanned.export.TitanSpannedChannelExportEntity64;
-import com.pinecone.hydra.storage.volume.entity.local.spanned.receive.TitanSpannedChannelReceiveEntity64;
+import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
 
 import java.io.IOException;
-import java.nio.channels.FileChannel;
+import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -57,26 +59,50 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
         this.volumeManager = volumeManager;
     }
 
+
     @Override
-    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel) throws IOException, SQLException {
-        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeManager,receiveStorageObject,destDirPath,channel,this );
-        MiddleStorageObject middleStorageObject = titanSpannedChannelReceiveEntity64.receive();
-        middleStorageObject.setBottomGuid( this.guid );
-        return middleStorageObject;
+    public StorageIOResponse receive(ReceiveEntity entity) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return entity.receive();
     }
 
     @Override
-    public MiddleStorageObject channelReceive(ReceiveStorageObject receiveStorageObject, String destDirPath, FileChannel channel, Number offset, Number endSize) throws IOException, SQLException {
-        TitanSpannedChannelReceiveEntity64 titanSpannedChannelReceiveEntity64 = new TitanSpannedChannelReceiveEntity64( this.volumeManager,receiveStorageObject,destDirPath,channel,this );
-        MiddleStorageObject middleStorageObject = titanSpannedChannelReceiveEntity64.receive( offset, endSize );
-        middleStorageObject.setBottomGuid( this.guid );
-        return middleStorageObject;
+    public StorageIOResponse receive(ReceiveEntity entity, Number offset, Number endSize) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        return entity.receive( offset, endSize );
     }
 
     @Override
-    public MiddleStorageObject channelExport(ExportStorageObject exportStorageObject, FileChannel channel) throws IOException, SQLException {
-        TitanSpannedChannelExportEntity64 titanSpannedChannelExportEntity64 = new TitanSpannedChannelExportEntity64( this.volumeManager, exportStorageObject,channel, this );
-        return titanSpannedChannelExportEntity64.export();
+    public StorageIOResponse receive(ReceiveEntity entity, CacheBlock cacheBlock, byte[] buffer) throws SQLException, IOException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity) throws SQLException, IOException {
+        return entity.export();
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, Number offset, Number endSize) {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws SQLException, IOException {
+        return entity.export( cacheBlock, offset, endSize, buffer );
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, boolean accessRandom) throws SQLException, IOException {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, Number offset, Number endSize, boolean accessRandom) {
+        return null;
+    }
+
+    @Override
+    public StorageIOResponse export(ExporterEntity entity, CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer, boolean accessRandom) throws SQLException, IOException {
+        return null;
     }
 
     @Override
@@ -86,7 +112,7 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
 
     @Override
     public boolean existStorageObject(GUID storageObject) throws SQLException {
-        List<LogicVolume> volumes = this.getChildren();
+        List<LogicVolume> volumes = this.queryChildren();
         for( LogicVolume volume : volumes ){
             if ( volume.existStorageObject( storageObject ) ){
                 return true;
@@ -95,12 +121,28 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
         return false;
     }
 
-    private boolean checkCapacity(long fileSize, VolumeCapacity64 capacity){
-        long remainingCapacity = capacity.getDefinitionCapacity() - capacity.getUsedSize();
-        return remainingCapacity > fileSize;
+    // Build 模式，最后去执行
+    @Override
+    public void build() throws SQLException {
+        VolumeConfig config = this.volumeManager.getConfig();
+        PhysicalVolume smallestCapacityPhysicalVolume = this.volumeManager.getSmallestCapacityPhysicalVolume();
+        String url = smallestCapacityPhysicalVolume.getMountPoint().getMountPoint() + config.getPathSeparator() + this.guid + config.getSqliteFileExtension();
+        SQLiteExecutor sqLiteExecutor = (SQLiteExecutor) this.volumeManager.getKenusPool().allot(url);
+        this.kenVolumeFileSystem.creatSpanLinkedVolumeTable( sqLiteExecutor );
+        this.kenVolumeFileSystem.createSpannedIndexTable( sqLiteExecutor );
+        List<LogicVolume> volumes = this.queryChildren();
+        int index = 0;
+        for( LogicVolume volume : volumes ){
+            this.kenVolumeFileSystem.insertSpannedIndexTable( sqLiteExecutor, index, volume.getGuid() );
+            index++;
+        }
+        this.kenVolumeFileSystem.insertSimpleTargetMappingTab( smallestCapacityPhysicalVolume.getGuid(), this.getGuid() );
+        this.volumeManager.put( this );
     }
 
-    private long getFreeSpace( LogicVolume volume ){
-        return volume.getVolumeCapacity().getDefinitionCapacity() - volume.getVolumeCapacity().getUsedSize();
+    @Override
+    public void storageExpansion(GUID volumeGuid) {
+        this.volumeManager.storageExpansion( this.getGuid(), volumeGuid );
     }
+
 }

@@ -2,6 +2,7 @@ package com.pinecone.hydra.storage.volume.entity;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 
 import java.time.LocalDateTime;
 
@@ -28,6 +29,6 @@ public interface Volume extends Pinenut {
 
     VolumeCapacity64 getVolumeCapacity();
     void setVolumeCapacity( VolumeCapacity64 volumeCapacity );
-
+    void setKenVolumeFileSystem();
 
 }

@@ -5,7 +5,7 @@ import java.util.Set;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.service.kom.GenericNamespaceRules;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 
 public interface Namespace extends FolderElement {
     Set<String > UnbeanifiedKeys = Set.of( "distributedTreeNode", "classificationRules" );
@@ -34,9 +34,9 @@ public interface Namespace extends FolderElement {
 
     void setClassificationRules( GenericNamespaceRules classificationRules );
 
-    GUIDDistributedTrieNode getDistributedTreeNode();
+    GUIDImperialTrieNode getDistributedTreeNode();
 
-    void setDistributedTreeNode( GUIDDistributedTrieNode distributedTreeNode );
+    void setDistributedTreeNode( GUIDImperialTrieNode distributedTreeNode );
 
     @Override
     default Namespace evinceNamespace() {

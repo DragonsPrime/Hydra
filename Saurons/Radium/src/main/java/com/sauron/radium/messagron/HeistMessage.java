@@ -1,11 +1,11 @@
 package com.sauron.radium.messagron;
 
 import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.messagram.ArchMessagram;
-import com.pinecone.hydra.messagram.MessagePackage;
+import com.pinecone.hydra.umct.ArchMessagram;
+import com.pinecone.hydra.umct.UMCConnection;
 
 public class HeistMessage extends Messageletson {
-    public HeistMessage( MessagePackage msgPackage, ArchMessagram servtron ) {
+    public HeistMessage(UMCConnection msgPackage, ArchMessagram servtron ) {
         super( msgPackage, servtron );
     }
 

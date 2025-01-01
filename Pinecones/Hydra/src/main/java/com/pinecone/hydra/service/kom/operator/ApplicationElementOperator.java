@@ -2,18 +2,15 @@ package com.pinecone.hydra.service.kom.operator;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
-import com.pinecone.hydra.service.kom.ServiceFamilyNode;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
 import com.pinecone.hydra.service.kom.entity.ApplicationElement;
 import com.pinecone.hydra.service.kom.entity.GenericApplicationElement;
-import com.pinecone.hydra.service.kom.entity.ServiceTreeNode;
 import com.pinecone.hydra.service.kom.source.ApplicationMetaManipulator;
 import com.pinecone.hydra.service.kom.source.ApplicationNodeManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
 import com.pinecone.hydra.system.ko.UOIUtils;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.util.List;
@@ -56,11 +53,11 @@ public class ApplicationElementOperator extends ArchElementOperator implements E
 
 
         //将节点信息存入主表
-        GUIDDistributedTrieNode node = new GUIDDistributedTrieNode();
+        GUIDImperialTrieNode node = new GUIDImperialTrieNode();
         node.setNodeMetadataGUID(descriptionGUID);
         node.setGuid(applicationNodeGUID);
         node.setType( UOIUtils.createLocalJavaClass( treeNode.getClass().getName() ) );
-        this.distributedTrieTree.insert( node );
+        this.imperialTree.insert( node );
         return applicationNodeGUID;
     }
 
@@ -68,20 +65,20 @@ public class ApplicationElementOperator extends ArchElementOperator implements E
     @Override
     public void purge( GUID guid ) {
         //namespace节点需要递归删除其拥有节点若其引用节点，没有其他引用则进行清理
-        List<GUIDDistributedTrieNode> childNodes = this.distributedTrieTree.getChildren(guid);
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
+        List<GUIDImperialTrieNode> childNodes = this.imperialTree.getChildren(guid);
+        GUIDImperialTrieNode node = this.imperialTree.getNode(guid);
         if ( !childNodes.isEmpty() ){
-            List<GUID > subordinates = this.distributedTrieTree.getSubordinates(guid);
+            List<GUID > subordinates = this.imperialTree.getSubordinates(guid);
             if ( !subordinates.isEmpty() ){
                 for ( GUID subordinateGuid : subordinates ){
                     this.purge( subordinateGuid );
                 }
             }
-            childNodes = this.distributedTrieTree.getChildren( guid );
-            for( GUIDDistributedTrieNode childNode : childNodes ){
-                List<GUID > parentNodes = this.distributedTrieTree.fetchParentGuids(childNode.getGuid());
+            childNodes = this.imperialTree.getChildren( guid );
+            for( GUIDImperialTrieNode childNode : childNodes ){
+                List<GUID > parentNodes = this.imperialTree.fetchParentGuids(childNode.getGuid());
                 if ( parentNodes.size() > 1 ){
-                    this.distributedTrieTree.removeInheritance(childNode.getGuid(),guid);
+                    this.imperialTree.removeInheritance(childNode.getGuid(),guid);
                 }
                 else {
                     this.purge( childNode.getGuid() );
@@ -107,7 +104,7 @@ public class ApplicationElementOperator extends ArchElementOperator implements E
 
     @Override
     public ApplicationElement get( GUID guid ) {
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode( guid );
+        GUIDImperialTrieNode node = this.imperialTree.getNode( guid );
         ApplicationElement applicationElement;
         if( node.getNodeMetadataGUID() != null ){
             applicationElement = this.applicationMetaManipulator.getApplicationElement( node.getNodeMetadataGUID(), this.servicesInstrument );
@@ -135,7 +132,10 @@ public class ApplicationElementOperator extends ArchElementOperator implements E
 
     @Override
     public void update( TreeNode treeNode ) {
-
+        GenericApplicationElement applicationElement = (GenericApplicationElement) treeNode;
+        this.applicationNodeManipulator.update( applicationElement );
+        this.applicationMetaManipulator.update( applicationElement );
+        this.commonDataManipulator.update( applicationElement );
     }
 
     @Override
@@ -144,9 +144,9 @@ public class ApplicationElementOperator extends ArchElementOperator implements E
     }
 
     protected void removeNode( GUID guid ){
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode( guid );
-        this.distributedTrieTree.purge( guid );
-        this.distributedTrieTree.removeCachePath(guid);
+        GUIDImperialTrieNode node = this.imperialTree.getNode( guid );
+        this.imperialTree.purge( guid );
+        this.imperialTree.removeCachePath(guid);
         this.applicationMetaManipulator.remove( node.getAttributesGUID() );
         this.commonDataManipulator.remove( node.getNodeMetadataGUID() );
         this.applicationNodeManipulator.remove( node.getGuid( ));

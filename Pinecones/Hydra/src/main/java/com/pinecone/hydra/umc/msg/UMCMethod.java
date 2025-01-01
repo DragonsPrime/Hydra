@@ -2,8 +2,8 @@ package com.pinecone.hydra.umc.msg;
 
 public enum UMCMethod {
     UNDEFINED ( 0x00, "Undefined" ),
-    PUT       ( 0x01, "Put"       ),
-    POST      ( 0x02, "Post"      );
+    INFORM    ( 0x01, "Inform"    ),
+    TRANSFER  ( 0x02, "Transfer"  );
 
     private final int value;
 

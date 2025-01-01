@@ -1,5 +1,6 @@
 package com.pinecone.hydra.umc.msg;
 
+import com.pinecone.framework.util.Bytes;
 import com.pinecone.framework.util.json.JSONException;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
@@ -136,10 +137,24 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         byteBuffer.putShort( head.status.getShortValue() );
         nBufLength += Short.BYTES;
 
-        byteBuffer.putShort( head.extraEncode.getShortValue() );
-        nBufLength += Short.BYTES;
+        byteBuffer.put( head.extraEncode.getByteValue() );
+        nBufLength += Byte.BYTES;
 
-        byteBuffer.put( head.extraHead );
+        byteBuffer.putLong( head.controlBits );
+        nBufLength += Long.BYTES;
+
+        byteBuffer.putLong( head.sessionId );
+        nBufLength += Long.BYTES;
+
+        byteBuffer.putLong( head.identityId );
+        nBufLength += Long.BYTES;
+
+        if( head.extraHead == null ) {
+            byteBuffer.put( Bytes.Empty );
+        }
+        else {
+            byteBuffer.put( head.extraHead );
+        }
         nBufLength += head.getExtraHeadLength();
 
         this.mOutputStream.write( byteBuffer.array(), 0, nBufLength );
@@ -175,7 +190,7 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
     }
 
     public static int basicHeadLength( String szSignature ) {
-        return szSignature.length() + 1 + Byte.BYTES + Integer.BYTES + Long.BYTES + Long.BYTES + Short.BYTES + Short.BYTES; // 1 for ' ';
+        return szSignature.length() + 1 + UMCHead.StructBlockSize; // 1 for ' ';
     }
 
     public static UMCHead onlyReadMsgBasicHead( byte[] buf, String szSignature, ExtraHeadCoder extraHeadCoder ) throws IOException {
@@ -209,8 +224,17 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         head.status            = Status.asValue( ByteBuffer.wrap( buf, nReadAt, Short.BYTES ).order( UMCHead.BinByteOrder ).getShort() );
         nReadAt += Short.BYTES;
 
-        head.extraEncode       = ExtraEncode.asValue( ByteBuffer.wrap( buf, nReadAt, Short.BYTES ).order( UMCHead.BinByteOrder ).getShort() );
-        nReadAt += Short.BYTES;
+        head.extraEncode       = ExtraEncode.asValue( ByteBuffer.wrap( buf, nReadAt, Byte.BYTES ).order( UMCHead.BinByteOrder ).get() );
+        nReadAt += Byte.BYTES;
+
+        head.controlBits      = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHead.BinByteOrder ).getLong();
+        nReadAt += Long.BYTES;
+
+        head.sessionId        = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHead.BinByteOrder ).getLong();
+        nReadAt += Long.BYTES;
+
+        head.identityId       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHead.BinByteOrder ).getLong();
+        nReadAt += Long.BYTES;
 
         return head;
     }

@@ -3,6 +3,8 @@ package com.pinecone.ulf.util.id;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.IllegalIdentificationException;
 
+import java.util.Map;
+
 public class GUID72 extends GUID64 {
     private byte nanoSeed;
 
@@ -61,5 +63,10 @@ public class GUID72 extends GUID64 {
         }
 
         return super.equals(obj) && b;
+    }
+
+    @Override
+    public int hashCode() {
+        return Long.hashCode( this.guid ) ^ Byte.hashCode( this.nanoSeed );
     }
 }

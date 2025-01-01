@@ -3,7 +3,7 @@ package com.sauron.radium.ally.rdb;
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.unit.LinkedTreeSet;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.JSONGet;
+import com.pinecone.framework.util.json.homotype.JSONGet;
 import com.pinecone.framework.util.lang.ClassScope;
 import com.pinecone.framework.util.lang.GenericClassScopeSet;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
@@ -235,6 +235,11 @@ public class GenericIbatisClient extends ArchRelationalDatabase implements Ibati
         catch ( BindingException ignore ) {
             // Do nothing.
         }
+    }
+
+    @Override
+    public SqlSessionFactory getSqlSessionFactory() {
+        return this.mSqlSessionFactory;
     }
 
     @Override

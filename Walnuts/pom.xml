@@ -17,6 +17,7 @@
     <modules>
         <module>sparta</module>
         <module>sparta-console</module>
+        <module>sparta-uofs-service</module>
     </modules>
 
 

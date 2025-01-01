@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.pinecone.framework.system.stereotype.JavaBeans;
+import com.pinecone.framework.util.ClassUtils;
+import com.pinecone.framework.util.json.JSONArray;
 
 public class MapStructuresEvaluator implements ObjectiveEvaluator {
     @Override
@@ -51,7 +53,26 @@ public class MapStructuresEvaluator implements ObjectiveEvaluator {
             setter = that.getClass().getMethod( setterName );
         }
         else {
-            setter = that.getClass().getMethod( setterName, val.getClass() );
+            try{
+                setter = that.getClass().getMethod( setterName, val.getClass() );
+            }
+            catch ( NoSuchMethodException e ) {
+                setter = null;
+                Method[] candidates = that.getClass().getMethods();
+                for( Method candidate : candidates ) {
+                    Class<?>[] pars = candidate.getParameterTypes();
+                    if( candidate.getName().equals( setterName ) && pars.length == 1 ) {
+                        if( ClassUtils.isAssignable( pars[0], val.getClass() ) ){
+                            setter = candidate;
+                            break;
+                        }
+                    }
+                }
+
+                if( setter == null ) {
+                    throw e;
+                }
+            }
         }
 
         setter.setAccessible( true );
@@ -268,7 +289,14 @@ public class MapStructuresEvaluator implements ObjectiveEvaluator {
         else if ( that instanceof List ) {
             try {
                 int index = Integer.parseInt( key );
-                Object value = ((List<?>) that).get( index );
+                Object value ;
+                if( that instanceof JSONArray ) {
+                    value = ((JSONArray) that).opt( index );
+                }
+                else {
+                    value = ((List<?>) that).get( index );
+                }
+
                 return value != null ? value.getClass() : Object.class;
             }
             catch ( NumberFormatException | IndexOutOfBoundsException e ) {

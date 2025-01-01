@@ -3,8 +3,8 @@ package com.pinecone.hydra.service.kom.entity;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.framework.util.json.hometype.BeanColonist;
-import com.pinecone.framework.util.json.hometype.BeanJSONDecoder;
+import com.pinecone.framework.util.json.homotype.BeanColonist;
+import com.pinecone.framework.util.json.homotype.BeanMapDecoder;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
 
 import java.util.List;
@@ -19,12 +19,12 @@ public class GenericApplicationElement extends ArchServoElement implements Appli
 
     public GenericApplicationElement( Map<String, Object > joEntity ) {
         super( joEntity );
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public GenericApplicationElement( Map<String, Object > joEntity, ServicesInstrument servicesInstrument ) {
         super( joEntity, servicesInstrument );
-        BeanJSONDecoder.BasicDecoder.decode( this, joEntity );
+        BeanMapDecoder.BasicDecoder.decode( this, joEntity );
     }
 
     public GenericApplicationElement( ServicesInstrument servicesInstrument ) {

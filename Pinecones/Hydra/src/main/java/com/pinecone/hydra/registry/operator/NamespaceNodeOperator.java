@@ -8,12 +8,12 @@ import com.pinecone.hydra.registry.entity.Namespace;
 import com.pinecone.hydra.registry.entity.NamespaceMeta;
 import com.pinecone.hydra.registry.entity.Attributes;
 import com.pinecone.hydra.registry.entity.RegistryTreeNode;
-import com.pinecone.hydra.unit.udtt.entity.TreeNode;
+import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.hydra.registry.source.RegistryMasterManipulator;
 import com.pinecone.hydra.registry.source.RegistryNSNodeManipulator;
 import com.pinecone.hydra.registry.source.RegistryNSNodeMetaManipulator;
-import com.pinecone.hydra.unit.udtt.DistributedTreeNode;
-import com.pinecone.hydra.unit.udtt.GUIDDistributedTrieNode;
+import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
+import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.ulf.util.id.GuidAllocator;
 
 import java.util.ArrayList;
@@ -38,7 +38,7 @@ public class NamespaceNodeOperator extends ArchRegistryOperator {
     @Override
     public GUID insert( TreeNode treeNode ) {
         Namespace nsNode        = (Namespace) treeNode;
-        DistributedTreeNode distributedTreeNode = this.affirmPreinsertionInitialize( treeNode );
+        ImperialTreeNode imperialTreeNode = this.affirmPreinsertionInitialize( treeNode );
         GuidAllocator guidAllocator = this.registry.getGuidAllocator();
         GUID guid72                 = nsNode.getGuid();
 
@@ -63,9 +63,9 @@ public class NamespaceNodeOperator extends ArchRegistryOperator {
             nodeAttributesGuid = null;
         }
 
-        distributedTreeNode.setNodeMetadataGUID(namespaceNodeMetaGuid);
-        distributedTreeNode.setBaseDataGUID(nodeAttributesGuid);
-        this.distributedTrieTree.insert( distributedTreeNode );
+        imperialTreeNode.setNodeMetadataGUID(namespaceNodeMetaGuid);
+        imperialTreeNode.setBaseDataGUID(nodeAttributesGuid);
+        this.imperialTree.insert(imperialTreeNode);
         this.namespaceNodeManipulator.insert( nsNode );
         return guid72;
     }
@@ -73,20 +73,20 @@ public class NamespaceNodeOperator extends ArchRegistryOperator {
     @Override
     public void purge( GUID guid ) {
         //namespace节点需要递归删除其拥有节点若其引用节点，没有其他引用则进行清理
-        List<GUIDDistributedTrieNode> childNodes = this.distributedTrieTree.getChildren(guid);
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
+        List<GUIDImperialTrieNode> childNodes = this.imperialTree.getChildren(guid);
+        GUIDImperialTrieNode node = this.imperialTree.getNode(guid);
         if ( !childNodes.isEmpty() ){
-            List<GUID > subordinates = this.distributedTrieTree.getSubordinates(guid);
+            List<GUID > subordinates = this.imperialTree.getSubordinates(guid);
             if ( !subordinates.isEmpty() ){
                 for ( GUID subordinateGuid : subordinates ){
                     this.purge( subordinateGuid );
                 }
             }
-            childNodes = this.distributedTrieTree.getChildren( guid );
-            for( GUIDDistributedTrieNode childNode : childNodes ){
-                List<GUID > parentNodes = this.distributedTrieTree.fetchParentGuids(childNode.getGuid());
+            childNodes = this.imperialTree.getChildren( guid );
+            for( GUIDImperialTrieNode childNode : childNodes ){
+                List<GUID > parentNodes = this.imperialTree.fetchParentGuids(childNode.getGuid());
                 if ( parentNodes.size() > 1 ){
-                    this.distributedTrieTree.removeInheritance(childNode.getGuid(),guid);
+                    this.imperialTree.removeInheritance(childNode.getGuid(),guid);
                 }
                 else {
                     this.purge( childNode.getGuid() );
@@ -140,12 +140,12 @@ public class NamespaceNodeOperator extends ArchRegistryOperator {
         if ( ns instanceof GenericNamespace ){
              ((GenericNamespace) ns).apply( this.registry );
         }
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
+        GUIDImperialTrieNode node = this.imperialTree.getNode(guid);
 
         if( depth <= 0 ) {
-            List<GUIDDistributedTrieNode> childNode = this.distributedTrieTree.getChildren(guid);
+            List<GUIDImperialTrieNode> childNode = this.imperialTree.getChildren(guid);
             ArrayList<GUID> guids = new ArrayList<>();
-            for ( GUIDDistributedTrieNode n : childNode ){
+            for ( GUIDImperialTrieNode n : childNode ){
                 guids.add( n.getGuid() );
             }
             ++depth;
@@ -160,9 +160,9 @@ public class NamespaceNodeOperator extends ArchRegistryOperator {
     }
 
     private void removeNode( GUID guid ){
-        GUIDDistributedTrieNode node = this.distributedTrieTree.getNode(guid);
-        this.distributedTrieTree.purge( guid );
-        this.distributedTrieTree.removeCachePath(guid);
+        GUIDImperialTrieNode node = this.imperialTree.getNode(guid);
+        this.imperialTree.purge( guid );
+        this.imperialTree.removeCachePath(guid);
         this.namespaceNodeManipulator.remove(guid);
         this.namespaceNodeMetaManipulator.remove(node.getNodeMetadataGUID());
         this.attributesManipulator.remove(node.getAttributesGUID());

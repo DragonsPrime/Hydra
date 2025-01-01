@@ -1,9 +1,9 @@
 package com.pinecone.hydra.system.ko;
 
-import com.pinecone.framework.system.skeleton.CascadeBone;
+import com.pinecone.framework.system.regimentation.UniformCascadeNodus;
 import com.pinecone.framework.util.name.Namespace;
 
-public interface CascadeInstrument extends KernelObjectInstrument, CascadeBone {
+public interface CascadeInstrument extends KernelObjectInstrument, UniformCascadeNodus {
     @Override
     CascadeInstrument parent();
 
@@ -15,27 +15,27 @@ public interface CascadeInstrument extends KernelObjectInstrument, CascadeBone {
     }
 
     default CascadeInstrument root() {
-        return (CascadeInstrument) CascadeBone.super.root();
+        return (CascadeInstrument) UniformCascadeNodus.super.root();
     }
 
     @Override
-    Namespace getName();
+    Namespace getTargetingName();
 
     @Override
-    void setName( Namespace name );
+    void setTargetingName( Namespace name );
 
     @Override
-    default void setName( String name ) {
-        CascadeBone.super.setName( name );
+    default void setTargetingName( String name ) {
+        UniformCascadeNodus.super.setTargetingName( name );
     }
 
     @Override
     default String getSimpleName() {
-        return this.getName().getSimpleName();
+        return this.getTargetingName().getSimpleName();
     }
 
     @Override
     default String getFullName() {
-        return this.getName().getFullName();
+        return this.getTargetingName().getFullName();
     }
 }

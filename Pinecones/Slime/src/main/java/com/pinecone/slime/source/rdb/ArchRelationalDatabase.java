@@ -1,6 +1,6 @@
 package com.pinecone.slime.source.rdb;
 
-import com.pinecone.framework.util.json.hometype.MapStructure;
+import com.pinecone.framework.util.json.homotype.MapStructure;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
