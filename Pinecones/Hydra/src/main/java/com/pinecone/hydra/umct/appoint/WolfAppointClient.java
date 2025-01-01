@@ -1,23 +1,14 @@
 package com.pinecone.hydra.umct.appoint;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
-import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
-import com.google.protobuf.InvalidProtocolBufferException;
-import com.pinecone.framework.lang.field.FieldEntity;
 import com.pinecone.hydra.servgram.Servgramium;
-import com.pinecone.hydra.umc.msg.ChannelControlBlock;
-import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.UMCMessage;
-import com.pinecone.hydra.umc.msg.UMCReceiver;
-import com.pinecone.hydra.umc.msg.UMCTransmit;
-import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
 import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 import com.pinecone.hydra.umc.wolfmc.client.UlfClient;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
@@ -26,15 +17,14 @@ import com.pinecone.hydra.umct.appoint.proxy.GenericIfaceProxyFactory;
 import com.pinecone.hydra.umct.appoint.proxy.IfaceProxyFactory;
 import com.pinecone.hydra.umct.husky.compiler.BytecodeIfacCompiler;
 import com.pinecone.hydra.umct.husky.compiler.CompilerEncoder;
-import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
 import com.pinecone.hydra.umct.husky.compiler.InterfacialCompiler;
+import com.pinecone.hydra.umct.husky.compiler.MethodPrototype;
 import com.pinecone.hydra.umct.husky.machinery.HuskyContextMachinery;
+import com.pinecone.hydra.umct.husky.machinery.PMCTContextMachinery;
 import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
 import com.pinecone.hydra.umct.mapping.ControllerInspector;
-import com.pinecone.ulf.util.protobuf.FieldProtobufEncoder;
 import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 
-import io.netty.channel.ChannelHandlerContext;
 import javassist.ClassPool;
 
 public class WolfAppointClient extends ArchAppointNode implements AppointClient {
@@ -42,8 +32,15 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
 
     protected IfaceProxyFactory      mIfaceProxyFactory;
 
+    protected WolfAppointClient( UlfClient messenger, boolean delay ){
+        super( (Servgramium) messenger );
+        this.mMessenger          = messenger;
+        this.mIfaceProxyFactory  = new GenericIfaceProxyFactory( this );
+    }
+
     public WolfAppointClient( UlfClient messenger, InterfacialCompiler compiler, ControllerInspector controllerInspector ){
-        super( (Servgramium) messenger, new HuskyContextMachinery( compiler, controllerInspector, new GenericFieldProtobufDecoder() ) );
+        this( messenger, true );
+        this.mPMCTContextMachinery = new HuskyContextMachinery( compiler, controllerInspector, new GenericFieldProtobufDecoder() );
         this.mMessenger          = messenger;
         this.mIfaceProxyFactory  = new GenericIfaceProxyFactory( this );
     }
@@ -71,6 +68,7 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
         return this.mMessenger;
     }
 
+
     @Override
     public UMCMessage sendSyncMsg( UMCMessage request ) throws IOException {
         return this.sendSyncMsg( request, false );
@@ -88,79 +86,18 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
 
     @Override
     public void sendAsynMsg( UMCMessage request, AsynMsgHandler handler ) throws IOException {
-        this.mMessenger.sendAsynMsg(request, new UlfAsyncMsgHandleAdapter() {
-            @Override
-            public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
-                handler.onSuccessfulMsgReceived( block.getTransmit(), block.getReceiver(), msg );
-            }
-
-            @Override
-            public void onSuccessfulMsgReceived( Medium medium, UMCTransmit transmit, UMCReceiver receiver, UMCMessage msg, Object[] args ) throws Exception {
-                handler.onSuccessfulMsgReceived( transmit, receiver, msg );
-            }
-
-            @Override
-            public void onErrorMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
-                handler.onErrorMsgReceived( block.getTransmit(), block.getReceiver(), msg );
-            }
-
-            @Override
-            public void onErrorMsgReceived( Medium medium, UMCTransmit transmit, UMCReceiver receiver, UMCMessage msg, Object[] args ) throws Exception {
-                handler.onErrorMsgReceived( transmit, receiver, msg );
-            }
-
-            @Override
-            public void onError( Object data, Throwable cause ) {
-                handler.onError( data, cause );
-            }
-        });
+        this.mMessenger.sendAsynMsg( request, AsynMsgHandler.wrap( handler ) );
     }
 
-    protected CompilerEncoder getCompilerEncoder() {
-        return this.getInterfacialCompiler().getCompilerEncoder();
-    }
-
-    protected DynamicMessage reinterpretMsg( DynamicMethodPrototype prototype, Object[] args ) {
-        FieldProtobufEncoder encoder = this.getFieldProtobufEncoder();
-        Descriptors.Descriptor descriptor = prototype.getArgumentsDescriptor();
-
-        FieldEntity[] types = prototype.getArgumentTemplate().getSegments();
-        for ( int i = 0; i < args.length; ++i ) {
-            types[ i + 1 ].setValue( args [ i ] );
-        }
-
-        return encoder.encode(
-                descriptor, types, this.getCompilerEncoder().getExceptedKeys(), this.getCompilerEncoder().getOptions()
-        );
-    }
-
-
-    public Object unmarshalResponse( DynamicMethodPrototype digest, byte[] raw ) throws IlleagalResponseException {
-        try{
-            Descriptors.Descriptor retDes = digest.getReturnDescriptor();
-            DynamicMessage rm = DynamicMessage.parseFrom( retDes, raw );
-            GenericFieldProtobufDecoder decoder = new GenericFieldProtobufDecoder();
-            return decoder.decode(
-                    digest.getReturnType(), retDes, rm, this.getCompilerEncoder().getExceptedKeys(), this.getCompilerEncoder().getOptions()
-            );
-        }
-        catch ( InvalidProtocolBufferException e ) {
-            throw new IlleagalResponseException( e );
-        }
-    }
-
-    public Object unmarshalResponse( DynamicMethodPrototype digest, UMCMessage msg ) throws IlleagalResponseException {
-        return this.unmarshalResponse( digest, (byte[]) msg.getHead().getExtraHead() );
-    }
 
     @Override
-    public void invokeInformAsyn( DynamicMethodPrototype method, Object[] args, AsynMsgHandler handler ) throws IOException {
+    public void invokeInformAsyn( MethodPrototype method, Object[] args, AsynMsgHandler handler ) throws IOException {
         DynamicMessage message = this.reinterpretMsg( method, args );
         this.sendAsynMsg( new UlfInformMessage(message.toByteArray()), handler );
     }
 
     @Override
-    public void invokeInformAsyn( DynamicMethodPrototype method, Object[] args, AsynReturnHandler handler ) throws IOException {
+    public void invokeInformAsyn( MethodPrototype method, Object[] args, AsynReturnHandler handler ) throws IOException {
         DynamicMessage message = this.reinterpretMsg( method, args );
         this.sendAsynMsg(new UlfInformMessage(message.toByteArray()), new AsynMsgHandler() {
             @Override
@@ -176,7 +113,7 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
     }
 
     @Override
-    public Object invokeInform( DynamicMethodPrototype method, Object[] args, long nWaitTimeMil ) throws IlleagalResponseException, IOException {
+    public Object invokeInform( MethodPrototype method, Object[] args, long nWaitTimeMil ) throws IlleagalResponseException, IOException {
         CompletableFuture<Object> future = new CompletableFuture<>();
         DynamicMessage message = this.reinterpretMsg(method, args);
 
@@ -204,25 +141,13 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
         });
 
         try {
-            Object ret;
             if ( nWaitTimeMil == -1 ) {
                 if ( this.mMessenger instanceof WolfMCClient ) {
                     nWaitTimeMil = ((WolfMCClient) this.mMessenger).getConnectionArguments().getKeepAliveTimeout() * 1000L;
                 }
             }
 
-            if ( nWaitTimeMil != -1 ) {
-                ret = future.get( nWaitTimeMil, TimeUnit.MILLISECONDS );
-            }
-            else {
-                ret = future.get();
-            }
-
-            if ( ret instanceof Exception ) {
-                throw new IlleagalResponseException( (Exception)ret );
-            }
-
-            return ret;
+            return WolfAppointHelper.evalCompletableFuture( future, nWaitTimeMil );
         }
         catch ( TimeoutException | ExecutionException e ) {
             throw new IlleagalResponseException( e );
@@ -234,17 +159,8 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
     }
 
     @Override
-    public Object invokeInform( DynamicMethodPrototype method, Object... args ) throws IlleagalResponseException, IOException {
+    public Object invokeInform( MethodPrototype method, Object... args ) throws IlleagalResponseException, IOException {
         return this.invokeInform( method, args, -1 );
-    }
-
-    protected DynamicMethodPrototype queryMethodPrototype( String szMethodAddress ) {
-        DynamicMethodPrototype method = (DynamicMethodPrototype) this.queryMethodDigest( szMethodAddress );
-        if ( method == null ) {
-            throw new IllegalArgumentException( "Method address `" + szMethodAddress + "` is invalid." );
-        }
-
-        return method;
     }
 
     @Override

@@ -30,14 +30,19 @@ public abstract class ArchMsgExpress implements MessageExpress, Slf4jTraceable {
     protected Map<String, MessageDeliver > mDeliverPool = new LinkedHashMap<>();
     protected ReadWriteLock                mPoolLock    = new ReentrantReadWriteLock();
 
-    public ArchMsgExpress( String name, MessageJunction junction ) {
+    public ArchMsgExpress( String name, MessageJunction junction, Logger logger ) {
         this.mszName      = name;
-        this.mLogger      = LoggerFactory.getLogger(  this.className() );
+        this.mLogger      = logger;
         this.mJunction    = junction;
 
         if( this.mszName == null ){
             this.mszName = this.className();
         }
+    }
+
+    public ArchMsgExpress( String name, MessageJunction junction ) {
+        this( name, junction, null );
+        this.mLogger = LoggerFactory.getLogger( this.className() );
     }
 
     public ArchMsgExpress( ArchMessagram messagram ) {
@@ -100,7 +105,7 @@ public abstract class ArchMsgExpress implements MessageExpress, Slf4jTraceable {
         return this.getDeliverPool().get( szName );
     }
 
-    public ArchMsgExpress   syncRegister(Deliver deliver ) {
+    public ArchMsgExpress   syncRegister( Deliver deliver ) {
         this.getPoolLock().writeLock().lock();
         try{
             this.register( deliver );

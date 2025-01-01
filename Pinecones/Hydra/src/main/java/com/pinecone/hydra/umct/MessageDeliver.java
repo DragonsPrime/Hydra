@@ -1,10 +1,10 @@
 package com.pinecone.hydra.umct;
 
-import com.pinecone.framework.unit.trie.TrieMap;
 import com.pinecone.hydra.express.Deliver;
 import com.pinecone.hydra.express.Package;
 
 import java.io.IOException;
+import java.util.Map;
 
 public interface MessageDeliver extends Deliver {
 
@@ -14,7 +14,7 @@ public interface MessageDeliver extends Deliver {
 
     String  getServiceKeyword();
 
-    TrieMap<String, MessageHandler> getRoutingTable();
+    Map<String, MessageHandler> getRoutingTable();
 
     void registerHandler( String addr, MessageHandler controller );
 }

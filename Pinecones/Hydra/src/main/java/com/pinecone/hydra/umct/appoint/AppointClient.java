@@ -5,6 +5,7 @@ import java.io.IOException;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.umct.IlleagalResponseException;
 import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
+import com.pinecone.hydra.umct.husky.compiler.MethodPrototype;
 
 public interface AppointClient extends AppointNode {
     UMCMessage sendSyncMsg( UMCMessage request ) throws IOException;
@@ -16,13 +17,13 @@ public interface AppointClient extends AppointNode {
     void       sendAsynMsg( UMCMessage request, AsynMsgHandler handler ) throws IOException ;
 
 
-    void invokeInformAsyn( DynamicMethodPrototype method, Object[] args, AsynMsgHandler handler ) throws IOException;
+    void invokeInformAsyn( MethodPrototype method, Object[] args, AsynMsgHandler handler ) throws IOException;
 
-    void invokeInformAsyn( DynamicMethodPrototype method, Object[] args, AsynReturnHandler handler ) throws IOException ;
+    void invokeInformAsyn( MethodPrototype method, Object[] args, AsynReturnHandler handler ) throws IOException ;
 
-    Object invokeInform( DynamicMethodPrototype method, Object[] args, long nWaitTimeMil ) throws IlleagalResponseException, IOException ;
+    Object invokeInform( MethodPrototype method, Object[] args, long nWaitTimeMil ) throws IlleagalResponseException, IOException ;
 
-    Object invokeInform( DynamicMethodPrototype method, Object... args ) throws IlleagalResponseException, IOException ;
+    Object invokeInform( MethodPrototype method, Object... args ) throws IlleagalResponseException, IOException ;
 
     void invokeInformAsyn( String szMethodAddress, Object[] args, AsynMsgHandler handler ) throws IOException ;
 

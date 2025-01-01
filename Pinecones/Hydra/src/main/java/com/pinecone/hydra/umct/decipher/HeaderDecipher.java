@@ -8,6 +8,7 @@ import com.pinecone.framework.system.Nullable;
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.hydra.umc.msg.Status;
 import com.pinecone.hydra.umc.msg.UMCMessage;
+import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 import com.pinecone.hydra.umct.UMCConnection;
 
 public interface HeaderDecipher extends Pinenut {
@@ -32,11 +33,11 @@ public interface HeaderDecipher extends Pinenut {
     String getServicePath( Object that );
 
     default void sendIllegalMessage( UMCConnection connection ) throws IOException {
-        connection.getTransmit().sendInformMsg(null, Status.IllegalMessage );
+        connection.getTransmit().sendInformMsg( null, Status.IllegalMessage );
     }
 
     default void sendInternalError( UMCConnection connection ) throws IOException {
-        connection.getTransmit().sendInformMsg(null, Status.InternalError );
+        connection.getTransmit().sendInformMsg( null, Status.InternalError );
     }
 
     UMCMessage assembleReturnMsg( Object that, Object descriptor ) ;

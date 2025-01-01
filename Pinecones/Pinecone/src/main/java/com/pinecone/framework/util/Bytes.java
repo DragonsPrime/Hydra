@@ -1,6 +1,8 @@
 package com.pinecone.framework.util;
 
 public final class Bytes {
+    public static final byte[] Empty = new byte[0];
+
     // LE
     public static byte[] int16ToBytesLE( short value ) {
         return new byte[]{

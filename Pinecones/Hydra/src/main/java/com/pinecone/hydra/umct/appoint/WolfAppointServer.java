@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+
 import com.pinecone.hydra.express.Deliver;
 import com.pinecone.hydra.servgram.Servgramium;
 import com.pinecone.hydra.umc.wolfmc.server.UlfServer;
@@ -71,8 +73,8 @@ public class WolfAppointServer extends ArchAppointNode implements AppointServer 
         this( messenger, new HuskyRouteDispatcher( messenger.getTaskManager().getClassLoader(), true ) );
 
         try{
-            Constructor<?> constructor = expressType.getConstructor( String.class, MessageJunction.class );
-            UMCTExpress express = (UMCTExpress) constructor.newInstance( AppointServer.DefaultEntityName, this );
+            Constructor<?> constructor = expressType.getConstructor( String.class, MessageJunction.class, Logger.class );
+            UMCTExpress express = (UMCTExpress) constructor.newInstance( AppointServer.DefaultEntityName, this, this.getLogger() );
 
             this.applyExpress( express );
             HuskyRouteDispatcherFabricator.afterConstructed( (HuskyRouteDispatcher)this.mRouteDispatcher, express );

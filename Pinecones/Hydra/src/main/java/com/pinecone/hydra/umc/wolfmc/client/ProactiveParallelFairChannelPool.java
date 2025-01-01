@@ -1,5 +1,6 @@
 package com.pinecone.hydra.umc.wolfmc.client;
 
+import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
 import com.pinecone.hydra.umc.msg.ChannelPool;
 import com.pinecone.hydra.umc.msg.FairChannelPool;
@@ -191,6 +192,7 @@ public class ProactiveParallelFairChannelPool<ID > extends ArchChannelPool imple
                     }
                     finally {
                         this.mPoolIOLock.readLock().unlock();
+                        bReadLocked = false;
                     }
                 }
             }

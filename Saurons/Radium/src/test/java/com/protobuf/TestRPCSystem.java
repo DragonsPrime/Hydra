@@ -8,15 +8,29 @@ import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.JSONMaptron;
+import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.lang.GenericDynamicFactory;
+import com.pinecone.hydra.express.Deliver;
+import com.pinecone.hydra.umc.msg.ChannelControlBlock;
+import com.pinecone.hydra.umc.msg.Medium;
+import com.pinecone.hydra.umc.msg.UMCMessage;
+import com.pinecone.hydra.umc.wolfmc.UlfAsyncMsgHandleAdapter;
+import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 import com.pinecone.hydra.umc.wolfmc.client.WolfMCClient;
 import com.pinecone.hydra.umc.wolfmc.server.WolfMCServer;
+import com.pinecone.hydra.umct.DuplexExpress;
+import com.pinecone.hydra.umct.MessageDeliver;
+import com.pinecone.hydra.umct.MessageExpress;
+import com.pinecone.hydra.umct.MessageJunction;
+import com.pinecone.hydra.umct.appoint.ArchDuplexExpress;
+import com.pinecone.hydra.umct.appoint.AsynReturnHandler;
 import com.pinecone.hydra.umct.appoint.HuskyDuplexExpress;
 import com.pinecone.hydra.umct.appoint.WolfAppointClient;
 import com.pinecone.hydra.umct.appoint.WolfAppointServer;
 import com.pinecone.hydra.umct.appoint.WolvesAppointClient;
 import com.pinecone.hydra.umct.appoint.WolvesAppointServer;
+import com.pinecone.hydra.umct.husky.compiler.ClassDigest;
 import com.pinecone.hydra.umct.husky.machinery.HuskyMappingLoader;
 import com.pinecone.hydra.umct.husky.machinery.MultiMappingLoader;
 import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
@@ -26,6 +40,7 @@ import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
 import com.pinecone.hydra.umct.husky.compiler.MethodDigest;
 import com.sauron.radium.messagron.Messagron;
 
+import io.netty.channel.ChannelHandlerContext;
 import javassist.ClassPool;
 
 class Jeff extends JesusChrist {
@@ -174,6 +189,7 @@ class Jeff extends JesusChrist {
         this.getTaskManager().add( wolf );
 
         this.testProtoRPCClient();
+        //this.testIfaceProxy();
     }
 
     private void testClassScanner() throws Exception {
@@ -195,7 +211,7 @@ class Jeff extends JesusChrist {
         WolfMCServer wolfKing = new WolfMCServer( "", this, new JSONMaptron("{host: \"0.0.0.0\",\n" +
                 "port: 5777, SocketTimeout: 800, KeepAliveTimeout: 3600, MaximumConnections: 1e6}") );
 
-        WolvesAppointServer wolf = new WolvesAppointServer( wolfKing, HuskyDuplexExpress.class );
+        WolvesAppointServer wolf = new WolvesAppointServer(wolfKing, HuskyDuplexExpress.class);
 
         RaccoonController controller  = new RaccoonController();
 
@@ -203,30 +219,64 @@ class Jeff extends JesusChrist {
 
         wolf.execute();
 
-        this.getTaskManager().add( wolf );
-
-
-
 
         this.testDuplexClient();
+
+
+        Debug.sleep( 300 );
+
+        ClassDigest digest = wolf.compile( Raccoon.class, false );
+
+//        for ( int i = 0; i < 2; i++ ) {
+//            wolf.invokeInformAsyn(2048, "com.protobuf.Raccoon.scratch", new Object[]{"shit", 123}, new AsynReturnHandler() {
+//                @Override
+//                public void onSuccessfulReturn( Object ret ) throws Exception {
+//                    Debug.redfs( ret );
+//                }
+//
+//                @Override
+//                public void onErrorMsgReceived( UMCMessage msg ) throws Exception {
+//                    Debug.redfs( msg );
+//                }
+//            });
+//        }
+
+
+
+        Debug.greenf( wolf.invokeInform( 2048, "com.protobuf.Raccoon.scratch", "fuck you", 2025 ) );
+
+        Raccoon raccoon = wolf.getIface( 2048, Raccoon.class );
+        Debug.greenf( raccoon.scratch( "fuck you", 2025 ) );
+
+
+        this.getTaskManager().add( wolf );
+
+        this.getTaskManager().syncWaitingTerminated();
+
     }
 
 
     private void testDuplexClient() throws Exception {
-        WolvesAppointClient wolf = new WolvesAppointClient( new WolfMCClient( 2048, "", this, this.getMiddlewareManager().getMiddlewareConfig().queryJSONObject( "Messagers.Messagers.WolfMCKingpin" ) ) );
+        WolvesAppointClient wolf = new WolvesAppointClient(
+                new WolfMCClient( 2048, "", this, this.getMiddlewareManager().getMiddlewareConfig().queryJSONObject( "Messagers.Messagers.WolfMCKingpin" ) )
+        );
         wolf.execute();
 
         wolf.compile( Raccoon.class, false );
         DynamicMethodPrototype digest = (DynamicMethodPrototype)wolf.queryMethodDigest( "com.protobuf.Raccoon.scratch" );
 
+        RaccoonController controller  = new RaccoonController();
+        wolf.getRouteDispatcher().registerController( controller );
+
         Debug.sleep( 200 );
 
         wolf.embraces(2);
 
+        Debug.bluef( wolf.invokeInform( "com.protobuf.Raccoon.scratch", "DP you!", 5202 ) );
+
         //Debug.greenf( wolf.invokeInform(digest, "fuck you", 2024 ) );
 
         this.getTaskManager().add( wolf );
-        this.getTaskManager().syncWaitingTerminated();
     }
 }
 

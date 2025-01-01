@@ -24,22 +24,22 @@ public final class UnsetUlfAsyncMsgHandleAdapter implements UlfAsyncMsgHandleAda
 
     @Override
     public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) {
-        Debug.warn( "Warning, MsgHandleAdapter is unset.", block.getChannel().getChannelID(), msg );
+        Debug.warn( Thread.currentThread().getName(), "Warning, MsgHandleAdapter is unset.", block.getChannel().getChannelID(), msg );
     }
 
     @Override
     public void onSuccessfulMsgReceived( Medium medium, UMCTransmit transmit, UMCReceiver receiver, UMCMessage msg, Object[] args ) throws Exception {
-        Debug.warn( "Warning, MsgHandleAdapter is unset.", msg );
+        Debug.warn( Thread.currentThread().getName(), "Warning, MsgHandleAdapter is unset.", msg );
     }
 
     @Override
     public void onErrorMsgReceived( Medium medium, UMCTransmit transmit, UMCReceiver receiver, UMCMessage msg, Object[] args ) throws Exception {
-        Debug.warn( "Warning, MsgHandleAdapter is unset.", msg );
+        Debug.warn( Thread.currentThread().getName(), "Warning, MsgHandleAdapter is unset.", msg );
     }
 
     @Override
     public void onErrorMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) {
-        Debug.warn( "Warning, MsgHandleAdapter is unset.", block.getChannel().getChannelID(), msg );
+        Debug.warn( Thread.currentThread().getName(), "Warning, MsgHandleAdapter is unset.", block.getChannel().getChannelID(), msg );
     }
 
     @Override

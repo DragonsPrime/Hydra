@@ -2,8 +2,11 @@ package com.pinecone.hydra.umct.appoint.pool;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
+import com.pinecone.hydra.umc.msg.ChannelPool;
 import com.pinecone.hydra.umc.msg.FairChannelPool;
 import com.pinecone.hydra.umc.msg.MultiClientChannelRegistry;
 import com.pinecone.hydra.umc.wolfmc.UlfIOLoadBalanceStrategy;
@@ -13,21 +16,34 @@ import com.pinecone.hydra.umc.wolfmc.client.ProactiveParallelFairChannelPool;
 public class GenericMultiClientChannelRegistry<CID > implements MultiClientChannelRegistry<CID > {
     protected static final UlfIOLoadBalanceStrategy LoadBalanceStrategy = new UlfIdleFirstBalanceStrategy();
 
+    protected Lock                          mPoolLock;
+
     protected Map<CID, FairChannelPool >    mClientChannelRegistry;
 
     public GenericMultiClientChannelRegistry() {
         this.mClientChannelRegistry = new ConcurrentHashMap<>();
+        this.mPoolLock              = new ReentrantLock();
     }
 
     @Override
     public void register( CID id, ChannelControlBlock controlBlock ) {
-        FairChannelPool pool = this.mClientChannelRegistry.get( id );
-        if ( pool == null ) {
-            pool = new ProactiveParallelFairChannelPool<>( LoadBalanceStrategy );
-            this.mClientChannelRegistry.put( id, pool );
-        }
-
+        FairChannelPool pool = this.mClientChannelRegistry.computeIfAbsent( id, (k)->{
+            return new ProactiveParallelFairChannelPool<>( LoadBalanceStrategy );
+        } );
         pool.add( controlBlock );
+    }
+
+    @Override
+    public void deregister( CID id ) {
+        FairChannelPool pool = this.mClientChannelRegistry.remove( id );
+        if ( pool != null ) {
+            pool.clear(); // All channels should be closed in this method, in principle.
+        }
+    }
+
+    @Override
+    public ChannelPool getPool( CID id ) {
+        return this.mClientChannelRegistry.get( id );
     }
 
     @Override
@@ -37,10 +53,16 @@ public class GenericMultiClientChannelRegistry<CID > implements MultiClientChann
 
     @Override
     public void clear() {
-        for( FairChannelPool pool : this.mClientChannelRegistry.values() ) {
-            pool.clear(); // All channels should be closed in this method, in principle.
+        this.mPoolLock.lock();
+        try{
+            for( FairChannelPool pool : this.mClientChannelRegistry.values() ) {
+                pool.clear(); // All channels should be closed in this method, in principle.
+            }
+            this.mClientChannelRegistry.clear();
         }
-        this.mClientChannelRegistry.clear();
+        finally {
+            this.mPoolLock.unlock();
+        }
     }
 
     @Override

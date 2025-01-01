@@ -13,4 +13,9 @@ public class RaccoonController {
     public String scratch( String target, int time ) {
         return "Raccoon Scratch " + target + time;
     }
+
+    @AddressMapping( "scratchV" )
+    public void scratchV( String target, int time ) {
+        //return "Raccoon Scratch " + target + time;
+    }
 }

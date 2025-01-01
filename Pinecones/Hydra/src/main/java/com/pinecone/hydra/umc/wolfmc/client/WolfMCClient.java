@@ -294,13 +294,21 @@ public class WolfMCClient extends ArchAsyncMessenger implements UlfClient {
                             ).get();
                             if( handle != null ) {
                                 WolfMCClient.this.handleArrivedMessage( handle, medium, channelControlBlock, message, ctx, msg );
-                                ctx.channel().attr( AttributeKey.valueOf( WolfMCStandardConstants.CB_ASYNC_MSG_HANDLE_KEY ) ).set( null ); // For another channel to reset, likes ajax.
+
+                                // Preserving binding-status for exclusive handler-binding channel.
+                                Object dyAsynExclusiveHandle = ctx.channel().attr( AttributeKey.valueOf( WolfMCStandardConstants.CB_ASY_EXCLUSIVE_HANDLE_KEY ) ).get();
+                                if ( dyAsynExclusiveHandle == null || !(Boolean) dyAsynExclusiveHandle ){
+                                    ctx.channel().attr( AttributeKey.valueOf( WolfMCStandardConstants.CB_ASYNC_MSG_HANDLE_KEY ) ).set( null ); // For another channel to reset, likes ajax.
+                                }
                             }
                             else {
                                 WolfMCClient.this.handleArrivedMessage( WolfMCClient.this.mPrimeAsyncMessageHandler, medium, channelControlBlock, message, ctx, msg );
                             }
 
-                            WolfMCClient.this.getChannelPool().setIdleChannel( channelControlBlock );
+                            Object dyExternalChannel = ctx.channel().attr( AttributeKey.valueOf( WolfMCStandardConstants.CB_EXTERNAL_CHANNEL_KEY ) ).get();
+                            if ( dyExternalChannel == null || !(Boolean) dyExternalChannel ){
+                                WolfMCClient.this.getChannelPool().setIdleChannel( channelControlBlock );
+                            }
                         }
 
                         medium.release();

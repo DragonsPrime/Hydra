@@ -47,7 +47,7 @@ public abstract class ArchAsyncMessenger extends WolfMCNode implements AsyncMess
         return this.mSynRequestLock;
     }
 
-    UlfAsyncMessengerChannelControlBlock      nextSynChannelCB() {
+    UlfAsyncMessengerChannelControlBlock      nextSynChannelCB() throws IOException {
         UlfAsyncMessengerChannelControlBlock block = (UlfAsyncMessengerChannelControlBlock) this.getChannelPool().nextSyncChannel( this.getChannelPool().getMajorWaitTimeout() * 2 );
         if( block == null ) {
             throw new ChannelAllocateException( "Channel allocate failed." );
@@ -56,7 +56,7 @@ public abstract class ArchAsyncMessenger extends WolfMCNode implements AsyncMess
         return block;
     }
 
-    UlfAsyncMessengerChannelControlBlock      nextAsyChannelCB() {
+    UlfAsyncMessengerChannelControlBlock      nextAsyChannelCB() throws IOException  {
         UlfAsyncMessengerChannelControlBlock block = (UlfAsyncMessengerChannelControlBlock) this.getChannelPool().nextAsynChannel( this.getChannelPool().getMajorWaitTimeout() * 2 );
         if( block == null ) {
             throw new ChannelAllocateException( "Channel allocate failed." );
@@ -87,15 +87,10 @@ public abstract class ArchAsyncMessenger extends WolfMCNode implements AsyncMess
         cb.sendAsynMsg( request, bNoneBuffered );
     }
 
-    static void reconnect( ChannelControlBlock block ) throws ProvokeHandleException {
+    static void reconnect( ChannelControlBlock block ) throws IOException {
         if( block.isShutdown() ) {
-            try{
-                block.getChannel().reconnect();
-                ( (UlfMessageNode)block.getParentMessageNode() ).getChannelPool().setIdleChannel( block );
-            }
-            catch ( IOException e ) {
-                throw new ProvokeHandleException( e );
-            }
+            block.getChannel().reconnect();
+            ( (UlfMessageNode)block.getParentMessageNode() ).getChannelPool().setIdleChannel( block );
         }
     }
 

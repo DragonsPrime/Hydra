@@ -2,12 +2,15 @@ package com.pinecone.hydra.umct;
 
 import java.util.Map;
 
+import org.slf4j.Logger;
+
 import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.Status;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.framework.system.ProvokeHandleException;
 import com.pinecone.hydra.umc.msg.UMCReceiver;
 import com.pinecone.hydra.umc.msg.UMCTransmit;
+import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 
 /**
  *  Pinecone Ursus For Java Hydra Ulfar, Wolf Express
@@ -15,6 +18,10 @@ import com.pinecone.hydra.umc.msg.UMCTransmit;
  *  Copyright © 2008 - 2028 Bean Nuts Foundation All rights reserved.
  */
 public class WolfMCExpress extends ArchMsgExpress implements UMCTExpress {
+    public WolfMCExpress( String name, MessageJunction messagram, Logger logger ) {
+        super( name, messagram, logger );
+    }
+
     public WolfMCExpress( String name, MessageJunction messagram ) {
         super( name, messagram );
     }
@@ -31,6 +38,11 @@ public class WolfMCExpress extends ArchMsgExpress implements UMCTExpress {
         return null;
     }
 
+
+    @Override
+    public UMCMessage processResponse( UMCMessage request, UMCMessage response ) {
+        return response;
+    }
 
     @Override
     public void onSuccessfulMsgReceived( Medium medium, UMCTransmit transmit, UMCReceiver receiver, UMCMessage msg, Object[] args ) throws Exception {
@@ -67,7 +79,7 @@ public class WolfMCExpress extends ArchMsgExpress implements UMCTExpress {
     @Override
     public void onError( Object ctx, Throwable cause ) {
         if( cause instanceof Exception ) {
-            this.warnSimple( cause.getMessage() );
+            this.getLogger().error( "Express error, " + cause.getMessage(), cause );
         }
         else {
             throw new ProvokeHandleException( cause );

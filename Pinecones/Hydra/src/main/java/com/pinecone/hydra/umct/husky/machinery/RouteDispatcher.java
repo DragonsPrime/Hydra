@@ -35,6 +35,10 @@ public interface RouteDispatcher extends Pinenut {
 
     void registerController( Object instance, Class<?> controllerType ) ;
 
+    default void registerController( Object instance ) {
+        this.registerController( instance, instance.getClass() );
+    }
+
     ClassDigest queryClassDigest( String name );
 
     MethodDigest queryMethodDigest( String name ) ;

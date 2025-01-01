@@ -5,7 +5,7 @@ import com.pinecone.hydra.umct.appoint.AppointClient;
 import com.pinecone.hydra.umct.husky.compiler.ClassDigest;
 
 public interface IfaceProxyFactory extends Pinenut {
-    <T> T createProxy(AppointClient client, ClassDigest classDigest, Class<T> iface ) ;
+    <T> T createProxy( AppointClient client, ClassDigest classDigest, Class<T> iface ) ;
 
     <T> T createProxy( AppointClient client, Class<T> iface ) ;
 

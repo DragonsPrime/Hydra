@@ -9,11 +9,13 @@ import com.pinecone.hydra.express.Package;
 import com.pinecone.hydra.umc.msg.Status;
 import com.pinecone.hydra.umc.msg.UMCHead;
 import com.pinecone.hydra.umc.msg.UMCMessage;
+import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 import com.pinecone.hydra.umct.decipher.HeaderDecipher;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ArchMsgDeliver implements MessageDeliver {
     protected String                                      mszName;
@@ -62,7 +64,7 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
     }
 
     @Override
-    public TrieMap<String, MessageHandler> getRoutingTable() {
+    public Map<String, MessageHandler> getRoutingTable() {
         return this.mRoutingTable;
     }
 
@@ -84,19 +86,34 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
         return szServiceKey != null;
     }
 
+    protected UMCMessage processResponse( UMCMessage request, UMCMessage response ) {
+        MessageExpress me = this.getExpress();
+        try{
+            UMCTExpress ue = (UMCTExpress) me;
+            return ue.processResponse( request, response );
+        }
+        catch ( ClassCastException e ) {
+            return response;
+        }
+    }
+
     protected void messageDispatch( Package that ) throws IOException, ServiceException {
         boolean bDenialService = false;
 
         try{
             UMCConnection connection  = this.wrap( that );
-            UMCMessage msg            = connection.getMessage();
+            UMCMessage request        = connection.getMessage();
+
+            if ( request.getHead().getStatus() != Status.OK ) {
+                throw new ServiceInternalException( "Error response." );
+            }
 
             if( this.sift( that ) ) {
-                connection.getTransmit().sendInformMsg(null, Status.IllegalMessage );
+                connection.getTransmit().sendInformMsg( null, Status.IllegalMessage );
                 return;
             }
 
-            UMCHead head                = msg.getHead();
+            UMCHead head                = request.getHead();
             Object  exHead              = head.getExtraHead();
             String szAddr               = this.mHeaderDecipher.getServicePath( exHead );
             if( szAddr == null ) {
@@ -119,7 +136,8 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
 
                 try{
                     Object ret = controller.invoke( args );
-                    connection.getTransmit().sendMsg( this.mHeaderDecipher.assembleReturnMsg( ret, controller.getReturnDescriptor() ) );
+                    UMCMessage response = this.mHeaderDecipher.assembleReturnMsg( ret, controller.getReturnDescriptor() );
+                    connection.getTransmit().sendMsg( this.processResponse( request, response ) );
                 }
                 catch ( Exception e ) {
                     this.mHeaderDecipher.sendInternalError( connection );

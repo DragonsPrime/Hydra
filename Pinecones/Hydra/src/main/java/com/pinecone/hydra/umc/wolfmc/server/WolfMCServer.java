@@ -13,13 +13,14 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.handler.codec.MessageToByteEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.AttributeKey;
 import com.pinecone.framework.system.ProvokeHandleException;
 import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.StringUtils;
 import com.pinecone.framework.util.json.JSONObject;
+import com.pinecone.hydra.umc.msg.RecipientChannelControlBlock;
+import com.pinecone.hydra.umc.msg.event.ChannelEventHandler;
 import com.pinecone.hydra.umc.wolfmc.AsyncUlfMedium;
 import com.pinecone.hydra.umc.wolfmc.ChannelUtils;
 import com.pinecone.hydra.umc.wolfmc.GenericUMCByteMessageDecoder;
@@ -43,6 +44,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.net.BindException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Lock;
@@ -64,27 +67,28 @@ import java.util.concurrent.locks.ReentrantLock;
  *  *****************************************************************************************
  */
 public class WolfMCServer extends WolfMCNode implements UlfServer {
-    protected ServerConnectArguments                          mConnectionArguments ;
+    protected ServerConnectArguments                          mConnectionArguments        ;
 
-    protected EventLoopGroup                                  mMasterEventGroup    ;
-    protected EventLoopGroup                                  mWorkersEventGroup   ;
-    protected ServerBootstrap                                 mBootstrap           ;
-    protected ChannelFuture                                   mPrimaryBindFuture   ;
-    protected SocketAddress                                   mPrimaryBindAddress  ;
-    protected PassiveRegisterChannelPool<ChannelId >          mChannelPool         ;
+    protected EventLoopGroup                                  mMasterEventGroup           ;
+    protected EventLoopGroup                                  mWorkersEventGroup          ;
+    protected ServerBootstrap                                 mBootstrap                  ;
+    protected ChannelFuture                                   mPrimaryBindFuture          ;
+    protected SocketAddress                                   mPrimaryBindAddress         ;
+    protected PassiveRegisterChannelPool<ChannelId >          mChannelPool                ;
 
-    protected UlfAsyncMsgHandleAdapter                        mRecipientMsgHandler ;
+    protected UlfAsyncMsgHandleAdapter                        mRecipientMsgHandler        ;
+    protected List<ChannelEventHandler >                      mDataArrivedEventHandlers   ;
 
     private final ReentrantLock                               mSynRequestLock      = new ReentrantLock(); // For inner purposes.
 
     public WolfMCServer( long nodeId, String szName, Processum parentProcess, UlfMessageNode parent, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
         super( nodeId, szName, parentProcess, parent, joConf, extraHeadCoder );
+        this.mDataArrivedEventHandlers = new ArrayList<>();
         this.apply( joConf );
     }
 
     public WolfMCServer( String szName, Processum parentProcess, UlfMessageNode parent, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
-        super( -1, szName, parentProcess, parent, joConf, extraHeadCoder );
-        this.apply( joConf );
+        this( -1, szName, parentProcess, parent, joConf, extraHeadCoder );
     }
 
     public WolfMCServer( long nodeId, String szName, Processum parentProcess, Map<String, Object> joConf, ExtraHeadCoder extraHeadCoder ) {
@@ -149,6 +153,17 @@ public class WolfMCServer extends WolfMCNode implements UlfServer {
         this.mRecipientMsgHandler = fnRecipientMsgHandler;
 
         return this;
+    }
+
+    @Override
+    public void addDataArrivedEventHandlers( ChannelEventHandler handler ) {
+        this.mDataArrivedEventHandlers.add( handler );
+    }
+
+    protected void notifyDataArrivedEventHandlers( RecipientChannelControlBlock block ) {
+        for( ChannelEventHandler h : this.mDataArrivedEventHandlers ) {
+            h.afterEventTriggered( block );
+        }
     }
 
     @Override
@@ -256,6 +271,8 @@ public class WolfMCServer extends WolfMCNode implements UlfServer {
                         WolfMCServer.this.handleArrivedMessage(
                                 WolfMCServer.this.mRecipientMsgHandler, medium, channelControlBlock, message, ctx, msg
                         );
+
+                        WolfMCServer.this.notifyDataArrivedEventHandlers( channelControlBlock );
 
                         medium.release();
                         medium = new AsyncUlfMedium( ctx, null, WolfMCServer.this );

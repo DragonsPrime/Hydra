@@ -7,8 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.pinecone.hydra.express.Deliver;
 import com.pinecone.hydra.servgram.Servgramium;
+import com.pinecone.hydra.system.component.Slf4jTraceable;
 import com.pinecone.hydra.umc.wolfmc.server.UlfServer;
 import com.pinecone.hydra.umct.MessageDeliver;
 import com.pinecone.hydra.umct.MessageExpress;
@@ -86,8 +90,16 @@ public class HuskyRouteDispatcher implements RouteDispatcher {
         );
 
         try{
-            Constructor<?> constructor = expressType.getConstructor( String.class, MessageJunction.class );
-            UMCTExpress express = (UMCTExpress) constructor.newInstance( AppointServer.DefaultEntityName, junction );
+            Constructor<?> constructor = expressType.getConstructor( String.class, MessageJunction.class, Logger.class );
+            Logger logger ;
+            if ( junction instanceof Slf4jTraceable ) {
+                logger = ((Slf4jTraceable) junction).getLogger();
+            }
+            else {
+                logger = LoggerFactory.getLogger( this.getClass().getName() );
+            }
+
+            UMCTExpress express = (UMCTExpress) constructor.newInstance( AppointServer.DefaultEntityName, junction, logger );
 
             this.applyExpress(
                     this.mPMCTContextMachinery.getInterfacialCompiler(), express

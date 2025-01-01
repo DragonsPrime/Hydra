@@ -1,5 +1,7 @@
 package com.pinecone.framework.util;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 import com.pinecone.framework.system.InstantKillError;
 import com.pinecone.framework.util.io.Tracer;
 import com.pinecone.framework.util.io.Tracerson;
@@ -136,6 +138,14 @@ public class Debug {
 
     public static void exit() {
         System.exit( -666 );
+    }
+
+
+
+    private static AtomicInteger InvokeCounts = new AtomicInteger();
+
+    public static long invokeCounts() {
+        return Debug.InvokeCounts.getAndIncrement();
     }
 
 }

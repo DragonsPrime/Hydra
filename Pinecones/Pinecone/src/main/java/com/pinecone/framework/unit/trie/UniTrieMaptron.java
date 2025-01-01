@@ -352,6 +352,9 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
 
             if ( i < segments.length - 1 ) {
                 node = dir.get( segment );
+                if ( node == null ) {
+                    return null;
+                }
                 dir  = node.evinceDirectory();
                 if( dir == null ) {
                     return null; // Illegal path.

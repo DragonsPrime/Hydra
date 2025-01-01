@@ -1,17 +1,25 @@
 package com.pinecone.hydra.umc.wolfmc;
 
+import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.umc.msg.ChannelStatus;
 
 public enum UlfChannelStatus implements ChannelStatus {
-    IDLE                     ( 0x00, "Idle"                 ),
-    WAITING_FOR_SEND         ( 0x01, "WaitingSend"          ),
-    WAITING_FOR_RECEIVE      ( 0x02, "WaitingReceive"       ),
-    WAITING_FOR_RECALL_FUN   ( 0x03, "WaitingRecallFun"     ),
-    WAITING_THREAD_RESUME    ( 0x04, "WaitingThreadResume"  ),
+    IDLE                     ( 0x00, "Idle"                   ),
+    WAITING_FOR_SEND         ( 0x01, "WaitingSend"            ),
+    WAITING_FOR_RECEIVE      ( 0x02, "WaitingReceive"         ),
+    WAITING_FOR_RECALL_FUN   ( 0x03, "WaitingRecallFun"       ),
+    WAITING_THREAD_RESUME    ( 0x04, "WaitingThreadResume"    ),
 
-    FORCE_SYNCHRONIZED       ( 0x05, "ForceSynchronized"    ),
-    WAITING_FOR_SHUTDOWN     ( 0x06, "WaitingShutdown"      ),
-    SHUTDOWN                 ( 0x07, "Shutdown"             );
+    FORCE_SYNCHRONIZED       ( 0x05, "ForceSynchronized"      ),
+    WAITING_FOR_SHUTDOWN     ( 0x06, "WaitingShutdown"        ),
+    SHUTDOWN                 ( 0x07, "Shutdown"               ),
+
+    WAITING_PASSIVE_SEND     ( 0xA1, "WaitingPassiveSend"     ),
+    WAITING_PASSIVE_RECEIVE  ( 0xA2, "WaitingPassiveReceive"  ),
+
+    ;
+
+    public static final int PassiveStatusMask = 0xA0;
 
     private final int value;
 
@@ -44,7 +52,7 @@ public enum UlfChannelStatus implements ChannelStatus {
 
     @Override
     public boolean isTerminated() {
-        return this.value >= UlfChannelStatus.WAITING_FOR_SHUTDOWN.value;
+        return this == UlfChannelStatus.WAITING_FOR_SHUTDOWN;
     }
 
     @Override
@@ -59,7 +67,7 @@ public enum UlfChannelStatus implements ChannelStatus {
 
     @Override
     public boolean isAsynAvailable() {
-        return !this.isTerminated() && this != UlfChannelStatus.FORCE_SYNCHRONIZED;
+        return !this.isTerminated() && this != UlfChannelStatus.FORCE_SYNCHRONIZED && ( (this.value & PassiveStatusMask) != PassiveStatusMask );
     }
 
     @Override

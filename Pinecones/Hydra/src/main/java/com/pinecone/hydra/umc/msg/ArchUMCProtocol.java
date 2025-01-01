@@ -1,5 +1,6 @@
 package com.pinecone.hydra.umc.msg;
 
+import com.pinecone.framework.util.Bytes;
 import com.pinecone.framework.util.json.JSONException;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
@@ -148,7 +149,12 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         byteBuffer.putLong( head.identityId );
         nBufLength += Long.BYTES;
 
-        byteBuffer.put( head.extraHead );
+        if( head.extraHead == null ) {
+            byteBuffer.put( Bytes.Empty );
+        }
+        else {
+            byteBuffer.put( head.extraHead );
+        }
         nBufLength += head.getExtraHeadLength();
 
         this.mOutputStream.write( byteBuffer.array(), 0, nBufLength );
