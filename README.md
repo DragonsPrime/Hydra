@@ -219,10 +219,11 @@ Servgram，小程序系统，是的这很微信，不过是服务端的小程序
    2. 简单卷
    3. 跨区卷
    4. 条带卷，基于状态机无锁编程化并行存储，采用基于差分多路缓存滑动窗口、DFA、FIFO多线程缓存等算法优化的高性能条带卷设计。
-   
+![VolumeArchitecture](assets/imgs/volume_architecture.png)
+
 2. 分布式文件系统\
 Hydra 是基于多级级联的大型系统架构，UOFS同样沿用了Hydra的整体架构体系，采样全局级联的设计。支持存储节点、索引节点、卷节点等每一层级的级联设计。
-![最小系统成功运行图](assets/imgs/demo_result.png)
+![FileSystemArchitecture](assets/imgs/fs_architecture.svg)
 
 3. 版本管理
 
@@ -310,7 +311,7 @@ TODO
 ```
 - 正常启动，将开始本地流水线序列调度 "Jesus"、"Satan"、"Rick"三个大任务和其子任务。
 
-     ![最小系统成功运行图](assets/imgs/fs_architecture.svg)
+     ![最小系统成功运行图](assets/imgs/demo_result.png)
      
 ## 三、🔨 目录结构说明
 - TODO 
