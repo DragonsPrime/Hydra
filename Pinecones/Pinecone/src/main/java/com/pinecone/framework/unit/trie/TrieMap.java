@@ -28,4 +28,6 @@ public interface TrieMap<K, V > extends Map<K, V >, PineUnit {
 
     String getSeparator();
 
+    DirectoryNode<V > root();
+
 }

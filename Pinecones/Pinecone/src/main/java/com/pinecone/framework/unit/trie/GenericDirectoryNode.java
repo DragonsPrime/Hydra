@@ -50,6 +50,11 @@ public class GenericDirectoryNode<V > extends ArchTrieNode<V > implements Direct
     }
 
     @Override
+    public Map<String, TrieNode<V > > segmentMap() {
+        return this.mChildren;
+    }
+
+    @Override
     public TrieNode<V > get( String szSegName ) {
         return this.mChildren.get( szSegName );
     }
@@ -65,19 +70,21 @@ public class GenericDirectoryNode<V > extends ArchTrieNode<V > implements Direct
     }
 
     protected void notifyMapChildrenEliminated( int nFatalities ) {
-        ( (UniTrieMaptron) this.mTrieMap ).notifyChildrenEliminated( nFatalities );
+        //( (UniTrieMaptron) this.mTrieMap ).notifyChildrenEliminated( nFatalities );
     }
 
     @Override
     public TrieNode<V > remove( String szSegName ) {
-        int nFatalities = 1;
-        DirectoryNode<V > childDir = this.getDirectory( szSegName );
-        if( childDir != null ) {
-            nFatalities = childDir.childrenLeafSize();
-        }
-        TrieNode<V > legacy = this.mChildren.remove( szSegName );
-        this.notifyMapChildrenEliminated( nFatalities ); // Cascading leafs.
-        return legacy;
+//        int nFatalities = 1;
+//        DirectoryNode<V > childDir = this.getDirectory( szSegName );
+//        if( childDir != null ) {
+//            nFatalities = childDir.childrenLeafSize();
+//        }
+//        TrieNode<V > legacy = this.mChildren.remove( szSegName );
+//        this.notifyMapChildrenEliminated( nFatalities ); // Cascading leafs.
+//        return legacy;
+
+        return this.mChildren.remove( szSegName );
     }
 
     @Override
@@ -92,9 +99,9 @@ public class GenericDirectoryNode<V > extends ArchTrieNode<V > implements Direct
 
     @Override
     public void purge() {
-        int nFatalities = this.mChildren.size();
+        //int nFatalities = this.childrenLeafSize();
         this.mChildren.clear();
-        this.notifyMapChildrenEliminated( nFatalities );
+        //this.notifyMapChildrenEliminated( nFatalities );
     }
 
     @Override

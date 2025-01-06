@@ -210,6 +210,9 @@ public class TestUnits {
 
         Debug.trace( trieMap, trieMap.size() );
 
+
+        //trieMap.remove( "a1/b1" );
+
         Debug.trace( trieMap.keySet() );
 
         Debug.trace( trieMap.values() );
