@@ -83,15 +83,30 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
 
     @Override
     public V put( K key, V value ) {
-        return this.putEntity( key, value );
+        return this.putEntity0( key, value, false );
     }
 
-    public V makeSymbolic ( K key, K target ) {
+    @Override
+    public V putIfAbsent( K key, V value ) {
+        return this.putEntity0( key, value, true );
+    }
+
+    public V makeSymbolic (K key, K target ) {
         ReparseNode<V> p = new GenericReparseNode<>( null, null, target,this );
-        return this.putEntity( key, p );
+        return this.putEntity0( key, p, false );
     }
 
-    public V putEntity( K key, Object value ) {
+    protected V putEntity0( K key, Object value, boolean isAbsent ) {
+        Object ret = this.putEntity( key, value, isAbsent );
+        if ( ret instanceof TrieNode ) {
+            return null;
+        }
+
+        return this.convertValue( ret );
+    }
+
+    @Override
+    public Object putEntity( K key, Object value, boolean isAbsent ) {
         if ( key == null ) {
             throw new IllegalArgumentException( "Key cannot be null." );
         }
@@ -115,7 +130,7 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
                 else {
                     dir = node.evinceDirectory();
                     if( dir == null ) {
-                        throw new IllegalArgumentException( "Path given is not a full-directory insertion path." );
+                        throw new IllegalArgumentException( "Path `" + key + "` given is not a full-directory insertion path." );
                     }
                 }
             }
@@ -133,10 +148,14 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
                     }
                     dir.put( segment, neo );
                     //++this.mnSize;
-                    return null; // Insertion
+                    return neo; // Insertion
                 }
             }
             parent = node;
+        }
+
+        if ( isAbsent ) {
+            return null;
         }
 
         // Modification
