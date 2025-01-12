@@ -32,6 +32,8 @@ public interface IndexableDataManipulator<K, V > extends Pinenut {
 
     void insert                ( IndexableTargetScopeMeta meta, K key, V entity );
 
+    void insert                ( IndexableTargetScopeMeta meta, K key, V entity, long expireMill );
+
     void updateByNS            ( IndexableTargetScopeMeta meta, String szNamespace, K key, V entity );
 
     void update                ( IndexableTargetScopeMeta meta, K key, V entity );

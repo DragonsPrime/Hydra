@@ -1,4 +1,4 @@
-package com.pinecone.slime.chunk.orchestration;
+package com.pinecone.slime.chunk.marshaling;
 
 import com.pinecone.slime.chunk.RangedChunk64;
 import com.pinecone.slime.chunk.Splitunk;

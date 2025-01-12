@@ -38,7 +38,7 @@ public class GenericDistributedScenarioMetaTree implements DistributedScenarioMe
     private NamespaceNodeManipulator        namespaceNodeManipulator;
     private ScenarioCommonDataManipulator   scenarioCommonDataManipulator;
 
-    public GenericDistributedScenarioMetaTree(Hydrarum hydrarum, KOIMasterManipulator masterManipulator){
+    public GenericDistributedScenarioMetaTree( Hydrarum hydrarum, KOIMasterManipulator masterManipulator){
         this.hydrarum                       =   hydrarum;
         this.scenarioMasterManipulator      =   (ScenarioMasterManipulator) masterManipulator;
         KOISkeletonMasterManipulator skeletonMasterManipulator = this.scenarioMasterManipulator.getSkeletonMasterManipulator();

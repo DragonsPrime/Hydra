@@ -35,7 +35,7 @@ class StanMarsh extends Radium {
 
         KOMRegistry registry = new GenericKOMRegistry( koiMappingDriver );
 
-        this.testBasicInsert( registry );
+        //this.testBasicInsert( registry );
         //this.testDeletion( registry );
         //this.testDataExtends( registry );
         //this.testHardLink( registry );
@@ -44,7 +44,7 @@ class StanMarsh extends Radium {
         //this.testMisc( registry );
         //this.testSelector( registry );
         //this.testAttributes( registry );
-        //this.testMarshaling( registry );
+        this.testMarshaling( registry );
     }
 
     private void testBasicInsert( KOMRegistry registry ) {

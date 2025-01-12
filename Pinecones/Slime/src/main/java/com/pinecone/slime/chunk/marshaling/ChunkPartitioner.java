@@ -1,4 +1,4 @@
-package com.pinecone.slime.chunk.orchestration;
+package com.pinecone.slime.chunk.marshaling;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.slime.chunk.DivisibleChunk;

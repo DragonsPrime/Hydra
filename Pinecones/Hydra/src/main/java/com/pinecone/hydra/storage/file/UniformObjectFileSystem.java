@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.file;
 
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
@@ -28,7 +29,6 @@ import com.pinecone.hydra.storage.file.source.SymbolicMetaManipulator;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
 import com.pinecone.hydra.storage.file.transmit.exporter.FileExportEntity;
 import com.pinecone.hydra.storage.file.transmit.receiver.FileReceiveEntity;
-import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
@@ -74,12 +74,12 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     protected RemoteFrameManipulator            remoteFrameManipulator;
     protected SymbolicManipulator               symbolicManipulator;
     protected SymbolicMetaManipulator           symbolicMetaManipulator;
-    protected FolderVolumeMappingManipulator folderVolumeMappingManipulator;
+    protected FolderVolumeMappingManipulator    folderVolumeMappingManipulator;
 
 
-    public UniformObjectFileSystem( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, KOMFileSystem parent, String name ){
+    public UniformObjectFileSystem( Processum superiorProcess, KOIMasterManipulator masterManipulator, KOMFileSystem parent, String name ){
         // Phase [1] Construct system.
-        super( hydrarum, masterManipulator, KernelFileSystemConfig, parent, name );
+        super( superiorProcess, masterManipulator, KernelFileSystemConfig, parent, name );
 
         // Phase [2] Construct fundamentals.
         this.fileMasterManipulator         = (FileMasterManipulator) masterManipulator;
@@ -97,32 +97,32 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         this.remoteFrameManipulator          =  this.fileMasterManipulator.getRemoteFrameManipulator();
         this.symbolicManipulator             =  this.fileMasterManipulator.getSymbolicManipulator();
         this.symbolicMetaManipulator         =  this.fileMasterManipulator.getSymbolicMetaManipulator();
-        this.folderVolumeMappingManipulator =  this.fileMasterManipulator.getFolderVolumeRelationManipulator();
+        this.folderVolumeMappingManipulator  =  this.fileMasterManipulator.getFolderVolumeRelationManipulator();
 
         // Phase [4] Construct selectors.
-        this.pathSelector                  =  new StandardPathSelector(
+        this.pathSelector                    =  new StandardPathSelector(
                 this.pathResolver, this.imperialTree, this.folderManipulator, new GUIDNameManipulator[] { this.fileManipulator }
         );
         // Warning: ReparseKOMTreeAddition must be constructed only after `pathSelector` has been constructed.
-        this.mReparseKOM                   =  new GenericReparseKOMTreeAddition( this );
+        this.mReparseKOM                     =  new GenericReparseKOMTreeAddition( this );
 
         // Phase [5] Construct misc.
 //        this.propertyTypeConverter         =  new DefaultPropertyConverter();
 //        this.textValueTypeConverter        =  new DefaultTextValueConverter();
-        this.fsNodeAllotment              =  new GenericFSNodeAllotment(this.fileMasterManipulator,this);
+        this.fsNodeAllotment                 =  new GenericFSNodeAllotment(this.fileMasterManipulator,this);
     }
 
 //    public GenericKOMFileSystem( Hydrarum hydrarum ) {
 //        this.hydrarum = hydrarum;
 //    }
 
-    public UniformObjectFileSystem( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
-        this( hydrarum, masterManipulator, null, KOMFileSystem.class.getSimpleName() );
+    public UniformObjectFileSystem( Processum superiorProcess, KOIMasterManipulator masterManipulator ){
+        this( superiorProcess, masterManipulator, null, KOMFileSystem.class.getSimpleName() );
     }
 
     public UniformObjectFileSystem( KOIMappingDriver driver, KOMFileSystem parent, String name ) {
         this(
-                driver.getSystem(),
+                driver.getSuperiorProcess(),
                 driver.getMasterManipulator(),
                 parent,
                 name
@@ -131,7 +131,7 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
 
     public UniformObjectFileSystem( KOIMappingDriver driver ) {
         this(
-                driver.getSystem(),
+                driver.getSuperiorProcess(),
                 driver.getMasterManipulator()
         );
     }

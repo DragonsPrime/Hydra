@@ -309,7 +309,7 @@ public class TestSchemeQuerier {
 
 
         JedisPoolConfig poolConfig = new JedisPoolConfig();
-        JedisPool jedisPool = new JedisPool( poolConfig, "b-serverkingpin", 6397, 2000, "wolf19310918", 0 );
+        JedisPool jedisPool = new JedisPool( poolConfig, "b-serverkingpin", 6379, 2000, "wolf19310918", 0 );
         Jedis jedis = jedisPool.getResource();
         jedis.auth( "wolf19310918" );
         //IndexableIteratableManipulator<String, String > manipulator = new GenericRedisHashManipulator<>( jedis );
@@ -338,7 +338,9 @@ public class TestSchemeQuerier {
 
         manipulator = new GenericRedisMasterManipulator<>( jedis );
         meta = new GenericIndexableTargetScopeMeta( "0", "", Object.class, manipulator );
-        IndexableMapQuerier<String, String > querier = new IndexableMapQuerier<>( meta );
+        //IndexableMapQuerier<String, String > querier = new IndexableMapQuerier<>( meta );
+        //IndexableMapQuerier<String, String > querier = new IndexableMapQuerier<>( meta, false );
+        IndexableMapQuerier<String, String > querier = new IndexableMapQuerier<>( meta, true );
 
         Debug.trace( querier.get( "test" ) );
         Debug.trace( querier.get( "test" ) );
@@ -404,8 +406,8 @@ public class TestSchemeQuerier {
             //TestSchemeQuerier.testLRUDictCache();
             //TestSchemeQuerier.testHotspotDictCache();
             //TestSchemeQuerier.testRDBDict();
-            //TestSchemeQuerier.testRedisDict();
-            TestSchemeQuerier.testMemCachedDict();
+            TestSchemeQuerier.testRedisDict();
+            //TestSchemeQuerier.testMemCachedDict();
 
 
             return 0;

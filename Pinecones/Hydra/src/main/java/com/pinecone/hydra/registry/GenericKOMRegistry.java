@@ -1,6 +1,7 @@
 package com.pinecone.hydra.registry;
 
 import com.pinecone.framework.system.Nullable;
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.registry.entity.ConfigNode;
@@ -19,7 +20,6 @@ import com.pinecone.hydra.registry.entity.TextFile;
 import com.pinecone.hydra.registry.entity.TextValue;
 import com.pinecone.hydra.registry.entity.TypeConverter;
 import com.pinecone.hydra.registry.operator.RegistryNodeOperator;
-import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.kom.ArchReparseKOMTree;
 import com.pinecone.hydra.system.ko.kom.GenericReparseKOMTreeAddition;
@@ -66,9 +66,9 @@ public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistr
     protected TypeConverter                   textValueTypeConverter;
 
 
-    public GenericKOMRegistry( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, KOMRegistry parent, String name ){
+    public GenericKOMRegistry( Processum superiorProcess, KOIMasterManipulator masterManipulator, KOMRegistry parent, String name ){
         // Phase [1] Construct system.
-        super( hydrarum, masterManipulator, Registry.KernelRegistryConfig, parent, name );
+        super( superiorProcess, masterManipulator, Registry.KernelRegistryConfig, parent, name );
 
         // Phase [2] Construct fundamentals.
         this.registryMasterManipulator     =  (RegistryMasterManipulator) masterManipulator;
@@ -94,24 +94,24 @@ public class GenericKOMRegistry extends ArchReparseKOMTree implements KOMRegistr
         this.textValueTypeConverter        =  new DefaultTextValueConverter();
     }
 
-    public GenericKOMRegistry( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ){
-        this( hydrarum, masterManipulator, null, KOMRegistry.class.getSimpleName() );
+    public GenericKOMRegistry( Processum superiorProcess, KOIMasterManipulator masterManipulator ){
+        this( superiorProcess, masterManipulator, null, KOMRegistry.class.getSimpleName() );
     }
 
-    public GenericKOMRegistry( Hydrarum hydrarum ) {
-        this( hydrarum, null );
+    public GenericKOMRegistry( Processum superiorProcess ) {
+        this( superiorProcess, null );
     }
 
     public GenericKOMRegistry( KOIMappingDriver driver ) {
         this(
-                driver.getSystem(),
+                driver.getSuperiorProcess(),
                 driver.getMasterManipulator()
         );
     }
 
     public GenericKOMRegistry( KOIMappingDriver driver, KOMRegistry parent, String name ) {
         this(
-                driver.getSystem(),
+                driver.getSuperiorProcess(),
                 driver.getMasterManipulator(),
                 parent,
                 name

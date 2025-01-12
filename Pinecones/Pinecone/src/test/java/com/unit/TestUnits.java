@@ -240,7 +240,7 @@ public class TestUnits {
 
     }
 
-    public static void testColum() {
+    public static void testConcurrentTrie() {
         UniTrieMaptron<String, String> trieMap = new UniTrieMaptron<>( ConcurrentHashMap::new );
         //UniTrieMaptron<String, String> trieMap = new UniTrieMaptron<>( TreeMap::new );
 
@@ -340,7 +340,7 @@ public class TestUnits {
             //TestUnits.testMergeSharedList();
             //TestUnits.testTrieMap();
 
-            TestUnits.testColum();
+            TestUnits.testConcurrentTrie();
 
             return 0;
         }, (Object[]) args );

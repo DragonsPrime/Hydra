@@ -1,5 +1,6 @@
 package com.pinecone.hydra.system.ko.kom;
 
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
@@ -12,10 +13,10 @@ public abstract class ArchReparseKOMTree extends ArchKOMTree implements ReparseK
     protected ReparseKOMTreeAddition mReparseKOM;
 
     public ArchReparseKOMTree(
-            Hydrarum hydrarum, KOIMasterManipulator masterManipulator , OperatorFactory operatorFactory, KernelObjectConfig kernelObjectConfig, PathSelector pathSelector,
+            Processum superiorProcess, KOIMasterManipulator masterManipulator , OperatorFactory operatorFactory, KernelObjectConfig kernelObjectConfig, PathSelector pathSelector,
             KOMInstrument parent, String name
     ){
-        this( hydrarum, masterManipulator, kernelObjectConfig, parent, name );
+        this( superiorProcess, masterManipulator, kernelObjectConfig, parent, name );
         this.pathResolver                  =  new KOPathResolver( kernelObjectConfig );
         this.pathSelector                  =  pathSelector;
         this.operatorFactory               =  operatorFactory;
@@ -23,9 +24,9 @@ public abstract class ArchReparseKOMTree extends ArchKOMTree implements ReparseK
     }
 
     public ArchReparseKOMTree (
-            Hydrarum hydrarum, KOIMasterManipulator masterManipulator ,KernelObjectConfig kernelObjectConfig, KOMInstrument parent, String name
+            Processum superiorProcess, KOIMasterManipulator masterManipulator ,KernelObjectConfig kernelObjectConfig, KOMInstrument parent, String name
     ){
-        super( hydrarum, masterManipulator, kernelObjectConfig, parent, name );
+        super( superiorProcess, masterManipulator, kernelObjectConfig, parent, name );
     }
 
     @Override

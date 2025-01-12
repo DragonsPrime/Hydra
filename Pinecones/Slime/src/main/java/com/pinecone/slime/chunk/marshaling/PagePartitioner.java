@@ -1,4 +1,4 @@
-package com.pinecone.slime.chunk.orchestration;
+package com.pinecone.slime.chunk.marshaling;
 
 public interface PagePartitioner extends ChunkPartitioner {
 }

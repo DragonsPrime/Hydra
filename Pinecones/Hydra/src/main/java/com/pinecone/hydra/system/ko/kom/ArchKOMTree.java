@@ -1,5 +1,6 @@
 package com.pinecone.hydra.system.ko.kom;
 
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.lang.GenericDynamicFactory;
@@ -29,6 +30,7 @@ public abstract class ArchKOMTree extends ArchRegimentObjectModel implements KOM
     protected KOMInstrument         mParentInstrument;
 
     protected Hydrarum              hydrarum;
+    protected Processum             superiorProcess;
 
     protected GuidAllocator         guidAllocator;
     protected OperatorFactory       operatorFactory;
@@ -39,24 +41,31 @@ public abstract class ArchKOMTree extends ArchRegimentObjectModel implements KOM
     protected DynamicFactory        dynamicFactory;
 
     public ArchKOMTree (
-            Hydrarum hydrarum, KOIMasterManipulator masterManipulator,
+            Processum superiorProcess, KOIMasterManipulator masterManipulator,
             OperatorFactory operatorFactory, KernelObjectConfig kernelObjectConfig, PathSelector pathSelector,
             KOMInstrument parent, String name
     ){
-        this( hydrarum, masterManipulator, kernelObjectConfig, parent, name );
+        this( superiorProcess, masterManipulator, kernelObjectConfig, parent, name );
 
         this.pathSelector              =  pathSelector;
         this.operatorFactory           =  operatorFactory;
     }
 
     public ArchKOMTree (
-            Hydrarum hydrarum, KOIMasterManipulator masterManipulator, KernelObjectConfig kernelObjectConfig,
+            Processum superiorProcess, KOIMasterManipulator masterManipulator, KernelObjectConfig kernelObjectConfig,
             KOMInstrument parent, String name
     ){
         super( masterManipulator, kernelObjectConfig );
-        this.hydrarum                      = hydrarum;
-        this.dynamicFactory                = new GenericDynamicFactory( hydrarum.getTaskManager().getClassLoader() );
-        this.mParentInstrument             = parent;
+        this.superiorProcess                 = superiorProcess;
+        if ( this.superiorProcess instanceof Hydrarum ) {
+            this.hydrarum                    = (Hydrarum) this.superiorProcess;
+        }
+        else {
+            this.hydrarum                    = (Hydrarum) superiorProcess.getSystem();
+        }
+
+        this.dynamicFactory                  = new GenericDynamicFactory( this.superiorProcess.getTaskManager().getClassLoader() );
+        this.mParentInstrument               = parent;
         this.setTargetingName( name );
     }
 
@@ -64,6 +73,11 @@ public abstract class ArchKOMTree extends ArchRegimentObjectModel implements KOM
     @Override
     public KOMInstrument parent() {
         return this.mParentInstrument;
+    }
+
+    @Override
+    public Processum getSuperiorProcess() {
+        return this.superiorProcess;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume;
 
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
@@ -45,7 +46,6 @@ import java.util.List;
 import java.util.Objects;
 
 public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
-    protected Hydrarum                          hydrarum;
     protected VolumeAllotment                   volumeAllotment;
     protected MirroredVolumeManipulator         mirroredVolumeManipulator;
     protected MountPointManipulator             mountPointManipulator;
@@ -65,9 +65,8 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     protected KenusPool                         kenusPool;
 
 
-    public UniformVolumeManager( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, VolumeManager parent, String name ) {
-
-        super( hydrarum, masterManipulator, VolumeManager.KernelVolumeConfig, parent, name );
+    public UniformVolumeManager( Processum superiorProcess, KOIMasterManipulator masterManipulator, VolumeManager parent, String name ) {
+        super( superiorProcess, masterManipulator, VolumeManager.KernelVolumeConfig, parent, name );
         this.hydrarum = hydrarum;
         this.volumeMasterManipulator       =   ( VolumeMasterManipulator ) masterManipulator;
         this.pathResolver                  =   new KOPathResolver( this.kernelObjectConfig );
@@ -92,16 +91,16 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
         );
     }
 
-    public UniformVolumeManager( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ) {
-        this( hydrarum, masterManipulator, null, VolumeManager.class.getSimpleName() );
+    public UniformVolumeManager( Processum superiorProcess, KOIMasterManipulator masterManipulator ) {
+        this( superiorProcess, masterManipulator, null, VolumeManager.class.getSimpleName() );
     }
 
     public UniformVolumeManager( KOIMappingDriver driver, VolumeManager parent, String name ){
-        this( driver.getSystem(), driver.getMasterManipulator(), parent, name );
+        this( driver.getSuperiorProcess(), driver.getMasterManipulator(), parent, name );
     }
 
     public UniformVolumeManager( KOIMappingDriver driver ) {
-        this( driver.getSystem(), driver.getMasterManipulator() );
+        this( driver.getSuperiorProcess(), driver.getMasterManipulator() );
     }
 
     @Override

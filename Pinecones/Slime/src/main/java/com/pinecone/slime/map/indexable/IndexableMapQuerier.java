@@ -1,8 +1,11 @@
 package com.pinecone.slime.map.indexable;
 
 import com.pinecone.framework.system.NotImplementedException;
+import com.pinecone.slime.cache.CacheConstants;
+import com.pinecone.slime.cache.query.ConcurrentMergeLRUDictCachePage;
 import com.pinecone.slime.cache.query.LocalFixedLRUDictCachePage;
 import com.pinecone.slime.cache.query.UniformCountSelfLoadingDictCache;
+import com.pinecone.slime.map.AlterableCacher;
 import com.pinecone.slime.map.AlterableQuerier;
 import com.pinecone.slime.source.indexable.GenericIndexKeySourceRetriever;
 import com.pinecone.slime.source.indexable.IndexableDataManipulator;
@@ -15,10 +18,23 @@ import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
 
-public class IndexableMapQuerier<K, V > implements AlterableQuerier<V > {
+public class IndexableMapQuerier<K, V > implements AlterableCacher<V > {
     private final IndexableDataManipulator<K, V >  mManipulator;
     protected UniformCountSelfLoadingDictCache<V > mCache;
     protected IndexableTargetScopeMeta             mIndexMeta;
+
+    protected static <V > UniformCountSelfLoadingDictCache<V > newCache( IndexableTargetScopeMeta meta, boolean bConcurrent ) {
+        if ( bConcurrent ) {
+            return new ConcurrentMergeLRUDictCachePage<>( CacheConstants.DefaultCachePageMegaCapacity,
+                    new GenericIndexKeySourceRetriever<>( meta )
+            );
+        }
+        else {
+            return new LocalFixedLRUDictCachePage<>( CacheConstants.DefaultCachePageMegaCapacity,
+                    new GenericIndexKeySourceRetriever<>( meta )
+            );
+        }
+    }
 
     public IndexableMapQuerier( IndexableTargetScopeMeta meta, UniformCountSelfLoadingDictCache<V > cache ) {
         this.mManipulator  = (IndexableDataManipulator<K, V >) meta.<K, V >getDataManipulator();
@@ -26,11 +42,14 @@ public class IndexableMapQuerier<K, V > implements AlterableQuerier<V > {
         this.mCache        = cache;
     }
 
-    public IndexableMapQuerier( IndexableTargetScopeMeta meta ) {
-        this( meta, new LocalFixedLRUDictCachePage<>( 1000,
-                new GenericIndexKeySourceRetriever<>( meta )
-        ) );
+    public IndexableMapQuerier( IndexableTargetScopeMeta meta, boolean bConcurrent ) {
+        this( meta, IndexableMapQuerier.newCache( meta, bConcurrent ) );
     }
+
+    public IndexableMapQuerier( IndexableTargetScopeMeta meta ) {
+        this( meta, true );
+    }
+
 
     @Override
     public long size() {
@@ -66,18 +85,24 @@ public class IndexableMapQuerier<K, V > implements AlterableQuerier<V > {
     }
 
     @Override
-    public V get(Object key) {
+    public V get( Object key ) {
         return this.mCache.get( key );
     }
 
     @Override
-    public V insert( Object key, V value) {
+    public V insert( Object key, V value ) {
         this.mManipulator.insert( this.mIndexMeta, (K)key, value );
         return value;
     }
 
     @Override
-    public V insertIfAbsent(Object key, V value) {
+    public V insert( Object key, V value, long expireMill ) {
+        this.mManipulator.insert( this.mIndexMeta, (K)key, value, expireMill );
+        return value;
+    }
+
+    @Override
+    public V insertIfAbsent( Object key, V value ) {
         if ( !this.containsKey( key ) ) {
             return this.insert( key, value );
         }
@@ -85,9 +110,17 @@ public class IndexableMapQuerier<K, V > implements AlterableQuerier<V > {
     }
 
     @Override
-    public V erase(Object key) {
-        V value = this.get(key);
-        this.expunge(key);
+    public V insertIfAbsent( Object key, V value, long expireMill ) {
+        if ( !this.containsKey( key ) ) {
+            return this.insert( key, value, expireMill );
+        }
+        return null;
+    }
+
+    @Override
+    public V erase( Object key ) {
+        V value = this.get( key );
+        this.expunge( key );
         return value;
     }
 

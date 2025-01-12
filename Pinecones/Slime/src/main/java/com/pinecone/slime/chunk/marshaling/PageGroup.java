@@ -1,4 +1,4 @@
-package com.pinecone.slime.chunk.orchestration;
+package com.pinecone.slime.chunk.marshaling;
 
 import com.pinecone.slime.cluster.ChunkGroup;
 import com.pinecone.slime.chunk.PatriarchalChunk;
