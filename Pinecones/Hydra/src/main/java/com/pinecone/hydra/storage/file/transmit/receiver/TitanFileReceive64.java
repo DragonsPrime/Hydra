@@ -66,10 +66,6 @@ public class TitanFileReceive64 implements FileReceive64{
         long frameSize = this.mKOMFileSystem.getConfig().getFrameSize().longValue();
         this.fileNode.setGuid( mKOMFileSystem.queryGUIDByPath( this.destDirPath ) );
 
-        int parityCheck = 0;
-        long checksum = 0;
-        long crc32Xor = 0;
-
         FSNodeAllotment allotment = mKOMFileSystem.getFSNodeAllotment();
         long segId = 0;
         long currentPosition = 0;

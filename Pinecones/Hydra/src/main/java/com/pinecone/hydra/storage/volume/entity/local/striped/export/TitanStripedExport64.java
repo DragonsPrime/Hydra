@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped.export;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.sqlite.SQLiteExecutor;
 import com.pinecone.hydra.storage.Chanface;
 import com.pinecone.hydra.storage.RandomAccessChanface;
@@ -17,12 +18,15 @@ import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.system.Hydrarum;
+import com.pinecone.hydra.umct.IlleagalResponseException;
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 public class TitanStripedExport64 implements StripedExport64{
     protected VolumeManager             volumeManager;
@@ -51,8 +55,8 @@ public class TitanStripedExport64 implements StripedExport64{
         int StripResidentCacheAllotRatio = volumeManager.getConfig().getStripResidentCacheAllotRatio();
         SQLiteExecutor sqLiteExecutor = this.stripedVolume.getSQLiteExecutor();
 
-        Hydrarum hydrarum = this.volumeManager.getHydrarum();
-        MasterVolumeGram masterVolumeGram = this.createMasterVolumeGram(hydrarum,jobCount,StripResidentCacheAllotRatio);
+        Processum supProc = this.volumeManager.getSuperiorProcess();
+        MasterVolumeGram masterVolumeGram = this.createMasterVolumeGram(supProc,jobCount,StripResidentCacheAllotRatio);
 
         // 创建文件写入线程
         createBufferOutJob( masterVolumeGram, this.storageExportIORequest.getSize().longValue());
@@ -62,6 +66,10 @@ public class TitanStripedExport64 implements StripedExport64{
 
         // 同步等待任务完成并处理异常
         this.waitForTaskCompletion(masterVolumeGram);
+        //masterVolumeGram.majorJobCountDownLatchWait();
+
+        supProc.getTaskManager().erase(masterVolumeGram);
+
 
         return null;
     }
@@ -86,6 +94,9 @@ public class TitanStripedExport64 implements StripedExport64{
 
         // 同步等待任务完成并处理异常
         this.waitForTaskCompletion(masterVolumeGram);
+        //masterVolumeGram.majorJobCountDownLatchWait();
+
+        hydrarum.getTaskManager().erase(masterVolumeGram);
 
         return null;
     }
@@ -100,11 +111,11 @@ public class TitanStripedExport64 implements StripedExport64{
         return null;
     }
 
-    private MasterVolumeGram createMasterVolumeGram(Hydrarum hydrarum, int jobCount, int StripResidentCacheAllotRatio ) {
+    private MasterVolumeGram createMasterVolumeGram(Processum supProcess, int jobCount, int StripResidentCacheAllotRatio ) {
         Number stripSize = this.volumeManager.getConfig().getDefaultStripSize();
 
-        MasterVolumeGram masterVolumeGram = new MasterVolumeGram(this.stripedVolume.getGuid().toString(), hydrarum,jobCount, StripResidentCacheAllotRatio, stripSize.intValue());
-        hydrarum.getTaskManager().add(masterVolumeGram);
+        MasterVolumeGram masterVolumeGram = new MasterVolumeGram(this.stripedVolume.getGuid().toString(), supProcess,jobCount, StripResidentCacheAllotRatio, stripSize.intValue());
+        supProcess.getTaskManager().add(masterVolumeGram);
         return masterVolumeGram;
     }
 
@@ -150,11 +161,26 @@ public class TitanStripedExport64 implements StripedExport64{
     }
 
     private void waitForTaskCompletion(MasterVolumeGram masterVolumeGram) throws ProxyProvokeHandleException {
-        try {
-            masterVolumeGram.getTaskManager().syncWaitingTerminated();
+//        try {
+//            masterVolumeGram.getTaskManager().syncWaitingTerminated();
+//        }
+//        catch (Exception e) {
+//            throw new ProxyProvokeHandleException(e);
+//        }
+
+        try{
+            Object ret = masterVolumeGram.getMajorJobFuture().get();
+
+            if ( ret instanceof Exception ) {
+                throw new ProxyProvokeHandleException( (Exception) ret );
+            }
+
+            if ( !(Boolean) ret ) {
+                throw new IllegalStateException( "Buffer-To-File thread has been returned `false`, which is expected `true`." );
+            }
         }
-        catch (Exception e) {
-            throw new ProxyProvokeHandleException(e);
+        catch ( InterruptedException | ExecutionException e ) {
+            throw new ProxyProvokeHandleException( e );
         }
     }
 

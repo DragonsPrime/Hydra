@@ -2,11 +2,14 @@ package com.pinecone.hydra.storage.volume.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 import com.pinecone.framework.system.GenericMasterTaskManager;
+import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.system.executum.ArchProcessum;
 import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.lock.SpinLock;
@@ -20,19 +23,23 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
     protected int                   bufferOutThreadId;
     protected Semaphore             bufferOutBlockerLatch;
     protected int                   currentBufferInJobCode;
+    protected CountDownLatch        countDownLatch;
+    protected final CompletableFuture<Object> majorJobFuture;
     
     
     protected List<CacheBlock>      cacheGroup;
     protected byte[]                buffer;
 
+
+
     public MasterVolumeGram( String szName, Processum parent ) {
         super( szName, parent );
         this.mTaskManager      = new GenericMasterTaskManager( this );
+        this.majorJobFuture    = new CompletableFuture<>();
     }
 
     public MasterVolumeGram( String szName, Processum parent, int jobCount, int StripResidentCacheAllotRatio, int stripSize ){
-        super( szName, parent );
-        this.mTaskManager   = new GenericMasterTaskManager( this );
+        this( szName, parent );
         this.jobCount       = jobCount;
         this.cacheGroup     = this.initializeCacheGroup( jobCount, StripResidentCacheAllotRatio, stripSize );
         this.buffer         = new byte[ jobCount * stripSize * StripResidentCacheAllotRatio ];
@@ -106,6 +113,32 @@ public class MasterVolumeGram extends ArchProcessum implements VolumeGram {
     @Override
     public void setCurrentBufferInJobCode(int currentBufferInJobCode) {
         this.currentBufferInJobCode = currentBufferInJobCode;
+    }
+
+    @Override
+    public CompletableFuture<Object> getMajorJobFuture() {
+        return this.majorJobFuture;
+    }
+
+    @Override
+    public void majorJobCountDown() {
+        this.countDownLatch.countDown();
+    }
+
+    @Override
+    public void setMajorJobCountDownNum(int num) {
+        this.countDownLatch = new CountDownLatch(num);
+    }
+
+    @Override
+    public void majorJobCountDownLatchWait() {
+        try {
+            this.countDownLatch.await();
+        }
+        catch ( InterruptedException e ) {
+            Thread.currentThread().interrupt();
+            throw new ProxyProvokeHandleException(e);
+        }
     }
 
     private List< CacheBlock > initializeCacheGroup(int jobCount, int StripResidentCacheAllotRatio, Number stripSize ){

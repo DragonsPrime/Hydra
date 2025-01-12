@@ -76,8 +76,8 @@ class Alice extends Radium {
         //this.testDirectExport( volumeTree );
         //Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
-        //this.testStripedInsert( volumeTree );
-        this.testSpannedInsert( volumeTree );
+        this.testStripedInsert( volumeTree );
+        //this.testSpannedInsert( volumeTree );
         //this.testStripedReceive( volumeTree );
         //this.testStripedExport( volumeTree );
         //this.testHash( volumeTree );

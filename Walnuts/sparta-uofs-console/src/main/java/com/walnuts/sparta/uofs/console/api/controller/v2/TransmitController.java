@@ -135,8 +135,8 @@ public class TransmitController {
      * @param siteName 站点
      * @return 返回操作结果
      */
-    @PostMapping("/upload")
-    public BasicResultResponse<String> upload(@RequestParam("siteName") String siteName, @RequestParam("filePath") String filePath, @RequestParam("version") String version, @RequestParam("file") MultipartFile file) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    @PostMapping("/CDNUpload")
+    public BasicResultResponse<String> CDNUpload(@RequestParam("siteName") String siteName, @RequestParam("filePath") String filePath, @RequestParam("version") String version, @RequestParam("file") MultipartFile file) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         SiteManipulator siteManipulator = this.bucketInstrument.getSiteManipulator();
         Site site = siteManipulator.querySiteByName(siteName);
         if( site == null ){
@@ -170,6 +170,29 @@ public class TransmitController {
 
         this.primaryVersion.insert( titanVersion );
 
+        return BasicResultResponse.success();
+    }
+
+    /**
+     *
+     * @param filePath 文件要上传的路径
+     * @param file 文件本体
+     * @return
+     */
+    @PostMapping("/upload")
+    public BasicResultResponse<String> upload(@RequestParam("filePath") String filePath, @RequestParam("file") MultipartFile file ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        File tempFile = File.createTempFile("upload",".temp");
+        file.transferTo(tempFile);
+
+        FSNodeAllotment fsNodeAllotment = this.primaryFileSystem.getFSNodeAllotment();
+        FileChannel channel = FileChannel.open(tempFile.toPath(), StandardOpenOption.READ);
+        TitanFileChannelChanface titanFileChannelKChannel = new TitanFileChannelChanface( channel );
+        FileNode fileNode = fsNodeAllotment.newFileNode();
+        fileNode.setDefinitionSize( tempFile.length() );
+        fileNode.setName( tempFile.getName() );
+        TitanFileReceiveEntity64 receiveEntity = new TitanFileReceiveEntity64( this.primaryFileSystem,filePath, fileNode,titanFileChannelKChannel,this.primaryVolume );
+
+        this.primaryFileSystem.receive( receiveEntity );
         return BasicResultResponse.success();
     }
 

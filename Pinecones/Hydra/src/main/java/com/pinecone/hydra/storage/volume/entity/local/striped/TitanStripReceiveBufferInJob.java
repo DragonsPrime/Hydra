@@ -49,6 +49,7 @@ public class TitanStripReceiveBufferInJob implements StripReceiveBufferInJob{
         while( true ){
             try {
                 if( this.status == ReceiveBufferInStatus.Exiting ){
+                    this.masterVolumeGram.majorJobCountDown();
                     break;
                 }
                 if(  this.masterVolumeGram.getCurrentBufferInJobCode() == this.jobCode ){

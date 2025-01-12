@@ -11,6 +11,7 @@ import com.pinecone.hydra.storage.volume.entity.ReceiveEntity;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.storage.volume.kvfs.OnVolumeFileSystem;
+import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -18,6 +19,7 @@ import java.sql.SQLException;
 import java.util.concurrent.Semaphore;
 
 public class TitanStripReceiverJob implements StripChannelReceiverJob{
+    private MasterVolumeGram            masterVolumeGram;
     private LogicVolume                 volume;
     private int                         jobCount;
     private int                         jobCode;
@@ -32,7 +34,9 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
     private UnifiedTransmitConstructor  constructor;
 
 
-    public TitanStripReceiverJob(ReceiveEntity entity, Chanface channel, int jobCount, int jobCode, LogicVolume volume, MappedExecutor executor, Number offset, Number ednSize ){
+
+    public TitanStripReceiverJob(MasterVolumeGram masterVolumeGram,ReceiveEntity entity, Chanface channel, int jobCount, int jobCode, LogicVolume volume, MappedExecutor executor, Number offset, Number ednSize ){
+        this.masterVolumeGram       = masterVolumeGram;
         this.volumeManager          = entity.getVolumeManager();
         this.object                 = entity.getReceiveStorageObject();
         this.chanface = channel;
@@ -57,6 +61,7 @@ public class TitanStripReceiverJob implements StripChannelReceiverJob{
 
             long bufferSize = stripSize;
             if( currentPosition >= size ){
+                this.masterVolumeGram.majorJobCountDown();
                 break;
             }
             if( currentPosition + bufferSize > size ){

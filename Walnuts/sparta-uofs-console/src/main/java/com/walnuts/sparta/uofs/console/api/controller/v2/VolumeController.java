@@ -194,6 +194,9 @@ public class VolumeController {
         if( logicVolume instanceof TitanLocalSimpleVolume){
             SimpleVolume simpleVolume = (SimpleVolume) logicVolume;
             List<GUID> guids = simpleVolume.listPhysicalVolume();
+            if(guids.isEmpty()){
+                return BasicResultResponse.success().toJSONString();
+            }
             PhysicalVolume volumePhysicalVolume = this.primaryVolume.getPhysicalVolume(guids.get(0));
             ArrayList<Volume> volumes = new ArrayList<>();
             volumes.add(volumePhysicalVolume);

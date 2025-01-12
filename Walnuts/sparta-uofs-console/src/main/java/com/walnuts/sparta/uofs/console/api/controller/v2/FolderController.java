@@ -40,7 +40,7 @@ public class FolderController {
      * @return 返回操作状态
      */
     @GetMapping("/creat/folder")
-    public BasicResultResponse<String> createFolder( @RequestParam String destDirPath ){
+    public BasicResultResponse<String> createFolder( @RequestParam("destDirPath") String destDirPath ){
         this.primaryFileSystem.affirmFolder( destDirPath );
         return BasicResultResponse.success();
     }

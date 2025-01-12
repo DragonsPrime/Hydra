@@ -68,7 +68,8 @@ public class TitanStripBufferOutJob implements StripBufferOutJob {
 
             if( this.exportSize >= this.totalSize ){
                 this.setExitingStatus();
-                break;
+                this.masterVolumeGram.getMajorJobFuture().complete( true );
+                return;
             }
             if( !this.isAllExiting() ){
                 try{
@@ -78,6 +79,8 @@ public class TitanStripBufferOutJob implements StripBufferOutJob {
                 }
                 catch ( InterruptedException e ) {
                     Thread.currentThread().interrupt();
+                    this.masterVolumeGram.getMajorJobFuture().completeExceptionally( e );
+                    break;
                 }
             }
             List<CacheBlock> writableCacheBlocks = this.getWritableCacheBlocks();
@@ -93,8 +96,9 @@ public class TitanStripBufferOutJob implements StripBufferOutJob {
                     int write = this.channel.write(this.mBuffer, writableCacheBlocks);
                     this.exportSize += write;
                 }
-                catch (IOException e) {
-                    throw new RuntimeException(e);
+                catch ( IOException e ) {
+                    this.masterVolumeGram.getMajorJobFuture().completeExceptionally( e );
+                    break;
                 }
                 //Arrays.fill(this.mBuffer, (byte) 0);
                 this.updateCurrentPosition( writableCacheBlocks.size() );
@@ -103,7 +107,7 @@ public class TitanStripBufferOutJob implements StripBufferOutJob {
                 this.setSuspendedStatus();
                 //唤醒所有缓存线程
                 //this.lockEntity.unlockPipeStage();
-                for( int i = 0; i < jobCount; ++i ){
+                for ( int i = 0; i < jobCount; ++i ){
                     CacheBlock cacheBlock = this.cacheBlocksGroup.get(i);
                     MasterVolumeGram masterVolumeGram = (MasterVolumeGram) this.parentThread.parentExecutum();
                     LocalStripedTaskThread bufferWriteThread = masterVolumeGram.getChildThread(cacheBlock.getBufferWriteThreadId());
@@ -123,6 +127,7 @@ public class TitanStripBufferOutJob implements StripBufferOutJob {
 
         }
 
+        this.masterVolumeGram.getMajorJobFuture().complete( false );
         //Debug.warnSyn( "wangwang" );
     }
 
