@@ -13,7 +13,7 @@ import com.pinecone.hydra.system.ko.kom.KOMInstrument;
 import com.pinecone.hydra.unit.imperium.ImperialTree;
 import com.pinecone.hydra.unit.imperium.entity.EntityNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 public abstract class ArchRuntimeKOMTree implements RuntimeInstrument {
     protected Namespace             mThisNamespace;

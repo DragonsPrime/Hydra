@@ -1,4 +1,4 @@
-package com.pinecone.ulf.util.id;
+package com.pinecone.ulf.util.guid;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.id.Identification;

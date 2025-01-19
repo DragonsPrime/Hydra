@@ -14,7 +14,7 @@ import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.TitanLocalSimpleVolume;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.guid.GUIDs;
 import com.walnuts.sparta.uofs.console.api.response.BasicResultResponse;
 import com.walnuts.sparta.uofs.console.domain.dto.PhysicalVolumeDTO;
 import com.walnuts.sparta.uofs.console.domain.dto.LogicVolumeDTO;

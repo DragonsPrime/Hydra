@@ -3,7 +3,7 @@ package com.pinecone.hydra.storage.file.entity;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.source.FileMasterManipulator;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 public class GenericFSNodeAllotment implements FSNodeAllotment {
     private FileMasterManipulator       fileMasterManipulator;
@@ -18,7 +18,7 @@ public class GenericFSNodeAllotment implements FSNodeAllotment {
     @Override
     public Folder newFolder(){
         GenericFolder folder = new GenericFolder(fileSystem, fileMasterManipulator.getFolderManipulator());
-        folder.setGuid( guidAllocator.nextGUID72() );
+        folder.setGuid( guidAllocator.nextGUID() );
         return folder;
     }
 
@@ -28,20 +28,20 @@ public class GenericFSNodeAllotment implements FSNodeAllotment {
     public Folder newFolder(String name) {
         GenericFolder folder = new GenericFolder(fileSystem, fileMasterManipulator.getFolderManipulator());
         folder.setName( name );
-        folder.setGuid( guidAllocator.nextGUID72() );
+        folder.setGuid( guidAllocator.nextGUID() );
         return folder;
     }
 
     @Override
     public FileNode newFileNode(){
         GenericFileNode fileNode = new GenericFileNode(fileSystem, fileMasterManipulator.getFileManipulator());
-        fileNode.setGuid( guidAllocator.nextGUID72() );
+        fileNode.setGuid( guidAllocator.nextGUID() );
         return fileNode;
     }
     @Override
     public FileNode newFileNode(String name, long definitionSize, boolean crc32Xor, boolean integrityCheckEnable, boolean disableCluster) {
         GenericFileNode fileNode = new GenericFileNode(fileSystem, fileMasterManipulator.getFileManipulator());
-        fileNode.setGuid( guidAllocator.nextGUID72() );
+        fileNode.setGuid( guidAllocator.nextGUID() );
         fileNode.setName( name );
         //fileNode.setCrc32Xor( crc32Xor );
         fileNode.setDefinitionSize( definitionSize );
@@ -55,7 +55,7 @@ public class GenericFSNodeAllotment implements FSNodeAllotment {
         GenericFileNode fileNode = new GenericFileNode(fileSystem, fileMasterManipulator.getFileManipulator());
         fileNode.setName( name );
         fileNode.setDefinitionSize( definitionSize );
-        fileNode.setGuid( guidAllocator.nextGUID72() );
+        fileNode.setGuid( guidAllocator.nextGUID() );
         return fileNode;
     }
 
@@ -74,13 +74,13 @@ public class GenericFSNodeAllotment implements FSNodeAllotment {
     @Override
     public LocalFrame newLocalFrame(){
         GenericLocalFrame frame = new GenericLocalFrame(fileMasterManipulator.getLocalFrameManipulator());
-        frame.setSegGuid( guidAllocator.nextGUID72() );
+        frame.setSegGuid( guidAllocator.nextGUID() );
         return frame;
     }
     @Override
     public LocalFrame newLocalFrame(GUID fileGuid, int segId, String sourceName, String crc32, long size, long fileStartOffset) {
         GenericLocalFrame frame = new GenericLocalFrame(fileMasterManipulator.getLocalFrameManipulator());
-        frame.setSegGuid( guidAllocator.nextGUID72() );
+        frame.setSegGuid( guidAllocator.nextGUID() );
         frame.setSegId( segId );
         frame.setSourceName( sourceName );
         frame.setCrc32( crc32 );
@@ -95,7 +95,7 @@ public class GenericFSNodeAllotment implements FSNodeAllotment {
         frame.setFileGuid( fileGuid );
         frame.setSegId( segId );
         frame.setSourceName( sourceName );
-        frame.setSegGuid( guidAllocator.nextGUID72() );
+        frame.setSegGuid( guidAllocator.nextGUID() );
         return frame;
     }
 
@@ -104,13 +104,13 @@ public class GenericFSNodeAllotment implements FSNodeAllotment {
     @Override
     public RemoteFrame newRemoteFrame(){
         GenericRemoteFrame frame = new GenericRemoteFrame(fileMasterManipulator.getRemoteFrameManipulator());
-        frame.setSegGuid( guidAllocator.nextGUID72() );
+        frame.setSegGuid( guidAllocator.nextGUID() );
         return frame;
     }
     @Override
     public RemoteFrame newRemoteFrame(GUID fileGuid, int segId, String crc32, long size) {
         GenericRemoteFrame frame = new GenericRemoteFrame(fileMasterManipulator.getRemoteFrameManipulator());
-        frame.setSegGuid( guidAllocator.nextGUID72() );
+        frame.setSegGuid( guidAllocator.nextGUID() );
         frame.setFileGuid( fileGuid );
         frame.setSegId( segId );
         frame.setCrc32( crc32 );
@@ -122,7 +122,7 @@ public class GenericFSNodeAllotment implements FSNodeAllotment {
     public RemoteFrame newRemoteFrame(GUID fileGuid, int segId) {
         GenericRemoteFrame frame = new GenericRemoteFrame(fileMasterManipulator.getRemoteFrameManipulator());
         frame.setFileGuid( fileGuid );
-        frame.setSegGuid( guidAllocator.nextGUID72() );
+        frame.setSegGuid( guidAllocator.nextGUID() );
         frame.setSegId( segId );
         return frame;
     }
@@ -142,7 +142,7 @@ public class GenericFSNodeAllotment implements FSNodeAllotment {
     public Strip newStrip() {
 
         GenericStrip strip = new GenericStrip(this.fileMasterManipulator.getStripManipulator());
-        strip.setStripGuid( this.guidAllocator.nextGUID72() );
+        strip.setStripGuid( this.guidAllocator.nextGUID() );
         return strip;
     }
 }

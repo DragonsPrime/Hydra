@@ -14,7 +14,7 @@ import com.pinecone.hydra.storage.file.source.FileMetaManipulator;
 import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +45,7 @@ public class GenericFileOperator extends ArchFileSystemOperator{
         GUID guid = file.getGuid();
 
         FileSystemAttributes attributes = file.getAttributes();
-        GUID attrbutesGuid = guidAllocator.nextGUID72();
+        GUID attrbutesGuid = guidAllocator.nextGUID();
         if ( attributes != null ){
             attributes.setGuid(attrbutesGuid);
             this.fileSystemAttributeManipulator.insert(attributes);
@@ -55,7 +55,7 @@ public class GenericFileOperator extends ArchFileSystemOperator{
         }
 
         FileMeta fileMeta = file.getFileMeta();
-        GUID fileMetaGuid = guidAllocator.nextGUID72();
+        GUID fileMetaGuid = guidAllocator.nextGUID();
         if ( fileMeta != null ){
             fileMeta.setGuid(fileMetaGuid);
             this.fileMetaManipulator.insert(fileMeta);

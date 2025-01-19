@@ -1,11 +1,11 @@
-package com.pinecone.ulf.util.id;
+package com.pinecone.ulf.util.guid;
 
-import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.ulf.util.id.exception.GuidGenerateException;
-import com.pinecone.ulf.util.id.worker.WorkerIdAssigner;
+import com.pinecone.framework.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidGenerateException;
+import com.pinecone.ulf.util.guid.worker.WorkerIdAssigner;
 
-public interface GuidAllocator extends Pinenut {
+public interface GuidAllocator72 extends GuidAllocator {
 
     /**
      * Get a unique ID

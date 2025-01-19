@@ -10,7 +10,7 @@ import com.pinecone.hydra.service.kom.source.ServiceNodeManipulator;
 import com.pinecone.hydra.system.ko.UOIUtils;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 public class ServiceElementOperator extends ArchElementOperator implements ElementOperator {
     protected ServiceNodeManipulator  serviceNodeManipulator;
@@ -36,12 +36,12 @@ public class ServiceElementOperator extends ArchElementOperator implements Eleme
         //将信息写入数据库
         //将节点信息存入应用节点表
         GuidAllocator guidAllocator = this.servicesInstrument.getGuidAllocator();
-        GUID serviceNodeGUID = guidAllocator.nextGUID72();
+        GUID serviceNodeGUID = guidAllocator.nextGUID();
         serviceElement.setGuid(serviceNodeGUID);
         this.serviceNodeManipulator.insert( serviceElement );
 
         //将应用节点基础信息存入信息表
-        GUID metaGUID = guidAllocator.nextGUID72();
+        GUID metaGUID = guidAllocator.nextGUID();
         if ( serviceElement.getMetaGuid() == null ){
             serviceElement.setMetaGuid( metaGUID );
         }

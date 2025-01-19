@@ -18,7 +18,7 @@ import com.pinecone.hydra.storage.file.transmit.receiver.TitanFileReceiveEntity6
 import com.pinecone.hydra.storage.version.VersionManage;
 import com.pinecone.hydra.storage.version.entity.TitanVersion;
 import com.pinecone.hydra.storage.volume.UniformVolumeManager;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.guid.GUIDs;
 import com.walnuts.sparta.uofs.console.api.response.BasicResultResponse;
 import com.walnuts.sparta.uofs.console.domain.dto.DownloadObjectByChannelDTO;
 import com.walnuts.sparta.uofs.console.domain.dto.UpdateObjectByChannelDTO;

@@ -1,9 +1,6 @@
-package com.pinecone.ulf.util.id;
+package com.pinecone.ulf.util.guid;
 
-import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.id.IllegalIdentificationException;
-
-import java.util.Map;
 
 public class GUID72 extends GUID64 {
     private byte nanoSeed;

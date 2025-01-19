@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pinecone.ulf.util.id.worker.entity;
+package com.pinecone.ulf.util.guid.worker.entity;
 
 
-import com.pinecone.ulf.util.id.worker.WorkerNodeType;
+import com.pinecone.ulf.util.guid.worker.WorkerNodeType;
 import org.apache.commons.lang.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang.builder.ToStringStyle;
 

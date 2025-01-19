@@ -6,7 +6,7 @@ import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.id.Identification;
 import com.pinecone.framework.util.json.homotype.BeanMapDecoder;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.guid.GUIDs;
 
 public abstract class ArchServiceFamilyMeta implements ServiceFamilyMeta {
     protected GUID   guid;

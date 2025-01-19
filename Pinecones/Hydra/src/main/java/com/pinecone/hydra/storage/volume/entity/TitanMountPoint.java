@@ -21,7 +21,7 @@ public class TitanMountPoint implements MountPoint{
     public TitanMountPoint(VolumeManager volumeManager, MountPointManipulator mountPointManipulator ){
         this.volumeManager = volumeManager;
         this.mountPointManipulator      =   mountPointManipulator;
-        this.guid                       =   volumeManager.getGuidAllocator().nextGUID72();
+        this.guid                       =   volumeManager.getGuidAllocator().nextGUID();
         this.createTime                 =   LocalDateTime.now();
         this.updateTime                 =   LocalDateTime.now();
     }

@@ -6,7 +6,7 @@ import com.pinecone.hydra.registry.entity.Properties;
 import com.pinecone.hydra.registry.entity.Property;
 import com.pinecone.hydra.registry.source.RegistryPropertiesManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.guid.GUIDs;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
@@ -16,8 +16,6 @@ import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

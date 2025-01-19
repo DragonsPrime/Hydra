@@ -7,7 +7,7 @@ import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.registry.KOMRegistry;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,7 +33,7 @@ public class GenericNamespace extends ArchElementNode implements Namespace {
         this.registry = registry;
 
         GuidAllocator guidAllocator = this.registry.getGuidAllocator();
-        this.setGuid( guidAllocator.nextGUID72() );
+        this.setGuid( guidAllocator.nextGUID() );
         this.setCreateTime( LocalDateTime.now() );
     }
 

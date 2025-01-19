@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.guid.GUIDs;
 
 public final class StorageConstants {
     public static final String StorageVersionSignature  = "Titan";

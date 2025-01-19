@@ -38,7 +38,7 @@ import com.pinecone.hydra.registry.source.RegistryNSNodeManipulator;
 import com.pinecone.hydra.registry.source.RegistryPropertiesManipulator;
 import com.pinecone.hydra.registry.source.RegistryTextFileManipulator;
 import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.guid.GUIDs;
 
 import java.io.StringReader;
 import java.time.LocalDateTime;

@@ -10,7 +10,6 @@ import com.pinecone.hydra.account.entity.GenericGroup;
 import com.pinecone.hydra.account.ibatis.hydranium.UserMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
-import com.pinecone.ulf.util.id.GuidAllocator;
 import com.sauron.radium.Radium;
 
 class Geralt extends Radium {

@@ -14,7 +14,7 @@ import com.pinecone.hydra.storage.file.source.FolderMetaManipulator;
 import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class GenericFolderOperator extends ArchFileSystemOperator{
         GUID guid = folder.getGuid();
 
         FileSystemAttributes attributes = folder.getAttributes();
-        GUID attributesGuid = guidAllocator.nextGUID72();
+        GUID attributesGuid = guidAllocator.nextGUID();
         if ( attributes != null ){
             attributes.setGuid(attributesGuid);
             this.fileSystemAttributeManipulator.insert(attributes);
@@ -52,7 +52,7 @@ public class GenericFolderOperator extends ArchFileSystemOperator{
         }
 
         FolderMeta folderMeta = folder.getFolderMeta();
-        GUID folderMetaGuid = guidAllocator.nextGUID72();
+        GUID folderMetaGuid = guidAllocator.nextGUID();
         if ( folderMeta != null ){
             folderMeta.setGuid(folderMetaGuid);
             this.folderMetaManipulator.insert(folderMeta);

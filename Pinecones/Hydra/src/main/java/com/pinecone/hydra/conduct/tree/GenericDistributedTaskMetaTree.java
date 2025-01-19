@@ -21,8 +21,8 @@ import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.RegimentedImperialTree;
 import com.pinecone.hydra.unit.imperium.source.TreeMasterManipulator;
-import com.pinecone.ulf.util.id.GuidAllocator;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.framework.util.id.GuidAllocator;
+import com.pinecone.ulf.util.guid.GUIDs;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -83,17 +83,17 @@ public class GenericDistributedTaskMetaTree implements DistributedTaskMetaTree{
         GuidAllocator guidAllocator = GUIDs.newGuidAllocator();
 
         GenericTaskNodeMeta genericTaskNodeMeta = taskNode.getGenericTaskNodeMeta();
-        GUID TaskNodeMetaGuid = guidAllocator.nextGUID72();
+        GUID TaskNodeMetaGuid = guidAllocator.nextGUID();
         genericTaskNodeMeta.setGuid(TaskNodeMetaGuid);
 
         GenericTaskCommonData genericTaskCommonData = taskNode.getGenericTaskCommonData();
-        GUID TaskCommonDataGuid = guidAllocator.nextGUID72();
+        GUID TaskCommonDataGuid = guidAllocator.nextGUID();
         genericTaskCommonData.setGuid(TaskCommonDataGuid);
         genericTaskCommonData.setCreateTime(LocalDateTime.now());
         genericTaskCommonData.setUpdateTime(LocalDateTime.now());
 
         GUIDImperialTrieNode guidDistributedTrieNode = new GUIDImperialTrieNode();
-        GUID nodeGuid = guidAllocator.nextGUID72();
+        GUID nodeGuid = guidAllocator.nextGUID();
         guidDistributedTrieNode.setGuid(nodeGuid);
         guidDistributedTrieNode.setNodeMetadataGUID(TaskNodeMetaGuid);
         guidDistributedTrieNode.setBaseDataGUID(TaskCommonDataGuid);

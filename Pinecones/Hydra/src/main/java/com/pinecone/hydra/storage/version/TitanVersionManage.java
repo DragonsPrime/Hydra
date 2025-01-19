@@ -1,15 +1,14 @@
 package com.pinecone.hydra.storage.version;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.version.entity.TitanVersion;
 import com.pinecone.hydra.storage.version.source.VersionManipulator;
 import com.pinecone.hydra.storage.version.source.VersionMasterManipulator;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
-import com.pinecone.ulf.util.id.GuidAllocator;
-import com.pinecone.ulf.util.id.impl.GenericGuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
+import com.pinecone.ulf.util.guid.GenericGuidAllocator;
 
 public class TitanVersionManage implements VersionManage{
     protected Hydrarum                 hydrarum;

@@ -13,10 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pinecone.ulf.util.id.worker;
+package com.pinecone.ulf.util.guid.worker;
 
 
-import com.pinecone.ulf.util.id.utils.ValuedEnum;
+import com.pinecone.ulf.util.guid.utils.ValuedEnum;
 
 /**
  * WorkerNodeType

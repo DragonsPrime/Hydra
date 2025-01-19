@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.pinecone.ulf.util.id.utils;
+package com.pinecone.ulf.util.guid.utils;
 
 /**
  * {@code ValuedEnum} defines an enumeration which is bounded to a value, you

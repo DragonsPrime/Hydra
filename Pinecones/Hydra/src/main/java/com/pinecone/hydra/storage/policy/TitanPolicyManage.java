@@ -5,11 +5,10 @@ import com.pinecone.hydra.storage.policy.entity.Policy;
 import com.pinecone.hydra.storage.policy.source.PolicyFileMappingManipulator;
 import com.pinecone.hydra.storage.policy.source.PolicyManipulator;
 import com.pinecone.hydra.storage.policy.source.PolicyMasterManipulator;
-import com.pinecone.hydra.storage.version.source.VersionManipulator;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
-import com.pinecone.ulf.util.id.GuidAllocator;
-import com.pinecone.ulf.util.id.impl.GenericGuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
+import com.pinecone.ulf.util.guid.GenericGuidAllocator;
 
 import java.util.List;
 

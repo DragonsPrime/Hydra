@@ -38,8 +38,8 @@ import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.entity.EntityNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
-import com.pinecone.ulf.util.id.GUIDs;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.ulf.util.guid.GUIDs;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.util.ArrayList;
 import java.util.List;

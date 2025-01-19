@@ -12,7 +12,7 @@ import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
 import com.pinecone.hydra.unit.imperium.ImperialTree;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 public abstract class ArchRegistryOperator implements RegistryNodeOperator {
     protected KOMRegistry                    registry;
@@ -42,7 +42,7 @@ public abstract class ArchRegistryOperator implements RegistryNodeOperator {
         // Case 1: Dummy config node.
         GuidAllocator guidAllocator = this.registry.getGuidAllocator();
         if( guid72 == null ) {
-            guid72 = guidAllocator.nextGUID72();
+            guid72 = guidAllocator.nextGUID();
             entityNode.setGuid( guid72 );
             entityNode.setCreateTime( LocalDateTime.now() );
         }

@@ -20,7 +20,6 @@ import com.pinecone.hydra.service.kom.source.ApplicationNodeManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
 import com.pinecone.hydra.service.kom.source.ServiceNodeManipulator;
-import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
@@ -34,7 +33,7 @@ import com.pinecone.hydra.unit.imperium.RegimentedImperialTree;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 import com.pinecone.hydra.unit.imperium.source.TreeMasterManipulator;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.guid.GUIDs;
 
 public class UniformServicesInstrument extends ArchReparseKOMTree implements ServicesInstrument {
     //GenericDistributedScopeTree

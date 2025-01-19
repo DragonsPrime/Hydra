@@ -1,15 +1,11 @@
-package com.pinecone.ulf.util.id.impl;
+package com.pinecone.ulf.util.guid;
 
 import com.pinecone.framework.util.StringUtils;
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.ulf.util.id.BitsAllocator;
-import com.pinecone.ulf.util.id.GUID64;
-import com.pinecone.ulf.util.id.GUID72;
-import com.pinecone.ulf.util.id.GuidAllocator;
-import com.pinecone.ulf.util.id.exception.GuidGenerateException;
-import com.pinecone.ulf.util.id.utils.DateUtils;
-import com.pinecone.ulf.util.id.worker.GenericDisposableWorkerIdAssigner;
-import com.pinecone.ulf.util.id.worker.WorkerIdAssigner;
+import com.pinecone.framework.util.id.GuidGenerateException;
+import com.pinecone.ulf.util.guid.utils.DateUtils;
+import com.pinecone.ulf.util.guid.worker.GenericDisposableWorkerIdAssigner;
+import com.pinecone.ulf.util.guid.worker.WorkerIdAssigner;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
-public class GenericGuidAllocator implements GuidAllocator, InitializingBean {
+public class GenericGuidAllocator implements GuidAllocator72, InitializingBean {
     private static final Logger LOGGER = LoggerFactory.getLogger(GenericGuidAllocator.class);
 
     /** Bits allocate */
@@ -119,6 +115,13 @@ public class GenericGuidAllocator implements GuidAllocator, InitializingBean {
 //        return new GUID64(sequence, workerId, deltaSeconds);
 //    }
 //
+
+
+    @Override
+    public GUID nextGUID() {
+        return this.nextGUID72();
+    }
+
     @Override
     public GUID nextGUID72() {
         //先获取GUID64

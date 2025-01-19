@@ -13,7 +13,7 @@ import com.pinecone.hydra.service.kom.source.ServiceNamespaceManipulator;
 import com.pinecone.hydra.system.ko.UOIUtils;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.util.List;
 
@@ -47,13 +47,13 @@ public class NamespaceOperator extends ArchElementOperator implements ElementOpe
             namespaceRulesGuid = null;
         }
 
-        GUID namespaceGuid = guidAllocator.nextGUID72();
+        GUID namespaceGuid = guidAllocator.nextGUID();
         ns.setGuid( namespaceGuid );
         ns.setRulesGUID( namespaceRulesGuid );
         this.namespaceManipulator.insert( ns );
 
         //存元信息
-        GUID metadataGUID = guidAllocator.nextGUID72();
+        GUID metadataGUID = guidAllocator.nextGUID();
         ns.setMetaGuid( metadataGUID );
         this.commonDataManipulator.insertNS( ns );
 

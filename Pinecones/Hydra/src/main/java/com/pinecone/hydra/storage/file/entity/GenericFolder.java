@@ -5,7 +5,7 @@ import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.source.FolderManipulator;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -24,7 +24,7 @@ public class GenericFolder extends ArchElementNode implements Folder{
     public GenericFolder(KOMFileSystem fileSystem ) {
         this.fileSystem = fileSystem;
         GuidAllocator guidAllocator = this.fileSystem.getGuidAllocator();
-        this.setGuid( guidAllocator.nextGUID72() );
+        this.setGuid( guidAllocator.nextGUID() );
         this.setCreateTime( LocalDateTime.now() );
     }
 

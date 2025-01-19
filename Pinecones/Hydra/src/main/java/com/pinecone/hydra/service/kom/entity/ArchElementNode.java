@@ -12,7 +12,7 @@ import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.hydra.service.ArchServiceFamilyMeta;
 import com.pinecone.hydra.service.kom.ServicesInstrument;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 public abstract class ArchElementNode extends ArchServiceFamilyMeta implements ElementNode {
     protected long                       enumId;
@@ -42,7 +42,7 @@ public abstract class ArchElementNode extends ArchServiceFamilyMeta implements E
     public void apply( ServicesInstrument servicesInstrument ) {
         this.servicesInstrument = servicesInstrument;
         GuidAllocator guidAllocator = this.servicesInstrument.getGuidAllocator();
-        this.setGuid( guidAllocator.nextGUID72() );
+        this.setGuid( guidAllocator.nextGUID() );
     }
 
     @Override

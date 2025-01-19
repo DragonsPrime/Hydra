@@ -11,7 +11,7 @@ import com.pinecone.hydra.service.kom.source.ServiceMasterManipulator;
 import com.pinecone.hydra.system.ko.UOIUtils;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.util.List;
 
@@ -36,12 +36,12 @@ public class ApplicationElementOperator extends ArchElementOperator implements E
         GenericApplicationElement applicationElement = (GenericApplicationElement) treeNode;
 
         GuidAllocator guidAllocator = this.servicesInstrument.getGuidAllocator();
-        GUID applicationNodeGUID = guidAllocator.nextGUID72();
+        GUID applicationNodeGUID = guidAllocator.nextGUID();
         applicationElement.setGuid( applicationNodeGUID );
         this.applicationNodeManipulator.insert( applicationElement );
 
 
-        GUID descriptionGUID = guidAllocator.nextGUID72();
+        GUID descriptionGUID = guidAllocator.nextGUID();
         if( applicationElement.getMetaGuid() == null ){
             applicationElement.setMetaGuid( descriptionGUID );
         }

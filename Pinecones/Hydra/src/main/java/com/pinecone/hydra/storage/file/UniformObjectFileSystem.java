@@ -39,7 +39,7 @@ import com.pinecone.hydra.system.ko.kom.StandardPathSelector;
 import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.guid.GUIDs;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;

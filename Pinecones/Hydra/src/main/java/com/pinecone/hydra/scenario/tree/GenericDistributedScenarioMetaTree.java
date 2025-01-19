@@ -23,8 +23,8 @@ import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.RegimentedImperialTree;
 import com.pinecone.hydra.unit.imperium.source.TreeMasterManipulator;
-import com.pinecone.ulf.util.id.GUIDs;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.ulf.util.guid.GUIDs;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -83,17 +83,17 @@ public class GenericDistributedScenarioMetaTree implements DistributedScenarioMe
         GuidAllocator guidAllocator = GUIDs.newGuidAllocator();
 
         NamespaceNodeMeta namespaceNodeMeta = namespaceNode.getNamespaceNodeMeta();
-        GUID namespaceNodeMetaGuid = guidAllocator.nextGUID72();
+        GUID namespaceNodeMetaGuid = guidAllocator.nextGUID();
         namespaceNodeMeta.setGuid(namespaceNodeMetaGuid);
 
         ScenarioCommonData scenarioCommonData = namespaceNode.getScenarioCommonData();
-        GUID scenarioCommonDataGuid = guidAllocator.nextGUID72();
+        GUID scenarioCommonDataGuid = guidAllocator.nextGUID();
         scenarioCommonData.setGuid(scenarioCommonDataGuid);
         scenarioCommonData.setCreateTime(LocalDateTime.now());
         scenarioCommonData.setUpdateTime(LocalDateTime.now());
 
         GUIDImperialTrieNode guidDistributedTrieNode = new GUIDImperialTrieNode();
-        GUID nodeGuid = guidAllocator.nextGUID72();
+        GUID nodeGuid = guidAllocator.nextGUID();
         namespaceNode.setGuid(nodeGuid);
         guidDistributedTrieNode.setGuid(nodeGuid);
         guidDistributedTrieNode.setNodeMetadataGUID(namespaceNodeMetaGuid);
