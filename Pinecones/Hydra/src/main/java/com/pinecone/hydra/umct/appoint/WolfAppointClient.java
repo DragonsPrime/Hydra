@@ -62,6 +62,10 @@ public class WolfAppointClient extends ArchAppointNode implements AppointClient 
     }
 
 
+    @Override
+    public void close() {
+        this.mMessenger.close();
+    }
 
     @Override
     public UlfClient getMessageNode() {

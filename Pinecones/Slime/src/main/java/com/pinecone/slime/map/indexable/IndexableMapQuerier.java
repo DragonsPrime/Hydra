@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class IndexableMapQuerier<K, V > implements AlterableCacher<V > {
     private final IndexableDataManipulator<K, V >  mManipulator;
@@ -98,6 +99,12 @@ public class IndexableMapQuerier<K, V > implements AlterableCacher<V > {
     @Override
     public V insert( Object key, V value, long expireMill ) {
         this.mManipulator.insert( this.mIndexMeta, (K)key, value, expireMill );
+        return value;
+    }
+
+    @Override
+    public V insert( Object key, V value, long expire, TimeUnit unit ) {
+        this.insert( key, value, unit.toMillis( expire ) );
         return value;
     }
 

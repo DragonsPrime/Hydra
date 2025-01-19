@@ -48,6 +48,12 @@
             <version>1.2.1</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>com.pinecone.slime</groupId>
+            <artifactId>slime</artifactId>
+            <version>2.1.0</version>
+            <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>mysql</groupId>
