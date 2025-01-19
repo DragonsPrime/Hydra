@@ -5,15 +5,15 @@ import com.pinecone.framework.system.prototype.Pinenut;
 public class StorageExpansionDTO implements Pinenut {
     public String logicGuid;
 
-    public String physicalGuid;
+    public String childGuid;
 
 
     public StorageExpansionDTO() {
     }
 
-    public StorageExpansionDTO(String logicGuid, String physicalGuid) {
+    public StorageExpansionDTO(String logicGuid, String childGuid) {
         this.logicGuid = logicGuid;
-        this.physicalGuid = physicalGuid;
+        this.childGuid = childGuid;
     }
 
 
@@ -27,16 +27,16 @@ public class StorageExpansionDTO implements Pinenut {
     }
 
 
-    public String getPhysicalGuid() {
-        return physicalGuid;
+    public String getChildGuid() {
+        return childGuid;
     }
 
 
-    public void setPhysicalGuid(String physicalGuid) {
-        this.physicalGuid = physicalGuid;
+    public void setChildGuid(String childGuid) {
+        this.childGuid = childGuid;
     }
 
     public String toString() {
-        return "StorageExpansionDTO{logicGuid = " + logicGuid + ", physicalGuid = " + physicalGuid + "}";
+        return "StorageExpansionDTO{logicGuid = " + logicGuid + ", physicalGuid = " + childGuid + "}";
     }
 }

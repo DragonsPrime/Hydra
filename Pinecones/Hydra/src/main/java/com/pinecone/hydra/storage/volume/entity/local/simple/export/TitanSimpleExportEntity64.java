@@ -18,8 +18,8 @@ public class TitanSimpleExportEntity64 extends ArchExportEntity implements Simpl
 
     public TitanSimpleExportEntity64(VolumeManager volumeManager, StorageExportIORequest storageExportIORequest, Chanface channel, SimpleVolume simpleVolume) {
         super(volumeManager, storageExportIORequest, channel);
-        this.simpleExportEntity = new TitanSimpleExport64( this );
         this.simpleVolume       = simpleVolume;
+        this.simpleExportEntity = new TitanSimpleExport64( this );
     }
 
     @Override
@@ -30,5 +30,10 @@ public class TitanSimpleExportEntity64 extends ArchExportEntity implements Simpl
     @Override
     public StorageIOResponse export(CacheBlock cacheBlock, Number offset, Number endSize, byte[] buffer) throws IOException {
         return this.simpleExportEntity.export( this.channel, cacheBlock, offset, endSize, buffer );
+    }
+
+    @Override
+    public SimpleVolume getSimpleVolume() {
+        return this.simpleVolume;
     }
 }

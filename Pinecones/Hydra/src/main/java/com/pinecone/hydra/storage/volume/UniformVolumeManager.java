@@ -322,12 +322,56 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
         List<Volume> spannedVolumes = this.spannedVolumeManipulator.queryAllSpannedVolume();
         List<Volume> stripedVolumes = this.stripedVolumeManipulator.queryAllStripedVolume();
 
+        List<Volume> fullPhysicalVolumes = new ArrayList<>();
+        List<Volume> fullSimpleVolumes = new ArrayList<>();
+        List<Volume> fullSpannedVolumes = new ArrayList<>();
+        List<Volume> fullStripedVolumes = new ArrayList<>();
+        for( Volume volume : physicalVolumes ){
+            PhysicalVolume physicalVolume = this.getPhysicalVolume(volume.getGuid());
+            fullPhysicalVolumes.add(physicalVolume);
+        }
+        for( Volume volume : simpleVolumes ){
+            LogicVolume logicVolume = this.get(volume.getGuid());
+            fullSimpleVolumes.add(logicVolume);
+        }
+        for( Volume volume : spannedVolumes ){
+            LogicVolume logicVolume = this.get(volume.getGuid());
+            fullSpannedVolumes.add(logicVolume);
+        }
+        for( Volume volume : stripedVolumes ){
+            LogicVolume logicVolume = this.get(volume.getGuid());
+            fullStripedVolumes.add(logicVolume);
+        }
+
         ArrayList<Volume> volumes = new ArrayList<>();
-        volumes.addAll( physicalVolumes );
+        volumes.addAll( fullPhysicalVolumes );
+        volumes.addAll(fullSimpleVolumes);
+        volumes.addAll(fullSpannedVolumes);
+        volumes.addAll(fullStripedVolumes);
+        return volumes;
+    }
+
+    @Override
+    public List<Volume> listLogicVolumes() {
+        List<Volume> simpleVolumes = this.simpleVolumeManipulator.queryAllSimpleVolumes();
+        List<Volume> spannedVolumes = this.spannedVolumeManipulator.queryAllSpannedVolume();
+        List<Volume> stripedVolumes = this.stripedVolumeManipulator.queryAllStripedVolume();
+        ArrayList<Volume> volumes = new ArrayList<>();
         volumes.addAll(simpleVolumes);
         volumes.addAll(spannedVolumes);
         volumes.addAll(stripedVolumes);
         return volumes;
+    }
+
+    @Override
+    public List<Volume> listPhysicsVolumes() {
+        List<Volume> physicalVolumes = this.physicalVolumeManipulator.queryAllPhysicalVolumes();
+        ArrayList<Volume> volumes = new ArrayList<>();
+        for( Volume volume : physicalVolumes ){
+            PhysicalVolume physicalVolume = this.getPhysicalVolume(volume.getGuid());
+            volumes.add(physicalVolume);
+        }
+        return new ArrayList<>(volumes);
     }
 
     private String getNodeName(ImperialTreeNode node ){

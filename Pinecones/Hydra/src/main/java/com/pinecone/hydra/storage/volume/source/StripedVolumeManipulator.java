@@ -16,4 +16,6 @@ public interface StripedVolumeManipulator extends LogicVolumeManipulator {
     List<GUID> listPhysicalVolume(GUID logicGuid );
 
     List<Volume> queryAllStripedVolume();
+
+    void updateDefinitionCapacity( GUID guid, long definitionCapacity );
 }

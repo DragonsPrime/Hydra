@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,4 +45,7 @@ public interface SimpleVolumeMapper extends SimpleVolumeManipulator, PrimeLogicV
     }
     @Select("SELECT `id` AS enumId, `guid`, `create_time` AS createTime, `update_time` AS updateTime, `name`,  `type`, `ext_config` AS extConfig FROM `hydra_uofs_volumes` WHERE type = 'SimpleVolume'")
     List<TitanLocalSimpleVolume> queryAllSimpleVolumes0();
+
+    @Update("UPDATE `hydra_uofs_volumes` SET definition_capacity = #{definitionCapacity} WHERE guid = #{guid}")
+    void updateDefinitionCapacity( @Param("guid") GUID guid, @Param("definitionCapacity") long definitionCapacity );
 }

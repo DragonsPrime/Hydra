@@ -178,12 +178,13 @@ public class TestSchemeQuerier {
             Debug.trace( cache.get( 126 ) );
             Debug.trace( cache.get( 128 ) );
 
+
+//            {username:undefined, role:admin, expired:20250117-12:30:00, xxxx}
             Debug.trace( cache.get( 1995 ) );
             Debug.trace( cache.get( 1915 ) );
             cache.erase( 1915 );
 
             Debug.trace( cache.get( 1915 ) );
-
             Debug.trace( cache.get( 2915 ) );
 
             Debug.trace( cache.get( 3615 ) );

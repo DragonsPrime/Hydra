@@ -70,7 +70,7 @@ public class TransmitController {
      * @throws SQLException
      */
     @PostMapping("/channel/update")
-    public BasicResultResponse<String> updateObjectByChannel(UpdateObjectByChannelDTO dto ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public  BasicResultResponse<String> updateObjectByChannel(UpdateObjectByChannelDTO dto ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
         MultipartFile object = dto.getObject();
         File file = File.createTempFile( "uofs","."+ getExtension(object.getOriginalFilename()) );
         object.transferTo( file );
