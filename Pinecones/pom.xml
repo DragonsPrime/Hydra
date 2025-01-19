@@ -23,6 +23,7 @@
         <module>summer</module>
         <module>springram</module>
         <module>hydra-default-driver</module>
+        <module>ulf-lib-construction</module>
     </modules>
 
     <dependencies>
