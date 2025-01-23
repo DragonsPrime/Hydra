@@ -28,11 +28,11 @@ public interface UMCProtocol extends MsgProtocol {
     void setHead  ( UMCHead head );
 
     default void setExHead( Map<String, Object > jo ) {
-        this.getHead().setExtraHead( jo );
+        this.getHead().inface().setExtraHead( jo );
     }
 
     default void setExHead( Object jo ) {
-        this.getHead().setExtraHead( jo );
+        this.getHead().inface().setExtraHead( jo );
     }
 
     void release();

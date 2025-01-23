@@ -16,10 +16,11 @@ public abstract class ArchUMCMessage implements UMCMessage {
     }
 
     ArchUMCMessage( Map<String,Object > joExHead, UMCMethod method, long controlBits ) {
-        this.mHead = new UMCHead();
-        this.mHead.setControlBits( controlBits );
-        this.mHead.setMethod( method );
-        this.mHead.applyExHead( joExHead );
+        UMCHeadV1 head = new UMCHeadV1();
+        head.setControlBits( controlBits );
+        head.setMethod( method );
+        head.applyExHead( joExHead );
+        this.mHead = head;
     }
 
     ArchUMCMessage( Map<String,Object > joExHead, UMCMethod method ) {
@@ -37,11 +38,12 @@ public abstract class ArchUMCMessage implements UMCMessage {
 
 
     protected ArchUMCMessage( Object protoExHead, ExtraEncode encode, UMCMethod method, long controlBits ) {
-        this.mHead = new UMCHead();
-        this.mHead.setControlBits( controlBits );
-        this.mHead.setMethod( method );
-        this.mHead.setExtraHead( protoExHead );
-        this.mHead.setExtraEncode( encode );
+        UMCHeadV1 head = new UMCHeadV1();
+        head.setControlBits( controlBits );
+        head.setMethod( method );
+        head.setExtraHead( protoExHead );
+        head.setExtraEncode( encode );
+        this.mHead = head;
     }
 
     protected ArchUMCMessage( Object protoExHead, UMCMethod method, long controlBits ) {
@@ -82,12 +84,12 @@ public abstract class ArchUMCMessage implements UMCMessage {
 
     @Override
     public long        getMessageLength(){
-        return UMCHead.HeadBlockSize + this.mHead.getExtraHeadLength() + this.mHead.getBodyLength();
+        return UMCHeadV1.HeadBlockSize + this.mHead.getExtraHeadLength() + this.mHead.getBodyLength();
     }
 
     @Override
     public long        queryMessageLength(){
-        this.mHead.transApplyExHead();
+        this.mHead.inface().transApplyExHead();
         return this.getMessageLength();
     }
 

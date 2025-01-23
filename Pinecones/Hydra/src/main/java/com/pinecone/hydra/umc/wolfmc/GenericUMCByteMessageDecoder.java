@@ -1,5 +1,6 @@
 package com.pinecone.hydra.umc.wolfmc;
 
+import com.pinecone.hydra.umc.msg.UMCHeadV1;
 import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -27,7 +28,7 @@ public class GenericUMCByteMessageDecoder extends ByteToMessageDecoder {
         this.cumulation = in;
 
         if ( this.byteSum == -1 ) {
-            int nBufSize = ArchUMCProtocol.basicHeadLength( UMCHead.ProtocolSignature );
+            int nBufSize = ArchUMCProtocol.basicHeadLength( UMCHeadV1.ProtocolSignature );
 
             // Waiting for more data to arrive, and that will be enough to decode the header.
             if ( in.readableBytes() < nBufSize ) {
@@ -37,7 +38,7 @@ public class GenericUMCByteMessageDecoder extends ByteToMessageDecoder {
             byte[] buf = new byte[ nBufSize ];
             in.readBytes(buf);
 
-            UMCHead head = ArchUMCProtocol.onlyReadMsgBasicHead( buf, UMCHead.ProtocolSignature, this.extraHeadCoder );
+            UMCHead head = ArchUMCProtocol.onlyReadMsgBasicHead( buf, UMCHeadV1.ProtocolSignature, this.extraHeadCoder );
             this.bodyBytes = head.getBodyLength();
             this.byteSum = nBufSize + head.getExtraHeadLength() + this.bodyBytes;
 

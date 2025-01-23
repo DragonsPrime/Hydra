@@ -9,7 +9,7 @@ public class ArchStreamTransferMessage extends ArchUMCMessage implements Transfe
 
     public ArchStreamTransferMessage( UMCHead head ) {
         super( head );
-        head.setMethod( UMCMethod.TRANSFER );
+        head.inface().setMethod( UMCMethod.TRANSFER );
     }
 
     public ArchStreamTransferMessage( UMCHead head, InputStream inStream ) {
@@ -43,10 +43,10 @@ public class ArchStreamTransferMessage extends ArchUMCMessage implements Transfe
     void setBody( InputStream inStream ) {
         this.mIStreamBody = inStream;
         try{
-            this.mHead.setBodyLength( this.mIStreamBody.available() );
+            this.mHead.inface().setBodyLength( this.mIStreamBody.available() );
         }
         catch ( IOException e ) {
-            this.mHead.setBodyLength( 0 );
+            this.mHead.inface().setBodyLength( 0 );
         }
     }
 

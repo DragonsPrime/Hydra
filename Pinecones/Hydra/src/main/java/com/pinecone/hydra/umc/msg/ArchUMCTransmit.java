@@ -12,10 +12,10 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
     @SuppressWarnings( "unchecked" )
     protected void applyExHead( Object msg ) {
         if( msg instanceof Map ) {
-            this.mHead.applyExHead( (Map) msg );
+            this.mHead.inface().applyExHead( (Map) msg );
         }
         else {
-            this.mHead.setExtraHead( msg );
+            this.mHead.inface().setExtraHead( msg );
         }
     }
 
@@ -23,7 +23,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
     public void sendInformMsg( Object msg, Status status ) throws IOException {
         this.applyExHead( msg );
         this.mHead.setStatus( status );
-        this.mHead.setMethod( UMCMethod.INFORM );
+        this.mHead.inface().setMethod( UMCMethod.INFORM );
         this.sendMsgHead( this.mHead );
     }
 
@@ -39,7 +39,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
 
     public void sendTransferMsgHead( Object msg, boolean bFlush ) throws IOException {
         this.applyExHead( msg );
-        this.mHead.setMethod( UMCMethod.TRANSFER );
+        this.mHead.inface().setMethod( UMCMethod.TRANSFER );
         this.sendMsgHead( this.mHead, bFlush );
     }
 
@@ -55,7 +55,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
 
     @Override
     public void sendTransferMsg( Object msg, byte[] bytes, Status status ) throws IOException {
-        this.mHead.setBodyLength( bytes.length );
+        this.mHead.inface().setBodyLength( bytes.length );
         this.mHead.setStatus( status );
         this.sendTransferMsgHead( msg, false );
         this.onlySendPostBody( bytes );
@@ -95,7 +95,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
 
     @Override
     public void sendTransferMsg( Object msg, InputStream is ) throws IOException {
-        this.mHead.setBodyLength( is.available() );
+        this.mHead.inface().setBodyLength( is.available() );
         this.sendTransferMsgHead( msg, false );
         this.onlySendPostBody( is, false );
     }
@@ -105,7 +105,7 @@ public abstract class ArchUMCTransmit extends ArchUMCProtocol implements UMCTran
     public void sendMsg( UMCMessage msg, boolean bNoneBuffered ) throws IOException {
         msg.getHead().setIdentityId( this.getMessageSource().getMessageNode().getMessageNodeId() );
         this.mHead = msg.getHead();
-        this.mHead.setSignature( this.mszSignature );
+        this.mHead.inface().setSignature( this.mszSignature );
 
         if( msg.getMethod() == UMCMethod.INFORM || msg.getMethod() == UMCMethod.UNDEFINED ) {
             this.sendMsgHead( this.mHead );

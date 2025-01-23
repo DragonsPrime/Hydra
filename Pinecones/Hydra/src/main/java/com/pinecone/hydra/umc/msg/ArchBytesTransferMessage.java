@@ -58,7 +58,7 @@ public abstract class ArchBytesTransferMessage extends ArchUMCMessage implements
 
     void setBody( byte[] sBytesBody ) {
         this.msBytesBody = sBytesBody;
-        this.mHead.setBodyLength( this.msBytesBody.length );
+        this.mHead.inface().setBodyLength( this.msBytesBody.length );
     }
 
     public byte[]      getBody() {

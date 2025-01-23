@@ -29,6 +29,6 @@ public abstract class ArchInformMessage extends ArchUMCMessage {
 
     @Override
     public long        getMessageLength(){
-        return UMCHead.HeadBlockSize + this.mHead.getExtraHeadLength();
+        return UMCHeadV1.HeadBlockSize + this.mHead.getExtraHeadLength();
     }
 }

@@ -33,9 +33,9 @@ import java.util.Map;
 public abstract class ArchUMCProtocol implements UMCProtocol {
     protected int           mnFrameSize    = 4096;
 
-    protected String        mszVersion     = UMCHead.ProtocolVersion;
+    protected String        mszVersion     = UMCHeadV1.ProtocolVersion;
 
-    protected String        mszSignature   = UMCHead.ProtocolSignature;
+    protected String        mszSignature   = UMCHeadV1.ProtocolSignature;
 
     protected UMCHead       mHead          ;
 
@@ -55,8 +55,9 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
     @Override
     public UMCProtocol applyMessageSource( Medium medium ) {
         this.mMessageSource = medium;
-        this.mHead          = new UMCHead( this.mszSignature );
-        this.mHead.applyExtraHeadCoder( this.getExtraHeadCoder() );
+        UMCHeadV1 head      = new UMCHeadV1( this.mszSignature );
+        head.applyExtraHeadCoder( this.getExtraHeadCoder() );
+        this.mHead          = head;
         return this;
     }
 
@@ -110,17 +111,18 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         this.sendMsgHead( head, true );
     }
 
-    protected void sendMsgHead( UMCHead head, boolean bFlush ) throws IOException {
+    protected void sendMsgHead( UMCHead umcHead, boolean bFlush ) throws IOException {
+        UMCHeadV1 head = (UMCHeadV1) umcHead;
         head.applyExtraHeadCoder( this.getExtraHeadCoder() );
         head.transApplyExHead();
 
         ByteBuffer byteBuffer = ByteBuffer.allocate( 64 + head.getExtraHeadLength() );
-        byteBuffer.order( UMCHead.BinByteOrder );
+        byteBuffer.order( UMCHeadV1.BinByteOrder );
 
         int nBufLength = head.getSignatureLength();
         byteBuffer.put( head.getSignature().getBytes() );
-        byteBuffer.put( (byte) ' ' );
-        ++nBufLength;
+        //byteBuffer.put( (byte) ' ' );
+        //++nBufLength;
 
         byteBuffer.put( head.method.getByteValue() );
         nBufLength += Byte.BYTES;
@@ -171,7 +173,7 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
             throw new StreamTerminateException("StreamEndException:[UMCProtocol] Stream is ended.");
         }
 
-        UMCHead head = ArchUMCProtocol.onlyReadMsgBasicHead( buf, this.mszSignature, this.getExtraHeadCoder() );
+        UMCHeadV1 head = (UMCHeadV1)ArchUMCProtocol.onlyReadMsgBasicHead( buf, this.mszSignature, this.getExtraHeadCoder() );
 
         byte[] headBuf = new byte[ head.nExtraHeadLength ];
         if ( this.mInputStream.read( headBuf ) < head.nExtraHeadLength ) {
@@ -190,7 +192,7 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
     }
 
     public static int basicHeadLength( String szSignature ) {
-        return szSignature.length() + 1 + UMCHead.StructBlockSize; // 1 for ' ';
+        return szSignature.length() + UMCHeadV1.StructBlockSize;
     }
 
     public static UMCHead onlyReadMsgBasicHead( byte[] buf, String szSignature, ExtraHeadCoder extraHeadCoder ) throws IOException {
@@ -205,35 +207,35 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
             throw new IOException( "[UMCProtocol] Illegal protocol signature." );
         }
 
-        UMCHead head = new UMCHead();
+        UMCHeadV1 head = new UMCHeadV1();
         head.applyExtraHeadCoder( extraHeadCoder );
-        nReadAt++; // For ' '
+        //nReadAt++; // For ' '
 
         head.method            = UMCMethod.values()[ buf[nReadAt] ];
         nReadAt += Byte.BYTES;
 
-        head.nExtraHeadLength  = ByteBuffer.wrap( buf, nReadAt, Integer.BYTES ).order( UMCHead.BinByteOrder ).getInt();
+        head.nExtraHeadLength  = ByteBuffer.wrap( buf, nReadAt, Integer.BYTES ).order( UMCHeadV1.BinByteOrder ).getInt();
         nReadAt += Integer.BYTES;
 
-        head.nBodyLength       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHead.BinByteOrder ).getLong();
+        head.nBodyLength       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
         nReadAt += Long.BYTES;
 
-        head.nKeepAlive       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHead.BinByteOrder ).getLong();
+        head.nKeepAlive       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
         nReadAt += Long.BYTES;
 
-        head.status            = Status.asValue( ByteBuffer.wrap( buf, nReadAt, Short.BYTES ).order( UMCHead.BinByteOrder ).getShort() );
+        head.status            = Status.asValue( ByteBuffer.wrap( buf, nReadAt, Short.BYTES ).order( UMCHeadV1.BinByteOrder ).getShort() );
         nReadAt += Short.BYTES;
 
-        head.extraEncode       = ExtraEncode.asValue( ByteBuffer.wrap( buf, nReadAt, Byte.BYTES ).order( UMCHead.BinByteOrder ).get() );
+        head.extraEncode       = ExtraEncode.asValue( ByteBuffer.wrap( buf, nReadAt, Byte.BYTES ).order( UMCHeadV1.BinByteOrder ).get() );
         nReadAt += Byte.BYTES;
 
-        head.controlBits      = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHead.BinByteOrder ).getLong();
+        head.controlBits      = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
         nReadAt += Long.BYTES;
 
-        head.sessionId        = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHead.BinByteOrder ).getLong();
+        head.sessionId        = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
         nReadAt += Long.BYTES;
 
-        head.identityId       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHead.BinByteOrder ).getLong();
+        head.identityId       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
         nReadAt += Long.BYTES;
 
         return head;

@@ -13,7 +13,7 @@ public abstract class ArchUMCReceiver extends ArchUMCProtocol implements UMCRece
     @Override
     public Object readInformMsg() throws IOException {
         UMCHead head = this.readMsgHead();
-        if( head.method != UMCMethod.INFORM ) {
+        if( head.getMethod() != UMCMethod.INFORM ) {
             throw new IOException( "[UMCProtocol] Illegal protocol method." );
         }
         return head.getExtraHead();
@@ -21,7 +21,7 @@ public abstract class ArchUMCReceiver extends ArchUMCProtocol implements UMCRece
 
     protected UMCHead readTransferHead() throws IOException {
         UMCHead head = this.readMsgHead();
-        if( head.method != UMCMethod.TRANSFER ) {
+        if( head.getMethod() != UMCMethod.TRANSFER ) {
             throw new IOException( "[UMCProtocol] Illegal protocol method." );
         }
         return head;
@@ -51,7 +51,7 @@ public abstract class ArchUMCReceiver extends ArchUMCProtocol implements UMCRece
             }
             else {
                 if( head.getMethod() != UMCMethod.INFORM ){
-                    if ( !( head.getMethod() == UMCMethod.UNDEFINED && head.extraEncode == ExtraEncode.Iussum ) ) {
+                    if ( !( head.getMethod() == UMCMethod.UNDEFINED && head.getExtraEncode() == ExtraEncode.Iussum ) ) {
                         throw new IOException( " [UMCProtocol] Unrecognized protocol method." );
                     }
                 }
