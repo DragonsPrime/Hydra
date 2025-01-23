@@ -1,6 +1,7 @@
 package com.pinecone.hydra.account.entity;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.hydra.account.AccountManager;
 
 public class GenericGroup extends ArchFolderElementNode implements Group{
@@ -23,5 +24,14 @@ public class GenericGroup extends ArchFolderElementNode implements Group{
         this.defaultPrivilegePolicyGuid = defaultPrivilegePolicyGuid;
     }
 
+    @Override
+    public String toJSONString() {
+        return BeanJSONEncoder.BasicEncoder.encode( this );
+    }
+
+    @Override
+    public String toString() {
+        return this.toJSONString();
+    }
 
 }

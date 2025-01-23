@@ -10,6 +10,8 @@ import com.pinecone.hydra.account.entity.GenericAccount;
 import com.pinecone.hydra.account.entity.GenericDomain;
 import com.pinecone.hydra.account.entity.GenericGroup;
 import com.pinecone.hydra.account.entity.Group;
+import com.pinecone.hydra.account.source.AuthorizationManipulator;
+import com.pinecone.hydra.account.source.CredentialManipulator;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
@@ -39,9 +41,14 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
 
     protected DomainNodeManipulator             domainNodeManipulator;
 
+    protected CredentialManipulator             credentialManipulator;
+
+    protected AuthorizationManipulator          authorizationManipulator;
+
     protected List<GUIDNameManipulator >        folderManipulators;
 
     protected List<GUIDNameManipulator >        fileManipulators;
+
 
     public UniformAccountManager( Processum superiorProcess, KOIMasterManipulator masterManipulator, AccountManager parent, String name ) {
         super( superiorProcess, masterManipulator, KernelAccountConfig, parent, name );
@@ -49,10 +56,12 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
         this.pathResolver          = new KOPathResolver( this.kernelObjectConfig );
         this.guidAllocator         = GUIDs.newGuidAllocator();
 
-        this.operatorFactory        = new GenericAccountOperatorFactory( this, this.userMasterManipulator );
-        this.groupNodeManipulator   = this.userMasterManipulator.getGroupNodeManipulator();
-        this.userNodeManipulator    = this.userMasterManipulator.getUserNodeManipulator();
-        this.domainNodeManipulator  = this.userMasterManipulator.getDomainNodeManipulator();
+        this.operatorFactory            = new GenericAccountOperatorFactory( this, this.userMasterManipulator );
+        this.groupNodeManipulator       = this.userMasterManipulator.getGroupNodeManipulator();
+        this.userNodeManipulator        = this.userMasterManipulator.getUserNodeManipulator();
+        this.domainNodeManipulator      = this.userMasterManipulator.getDomainNodeManipulator();
+        this.credentialManipulator      = this.userMasterManipulator.getCredentialManipulator();
+        this.authorizationManipulator   = this.userMasterManipulator.getAuthorizationManipulator();
 
         this.folderManipulators = new ArrayList<>(List.of(this.domainNodeManipulator, this.groupNodeManipulator));
         this.fileManipulators   = new ArrayList<>(List.of(this.userNodeManipulator));

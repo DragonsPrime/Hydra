@@ -6,7 +6,6 @@ import com.pinecone.slime.cache.query.ConcurrentMergeLRUDictCachePage;
 import com.pinecone.slime.cache.query.LocalFixedLRUDictCachePage;
 import com.pinecone.slime.cache.query.UniformCountSelfLoadingDictCache;
 import com.pinecone.slime.map.AlterableCacher;
-import com.pinecone.slime.map.AlterableQuerier;
 import com.pinecone.slime.source.indexable.GenericIndexKeySourceRetriever;
 import com.pinecone.slime.source.indexable.IndexableDataManipulator;
 import com.pinecone.slime.source.indexable.IndexableIterableManipulator;
@@ -104,7 +103,7 @@ public class IndexableMapQuerier<K, V > implements AlterableCacher<V > {
 
     @Override
     public V insert( Object key, V value, long expire, TimeUnit unit ) {
-        this.insert( key, value, unit.toMillis( expire ) );
+        this.insert( key, value, unit.toHours( expire ) );
         return value;
     }
 

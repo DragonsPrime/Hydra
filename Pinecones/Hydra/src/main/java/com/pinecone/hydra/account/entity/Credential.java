@@ -5,7 +5,7 @@ import com.pinecone.framework.util.id.GUID;
 
 import java.time.LocalDateTime;
 
-public interface credential extends Pinenut {
+public interface Credential extends Pinenut {
     int getEnumId();
 
     GUID getGuid();

@@ -43,13 +43,15 @@ class Geralt extends Radium {
         uniformAccountManager.put( genericAccount );
         uniformAccountManager.put( genericGroup );
         uniformAccountManager.put( genericDomain );
+        uniformAccountManager.addChildren( genericDomain.getGuid(), genericGroup.getGuid() );
+        uniformAccountManager.addChildren( genericGroup.getGuid(), genericAccount.getGuid() );
     }
 
     public void testQuery( UniformAccountManager uniformAccountManager ){
-        Debug.trace(uniformAccountManager.queryGUIDByPath( "用户域/用户组/用户" ));
+        Debug.trace(uniformAccountManager.get(uniformAccountManager.queryGUIDByPath( "用户域/用户组/用户" )));
     }
 }
-public class TestUser {
+public class TestAccount {
     public static void main( String[] args ) throws Exception {
         Pinecone.init( (Object...cfg )->{
             Geralt Geralt = (Geralt) Pinecone.sys().getTaskManager().add( new Geralt( args, Pinecone.sys() ) );

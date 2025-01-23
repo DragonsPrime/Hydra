@@ -129,6 +129,10 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         this( superiorProcess, masterManipulator, null, KOMFileSystem.class.getSimpleName() );
     }
 
+    public UniformObjectFileSystem( Processum superiorProcess, KOIMasterManipulator masterManipulator, IndexableMapQuerier<String, String > globalPathGuidCacheQuerier  ){
+        this( superiorProcess, masterManipulator, null, KOMFileSystem.class.getSimpleName(), globalPathGuidCacheQuerier );
+    }
+
     public UniformObjectFileSystem( KOIMappingDriver driver, KOMFileSystem parent, String name ) {
         this(
                 driver.getSuperiorProcess(),
@@ -145,6 +149,13 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         );
     }
 
+    public UniformObjectFileSystem( KOIMappingDriver driver, IndexableMapQuerier<String, String > globalPathGuidCacheQuerier  ) {
+        this(
+                driver.getSuperiorProcess(),
+                driver.getMasterManipulator(),
+                globalPathGuidCacheQuerier
+        );
+    }
 
 
 
@@ -289,15 +300,18 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
 
     @Override
     public GUID queryGUIDByPath( String path ) {
+        FileSystemConfig config = this.getConfig();
         if ( this.globalPathGuidCacheQuerier != null ) {
-            String szGUID = this.globalPathGuidCacheQuerier.get( path );
+            String key = FileConstants.FILE_PATH_CACHE_KEY + path;
+            String szGUID = this.globalPathGuidCacheQuerier.get( key );
             if ( StringUtils.isEmpty( szGUID ) ) {
                 return GUIDs.GUID72( szGUID );
             }
         }
         GUID guid =  super.queryGUIDByPath( path ); // Into OLTP-RDB
         if ( this.globalPathGuidCacheQuerier != null ) {
-            this.globalPathGuidCacheQuerier.insert( path, guid.toString(), 1000 ); // TODO, 常数化
+            String key = FileConstants.FILE_PATH_CACHE_KEY + path;
+            this.globalPathGuidCacheQuerier.insert( key, guid.toString(), config.getExpiryTime() );
         }
         return guid;
     }

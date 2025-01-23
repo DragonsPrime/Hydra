@@ -1,6 +1,10 @@
 package com.pinecone.hydra.account.ibatis.hydranium;
 
 import com.pinecone.framework.system.construction.Structure;
+import com.pinecone.hydra.account.ibatis.AuthorizationMapper;
+import com.pinecone.hydra.account.ibatis.CredentialMapper;
+import com.pinecone.hydra.account.source.AuthorizationManipulator;
+import com.pinecone.hydra.account.source.CredentialManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
 import com.pinecone.hydra.account.ibatis.DomainNodeMapper;
@@ -29,8 +33,18 @@ public class UserMasterManipulatorImpl implements UserMasterManipulator {
     protected UserNodeManipulator           userNodeManipulator;
 
     @Resource
+    @Structure( type = AuthorizationMapper.class )
+    protected AuthorizationManipulator      authorizationManipulator;
+
+    @Resource
     @Structure( type = UserMasterTreeManipulatorImpl.class )
     protected KOISkeletonMasterManipulator skeletonMasterManipulator;
+
+    @Resource
+    @Structure( type = CredentialMapper.class )
+    protected CredentialManipulator credentialManipulator;
+
+
 
     public UserMasterManipulatorImpl() {
 
@@ -59,5 +73,15 @@ public class UserMasterManipulatorImpl implements UserMasterManipulator {
     @Override
     public UserNodeManipulator getUserNodeManipulator() {
         return this.userNodeManipulator;
+    }
+
+    @Override
+    public CredentialManipulator getCredentialManipulator() {
+        return this.credentialManipulator;
+    }
+
+    @Override
+    public AuthorizationManipulator getAuthorizationManipulator() {
+        return this.authorizationManipulator;
     }
 }

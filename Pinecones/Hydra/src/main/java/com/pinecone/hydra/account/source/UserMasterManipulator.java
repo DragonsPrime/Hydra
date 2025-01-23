@@ -3,9 +3,13 @@ package com.pinecone.hydra.account.source;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 
 public interface UserMasterManipulator extends KOIMasterManipulator {
-    DomainNodeManipulator   getDomainNodeManipulator();
+    DomainNodeManipulator       getDomainNodeManipulator();
 
-    GroupNodeManipulator    getGroupNodeManipulator();
+    GroupNodeManipulator        getGroupNodeManipulator();
 
-    UserNodeManipulator     getUserNodeManipulator();
+    UserNodeManipulator         getUserNodeManipulator();
+
+    CredentialManipulator       getCredentialManipulator();
+
+    AuthorizationManipulator    getAuthorizationManipulator();
 }
