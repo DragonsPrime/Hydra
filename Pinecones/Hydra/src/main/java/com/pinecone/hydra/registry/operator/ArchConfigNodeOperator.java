@@ -14,7 +14,7 @@ import com.pinecone.hydra.registry.source.RegistryNodeMetaManipulator;
 import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -49,7 +49,7 @@ public abstract class ArchConfigNodeOperator extends ArchRegistryOperator {
         GUID guid72                 = configNode.getGuid();
 
 
-        GUID configNodeMetaGuid = guidAllocator.nextGUID72();
+        GUID configNodeMetaGuid = guidAllocator.nextGUID();
         ConfigNodeMeta configNodeMeta = configNode.getConfigNodeMeta();
         if ( configNodeMeta != null ){
             configNodeMeta.setGuid(configNodeMetaGuid);
@@ -60,7 +60,7 @@ public abstract class ArchConfigNodeOperator extends ArchRegistryOperator {
         }
 
 
-        GUID commonDataGuid = guidAllocator.nextGUID72();
+        GUID commonDataGuid = guidAllocator.nextGUID();
         Attributes attributes = configNode.getAttributes();
         if (attributes != null){
             attributes.setGuid(commonDataGuid);

@@ -178,12 +178,13 @@ public class TestSchemeQuerier {
             Debug.trace( cache.get( 126 ) );
             Debug.trace( cache.get( 128 ) );
 
+
+//            {username:undefined, role:admin, expired:20250117-12:30:00, xxxx}
             Debug.trace( cache.get( 1995 ) );
             Debug.trace( cache.get( 1915 ) );
             cache.erase( 1915 );
 
             Debug.trace( cache.get( 1915 ) );
-
             Debug.trace( cache.get( 2915 ) );
 
             Debug.trace( cache.get( 3615 ) );
@@ -309,7 +310,7 @@ public class TestSchemeQuerier {
 
 
         JedisPoolConfig poolConfig = new JedisPoolConfig();
-        JedisPool jedisPool = new JedisPool( poolConfig, "b-serverkingpin", 6397, 2000, "wolf19310918", 0 );
+        JedisPool jedisPool = new JedisPool( poolConfig, "b-serverkingpin", 6379, 2000, "wolf19310918", 0 );
         Jedis jedis = jedisPool.getResource();
         jedis.auth( "wolf19310918" );
         //IndexableIteratableManipulator<String, String > manipulator = new GenericRedisHashManipulator<>( jedis );
@@ -338,7 +339,9 @@ public class TestSchemeQuerier {
 
         manipulator = new GenericRedisMasterManipulator<>( jedis );
         meta = new GenericIndexableTargetScopeMeta( "0", "", Object.class, manipulator );
-        IndexableMapQuerier<String, String > querier = new IndexableMapQuerier<>( meta );
+        //IndexableMapQuerier<String, String > querier = new IndexableMapQuerier<>( meta );
+        //IndexableMapQuerier<String, String > querier = new IndexableMapQuerier<>( meta, false );
+        IndexableMapQuerier<String, String > querier = new IndexableMapQuerier<>( meta, true );
 
         Debug.trace( querier.get( "test" ) );
         Debug.trace( querier.get( "test" ) );
@@ -404,8 +407,8 @@ public class TestSchemeQuerier {
             //TestSchemeQuerier.testLRUDictCache();
             //TestSchemeQuerier.testHotspotDictCache();
             //TestSchemeQuerier.testRDBDict();
-            //TestSchemeQuerier.testRedisDict();
-            TestSchemeQuerier.testMemCachedDict();
+            TestSchemeQuerier.testRedisDict();
+            //TestSchemeQuerier.testMemCachedDict();
 
 
             return 0;

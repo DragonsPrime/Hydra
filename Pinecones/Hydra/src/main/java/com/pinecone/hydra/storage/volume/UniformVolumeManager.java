@@ -1,5 +1,6 @@
 package com.pinecone.hydra.storage.volume;
 
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
@@ -37,15 +38,14 @@ import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.entity.EntityNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
-import com.pinecone.ulf.util.id.GUIDs;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.ulf.util.guid.GUIDs;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
-    protected Hydrarum                          hydrarum;
     protected VolumeAllotment                   volumeAllotment;
     protected MirroredVolumeManipulator         mirroredVolumeManipulator;
     protected MountPointManipulator             mountPointManipulator;
@@ -65,9 +65,8 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
     protected KenusPool                         kenusPool;
 
 
-    public UniformVolumeManager( Hydrarum hydrarum, KOIMasterManipulator masterManipulator, VolumeManager parent, String name ) {
-
-        super( hydrarum, masterManipulator, VolumeManager.KernelVolumeConfig, parent, name );
+    public UniformVolumeManager( Processum superiorProcess, KOIMasterManipulator masterManipulator, VolumeManager parent, String name ) {
+        super( superiorProcess, masterManipulator, VolumeManager.KernelVolumeConfig, parent, name );
         this.hydrarum = hydrarum;
         this.volumeMasterManipulator       =   ( VolumeMasterManipulator ) masterManipulator;
         this.pathResolver                  =   new KOPathResolver( this.kernelObjectConfig );
@@ -92,16 +91,16 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
         );
     }
 
-    public UniformVolumeManager( Hydrarum hydrarum, KOIMasterManipulator masterManipulator ) {
-        this( hydrarum, masterManipulator, null, VolumeManager.class.getSimpleName() );
+    public UniformVolumeManager( Processum superiorProcess, KOIMasterManipulator masterManipulator ) {
+        this( superiorProcess, masterManipulator, null, VolumeManager.class.getSimpleName() );
     }
 
     public UniformVolumeManager( KOIMappingDriver driver, VolumeManager parent, String name ){
-        this( driver.getSystem(), driver.getMasterManipulator(), parent, name );
+        this( driver.getSuperiorProcess(), driver.getMasterManipulator(), parent, name );
     }
 
     public UniformVolumeManager( KOIMappingDriver driver ) {
-        this( driver.getSystem(), driver.getMasterManipulator() );
+        this( driver.getSuperiorProcess(), driver.getMasterManipulator() );
     }
 
     @Override
@@ -323,12 +322,56 @@ public class UniformVolumeManager extends ArchKOMTree implements VolumeManager {
         List<Volume> spannedVolumes = this.spannedVolumeManipulator.queryAllSpannedVolume();
         List<Volume> stripedVolumes = this.stripedVolumeManipulator.queryAllStripedVolume();
 
+        List<Volume> fullPhysicalVolumes = new ArrayList<>();
+        List<Volume> fullSimpleVolumes = new ArrayList<>();
+        List<Volume> fullSpannedVolumes = new ArrayList<>();
+        List<Volume> fullStripedVolumes = new ArrayList<>();
+        for( Volume volume : physicalVolumes ){
+            PhysicalVolume physicalVolume = this.getPhysicalVolume(volume.getGuid());
+            fullPhysicalVolumes.add(physicalVolume);
+        }
+        for( Volume volume : simpleVolumes ){
+            LogicVolume logicVolume = this.get(volume.getGuid());
+            fullSimpleVolumes.add(logicVolume);
+        }
+        for( Volume volume : spannedVolumes ){
+            LogicVolume logicVolume = this.get(volume.getGuid());
+            fullSpannedVolumes.add(logicVolume);
+        }
+        for( Volume volume : stripedVolumes ){
+            LogicVolume logicVolume = this.get(volume.getGuid());
+            fullStripedVolumes.add(logicVolume);
+        }
+
         ArrayList<Volume> volumes = new ArrayList<>();
-        volumes.addAll( physicalVolumes );
+        volumes.addAll( fullPhysicalVolumes );
+        volumes.addAll(fullSimpleVolumes);
+        volumes.addAll(fullSpannedVolumes);
+        volumes.addAll(fullStripedVolumes);
+        return volumes;
+    }
+
+    @Override
+    public List<Volume> listLogicVolumes() {
+        List<Volume> simpleVolumes = this.simpleVolumeManipulator.queryAllSimpleVolumes();
+        List<Volume> spannedVolumes = this.spannedVolumeManipulator.queryAllSpannedVolume();
+        List<Volume> stripedVolumes = this.stripedVolumeManipulator.queryAllStripedVolume();
+        ArrayList<Volume> volumes = new ArrayList<>();
         volumes.addAll(simpleVolumes);
         volumes.addAll(spannedVolumes);
         volumes.addAll(stripedVolumes);
         return volumes;
+    }
+
+    @Override
+    public List<Volume> listPhysicsVolumes() {
+        List<Volume> physicalVolumes = this.physicalVolumeManipulator.queryAllPhysicalVolumes();
+        ArrayList<Volume> volumes = new ArrayList<>();
+        for( Volume volume : physicalVolumes ){
+            PhysicalVolume physicalVolume = this.getPhysicalVolume(volume.getGuid());
+            volumes.add(physicalVolume);
+        }
+        return new ArrayList<>(volumes);
     }
 
     private String getNodeName(ImperialTreeNode node ){

@@ -8,6 +8,8 @@ import java.util.Set;
 public interface DirectoryNode<V > extends TrieNode<V > {
     Map<String, TrieNode<V > > children();
 
+    Map<String, TrieNode<V > > segmentMap();
+
     default DirectoryNode<V > getDirectory( String szSegName ) {
         TrieNode<V > n = this.get( szSegName );
         if( n != null ) {

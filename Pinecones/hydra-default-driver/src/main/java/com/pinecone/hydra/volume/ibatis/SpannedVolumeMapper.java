@@ -8,7 +8,9 @@ import com.pinecone.hydra.storage.volume.source.SpannedVolumeManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisDataAccessObject;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,4 +39,7 @@ public interface SpannedVolumeMapper extends SpannedVolumeManipulator, PrimeLogi
     }
     @Select("SELECT `id` AS enumId, `guid`, `create_time` AS createTime, `update_time` AS updateTime, `name`, `definition_capacity` AS definitionCapacity, `used_size` AS userdSize, `quota_capacity` AS quotaCapacity, `type`, `ext_config` AS extConfig FROM `hydra_uofs_volumes` WHERE type = 'SpannedVolume'")
     List<TitanLocalSpannedVolume> queryAllSpannedVolume0();
+
+    @Update("UPDATE `hydra_uofs_volumes` SET definition_capacity = #{definitionCapacity} WHERE guid = #{guid}")
+    void updateDefinitionCapacity(@Param("guid") GUID guid, @Param("definitionCapacity") long definitionCapacity );
 }

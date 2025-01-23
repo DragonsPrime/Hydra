@@ -43,4 +43,8 @@ public interface VolumeManager extends KOMInstrument {
     KenusPool getKenusPool();
 
     List<Volume> queryAllVolumes();
+
+    List<Volume> listLogicVolumes();
+
+    List<Volume> listPhysicsVolumes();
 }

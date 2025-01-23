@@ -1,6 +1,7 @@
 package com.pinecone.hydra.account.ibatis;
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.account.entity.GenericGroup;
 import com.pinecone.hydra.account.entity.Group;
 import com.pinecone.hydra.account.entity.Account;
 import com.pinecone.hydra.account.source.GroupNodeManipulator;
@@ -21,7 +22,7 @@ public interface GroupNodeMapper extends GroupNodeManipulator {
     void remove(GUID groupGuid);
 
     @Select("SELECT `id`, `default_privilege_policy_guid`, `guid`, `name` FROM `hydra_account_group_node` WHERE `guid` = #{groupGuid}")
-    Account queryGroup(GUID groupGuid );
+    GenericGroup queryGroup(GUID groupGuid );
 
     @Select("SELECT `guid` FROM hydra_account_group_node WHERE `name` = #{name}")
     List<GUID > getGuidsByName(String name );

@@ -45,17 +45,20 @@ class JesusChrist extends Radium {
 
 
 
+
+        sparta.setPrimarySources( SpartaBoot.class );
+
         KOIMappingDriver koiMappingDriver = new VolumeMappingDriver(
-                this, (IbatisClient)this.getMiddlewareManager().getRDBManager().getRDBClientByName( "MySQLKingHydranium" ), this.getDispenserCenter()
+                sparta, (IbatisClient)this.getMiddlewareManager().getRDBManager().getRDBClientByName( "MySQLKingHydranium" ), this.getDispenserCenter()
         );
         KOIMappingDriver koiFileMappingDriver = new FileMappingDriver(
-                this, (IbatisClient)this.getMiddlewareManager().getRDBManager().getRDBClientByName( "MySQLKingHydranium" ), this.getDispenserCenter()
+                sparta, (IbatisClient)this.getMiddlewareManager().getRDBManager().getRDBClientByName( "MySQLKingHydranium" ), this.getDispenserCenter()
         );
         KOIMappingDriver koiBucketMappingDriver = new BucketMappingDriver(
-                this, (IbatisClient)this.getMiddlewareManager().getRDBManager().getRDBClientByName( "MySQLKingHydranium" ), this.getDispenserCenter()
+                sparta, (IbatisClient)this.getMiddlewareManager().getRDBManager().getRDBClientByName( "MySQLKingHydranium" ), this.getDispenserCenter()
         );
         KOIMappingDriver koiVersionMappingDriver = new VersionMappingDriver(
-                this, (IbatisClient)this.getMiddlewareManager().getRDBManager().getRDBClientByName( "MySQLKingHydranium" ), this.getDispenserCenter()
+                sparta, (IbatisClient)this.getMiddlewareManager().getRDBManager().getRDBClientByName( "MySQLKingHydranium" ), this.getDispenserCenter()
         );
 
 
@@ -64,9 +67,6 @@ class JesusChrist extends Radium {
         UniformVolumeManager volumeTree = new UniformVolumeManager( koiMappingDriver );
         TitanBucketInstrument bucketInstrument = new TitanBucketInstrument( koiBucketMappingDriver );
         TitanVersionManage versionManage = new TitanVersionManage( koiVersionMappingDriver );
-
-
-        sparta.setPrimarySources( SpartaBoot.class );
 
         sparta.setInitializer(new Executor() {
             @Override

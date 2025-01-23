@@ -3,6 +3,8 @@ package com.pinecone.hydra.storage.file;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.system.ko.KernelObjectConfig;
 
+import java.util.concurrent.TimeUnit;
+
 public interface FileSystemConfig extends KernelObjectConfig {
     String getVersionSignature();
 
@@ -13,4 +15,16 @@ public interface FileSystemConfig extends KernelObjectConfig {
     Number getTinyFileStripSizing();
 
     String getDefaultVolume();
+
+    int getExpiryTime();
+
+    String getRedisHost();
+
+    int getRedisPort();
+
+    int getRedisTimeOut();
+
+    String getRedisPassword();
+
+    int getRedisDatabase();
 }

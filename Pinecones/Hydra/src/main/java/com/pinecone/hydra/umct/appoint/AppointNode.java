@@ -35,4 +35,6 @@ public interface AppointNode extends UMCTNode {
     void addMethodDigest( MethodDigest that );
 
     ClassDigest compile( Class<? > clazz, boolean bAsIface );
+
+    void close();
 }

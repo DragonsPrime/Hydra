@@ -5,12 +5,21 @@ import com.pinecone.hydra.storage.StorageConstants;
 import com.pinecone.hydra.storage.volume.VolumeConstants;
 import com.pinecone.hydra.system.ko.ArchKernelObjectConfig;
 
+import java.util.concurrent.TimeUnit;
+
 public class KernelFileSystemConfig extends ArchKernelObjectConfig implements FileSystemConfig {
     protected String mszVersionSignature    = StorageConstants.StorageVersionSignature;
     protected Number mnFrameSize            = FileConstants.DefaultFrameSize;
     protected GUID   mLocalhostGUID         = StorageConstants.LocalhostGUID;
     protected Number TinyFileStripSizing    = VolumeConstants.TinyFileStripSizing;
     protected String DefaultVolumePath      = StorageConstants.DefaultVolumePath;
+    protected int    DefaultExpiryTime      = FileConstants.Expiry_Time;
+    protected String RedisHost              = FileConstants.REDIS_HOST;
+    protected int    RedisPort              = FileConstants.REDIS_PORT;
+    protected int    RedisTimeOut           = FileConstants.REDIS_TIME_OUT;
+    protected String RedisPassword          = FileConstants.REDIS_PASSWORD;
+    protected int    RedisDatabase          = FileConstants.REDIS_DATABASE;
+
 
     @Override
     public String getVersionSignature() {
@@ -33,5 +42,35 @@ public class KernelFileSystemConfig extends ArchKernelObjectConfig implements Fi
     @Override
     public String getDefaultVolume() {
         return this.DefaultVolumePath;
+    }
+
+    @Override
+    public int getExpiryTime() {
+        return this.DefaultExpiryTime;
+    }
+
+    @Override
+    public String getRedisHost() {
+        return this.RedisHost;
+    }
+
+    @Override
+    public int getRedisPort() {
+        return this.RedisPort;
+    }
+
+    @Override
+    public int getRedisTimeOut() {
+        return this.RedisTimeOut;
+    }
+
+    @Override
+    public String getRedisPassword() {
+        return this.RedisPassword;
+    }
+
+    @Override
+    public int getRedisDatabase() {
+        return this.RedisDatabase;
     }
 }

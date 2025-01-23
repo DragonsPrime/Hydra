@@ -10,5 +10,5 @@ public interface DomainNodeManipulator extends GUIDNameManipulator {
 
     void remove(GUID domainGuid);
 
-    Account queryDomain(GUID domainGuid );
+    Domain queryDomain(GUID domainGuid );
 }

@@ -10,6 +10,6 @@ public interface GroupNodeManipulator extends GUIDNameManipulator {
 
     void remove(GUID groupGuid);
 
-    Account queryGroup(GUID groupGuid );
+    Group queryGroup(GUID groupGuid );
 
 }

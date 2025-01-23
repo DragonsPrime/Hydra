@@ -3,7 +3,7 @@ package com.walnuts.sparta.uofs.console.api.controller.v2;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.file.entity.Folder;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.guid.GUIDs;
 import com.walnuts.sparta.uofs.console.api.response.BasicResultResponse;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,7 +40,7 @@ public class FolderController {
      * @return 返回操作状态
      */
     @GetMapping("/creat/folder")
-    public BasicResultResponse<String> createFolder( @RequestParam String destDirPath ){
+    public BasicResultResponse<String> createFolder( @RequestParam("destDirPath") String destDirPath ){
         this.primaryFileSystem.affirmFolder( destDirPath );
         return BasicResultResponse.success();
     }

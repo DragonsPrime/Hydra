@@ -34,8 +34,8 @@ import com.pinecone.hydra.storage.volume.kvfs.KenVolumeFileSystem;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.volume.ibatis.hydranium.VolumeMappingDriver;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
-import com.pinecone.ulf.util.id.GUIDs;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.ulf.util.guid.GUIDs;
+import com.pinecone.framework.util.id.GuidAllocator;
 import com.sauron.radium.Radium;
 
 import java.io.File;
@@ -76,8 +76,8 @@ class Alice extends Radium {
         //this.testDirectExport( volumeTree );
         //Debug.trace( volumeTree.queryGUIDByPath( "逻辑卷三/逻辑卷一" ) );
         //volumeTree.get( GUIDs.GUID72( "05e44c4-00022b-0006-20" ) ).build();
-        //this.testStripedInsert( volumeTree );
-        this.testSpannedInsert( volumeTree );
+        this.testStripedInsert( volumeTree );
+        //this.testSpannedInsert( volumeTree );
         //this.testStripedReceive( volumeTree );
         //this.testStripedExport( volumeTree );
         //this.testHash( volumeTree );
@@ -216,7 +216,7 @@ class Alice extends Radium {
         File file = new File("D:/井盖视频块/我的视频.mp4");
         titanReceiveStorageObject.setName( "我的视频" );
         titanReceiveStorageObject.setSize( file.length() );
-        titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
+        titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID() );
 
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
         TitanFileChannelChanface kChannel = new TitanFileChannelChanface( channel );
@@ -238,7 +238,7 @@ class Alice extends Radium {
         File file = new File("D:/井盖视频块/我的视频.mp4");
         titanReceiveStorageObject.setName( "视频" );
         titanReceiveStorageObject.setSize( file.length() );
-        titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
+        titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID() );
 
         FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
         TitanFileChannelChanface kChannel = new TitanFileChannelChanface( channel );
@@ -254,7 +254,7 @@ class Alice extends Radium {
         File file = new File("D:/井盖视频块/4月13日 (2).mp4");
         titanReceiveStorageObject.setName( "视频" );
         titanReceiveStorageObject.setSize( file.length() );
-        titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID72() );
+        titanReceiveStorageObject.setStorageObjectGuid( guidAllocator.nextGUID() );
 
 //        FileChannel channel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
 //        TitanFileChannelKChannel kChannel = new TitanFileChannelKChannel(channel);

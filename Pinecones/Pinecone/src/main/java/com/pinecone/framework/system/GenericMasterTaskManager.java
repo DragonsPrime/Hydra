@@ -4,6 +4,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.TimeUnit;
@@ -13,24 +14,20 @@ import com.pinecone.framework.system.executum.ExclusiveProcessum;
 import com.pinecone.framework.system.executum.Executum;
 import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.system.executum.VitalResource;
-import com.pinecone.framework.unit.LinkedTreeMap;
-import com.pinecone.framework.util.Debug;
-import com.pinecone.framework.util.lock.ReentrantReadWriteSpinLock;
 
 public class GenericMasterTaskManager implements EventedTaskManager {
     protected Processum                               mParentProcessum     ;
     protected ClassLoader                             mClassLoader         ;
     protected RuntimeSystem                           mSystem;
-    protected Map<Integer, Executum>                  mExecutumPool        = new LinkedTreeMap<>();
-    protected Map<String, ExclusiveProcessum >        mExclusiveTasks      = new LinkedTreeMap<>();
-    protected Map<Integer, VitalResource>             mVitalResourcePool   = new LinkedTreeMap<>();
+    protected Map<Integer, Executum>                  mExecutumPool        = new ConcurrentHashMap<>();
+    protected Map<String, ExclusiveProcessum >        mExclusiveTasks      = new ConcurrentHashMap<>();
+    protected Map<Integer, VitalResource>             mVitalResourcePool   = new ConcurrentHashMap<>();
     protected long                                    mnVitalizeCount      = 0;
     protected long                                    mnFatalityCount      = 0;
     protected long                                    mnMaxWaitApoptosis   = 5000;
     protected final Object                            mTerminationLock     = new Object();
     protected BlockingDeque<Executum >                mSyncApoptosisQueue  = new LinkedBlockingDeque<>();
     protected Phaser                                  mFinishingPhaser     = new Phaser( 1 );
-    protected final ReentrantReadWriteSpinLock        mPoolLock            = new ReentrantReadWriteSpinLock(); // Using optimistic lock.
 
     public GenericMasterTaskManager( Processum parent, ClassLoader classLoader ) {
         this.mParentProcessum = parent;
@@ -173,17 +170,6 @@ public class GenericMasterTaskManager implements EventedTaskManager {
     }
 
     @Override
-    public Executum addSync( Executum that ) {
-        this.mPoolLock.writeLock().lock();
-        try{
-            return this.add( that );
-        }
-        finally {
-            this.mPoolLock.writeLock().unlock();
-        }
-    }
-
-    @Override
     public void erase( Executum that ){
         if( this.autopsy( that ) ) {
             this.getExecutumPool().remove( that.getId() );
@@ -192,17 +178,6 @@ public class GenericMasterTaskManager implements EventedTaskManager {
         }
         else {
             throw new IllegalStateException( "Executum is still alive." );
-        }
-    }
-
-    @Override
-    public void eraseSync( Executum that ) {
-        this.mPoolLock.writeLock().lock();
-        try{
-            this.erase( that );
-        }
-        finally {
-            this.mPoolLock.writeLock().unlock();
         }
     }
 
@@ -298,7 +273,7 @@ public class GenericMasterTaskManager implements EventedTaskManager {
     @Override
     public void     kill          ( Executum that ) {
         that.kill();
-        this.eraseSync( that );
+        this.erase( that );
     }
 
     protected boolean isApproveLifeRenewal( ApoptosisRejectSignalException e ) {

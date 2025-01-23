@@ -11,7 +11,7 @@ import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
 import com.pinecone.hydra.unit.imperium.ImperialTree;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.time.LocalDateTime;
 
@@ -41,7 +41,7 @@ public abstract class ArchFileSystemOperator implements FileSystemOperator{
         // Case 1: Dummy config node.
         GuidAllocator guidAllocator = this.fileSystem.getGuidAllocator();
         if( guid72 == null ) {
-            guid72 = guidAllocator.nextGUID72();
+            guid72 = guidAllocator.nextGUID();
             entityNode.setGuid( guid72 );
             entityNode.setCreateTime( LocalDateTime.now() );
         }

@@ -2,7 +2,7 @@ package com.pinecone.slime.chunk.scheduler;
 
 import com.pinecone.slime.chunk.Chunk;
 import com.pinecone.slime.chunk.Splitunk;
-import com.pinecone.slime.chunk.orchestration.PageDividerPartition64;
+import com.pinecone.slime.chunk.marshaling.PageDividerPartition64;
 
 public class FixedPageDivider64 extends FixedChunkDivider64 implements PageDivider {
     protected PagePool                  mPagePool;

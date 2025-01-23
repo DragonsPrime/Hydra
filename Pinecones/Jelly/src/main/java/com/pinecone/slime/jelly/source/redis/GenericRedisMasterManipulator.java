@@ -202,7 +202,7 @@ public class GenericRedisMasterManipulator<K extends String, V > implements Inde
         );
     }
 
-    protected void insert0( IndexableTargetScopeMeta meta, String szKey, V entity ) {
+    protected void insert0( IndexableTargetScopeMeta meta, String szKey, V entity, long expireMill ) {
         try {
             if( entity instanceof String ) {
                 this.mJedis.set( szKey, (String)entity );
@@ -239,10 +239,18 @@ public class GenericRedisMasterManipulator<K extends String, V > implements Inde
                     this.mJedis.hset( szKey, k, bean.get( k ).toString() );
                 }
             }
+
+            if( expireMill > 0 ) {
+                this.mJedis.pexpire( szKey, expireMill );
+            }
         }
         catch ( JedisException | ClassCastException e ) {
             // Handle exceptions (log, throw, etc.)
         }
+    }
+
+    protected void insert0( IndexableTargetScopeMeta meta, String szKey, V entity ) {
+        this.insert0( meta, szKey, entity, -1 );
     }
 
     @Override
@@ -254,6 +262,11 @@ public class GenericRedisMasterManipulator<K extends String, V > implements Inde
     @Override
     public void insert( IndexableTargetScopeMeta meta, K key, V entity ) {
         this.insert0( meta, key.toString(), entity );
+    }
+
+    @Override
+    public void insert( IndexableTargetScopeMeta meta, K key, V entity, long expireMill ) {
+        this.insert0( meta, key.toString(), entity, expireMill );
     }
 
     @Override

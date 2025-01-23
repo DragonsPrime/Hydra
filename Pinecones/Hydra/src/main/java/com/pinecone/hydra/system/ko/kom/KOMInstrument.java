@@ -1,5 +1,6 @@
 package com.pinecone.hydra.system.ko.kom;
 
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.system.ko.CascadeInstrument;
 import com.pinecone.hydra.unit.imperium.entity.EntityNode;
@@ -64,5 +65,7 @@ public interface KOMInstrument extends CascadeInstrument {
     List<? extends TreeNode > fetchRoot();
 
     void rename( GUID guid, String name );
+
+    Processum getSuperiorProcess();
 
 }

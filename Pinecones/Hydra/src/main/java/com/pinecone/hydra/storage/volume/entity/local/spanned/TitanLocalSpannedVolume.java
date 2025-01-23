@@ -142,7 +142,10 @@ public class TitanLocalSpannedVolume extends ArchLogicVolume implements LocalSpa
 
     @Override
     public void storageExpansion(GUID volumeGuid) {
+        //todo 跨区卷扩容还有点问题
         this.volumeManager.storageExpansion( this.getGuid(), volumeGuid );
+        LogicVolume logicVolume = this.volumeManager.get(volumeGuid);
+        this.spannedVolumeManipulator.updateDefinitionCapacity( this.guid, logicVolume.getVolumeCapacity().getDefinitionCapacity() );
     }
 
 }

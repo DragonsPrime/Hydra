@@ -1,6 +1,7 @@
 package com.pinecone.slime.map.rdb;
 
 import com.pinecone.framework.system.NotImplementedException;
+import com.pinecone.slime.cache.CacheConstants;
 import com.pinecone.slime.cache.query.SourceRetriever;
 import com.pinecone.slime.cache.query.UniformCountSelfLoadingDictCache;
 import com.pinecone.slime.cache.query.pool.BatchPageSourceRetriever;
@@ -30,8 +31,8 @@ public class RDBMapQuerier<K, V > implements AlterableQuerier<V > {
     }
 
     public RDBMapQuerier( RDBTargetTableMeta tableMeta, String szRangeKey ) {
-        this( tableMeta, new LocalLRUPrimaryPooledDictCache<>( 1000, 5,
-                new ContiguousNumIndexBatchPageSourceRetriever<>( tableMeta, 1000, szRangeKey )
+        this( tableMeta, new LocalLRUPrimaryPooledDictCache<>( CacheConstants.DefaultCachePageCapacity, 5,
+                new ContiguousNumIndexBatchPageSourceRetriever<>( tableMeta, CacheConstants.DefaultCachePageCapacity, szRangeKey )
         ) );
     }
 

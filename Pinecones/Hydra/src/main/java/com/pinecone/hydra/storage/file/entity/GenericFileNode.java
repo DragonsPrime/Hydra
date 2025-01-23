@@ -1,16 +1,11 @@
 package com.pinecone.hydra.storage.file.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
-import com.pinecone.hydra.registry.entity.PropertyJSONEncoder;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.source.FileManipulator;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
-import java.io.IOException;
-import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.util.TreeMap;
 
@@ -55,7 +50,7 @@ public class GenericFileNode extends ArchElementNode implements FileNode{
     public GenericFileNode(KOMFileSystem fileSystem ) {
         this.fileSystem = fileSystem;
         GuidAllocator guidAllocator = this.fileSystem.getGuidAllocator();
-        this.setGuid( guidAllocator.nextGUID72() );
+        this.setGuid( guidAllocator.nextGUID() );
         this.setCreateTime( LocalDateTime.now() );
     }
     public GenericFileNode( KOMFileSystem fileSystem, FileManipulator fileManipulator ) {

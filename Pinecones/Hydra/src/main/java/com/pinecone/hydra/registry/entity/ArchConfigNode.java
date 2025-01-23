@@ -3,7 +3,7 @@ package com.pinecone.hydra.registry.entity;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.hydra.registry.KOMRegistry;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.time.LocalDateTime;
 
@@ -22,7 +22,7 @@ public abstract class ArchConfigNode extends ArchElementNode implements ConfigNo
         this.registry = registry;
 
         GuidAllocator guidAllocator = this.registry.getGuidAllocator();
-        this.setGuid( guidAllocator.nextGUID72() );
+        this.setGuid( guidAllocator.nextGUID() );
         this.setCreateTime( LocalDateTime.now() );
     }
 

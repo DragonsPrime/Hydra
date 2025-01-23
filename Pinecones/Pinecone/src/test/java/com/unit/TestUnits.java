@@ -1,6 +1,7 @@
 package com.unit;
 import com.pinecone.Pinecone;
 import com.pinecone.framework.unit.*;
+import com.pinecone.framework.unit.TreeMap;
 import com.pinecone.framework.unit.tabulate.*;
 import com.pinecone.framework.unit.trie.TrieMap;
 import com.pinecone.framework.unit.trie.TrieNode;
@@ -9,6 +10,9 @@ import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.JSONMaptron;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @SuppressWarnings( "unchecked" )
 public class TestUnits {
@@ -210,6 +214,9 @@ public class TestUnits {
 
         Debug.trace( trieMap, trieMap.size() );
 
+
+        //trieMap.remove( "a1/b1" );
+
         Debug.trace( trieMap.keySet() );
 
         Debug.trace( trieMap.values() );
@@ -233,6 +240,96 @@ public class TestUnits {
 
     }
 
+    public static void testConcurrentTrie() {
+        UniTrieMaptron<String, String> trieMap = new UniTrieMaptron<>( ConcurrentHashMap::new );
+        //UniTrieMaptron<String, String> trieMap = new UniTrieMaptron<>( TreeMap::new );
+
+        trieMap.put("a1/b1/c1", "T1");
+        trieMap.put("a2/b2/c2", "T2");
+        trieMap.put("a3/b3/c3", "T3");
+        trieMap.put("a3/b4/c4", "T4");
+        trieMap.put("a4/b5/c5", "T5");
+        trieMap.put("a1/b1/c2", "T6");
+        trieMap.put("a1/b1/c3", "T7");
+
+
+        var s = trieMap.root();
+
+
+
+
+
+        Debug.greenfs( trieMap );
+
+
+
+        int numberOfThreads = 10;
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+
+        for (int i = 0; i < numberOfThreads; i++) {
+            executorService.execute(new PathInserter(trieMap));
+        }
+
+
+        executorService.shutdown();
+        while (!executorService.isTerminated()) {
+        }
+
+        Debug.trace( trieMap.size() );
+    }
+
+
+
+
+    private static final String CHARACTERS = "abcdefghijklmnopqrstuvwxyz";
+    private static final Random random = new Random();
+
+    private static String generateRandomPath() {
+        int segmentCount = 3 + random.nextInt(3); // Generate between 3 to 5 segments
+        StringBuilder path = new StringBuilder();
+        for (int i = 0; i < segmentCount; i++) {
+            if (i > 0) {
+                path.append('/');
+            }
+            path.append(generateRandomSegment());
+        }
+        return path.toString();
+    }
+
+    private static String generateRandomSegment() {
+        //int length = 2 + random.nextInt(3); // Generate segment length between 2 to 4
+        int length = 1;
+        StringBuilder segment = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            segment.append(CHARACTERS.charAt(random.nextInt(CHARACTERS.length())));
+        }
+        return segment.toString();
+    }
+
+    private static class PathInserter implements Runnable {
+        private final UniTrieMaptron<String, String> trieMap;
+
+        public PathInserter(UniTrieMaptron<String, String> trieMap) {
+            this.trieMap = trieMap;
+        }
+
+        @Override
+        public void run() {
+            for (int i = 0; i < 10000; i++) {
+                String path = generateRandomPath();
+                String value = "Value_" + random.nextInt(1000);
+                System.out.printf("Inserting path: %s with value: %s%n", path, value);
+                try{
+                    trieMap.put(path, value);
+                }
+                catch ( IllegalArgumentException e ) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+
     public static void main( String[] args ) throws Exception {
         Pinecone.init( (Object...cfg )->{
 
@@ -241,7 +338,9 @@ public class TestUnits {
             //TestUnits.testPrecedeMultiMap();
             //TestUnits.testRecursiveEntryIterator();
             //TestUnits.testMergeSharedList();
-            TestUnits.testTrieMap();
+            //TestUnits.testTrieMap();
+
+            TestUnits.testConcurrentTrie();
 
             return 0;
         }, (Object[]) args );

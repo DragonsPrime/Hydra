@@ -156,6 +156,8 @@ public class TitanLocalSimpleVolume extends ArchLogicVolume implements LocalSimp
     @Override
     public void storageExpansion(GUID volumeGuid) {
         this.extendLogicalVolume( volumeGuid );
+        PhysicalVolume physicalVolume = this.volumeManager.getPhysicalVolume(volumeGuid);
+        this.simpleVolumeManipulator.updateDefinitionCapacity( this.guid, physicalVolume.getVolumeCapacity().getDefinitionCapacity() );
     }
     @Override
     public SQLiteExecutor getSQLiteExecutor() throws SQLException {

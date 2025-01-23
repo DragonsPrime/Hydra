@@ -1,5 +1,6 @@
 package com.pinecone.hydra.scenario.ibatis.hydranium;
 
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.hydra.entity.ibatis.hydranium.ArchMappingDriver;
 import com.pinecone.hydra.service.ibatis.hydranium.ServiceMappingDriver;
 import com.pinecone.hydra.service.ibatis.hydranium.ServiceMasterManipulatorImpl;
@@ -11,11 +12,11 @@ import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
 
 public class ScenarioMappingDriver extends ArchMappingDriver implements KOIMappingDriver {
     protected KOIMasterManipulator mKOIMasterManipulator;
-    public ScenarioMappingDriver(Hydrarum system) {
-        super(system);
+    public ScenarioMappingDriver( Processum superiorProcess ) {
+        super( superiorProcess );
     }
-    public ScenarioMappingDriver(Hydrarum system, IbatisClient ibatisClient, ResourceDispenserCenter dispenserCenter ) {
-        super( system, ibatisClient, dispenserCenter, ScenarioMappingDriver.class.getPackageName().replace( "hydranium", "" ) );
+    public ScenarioMappingDriver( Processum superiorProcess, IbatisClient ibatisClient, ResourceDispenserCenter dispenserCenter ) {
+        super( superiorProcess, ibatisClient, dispenserCenter, ScenarioMappingDriver.class.getPackageName().replace( "hydranium", "" ) );
 
         this.mKOIMasterManipulator = new ScenarioMasterManipulatorImpl( this );
     }

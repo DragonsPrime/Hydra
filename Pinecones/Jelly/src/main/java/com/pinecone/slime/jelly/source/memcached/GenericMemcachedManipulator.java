@@ -158,6 +158,21 @@ public class GenericMemcachedManipulator<V extends Serializable > implements Mem
     }
 
     @Override
+    public void insert( IndexableTargetScopeMeta meta, String key, V entity, long expireMill ) {
+        int expireSeconds = (int) (expireMill / 1000);
+
+        Future<Boolean> setFuture = this.mMemClient.set(key, expireSeconds, entity);
+        try {
+            if ( !setFuture.get( 5, TimeUnit.SECONDS ) ) {
+                throw new IllegalStateException("Failed to insert key: " + key);
+            }
+        }
+        catch ( TimeoutException | ExecutionException | InterruptedException e ) {
+            throw new ProxyProvokeHandleException(e);
+        }
+    }
+
+    @Override
     public void insertByNS( IndexableTargetScopeMeta meta, String szNamespace, String key, V entity ) {
         String scopeKey = this.getFullKey( meta, szNamespace, key );
         this.insert0( meta, scopeKey, entity );

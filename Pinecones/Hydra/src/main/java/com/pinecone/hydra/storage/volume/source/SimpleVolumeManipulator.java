@@ -18,4 +18,7 @@ public interface SimpleVolumeManipulator extends LogicVolumeManipulator {
     List<GUID> listPhysicalVolume(GUID logicGuid );
 
     List<Volume> queryAllSimpleVolumes();
+
+    void updateDefinitionCapacity( GUID guid, long definitionCapacity );
+
 }

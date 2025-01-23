@@ -9,4 +9,5 @@ public interface LogicVolumeManipulator extends GUIDNameManipulator {
     void extendLogicalVolume( GUID logicGuid, GUID physicalGuid );
 
     List< GUID > listPhysicalVolume( GUID logicGuid );
+
 }

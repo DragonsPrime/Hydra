@@ -9,8 +9,8 @@ import com.pinecone.hydra.unit.imperium.source.TireOwnerManipulator;
 import com.pinecone.hydra.unit.imperium.source.TriePathCacheManipulator;
 import com.pinecone.hydra.unit.imperium.source.TrieTreeManipulator;
 import com.pinecone.hydra.unit.imperium.source.TreeMasterManipulator;
-import com.pinecone.ulf.util.id.GUID72;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.ulf.util.guid.GUID72;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.util.List;
 
@@ -236,7 +236,7 @@ public class RegimentedImperialTree implements UniImperialTree {
     @Override
     public void newLinkTag( GUID originalGuid, GUID dirGuid, String tagName, KernelObjectInstrument instrument ) {
         GuidAllocator guidAllocator = instrument.getGuidAllocator();
-        GUID tagGuid = guidAllocator.nextGUID72();
+        GUID tagGuid = guidAllocator.nextGUID();
         this.trieTreeManipulator.newLinkTag( originalGuid, dirGuid, tagName, tagGuid );
     }
 

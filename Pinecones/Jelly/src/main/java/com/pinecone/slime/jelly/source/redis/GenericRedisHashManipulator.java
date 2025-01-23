@@ -116,6 +116,11 @@ public class GenericRedisHashManipulator<K extends String, V> implements Indexab
     }
 
     @Override
+    public void insert( IndexableTargetScopeMeta meta, K key, V entity, long expireMill ) {
+        this.insertByNS( meta, meta.getIndexKey(), key, entity ); // Not supported.
+    }
+
+    @Override
     public void updateByNS( IndexableTargetScopeMeta meta, String szParentIndexKey, K key, V entity ) {
         this.insertByNS( meta, szParentIndexKey, key, entity );
     }

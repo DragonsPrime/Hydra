@@ -10,8 +10,8 @@ import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
-import com.pinecone.ulf.util.id.GuidAllocator;
-import com.pinecone.ulf.util.id.impl.GenericGuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
+import com.pinecone.ulf.util.guid.GenericGuidAllocator;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -49,7 +49,7 @@ public class TitanBucketInstrument implements BucketInstrument {
 
     @Override
     public GUID createBucket(Bucket bucket) {
-        GUID guid = this.guidAllocator.nextGUID72();
+        GUID guid = this.guidAllocator.nextGUID();
         bucket.setBucketGuid( guid );
         this.bucketManipulator.insert( bucket );
         return guid;
@@ -82,7 +82,7 @@ public class TitanBucketInstrument implements BucketInstrument {
 
     @Override
     public GUID createSite(Site site) {
-        GUID guid = this.guidAllocator.nextGUID72();
+        GUID guid = this.guidAllocator.nextGUID();
         site.setSiteGuid(guid);
         site.setCreateTime(LocalDateTime.now());
         this.siteManipulator.insert(site);

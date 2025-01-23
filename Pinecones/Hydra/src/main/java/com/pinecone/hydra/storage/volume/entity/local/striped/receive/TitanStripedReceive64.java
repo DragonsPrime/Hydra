@@ -29,6 +29,8 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 public class TitanStripedReceive64 implements StripedReceive64{
     protected VolumeManager             volumeManager;
@@ -64,16 +66,19 @@ public class TitanStripedReceive64 implements StripedReceive64{
 
 
         int index = 0;
+        masterVolumeGram.setMajorJobCountDownNum( volumes.size() );
         for( LogicVolume volume : volumes ){
-            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob( this.entity, chanface, volumes.size(), index, volume, mappedExecutor, 0, this.entity.getReceiveStorageObject().getSize() );
+            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob(masterVolumeGram, this.entity, chanface, volumes.size(), index, volume, mappedExecutor, 0, this.entity.getReceiveStorageObject().getSize() );
             LocalStripedTaskThread taskThread = new LocalStripedTaskThread(  this.stripedVolume.getName() + index, masterVolumeGram, receiverJob );
             masterVolumeGram.getTaskManager().add( taskThread );
             taskThread.start();
 
             index ++;
         }
-        this.waitForTaskCompletion( masterVolumeGram );
-        masterVolumeGram.kill();
+//        this.waitForTaskCompletion( masterVolumeGram );
+//        masterVolumeGram.kill();
+
+        masterVolumeGram.majorJobCountDownLatchWait();
         return null;
     }
 
@@ -86,8 +91,9 @@ public class TitanStripedReceive64 implements StripedReceive64{
 
 
         int index = 0;
+        masterVolumeGram.setMajorJobCountDownNum( volumes.size() );
         for( LogicVolume volume : volumes ){
-            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob( this.entity, chanface, volumes.size(), index, volume, this.mappedExecutor, offset, offset.longValue()+endSize.longValue() );
+            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob(masterVolumeGram, this.entity, chanface, volumes.size(), index, volume, this.mappedExecutor, offset, offset.longValue()+endSize.longValue() );
             LocalStripedTaskThread taskThread = new LocalStripedTaskThread(  this.stripedVolume.getName() + index, masterVolumeGram, receiverJob );
             masterVolumeGram.getTaskManager().add( taskThread );
             taskThread.start();
@@ -95,8 +101,10 @@ public class TitanStripedReceive64 implements StripedReceive64{
             index ++;
         }
 
-        this.waitForTaskCompletion( masterVolumeGram );
-        masterVolumeGram.kill();
+//        this.waitForTaskCompletion( masterVolumeGram );
+//        masterVolumeGram.kill();
+
+        masterVolumeGram.majorJobCountDownLatchWait();
         return null;
     }
 
@@ -115,6 +123,7 @@ public class TitanStripedReceive64 implements StripedReceive64{
         taskThread.start();
 
         int index = 0;
+        masterVolumeGram.setMajorJobCountDownNum( volumes.size() );
         for( LogicVolume volume : volumes ){
             TitanStripReceiveBufferInJob bufferInJob = new TitanStripReceiveBufferInJob( masterVolumeGram, index,randomAccessChanface,volume );
             LocalStripedTaskThread bufferInThread = new LocalStripedTaskThread(volume.getName(), masterVolumeGram, bufferInJob);
@@ -125,7 +134,9 @@ public class TitanStripedReceive64 implements StripedReceive64{
             index++;
         }
 
-        this.waitForTaskCompletion( masterVolumeGram );
+//        this.waitForTaskCompletion( masterVolumeGram );
+
+        masterVolumeGram.majorJobCountDownLatchWait();
         return null;
     }
 
@@ -143,11 +154,23 @@ public class TitanStripedReceive64 implements StripedReceive64{
     }
 
     private void waitForTaskCompletion(MasterVolumeGram masterVolumeGram) throws ProxyProvokeHandleException {
-        try {
-            masterVolumeGram.getTaskManager().syncWaitingTerminated();
+        Semaphore semaphore = new Semaphore(0);
+        //semaphore.a
+        CountDownLatch latch = new CountDownLatch(10);
+        latch.countDown();
+
+        try{
+            latch.await();
         }
-        catch (Exception e) {
-            throw new ProxyProvokeHandleException(e);
+        catch ( InterruptedException e ) {
+            Thread.currentThread().interrupt();
+            throw new ProxyProvokeHandleException( e );
         }
+//        try {
+//            masterVolumeGram.getTaskManager().syncWaitingTerminated();
+//        }
+//        catch (Exception e) {
+//            throw new ProxyProvokeHandleException(e);
+//        }
     }
 }

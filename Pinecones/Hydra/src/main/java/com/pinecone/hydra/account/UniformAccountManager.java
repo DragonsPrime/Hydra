@@ -1,5 +1,6 @@
 package com.pinecone.hydra.account;
 
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.account.entity.Account;
@@ -9,7 +10,8 @@ import com.pinecone.hydra.account.entity.GenericAccount;
 import com.pinecone.hydra.account.entity.GenericDomain;
 import com.pinecone.hydra.account.entity.GenericGroup;
 import com.pinecone.hydra.account.entity.Group;
-import com.pinecone.hydra.system.Hydrarum;
+import com.pinecone.hydra.account.source.AuthorizationManipulator;
+import com.pinecone.hydra.account.source.CredentialManipulator;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
@@ -24,15 +26,13 @@ import com.pinecone.hydra.account.source.DomainNodeManipulator;
 import com.pinecone.hydra.account.source.GroupNodeManipulator;
 import com.pinecone.hydra.account.source.UserMasterManipulator;
 import com.pinecone.hydra.account.source.UserNodeManipulator;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.guid.GUIDs;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class UniformAccountManager extends ArchKOMTree implements AccountManager {
-    protected Hydrarum                          hydrarum;
-
     protected UserMasterManipulator             userMasterManipulator;
 
     protected GroupNodeManipulator              groupNodeManipulator;
@@ -41,21 +41,27 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
 
     protected DomainNodeManipulator             domainNodeManipulator;
 
+    protected CredentialManipulator             credentialManipulator;
+
+    protected AuthorizationManipulator          authorizationManipulator;
+
     protected List<GUIDNameManipulator >        folderManipulators;
 
     protected List<GUIDNameManipulator >        fileManipulators;
 
-    public UniformAccountManager(Hydrarum hydrarum, KOIMasterManipulator masterManipulator, AccountManager parent, String name) {
-        super(hydrarum, masterManipulator, KernelAccountConfig, parent, name);
-        this.hydrarum              = hydrarum;
+
+    public UniformAccountManager( Processum superiorProcess, KOIMasterManipulator masterManipulator, AccountManager parent, String name ) {
+        super( superiorProcess, masterManipulator, KernelAccountConfig, parent, name );
         this.userMasterManipulator = (UserMasterManipulator) masterManipulator;
         this.pathResolver          = new KOPathResolver( this.kernelObjectConfig );
         this.guidAllocator         = GUIDs.newGuidAllocator();
 
-        this.operatorFactory        = new GenericAccountOperatorFactory( this, this.userMasterManipulator );
-        this.groupNodeManipulator   = this.userMasterManipulator.getGroupNodeManipulator();
-        this.userNodeManipulator    = this.userMasterManipulator.getUserNodeManipulator();
-        this.domainNodeManipulator  = this.userMasterManipulator.getDomainNodeManipulator();
+        this.operatorFactory            = new GenericAccountOperatorFactory( this, this.userMasterManipulator );
+        this.groupNodeManipulator       = this.userMasterManipulator.getGroupNodeManipulator();
+        this.userNodeManipulator        = this.userMasterManipulator.getUserNodeManipulator();
+        this.domainNodeManipulator      = this.userMasterManipulator.getDomainNodeManipulator();
+        this.credentialManipulator      = this.userMasterManipulator.getCredentialManipulator();
+        this.authorizationManipulator   = this.userMasterManipulator.getAuthorizationManipulator();
 
         this.folderManipulators = new ArrayList<>(List.of(this.domainNodeManipulator, this.groupNodeManipulator));
         this.fileManipulators   = new ArrayList<>(List.of(this.userNodeManipulator));
@@ -65,16 +71,16 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
         );
     }
 
-    public UniformAccountManager(Hydrarum hydrarum, KOIMasterManipulator masterManipulator ) {
-        this( hydrarum, masterManipulator, null, AccountManager.class.getSimpleName() );
+    public UniformAccountManager( Processum superiorProcess, KOIMasterManipulator masterManipulator ) {
+        this( superiorProcess, masterManipulator, null, AccountManager.class.getSimpleName() );
     }
 
-    public UniformAccountManager(KOIMappingDriver driver, AccountManager parent, String name ){
-        this( driver.getSystem(), driver.getMasterManipulator(), parent, name );
+    public UniformAccountManager( KOIMappingDriver driver, AccountManager parent, String name ){
+        this( driver.getSuperiorProcess(), driver.getMasterManipulator(), parent, name );
     }
 
-    public UniformAccountManager(KOIMappingDriver driver ) {
-        this( driver.getSystem(), driver.getMasterManipulator() );
+    public UniformAccountManager( KOIMappingDriver driver ) {
+        this( driver.getSuperiorProcess(), driver.getMasterManipulator() );
     }
 
     @Override

@@ -30,7 +30,7 @@ import com.pinecone.framework.util.json.JSON;
 public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V > implements TrieMap<K, V >, Cloneable {
     protected transient DirectoryNode<V >                           mRoot;
     protected final transient Supplier<Map<String, TrieNode<V > > > mMapSupplier;
-    protected transient int                                         mnSize;
+    //protected transient int                                         mnSize;
     protected transient TrieSegmentor                               mSegmentor;
 
     protected transient Set<Entry<K, V> >                           mEntrySet;
@@ -44,7 +44,7 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
         }
         this.mMapSupplier  = mapSupplier;
         this.mRoot         = new GenericDirectoryNode( this.mMapSupplier.get(), this );
-        this.mnSize         = 0;
+        //this.mnSize        = 0;
         this.mSegmentor    = segmentor;
     }
 
@@ -83,15 +83,30 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
 
     @Override
     public V put( K key, V value ) {
-        return this.putEntity( key, value );
+        return this.putEntity0( key, value, false );
     }
 
-    public V makeSymbolic ( K key, K target ) {
+    @Override
+    public V putIfAbsent( K key, V value ) {
+        return this.putEntity0( key, value, true );
+    }
+
+    public V makeSymbolic (K key, K target ) {
         ReparseNode<V> p = new GenericReparseNode<>( null, null, target,this );
-        return this.putEntity( key, p );
+        return this.putEntity0( key, p, false );
     }
 
-    public V putEntity( K key, Object value ) {
+    protected V putEntity0( K key, Object value, boolean isAbsent ) {
+        Object ret = this.putEntity( key, value, isAbsent );
+        if ( ret instanceof TrieNode ) {
+            return null;
+        }
+
+        return this.convertValue( ret );
+    }
+
+    @Override
+    public Object putEntity( K key, Object value, boolean isAbsent ) {
         if ( key == null ) {
             throw new IllegalArgumentException( "Key cannot be null." );
         }
@@ -115,7 +130,7 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
                 else {
                     dir = node.evinceDirectory();
                     if( dir == null ) {
-                        throw new IllegalArgumentException( "Path given is not a full-directory insertion path." );
+                        throw new IllegalArgumentException( "Path `" + key + "` given is not a full-directory insertion path." );
                     }
                 }
             }
@@ -132,11 +147,15 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
                         neo = new GenericValueNode<>( segment, this.convertValue( value ), parent, this );
                     }
                     dir.put( segment, neo );
-                    ++this.mnSize;
-                    return null; // Insertion
+                    //++this.mnSize;
+                    return neo; // Insertion
                 }
             }
             parent = node;
+        }
+
+        if ( isAbsent ) {
+            return null;
         }
 
         // Modification
@@ -254,10 +273,51 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
     public V remove( Object key ) {
         String szKey = this.getStringKey( key );
 
-        return this.remove( this.mRoot, this.mSegmentor.segments( szKey ), 0 );
+        //return this.remove( this.mRoot, this.mSegmentor.segments( szKey ), 0 );
+        return this.remove( this.mRoot, this.mSegmentor.segments( szKey ) );
     }
 
-    protected V remove( TrieNode<V > node, String[] segments, int depth ) {
+
+    protected V remove( TrieNode<V> startNode, String[] segments ) {
+        if ( startNode == null || segments.length == 0 ) {
+            return null;
+        }
+
+        TrieNode<V> node = startNode;
+        DirectoryNode<V> directory;
+        int depth = 0;
+
+        while ( depth < segments.length ) {
+            directory = node.evinceDirectory();
+            if ( directory == null ) {
+                return null;
+            }
+
+            String segment = segments[ depth ];
+            TrieNode<V> childNode = directory.get( segment );
+
+            if ( depth == segments.length - 1 ) {
+                if ( childNode == null ) {
+                    return null; // Illegal path.
+                }
+
+                directory.remove( segment ); // <= Fatalities statistics therein.
+
+                ValueNode<V > valueNode = childNode.evinceValue();
+                if ( valueNode != null ) {
+                    return valueNode.getValue();
+                }
+                return null;
+            }
+
+            node = childNode;
+            ++depth;
+        }
+
+        return null;
+    }
+
+    /*protected V remove( TrieNode<V > node, String[] segments, int depth ) {
         if ( node == null || depth >= segments.length ) {
             return null;
         }
@@ -312,7 +372,7 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
 //        }
 //
 //        return result;
-    }
+    }*/
 
     @Override
     public void putAll( Map<? extends K, ? extends V> m ) {
@@ -323,22 +383,29 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
 
     @Override
     public void clear() {
-        this.mRoot.purge();
-        this.mnSize = 0;
+        this.mRoot.segmentMap().clear();
+        //this.mnSize = 0;
     }
 
-    protected void notifyChildrenEliminated( int nFatalities ) {
-        this.mnSize -= nFatalities;
+//    protected void notifyChildrenEliminated( int nFatalities ) {
+//        this.mnSize -= nFatalities;
+//    }
+
+
+    @Override
+    public DirectoryNode<V> root() {
+        return this.mRoot;
     }
 
     @Override
     public int size() {
-        return this.mnSize;
+        return this.mRoot.childrenLeafSize();
+        //return this.mnSize;
     }
 
     @Override
     public boolean isEmpty() {
-        return this.mnSize == 0;
+        return this.mRoot.isEmpty();
     }
 
     @Override
@@ -612,7 +679,7 @@ public class UniTrieMaptron<K extends String, V > extends AbstractTrieMap<K, V >
             clonedMap.mEntrySet = null;
             clonedMap.mKeySet   = null;
             clonedMap.mValues   = null;
-            clonedMap.mnSize    = this.mnSize;
+            //clonedMap.mnSize    = this.mnSize;
 
             return clonedMap;
         }

@@ -22,7 +22,7 @@ public interface DomainNodeMapper extends DomainNodeManipulator {
     void remove(GUID domainGuid);
 
     @Select("SELECT `id`, `domain_name` AS domainName, `domin_guid` AS guid, `name` FROM `hydra_account_domain_node` WHERE `domin_guid` = #{domainGuid}")
-    Account queryDomain(GUID domainGuid );
+    Domain queryDomain(GUID domainGuid );
 
     @Select("SELECT `domin_guid` FROM hydra_account_domain_node WHERE `name` = #{name}")
     List<GUID > getGuidsByName(String name );

@@ -1,37 +1,35 @@
 package com.sparta;
 
+import com.pinecone.hydra.umq.GenericMessageHandler;
+import com.pinecone.hydra.umq.RocketMQCenter;
 import com.pinecone.hydra.umq.RocketMQClient;
+import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
+import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
+import org.apache.rocketmq.client.consumer.listener.MessageListenerConcurrently;
 import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.common.message.MessageExt;
 import org.apache.rocketmq.remoting.common.RemotingHelper;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 public class TestRocketClient {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws MQClientException {
         String nameSrvAddr = "127.0.0.1:9876";
         String groupName = "testGroup";
-
-        RocketMQClient rocketMQClient = new RocketMQClient(nameSrvAddr, groupName);
-
         String topic = "testTopic";
-        String tags = "testTags";
+        String tags = "*";
         String keys = "testKeys";
         String body = "This is a test message";
 
-        try {
-            boolean result = rocketMQClient.sendMessage(topic, tags, keys, body.getBytes(RemotingHelper.DEFAULT_CHARSET));
-            if (result) {
-                System.out.println("Message sent successfully");
-            } else {
-                System.out.println("Failed to send message");
-            }
-        } catch (MQClientException e) {
-            System.out.println("Failed to send message: " + e.getMessage());
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        RocketMQCenter rocketMQCenter = new RocketMQCenter(nameSrvAddr, groupName, topic, tags);
+        rocketMQCenter.listen(new GenericMessageHandler());
 
-        // 关闭生产者
-        rocketMQClient.shutdown();
+        RocketMQClient client = rocketMQCenter.getClient(nameSrvAddr, groupName);
+
+        client.sendMessage( topic, tags, keys, "你好".getBytes() );
+
+        rocketMQCenter.stopListen();
+
     }
 }

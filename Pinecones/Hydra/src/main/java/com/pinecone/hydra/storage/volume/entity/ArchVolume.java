@@ -21,7 +21,7 @@ public abstract class ArchVolume implements Volume{
 
     public ArchVolume( VolumeManager volumeManager ){
         this.volumeManager = volumeManager;
-        this.guid = volumeManager.getGuidAllocator().nextGUID72();
+        this.guid = volumeManager.getGuidAllocator().nextGUID();
         this.createTime = LocalDateTime.now();
         this.updateTime = LocalDateTime.now();
         this. kenVolumeFileSystem = new KenVolumeFileSystem( this.volumeManager );

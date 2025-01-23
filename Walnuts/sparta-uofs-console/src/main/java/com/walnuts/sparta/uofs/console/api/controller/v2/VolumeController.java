@@ -14,7 +14,7 @@ import com.pinecone.hydra.storage.volume.entity.local.LocalSimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalSpannedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.LocalStripedVolume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.TitanLocalSimpleVolume;
-import com.pinecone.ulf.util.id.GUIDs;
+import com.pinecone.ulf.util.guid.GUIDs;
 import com.walnuts.sparta.uofs.console.api.response.BasicResultResponse;
 import com.walnuts.sparta.uofs.console.domain.dto.PhysicalVolumeDTO;
 import com.walnuts.sparta.uofs.console.domain.dto.LogicVolumeDTO;
@@ -170,7 +170,7 @@ public class VolumeController {
     @PostMapping("/storageExpansion")
     public BasicResultResponse<String> storageExpansion(@RequestBody StorageExpansionDTO dto){
         GUID logicGuid = GUIDs.GUID72( dto.getLogicGuid() );
-        GUID physicalGuid = GUIDs.GUID72( dto.getPhysicalGuid() );
+        GUID physicalGuid = GUIDs.GUID72( dto.getChildGuid() );
 
         LogicVolume logicVolume = this.primaryVolume.get(logicGuid);
 
@@ -194,6 +194,9 @@ public class VolumeController {
         if( logicVolume instanceof TitanLocalSimpleVolume){
             SimpleVolume simpleVolume = (SimpleVolume) logicVolume;
             List<GUID> guids = simpleVolume.listPhysicalVolume();
+            if(guids.isEmpty()){
+                return BasicResultResponse.success().toJSONString();
+            }
             PhysicalVolume volumePhysicalVolume = this.primaryVolume.getPhysicalVolume(guids.get(0));
             ArrayList<Volume> volumes = new ArrayList<>();
             volumes.add(volumePhysicalVolume);
@@ -212,6 +215,26 @@ public class VolumeController {
     @GetMapping("/queryAllVolumes")
     public String queryAllVolumes(){
         List<Volume> volumes = this.primaryVolume.queryAllVolumes();
+        return BasicResultResponse.success(volumes).toJSONString();
+    }
+
+    /**
+     * 获取全部逻辑卷
+     * @return 返回卷信息
+     */
+    @GetMapping("/listLogicVolumes")
+    public String queryLogicVolumes(){
+        List<Volume> volumes = this.primaryVolume.listLogicVolumes();
+        return BasicResultResponse.success(volumes).toJSONString();
+    }
+
+    /**
+     * 获取全部物理卷
+     * @return 返回卷信息
+     */
+    @GetMapping("/listPhysicsVolumes")
+    public String queryPhysicsVolumes(){
+        List<Volume> volumes = this.primaryVolume.listPhysicsVolumes();
         return BasicResultResponse.success(volumes).toJSONString();
     }
 

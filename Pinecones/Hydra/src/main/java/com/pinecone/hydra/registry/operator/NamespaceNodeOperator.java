@@ -14,7 +14,7 @@ import com.pinecone.hydra.registry.source.RegistryNSNodeManipulator;
 import com.pinecone.hydra.registry.source.RegistryNSNodeMetaManipulator;
 import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
 import com.pinecone.hydra.unit.imperium.GUIDImperialTrieNode;
-import com.pinecone.ulf.util.id.GuidAllocator;
+import com.pinecone.framework.util.id.GuidAllocator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,7 +43,7 @@ public class NamespaceNodeOperator extends ArchRegistryOperator {
         GUID guid72                 = nsNode.getGuid();
 
         NamespaceMeta namespaceMeta = nsNode.getNamespaceWithMeta();
-        GUID namespaceNodeMetaGuid = guidAllocator.nextGUID72();
+        GUID namespaceNodeMetaGuid = guidAllocator.nextGUID();
         if (namespaceMeta != null){
             namespaceMeta.setGuid(namespaceNodeMetaGuid);
             this.namespaceNodeMetaManipulator.insert(namespaceMeta);
@@ -54,7 +54,7 @@ public class NamespaceNodeOperator extends ArchRegistryOperator {
 
 
         Attributes attributes = nsNode.getAttributes();
-        GUID nodeAttributesGuid = guidAllocator.nextGUID72();
+        GUID nodeAttributesGuid = guidAllocator.nextGUID();
         if (attributes != null){
             attributes.setGuid( nodeAttributesGuid );
             this.attributesManipulator.insert(attributes);

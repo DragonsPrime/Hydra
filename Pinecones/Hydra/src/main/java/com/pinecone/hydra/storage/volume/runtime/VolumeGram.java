@@ -4,6 +4,7 @@ import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Semaphore;
 
 public interface VolumeGram extends Processum {
@@ -24,4 +25,12 @@ public interface VolumeGram extends Processum {
 
     int getCurrentBufferInJobCode();
     void setCurrentBufferInJobCode( int currentBufferInJobCode );
+
+    CompletableFuture<Object> getMajorJobFuture();
+
+    void majorJobCountDown();
+
+    void setMajorJobCountDownNum( int num );
+
+    void majorJobCountDownLatchWait();
 }

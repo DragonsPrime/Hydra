@@ -56,7 +56,7 @@ public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
 
         int index = 0;
         for( LogicVolume volume : volumes ){
-            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob( this.entity, this.fileChannel, volumes.size(), index, volume, sqLiteExecutor, 0, this.entity.getReceiveStorageObject().getSize() );
+            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob(masterVolumeGram, this.entity, this.fileChannel, volumes.size(), index, volume, sqLiteExecutor, 0, this.entity.getReceiveStorageObject().getSize() );
             LocalStripedTaskThread taskThread = new LocalStripedTaskThread(  this.stripedVolume.getName() + index, masterVolumeGram, receiverJob );
             masterVolumeGram.getTaskManager().add( taskThread );
             taskThread.start();
@@ -79,7 +79,7 @@ public class TitanStripedChannelReceiver64 implements StripedChannelReceiver64{
 
         int index = 0;
         for( LogicVolume volume : volumes ){
-            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob( this.entity, this.fileChannel, volumes.size(), index, volume, sqLiteExecutor, offset, offset.longValue()+endSize.longValue() );
+            TitanStripReceiverJob receiverJob = new TitanStripReceiverJob(masterVolumeGram, this.entity, this.fileChannel, volumes.size(), index, volume, sqLiteExecutor, offset, offset.longValue()+endSize.longValue() );
             LocalStripedTaskThread taskThread = new LocalStripedTaskThread(  this.stripedVolume.getName() + index, masterVolumeGram, receiverJob );
             masterVolumeGram.getTaskManager().add( taskThread );
             taskThread.start();

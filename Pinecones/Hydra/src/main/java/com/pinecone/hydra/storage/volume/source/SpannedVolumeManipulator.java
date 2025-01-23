@@ -16,4 +16,6 @@ public interface SpannedVolumeManipulator extends LogicVolumeManipulator {
     List<GUID> listPhysicalVolume(GUID logicGuid );
 
     List<Volume> queryAllSpannedVolume();
+
+    void updateDefinitionCapacity( GUID guid, long definitionCapacity );
 }

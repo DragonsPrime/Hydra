@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.framework.system.construction.UnifyStructureInjector;
+import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.system.homotype.StereotypicInjector;
 import com.pinecone.hydra.entity.ibatis.GUID72TypeHandler;
 import com.pinecone.hydra.entity.ibatis.GUIDTypeHandler;
@@ -13,11 +14,12 @@ import com.pinecone.hydra.system.Hydrarum;
 import com.pinecone.hydra.system.component.ResourceDispenserCenter;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.slime.jelly.source.ibatis.ProxySessionMapperPool;
-import com.pinecone.slime.jelly.source.ibatis.SoloSessionMapperPool;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
 
 public abstract class ArchMappingDriver implements KOIMappingDriver {
     protected Hydrarum             mSystem;
+
+    protected Processum            mSuperiorProcess;
 
     protected IbatisClient         mIbatisClient;
 
@@ -27,13 +29,20 @@ public abstract class ArchMappingDriver implements KOIMappingDriver {
 
     protected ResourceDispenserCenter mResourceDispenserCenter;
 
-    public ArchMappingDriver( Hydrarum system ) {
-        this.mSystem = system;
+    public ArchMappingDriver( Processum superiorProcess ) {
+        this.mSuperiorProcess                 = superiorProcess;
+        if ( this.mSuperiorProcess instanceof Hydrarum ) {
+            this.mSystem                      = (Hydrarum) this.mSuperiorProcess;
+        }
+        else {
+            this.mSystem                      = (Hydrarum) superiorProcess.getSystem();
+        }
     }
 
     // Temp , TODO
-    public ArchMappingDriver( Hydrarum system, IbatisClient ibatisClient, ResourceDispenserCenter dispenserCenter, String szPackageName ) {
-        this.mSystem       = system;
+    public ArchMappingDriver( Processum superiorProcess, IbatisClient ibatisClient, ResourceDispenserCenter dispenserCenter, String szPackageName ) {
+        this( superiorProcess );
+
         this.mIbatisClient = ibatisClient;
         //this.mSqlSession   = ibatisClient.openSession( true );
 
@@ -76,5 +85,10 @@ public abstract class ArchMappingDriver implements KOIMappingDriver {
     @Override
     public Hydrarum getSystem() {
         return this.mSystem;
+    }
+
+    @Override
+    public Processum getSuperiorProcess() {
+        return this.mSuperiorProcess;
     }
 }
