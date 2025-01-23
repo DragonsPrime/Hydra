@@ -103,7 +103,7 @@ public class IndexableMapQuerier<K, V > implements AlterableCacher<V > {
 
     @Override
     public V insert( Object key, V value, long expire, TimeUnit unit ) {
-        this.insert( key, value, unit.toHours( expire ) );
+        this.insert( key, value, unit.toMillis( expire ) );
         return value;
     }
 
