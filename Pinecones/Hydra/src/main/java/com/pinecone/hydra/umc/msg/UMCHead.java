@@ -2,19 +2,12 @@ package com.pinecone.hydra.umc.msg;
 
 import java.util.Map;
 
-import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 
-public interface UMCHead extends Pinenut {
+public interface UMCHead extends EMCHead {
     ExtraHeadCoder getExtraHeadCoder();
 
-    String          getSignature();
-
-    int             getSignatureLength();
-
     UMCMethod       getMethod();
-
-    int             getExtraHeadLength();
 
     long            getBodyLength();
 
@@ -43,6 +36,8 @@ public interface UMCHead extends Pinenut {
     void putExHeaderVal( String key, Object val ) throws IllegalArgumentException;
 
 
+
+
     void setKeepAlive     ( long nKeepAlive        );
 
     void setControlBits   ( long controlBits       );
@@ -52,6 +47,9 @@ public interface UMCHead extends Pinenut {
     void setIdentityId    ( long identityId        );
 
     void setStatus        ( Status status          );
+
+
+
 
 
     void release();

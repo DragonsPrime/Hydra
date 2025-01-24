@@ -1,11 +1,10 @@
-package com.pinecone.hydra.umq;
+package com.pinecone.hydra.umb;
 
 import java.nio.ByteOrder;
 import java.util.Map;
 
 import com.pinecone.framework.system.prototype.ObjectiveBean;
 import com.pinecone.framework.unit.KeyValue;
-import com.pinecone.framework.unit.LinkedTreeMap;
 import com.pinecone.framework.util.ReflectionUtils;
 import com.pinecone.framework.util.json.JSON;
 import com.pinecone.framework.util.json.JSONEncoder;
@@ -14,35 +13,50 @@ import com.pinecone.hydra.umc.msg.AbstractUMCHead;
 import com.pinecone.hydra.umc.msg.ExtraEncode;
 import com.pinecone.hydra.umc.msg.Status;
 import com.pinecone.hydra.umc.msg.UMCHead;
-import com.pinecone.hydra.umc.msg.UMCHeadV1;
 import com.pinecone.hydra.umc.msg.UMCMethod;
 import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 
-public class UMCHeadMQ extends AbstractUMCHead implements UMCHead {
+/**
+ *  Pinecone Ursus For Java UMB [ Uniform Message Broadcast Control Transmit - Package ]
+ *  Author: Harold.E / JH.W (DragonKing)
+ *  Copyright © 2008 - 2028 Bean Nuts Foundation All rights reserved.
+ *  **********************************************************
+ *  Uniform Message Control Transmit Protocol - Broadcast Package [UMC-T-BP]
+ *  统一消息广播控制传输协议-小包分协议
+ *  For: Simplified Message Small-Package [最小压缩邮政小包]
+ *  **********************************************************
+ *  According to MQ traits, in practice, if a message is received, its status should be 'OK' in principle.
+ *  根据MQ特性，实践中，若收到消息状态码原则上就应该是 `OK`
+ *  **********************************************************
+ */
+public class UMBPHeadV1 extends AbstractUMCHead implements UMBHead {
     public static final String     ProtocolVersion   = "1.1";
-    public static final String     ProtocolSignature = "UMC/" + UMCHeadV1.ProtocolVersion;
-    public static final int        StructBlockSize   = Byte.BYTES + Integer.BYTES + Long.BYTES + Long.BYTES + Short.BYTES + Byte.BYTES + Long.BYTES + Long.BYTES + Long.BYTES;
-    public static final int        HeadBlockSize     = UMCHeadV1.ProtocolSignature.length() + UMCHeadV1.StructBlockSize;
+    public static final String     ProtocolSignature = "UMC-BP/" + UMBPHeadV1.ProtocolVersion;
+    public static final int        StructBlockSize   = Integer.BYTES + Byte.BYTES;
+    public static final int        HeadBlockSize     = UMBPHeadV1.ProtocolSignature.length() + UMBPHeadV1.StructBlockSize;
     public static final ByteOrder  BinByteOrder      = ByteOrder.LITTLE_ENDIAN ;// Using x86, C/C++
 
-    protected String                 szSignature                                ;
-    protected UMCMethod              method                                     ; // sizeof( UMCMethod/byte ) = 1
-    protected int                    nExtraHeadLength  = 2                      ; // sizeof( int32 ) = 4
-    protected long                   nBodyLength       = 0                      ; // sizeof( int64 ) = 8
-    protected long                   nKeepAlive        = -1                     ; // sizeof( int64 ) = 8, [-1 for forever, 0 for off, others for millis]
-    protected Status                 status            = Status.OK              ; // sizeof( Status/Short ) = 2
-    protected ExtraEncode            extraEncode       = ExtraEncode.Undefined  ; // sizeof( ExtraEncode/byte ) = 1
-    protected long                   controlBits                                ; // sizeof( int64 ) = 8, Custom control bytes.
-    protected long                   sessionId         = 0                      ; // sizeof( int64 ) = 8
-    protected long                   identityId        = 0                      ; // sizeof( int64 ) = 8, Client / Node ID
+    protected String                 szSignature                                ; // :0
+    protected int                    nExtraHeadLength  = 2                      ; // :1 sizeof( int32 ) = 4
+    protected ExtraEncode            extraEncode       = ExtraEncode.Undefined  ; // :2 sizeof( ExtraEncode/byte ) = 1
+
+//    protected long                   nBodyLength       = 0                      ; // :3 sizeof( int64 ) = 8
+//    protected long                   nKeepAlive        = -1                     ; // :4 sizeof( int64 ) = 8, [-1 for forever, 0 for off, others for millis]
+//    protected UMCMethod              method                                     ; // :5 sizeof( UMCMethod/byte ) = 1  | // Inform Only
+//    protected Status                 status            = Status.OK              ; // :6 sizeof( Status/Short ) = 2
+//    protected long                   controlBits                                ; // :7 sizeof( int64 ) = 8, Custom control bytes.
+//    protected long                   identityId        = 0                      ; // :9 sizeof( int64 ) = 8, Client / Node ID
+//    protected long                   sessionId         = 0                      ; // :8 sizeof( int64 ) = 8
+
     protected byte[]                 extraHead         = {}                     ;
     protected Object                 dyExtraHead                                ;
-
     protected ExtraHeadCoder         extraHeadCoder                             ;
 
 
-
-
+    @Override
+    public int sizeof() {
+        return UMBPHeadV1.HeadBlockSize;
+    }
 
     @Override
     protected void setSignature            ( String signature       ) {
@@ -51,20 +65,17 @@ public class UMCHeadMQ extends AbstractUMCHead implements UMCHead {
 
     @Override
     protected void setBodyLength           ( long length            ) {
-        this.nBodyLength = length;
+
     }
 
     @Override
     public void setKeepAlive     ( long nKeepAlive        ) {
-        this.nKeepAlive = nKeepAlive;
+
     }
 
     @Override
     protected void setMethod               ( UMCMethod umcMethod    ) {
-        this.method = umcMethod;
-        if ( this.method == UMCMethod.INFORM ) {
-            this.nBodyLength = 0;
-        }
+
     }
 
     @Override
@@ -76,17 +87,17 @@ public class UMCHeadMQ extends AbstractUMCHead implements UMCHead {
 
     @Override
     public void setControlBits   ( long controlBits       ) {
-        this.controlBits = controlBits;
+
     }
 
     @Override
     public void setSessionId     ( long sessionId         ) {
-        this.sessionId = sessionId;
+
     }
 
     @Override
     public void setIdentityId    ( long identityId        ) {
-        this.identityId = identityId;
+
     }
 
 
@@ -151,7 +162,7 @@ public class UMCHeadMQ extends AbstractUMCHead implements UMCHead {
 
     @Override
     public void            setStatus ( Status status ) {
-        this.status = status;
+
     }
 
     @Override
@@ -171,7 +182,7 @@ public class UMCHeadMQ extends AbstractUMCHead implements UMCHead {
 
     @Override
     public UMCMethod       getMethod() {
-        return this.method;
+        return UMCMethod.INFORM;
     }
 
     @Override
@@ -181,22 +192,22 @@ public class UMCHeadMQ extends AbstractUMCHead implements UMCHead {
 
     @Override
     public long            getBodyLength() {
-        return this.nBodyLength;
+        return 0L;
     }
 
     @Override
     public long            getKeepAlive() {
-        return this.nKeepAlive;
+        return -1L;
     }
 
     @Override
     public long            getSessionId() {
-        return this.sessionId;
+        return -1L;
     }
 
     @Override
     public Status          getStatus() {
-        return this.status;
+        return Status.OK;
     }
 
     @Override
@@ -206,12 +217,12 @@ public class UMCHeadMQ extends AbstractUMCHead implements UMCHead {
 
     @Override
     public long            getControlBits() {
-        return this.controlBits;
+        return 0;
     }
 
     @Override
     public long            getIdentityId() {
-        return this.identityId;
+        return 0;
     }
 
     @Override

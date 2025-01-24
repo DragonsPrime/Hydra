@@ -1,4 +1,4 @@
-package com.pinecone.hydra.umq;
+package com.pinecone.hydra.umb;
 
 import com.pinecone.hydra.system.Hydrarum;
 import com.rabbitmq.client.Channel;

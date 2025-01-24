@@ -16,23 +16,24 @@ import java.util.Map;
 public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
     public static final String     ProtocolVersion   = "1.1";
     public static final String     ProtocolSignature = "UMC/" + UMCHeadV1.ProtocolVersion;
-    public static final int        StructBlockSize   = Byte.BYTES + Integer.BYTES + Long.BYTES + Long.BYTES + Short.BYTES + Byte.BYTES + Long.BYTES + Long.BYTES + Long.BYTES;
+    public static final int        StructBlockSize   = Integer.BYTES + Byte.BYTES + Long.BYTES + Long.BYTES + Byte.BYTES + Short.BYTES + Long.BYTES + Long.BYTES + Long.BYTES;
     public static final int        HeadBlockSize     = UMCHeadV1.ProtocolSignature.length() + UMCHeadV1.StructBlockSize;
     public static final ByteOrder  BinByteOrder      = ByteOrder.LITTLE_ENDIAN ;// Using x86, C/C++
 
-    protected String                 szSignature                                ;
-    protected UMCMethod              method                                     ; // sizeof( UMCMethod/byte ) = 1
-    protected int                    nExtraHeadLength  = 2                      ; // sizeof( int32 ) = 4
-    protected long                   nBodyLength       = 0                      ; // sizeof( int64 ) = 8
-    protected long                   nKeepAlive        = -1                     ; // sizeof( int64 ) = 8, [-1 for forever, 0 for off, others for millis]
-    protected Status                 status            = Status.OK              ; // sizeof( Status/Short ) = 2
-    protected ExtraEncode            extraEncode       = ExtraEncode.Undefined  ; // sizeof( ExtraEncode/byte ) = 1
-    protected long                   controlBits                                ; // sizeof( int64 ) = 8, Custom control bytes.
-    protected long                   sessionId         = 0                      ; // sizeof( int64 ) = 8
-    protected long                   identityId        = 0                      ; // sizeof( int64 ) = 8, Client / Node ID
+    protected String                 szSignature                                ; // :0
+    protected int                    nExtraHeadLength  = 2                      ; // :1 sizeof( int32 ) = 4
+    protected ExtraEncode            extraEncode       = ExtraEncode.Undefined  ; // :2 sizeof( ExtraEncode/byte ) = 1
+
+    protected long                   nBodyLength       = 0                      ; // :3 sizeof( int64 ) = 8
+    protected long                   nKeepAlive        = -1                     ; // :4 sizeof( int64 ) = 8, [-1 for forever, 0 for off, others for millis]
+    protected UMCMethod              method                                     ; // :5 sizeof( UMCMethod/byte ) = 1
+    protected Status                 status            = Status.OK              ; // :6 sizeof( Status/Short ) = 2
+    protected long                   controlBits                                ; // :7 sizeof( int64 ) = 8, Custom control bytes.
+    protected long                   identityId        = 0                      ; // :9 sizeof( int64 ) = 8, Client / Node ID
+    protected long                   sessionId         = 0                      ; // :8 sizeof( int64 ) = 8
+
     protected byte[]                 extraHead         = {}                     ;
     protected Object                 dyExtraHead                                ;
-
     protected ExtraHeadCoder         extraHeadCoder                             ;
 
 
@@ -80,6 +81,11 @@ public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
     @Override
     protected void setBodyLength           ( long length            ) {
         this.nBodyLength = length;
+    }
+
+    @Override
+    public int sizeof() {
+        return UMCHeadV1.HeadBlockSize;
     }
 
     @Override

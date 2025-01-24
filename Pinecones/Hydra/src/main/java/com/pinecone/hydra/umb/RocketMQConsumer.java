@@ -1,4 +1,4 @@
-package com.pinecone.hydra.umq;
+package com.pinecone.hydra.umb;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;

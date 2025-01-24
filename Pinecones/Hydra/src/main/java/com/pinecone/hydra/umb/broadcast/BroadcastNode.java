@@ -1,4 +1,4 @@
-package com.pinecone.hydra.umct.broadcast;
+package com.pinecone.hydra.umb.broadcast;
 
 import com.pinecone.hydra.umct.UMCTNode;
 

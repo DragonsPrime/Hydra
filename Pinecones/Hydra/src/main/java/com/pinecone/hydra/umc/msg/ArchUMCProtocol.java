@@ -124,11 +124,13 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         //byteBuffer.put( (byte) ' ' );
         //++nBufLength;
 
-        byteBuffer.put( head.method.getByteValue() );
-        nBufLength += Byte.BYTES;
-
         byteBuffer.putInt( head.nExtraHeadLength );
         nBufLength += Integer.BYTES;
+
+        byteBuffer.put( head.extraEncode.getByteValue() );
+        nBufLength += Byte.BYTES;
+
+
 
         byteBuffer.putLong( head.nBodyLength );
         nBufLength += Long.BYTES;
@@ -136,20 +138,24 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         byteBuffer.putLong( head.nKeepAlive );
         nBufLength += Long.BYTES;
 
+        byteBuffer.put( head.method.getByteValue() );
+        nBufLength += Byte.BYTES;
+
         byteBuffer.putShort( head.status.getShortValue() );
         nBufLength += Short.BYTES;
 
-        byteBuffer.put( head.extraEncode.getByteValue() );
-        nBufLength += Byte.BYTES;
+
 
         byteBuffer.putLong( head.controlBits );
+        nBufLength += Long.BYTES;
+
+        byteBuffer.putLong( head.identityId );
         nBufLength += Long.BYTES;
 
         byteBuffer.putLong( head.sessionId );
         nBufLength += Long.BYTES;
 
-        byteBuffer.putLong( head.identityId );
-        nBufLength += Long.BYTES;
+
 
         if( head.extraHead == null ) {
             byteBuffer.put( Bytes.Empty );
@@ -211,11 +217,14 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         head.applyExtraHeadCoder( extraHeadCoder );
         //nReadAt++; // For ' '
 
-        head.method            = UMCMethod.values()[ buf[nReadAt] ];
-        nReadAt += Byte.BYTES;
 
         head.nExtraHeadLength  = ByteBuffer.wrap( buf, nReadAt, Integer.BYTES ).order( UMCHeadV1.BinByteOrder ).getInt();
         nReadAt += Integer.BYTES;
+
+        head.extraEncode       = ExtraEncode.asValue( ByteBuffer.wrap( buf, nReadAt, Byte.BYTES ).order( UMCHeadV1.BinByteOrder ).get() );
+        nReadAt += Byte.BYTES;
+
+
 
         head.nBodyLength       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
         nReadAt += Long.BYTES;
@@ -223,19 +232,19 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         head.nKeepAlive       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
         nReadAt += Long.BYTES;
 
+        head.method            = UMCMethod.values()[ buf[nReadAt] ];
+        nReadAt += Byte.BYTES;
+
         head.status            = Status.asValue( ByteBuffer.wrap( buf, nReadAt, Short.BYTES ).order( UMCHeadV1.BinByteOrder ).getShort() );
         nReadAt += Short.BYTES;
-
-        head.extraEncode       = ExtraEncode.asValue( ByteBuffer.wrap( buf, nReadAt, Byte.BYTES ).order( UMCHeadV1.BinByteOrder ).get() );
-        nReadAt += Byte.BYTES;
 
         head.controlBits      = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
         nReadAt += Long.BYTES;
 
-        head.sessionId        = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
+        head.identityId       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
         nReadAt += Long.BYTES;
 
-        head.identityId       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
+        head.sessionId        = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
         nReadAt += Long.BYTES;
 
         return head;

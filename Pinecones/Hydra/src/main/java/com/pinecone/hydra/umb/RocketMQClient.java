@@ -1,7 +1,7 @@
-package com.pinecone.hydra.umq;
+package com.pinecone.hydra.umb;
 
 import com.pinecone.framework.system.prototype.Pinenut;
-import com.pinecone.framework.util.Debug;
+
 import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
