@@ -13,6 +13,7 @@ import com.pinecone.hydra.umc.msg.AbstractUMCHead;
 import com.pinecone.hydra.umc.msg.ExtraEncode;
 import com.pinecone.hydra.umc.msg.Status;
 import com.pinecone.hydra.umc.msg.UMCHead;
+import com.pinecone.hydra.umc.msg.UMCHeadV1;
 import com.pinecone.hydra.umc.msg.UMCMethod;
 import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 
@@ -34,19 +35,12 @@ public class UMBPHeadV1 extends AbstractUMCHead implements UMBHead {
     public static final String     ProtocolSignature = "UMC-BP/" + UMBPHeadV1.ProtocolVersion;
     public static final int        StructBlockSize   = Integer.BYTES + Byte.BYTES;
     public static final int        HeadBlockSize     = UMBPHeadV1.ProtocolSignature.length() + UMBPHeadV1.StructBlockSize;
-    public static final ByteOrder  BinByteOrder      = ByteOrder.LITTLE_ENDIAN ;// Using x86, C/C++
+    public static final ByteOrder  BinByteOrder      = UMCHeadV1.BinByteOrder;
+    public static final int        HeadFieldsSize    = 3;
 
     protected String                 szSignature                                ; // :0
     protected int                    nExtraHeadLength  = 2                      ; // :1 sizeof( int32 ) = 4
     protected ExtraEncode            extraEncode       = ExtraEncode.Undefined  ; // :2 sizeof( ExtraEncode/byte ) = 1
-
-//    protected long                   nBodyLength       = 0                      ; // :3 sizeof( int64 ) = 8
-//    protected long                   nKeepAlive        = -1                     ; // :4 sizeof( int64 ) = 8, [-1 for forever, 0 for off, others for millis]
-//    protected UMCMethod              method                                     ; // :5 sizeof( UMCMethod/byte ) = 1  | // Inform Only
-//    protected Status                 status            = Status.OK              ; // :6 sizeof( Status/Short ) = 2
-//    protected long                   controlBits                                ; // :7 sizeof( int64 ) = 8, Custom control bytes.
-//    protected long                   identityId        = 0                      ; // :9 sizeof( int64 ) = 8, Client / Node ID
-//    protected long                   sessionId         = 0                      ; // :8 sizeof( int64 ) = 8
 
     protected byte[]                 extraHead         = {}                     ;
     protected Object                 dyExtraHead                                ;
@@ -57,6 +51,14 @@ public class UMBPHeadV1 extends AbstractUMCHead implements UMBHead {
     public int sizeof() {
         return UMBPHeadV1.HeadBlockSize;
     }
+
+
+    @Override
+    public int fieldsSize() {
+        return UMBPHeadV1.HeadFieldsSize;
+    }
+
+
 
     @Override
     protected void setSignature            ( String signature       ) {
@@ -273,6 +275,7 @@ public class UMBPHeadV1 extends AbstractUMCHead implements UMBHead {
         }
     }
 
+    @Override
     protected UMCHead applyExHead( Map<String, Object > jo      ) {
         if( !( this.dyExtraHead instanceof Map ) ) {
             throw new IllegalArgumentException( "Current extra headed is not dynamic." );
@@ -302,35 +305,5 @@ public class UMBPHeadV1 extends AbstractUMCHead implements UMBHead {
     public void release() {
         // Help GC
         this.dyExtraHead = null;
-    }
-
-    @Override
-    public String toString() {
-        return this.toJSONString();
-    }
-
-    @Override
-    public String toJSONString() {
-        Map<String, Object > joExtraHead = this.getMapExtraHead();
-        String szExtraHead;
-        if( joExtraHead == null ) {
-            szExtraHead = "[object Object]";
-        }
-        else {
-            szExtraHead = JSON.stringify( this.getMapExtraHead() );
-        }
-        return JSONEncoder.stringifyMapFormat( new KeyValue[]{
-                new KeyValue<>( "Signature"      , this.getSignature()                                             ),
-                new KeyValue<>( "Method"         , this.getMethod()                                                ),
-                new KeyValue<>( "ExtraHeadLength", this.getExtraHeadLength()                                       ),
-                new KeyValue<>( "BodyLength"     , this.getBodyLength()                                            ),
-                new KeyValue<>( "KeepAlive"      , this.getKeepAlive()                                             ),
-                new KeyValue<>( "Status"         , this.getStatus().getName()                                      ),
-                new KeyValue<>( "ExtraEncode"    , this.getExtraEncode().getName()                                 ),
-                new KeyValue<>( "ControlBits"    , "0x" + Long.toUnsignedString( this.getControlBits(),16 )  ),
-                new KeyValue<>( "SessionId"      , this.getSessionId()                                             ),
-                new KeyValue<>( "IdentityId"     , this.getIdentityId()                                            ),
-                new KeyValue<>( "ExtraHead"      , szExtraHead                                                     ),
-        } );
     }
 }

@@ -37,17 +37,15 @@ public interface UMCHead extends EMCHead {
 
 
 
+    void setStatus        ( Status status          );
 
     void setKeepAlive     ( long nKeepAlive        );
 
     void setControlBits   ( long controlBits       );
 
-    void setSessionId     ( long sessionId         );
-
     void setIdentityId    ( long identityId        );
 
-    void setStatus        ( Status status          );
-
+    void setSessionId     ( long sessionId         );
 
 
 

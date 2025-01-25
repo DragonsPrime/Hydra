@@ -19,6 +19,9 @@ public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
     public static final int        StructBlockSize   = Integer.BYTES + Byte.BYTES + Long.BYTES + Long.BYTES + Byte.BYTES + Short.BYTES + Long.BYTES + Long.BYTES + Long.BYTES;
     public static final int        HeadBlockSize     = UMCHeadV1.ProtocolSignature.length() + UMCHeadV1.StructBlockSize;
     public static final ByteOrder  BinByteOrder      = ByteOrder.LITTLE_ENDIAN ;// Using x86, C/C++
+    public static final int        HeadFieldsSize    = 10;
+    public static final int        ReadBufferSize    = 64;
+
 
     protected String                 szSignature                                ; // :0
     protected int                    nExtraHeadLength  = 2                      ; // :1 sizeof( int32 ) = 4
@@ -28,9 +31,9 @@ public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
     protected long                   nKeepAlive        = -1                     ; // :4 sizeof( int64 ) = 8, [-1 for forever, 0 for off, others for millis]
     protected UMCMethod              method                                     ; // :5 sizeof( UMCMethod/byte ) = 1
     protected Status                 status            = Status.OK              ; // :6 sizeof( Status/Short ) = 2
-    protected long                   controlBits                                ; // :7 sizeof( int64 ) = 8, Custom control bytes.
-    protected long                   identityId        = 0                      ; // :9 sizeof( int64 ) = 8, Client / Node ID
-    protected long                   sessionId         = 0                      ; // :8 sizeof( int64 ) = 8
+    protected long                   controlBits       = 0                      ; // :7 sizeof( int64 ) = 8, Custom control bytes.
+    protected long                   identityId        = 0                      ; // :8 sizeof( int64 ) = 8, Client / Node ID
+    protected long                   sessionId         = 0                      ; // :9 sizeof( int64 ) = 8
 
     protected byte[]                 extraHead         = {}                     ;
     protected Object                 dyExtraHead                                ;
@@ -61,7 +64,7 @@ public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
         this.szSignature       = szSignature;
         this.method            = umcMethod;
         this.dyExtraHead       = ex;
-        this.controlBits      = controlBits;
+        this.controlBits       = controlBits;
     }
 
     UMCHeadV1( String szSignature, UMCMethod umcMethod, Map<String,Object > joEx, long controlBits ) {
@@ -73,6 +76,19 @@ public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
     }
 
 
+
+    @Override
+    public int sizeof() {
+        return UMCHeadV1.HeadBlockSize;
+    }
+
+    @Override
+    public int fieldsSize() {
+        return UMCHeadV1.HeadFieldsSize;
+    }
+
+
+
     @Override
     protected void setSignature            ( String signature       ) {
         this.szSignature = signature;
@@ -81,11 +97,6 @@ public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
     @Override
     protected void setBodyLength           ( long length            ) {
         this.nBodyLength = length;
-    }
-
-    @Override
-    public int sizeof() {
-        return UMCHeadV1.HeadBlockSize;
     }
 
     @Override
@@ -114,14 +125,16 @@ public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
     }
 
     @Override
+    public void setIdentityId    ( long identityId        ) {
+        this.identityId = identityId;
+    }
+
+    @Override
     public void setSessionId     ( long sessionId         ) {
         this.sessionId = sessionId;
     }
 
-    @Override
-    public void setIdentityId    ( long identityId        ) {
-        this.identityId = identityId;
-    }
+
 
 
 
@@ -332,8 +345,7 @@ public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
         return this.toJSONString();
     }
 
-    @Override
-    public String toJSONString() {
+    protected String jsonifyExtraHead() {
         Map<String, Object > joExtraHead = this.getMapExtraHead();
         String szExtraHead;
         if( joExtraHead == null ) {
@@ -342,18 +354,27 @@ public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
         else {
             szExtraHead = JSON.stringify( this.getMapExtraHead() );
         }
+
+        return szExtraHead;
+    }
+
+    @Override
+    public String toJSONString() {
+        String szExtraHead = this.jsonifyExtraHead();
+
         return JSONEncoder.stringifyMapFormat( new KeyValue[]{
                 new KeyValue<>( "Signature"      , this.getSignature()                                             ),
-                new KeyValue<>( "Method"         , this.getMethod()                                                ),
                 new KeyValue<>( "ExtraHeadLength", this.getExtraHeadLength()                                       ),
+                new KeyValue<>( "ExtraEncode"    , this.getExtraEncode().getName()                                 ),
                 new KeyValue<>( "BodyLength"     , this.getBodyLength()                                            ),
                 new KeyValue<>( "KeepAlive"      , this.getKeepAlive()                                             ),
+                new KeyValue<>( "Method"         , this.getMethod()                                                ),
                 new KeyValue<>( "Status"         , this.getStatus().getName()                                      ),
-                new KeyValue<>( "ExtraEncode"    , this.getExtraEncode().getName()                                 ),
                 new KeyValue<>( "ControlBits"    , "0x" + Long.toUnsignedString( this.getControlBits(),16 )  ),
-                new KeyValue<>( "SessionId"      , this.getSessionId()                                             ),
                 new KeyValue<>( "IdentityId"     , this.getIdentityId()                                            ),
+                new KeyValue<>( "SessionId"      , this.getSessionId()                                             ),
                 new KeyValue<>( "ExtraHead"      , szExtraHead                                                     ),
         } );
     }
+
 }

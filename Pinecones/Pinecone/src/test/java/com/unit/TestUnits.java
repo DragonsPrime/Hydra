@@ -330,6 +330,18 @@ public class TestUnits {
     }
 
 
+    private static void testBitSet64(){
+        long i = 0b1110101110101110101010000010001111011000001010111011101110111010L ;
+        long k = 0 ;
+
+        for ( int j = 0; j < 64; ++j ) {
+            Debug.redf(BitSet64.toBinaryStringLSB(i));
+            Debug.greenfs(BitSet64.toBinaryStringLSB(BitSet64.reverse(i,0,j)));
+            Debug.hhf();
+        }
+    }
+
+
     public static void main( String[] args ) throws Exception {
         Pinecone.init( (Object...cfg )->{
 
@@ -340,7 +352,8 @@ public class TestUnits {
             //TestUnits.testMergeSharedList();
             //TestUnits.testTrieMap();
 
-            TestUnits.testConcurrentTrie();
+            //TestUnits.testConcurrentTrie();
+            TestUnits.testBitSet64();
 
             return 0;
         }, (Object[]) args );

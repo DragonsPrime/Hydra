@@ -30,5 +30,7 @@ public interface EMCHead extends Pinenut {
 
     int             sizeof();
 
+    int             fieldsSize(); // UMCHead (Non-Dynamic) Fields size.
+
     int             getExtraHeadLength();
 }

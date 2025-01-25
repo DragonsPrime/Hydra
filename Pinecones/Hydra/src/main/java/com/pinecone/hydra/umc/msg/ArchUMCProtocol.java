@@ -84,6 +84,7 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
     @Override
     public void setHead( UMCHead head ) {
         this.mHead = head;
+        this.mszSignature = head.getSignature();
     }
 
     @Override
@@ -116,7 +117,7 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         head.applyExtraHeadCoder( this.getExtraHeadCoder() );
         head.transApplyExHead();
 
-        ByteBuffer byteBuffer = ByteBuffer.allocate( 64 + head.getExtraHeadLength() );
+        ByteBuffer byteBuffer = ByteBuffer.allocate( UMCHeadV1.ReadBufferSize + head.getExtraHeadLength() );
         byteBuffer.order( UMCHeadV1.BinByteOrder );
 
         int nBufLength = head.getSignatureLength();

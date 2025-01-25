@@ -24,6 +24,8 @@
         <module>springram</module>
         <module>hydra-default-driver</module>
         <module>ulf-lib-construction</module>
+        <module>hydra-thrift-sdk</module>
+        <module>hydra-lib-uofs-cache</module>
     </modules>
 
     <dependencies>
