@@ -1,6 +1,13 @@
 package com.pinecone.hydra.thrift.server;
 
+import java.util.Map;
+
 public interface ThriftServer {
     void start();
-    void stop();
+
+    void close();
+
+    ServerConnectArguments getConnectionArguments();
+
+    ThriftServer apply( Map<String, Object> conf );
 }

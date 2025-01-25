@@ -1,5 +1,6 @@
 package com.thrift;
 
+import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.hydra.thrift.client.GenericMultiplexedThriftClient;
 import com.pinecone.hydra.thrift.client.GenericThriftClient;
 import com.pinecone.hydra.thrift.server.GenericThriftServer;
@@ -15,8 +16,11 @@ public class TestThriftService {
             HelloWorldService.Iface hello = new HelloWorldServiceImpl();
 //            GenericThriftServer<HelloWorldService.Processor<HelloWorldService.Iface>> server = new GenericThriftServer<>(new HelloWorldService.Processor<>(hello), 8001);
 //            server.start();
-            MultiplexedServer multiplexedServer = new MultiplexedServer(8001);
-            multiplexedServer.registerService( "Hello", new HelloWorldService.Processor<>(hello) );
+            MultiplexedServer multiplexedServer = new MultiplexedServer(
+                    new JSONMaptron("{host: \"0.0.0.0\",\n" +
+                    "port: 16701, SocketTimeout: 800, KeepAliveTimeout: 3600, MaximumConnections: 1e6}")
+            );
+            multiplexedServer.registerProcessor( new HelloWorldService.Processor<>(hello) );
             multiplexedServer.start();
         });
         thread.start();
@@ -27,8 +31,8 @@ public class TestThriftService {
 //        GenericThriftClient<HelloWorldService.Client> client = new GenericThriftClient<>("localhost", 8001, 30000, HelloWorldService.Client.class);
 //        HelloWorldService.Client clientClient = client.getClient();
 //        clientClient.sayHello("你好");
-        GenericMultiplexedThriftClient thriftClient = new GenericMultiplexedThriftClient("localhost", 8001);
-        HelloWorldService.Client hello = thriftClient.getClient("Hello", HelloWorldService.Client.class);
+        GenericMultiplexedThriftClient thriftClient = new GenericMultiplexedThriftClient("localhost", 16701);
+        HelloWorldService.Client hello = thriftClient.getClient("HelloWorldService", HelloWorldService.Client.class);
         hello.sayHello("你好");
     }
 }

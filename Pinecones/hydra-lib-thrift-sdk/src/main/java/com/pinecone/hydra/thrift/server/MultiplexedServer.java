@@ -1,5 +1,10 @@
 package com.pinecone.hydra.thrift.server;
 
+import com.pinecone.framework.system.ProxyProvokeHandleException;
+import com.pinecone.framework.util.StringUtils;
+import com.pinecone.framework.util.json.JSONMaptron;
+import com.pinecone.framework.util.json.JSONObject;
+import com.pinecone.framework.util.lang.DynamicFactory;
 import org.apache.thrift.TMultiplexedProcessor;
 import org.apache.thrift.TProcessor;
 import org.apache.thrift.protocol.TBinaryProtocol;
@@ -7,43 +12,117 @@ import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TSimpleServer;
 import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TTransportException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class MultiplexedServer implements ThriftServer{
-    private final TMultiplexedProcessor multiplexedProcessor;
-    private final int port;
+import java.lang.reflect.InvocationTargetException;
+import java.net.InetSocketAddress;
+import java.net.SocketAddress;
+import java.util.Map;
 
-    public MultiplexedServer(int port){
-        this.multiplexedProcessor = new TMultiplexedProcessor();
-        this.port = port;
+public class MultiplexedServer implements ThriftServer {
+
+    protected Logger logger = LoggerFactory.getLogger( MultiplexedServer.class );
+
+    protected JSONObject                  mjoSectionConf;
+
+    protected ServerConnectArguments      connectionArguments ;
+
+    protected InetSocketAddress           primaryBindAddress  ;
+
+    protected final TMultiplexedProcessor multiplexedProcessor;
+
+    protected TServer server;
+
+    public MultiplexedServer( Map<String, Object> conf ){
+        this( conf, null );
     }
 
-    public void registerService(String serviceName, TProcessor processor) {
-        multiplexedProcessor.registerProcessor(serviceName, processor);
+    public MultiplexedServer( Map<String, Object> conf, ServerConnectArguments arguments ){
+        this.multiplexedProcessor = new TMultiplexedProcessor();
+        this.mjoSectionConf       = MultiplexedServer.asConfig( conf );
+        this.connectionArguments  = arguments;
+
+        if ( this.connectionArguments == null ) {
+            this.connectionArguments = new ServerConnectionArguments( this.mjoSectionConf );
+        }
+    }
+
+    protected static JSONObject asConfig( Map<String, Object> joConf ) {
+        if( joConf instanceof JSONObject ) {
+            return (JSONObject) joConf;
+        }
+        else {
+            return new JSONMaptron( joConf, true );
+        }
+    }
+
+    @Override
+    public ThriftServer apply( Map<String, Object> conf ) {
+        this.mjoSectionConf = MultiplexedServer.asConfig( conf );
+        JSONObject joConf = this.getSectionConf();
+
+        this.connectionArguments = new ServerConnectionArguments( joConf );
+//        this.mChannelPool         = new PassiveRegisterChannelPool<>(
+//                this, new UlfIdleFirstBalanceStrategy(), joConf.optInt( "MaximumConnections", (int)1e7 )
+//        );
+
+        return this;
+    }
+
+
+    public void registerProcessor( TProcessor processor ) {
+        String name = processor.getClass().getName();
+        String[] parts = name.split("[.$]");
+        name = parts[parts.length - 2];
+
+        this.registerProcessor( name, processor );
+    }
+
+    public void registerProcessor( String serviceName, TProcessor processor ) {
+        this.multiplexedProcessor.registerProcessor( serviceName, processor );
     }
 
     @Override
     public void start() {
         try {
-            System.out.println("服务端开启....");
+            String szHost           = this.getConnectionArguments().getHost();
+            short  nPort            = this.getConnectionArguments().getPort();
+            if( StringUtils.isEmpty( szHost ) ) {
+                this.primaryBindAddress = new InetSocketAddress( nPort );
+            }
+            else {
+                this.primaryBindAddress = new InetSocketAddress( szHost, nPort );
+            }
 
-            // 创建服务传输层
-            TServerSocket serverTransport = new TServerSocket(port);
+            TServerSocket serverTransport = new TServerSocket( this.primaryBindAddress );
 
-            // 构造服务参数
             TSimpleServer.Args tArgs = new TSimpleServer.Args(serverTransport);
-            tArgs.processor(multiplexedProcessor); // 使用多路复用处理器
-            tArgs.protocolFactory(new TBinaryProtocol.Factory());
+            tArgs.processor( this.multiplexedProcessor );
+            tArgs.protocolFactory( new TBinaryProtocol.Factory() );
 
-            // 创建并启动服务
-            TServer server = new TSimpleServer(tArgs);
-            server.serve();
-        } catch (TTransportException e) {
+            this.server = new TSimpleServer(tArgs);
+            this.server.serve();
+
+
+        }
+        catch ( TTransportException e ) {
             e.printStackTrace();
         }
     }
 
+
+    public JSONObject getSectionConf() {
+        return this.mjoSectionConf;
+    }
+
     @Override
-    public void stop() {
+    public ServerConnectArguments getConnectionArguments() {
+        return this.connectionArguments;
+    }
+
+    @Override
+    public void close() {
 
     }
 }

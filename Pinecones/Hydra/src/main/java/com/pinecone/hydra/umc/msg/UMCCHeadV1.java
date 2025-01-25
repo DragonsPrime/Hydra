@@ -233,6 +233,12 @@ public class UMCCHeadV1 extends UMCHeadV1 implements UMCCHead {
     }
 
     @Override
+    public void onlySetExtraHead           ( Object o                 ) {
+        super.setExtraHead( o );
+        this.enableExtraHead();
+    }
+
+    @Override
     public void setExtraEncode             ( ExtraEncode encode      ) {
         super.setExtraEncode( encode );
         this.transApplyExHead();

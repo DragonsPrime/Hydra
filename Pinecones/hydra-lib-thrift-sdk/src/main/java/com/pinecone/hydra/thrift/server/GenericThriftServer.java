@@ -8,6 +8,8 @@ import org.apache.thrift.transport.TServerSocket;
 import org.apache.thrift.transport.TServerTransport;
 import org.apache.thrift.transport.TTransportException;
 
+import java.util.Map;
+
 public class GenericThriftServer <T extends TProcessor> implements ThriftServer{
     private final T processor;
     private final int port;
@@ -41,7 +43,17 @@ public class GenericThriftServer <T extends TProcessor> implements ThriftServer{
     }
 
     @Override
-    public void stop() {
+    public void close() {
 
+    }
+
+    @Override
+    public ServerConnectArguments getConnectionArguments() {
+        return null;
+    }
+
+    @Override
+    public ThriftServer apply( Map<String, Object> conf ) {
+        return null;
     }
 }

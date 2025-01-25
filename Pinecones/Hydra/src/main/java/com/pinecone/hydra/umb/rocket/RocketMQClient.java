@@ -2,63 +2,104 @@ package com.pinecone.hydra.umb.rocket;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 
+import com.pinecone.hydra.umb.broadcast.BroadcastConsumer;
+import com.pinecone.hydra.umb.broadcast.BroadcastProducer;
+import com.pinecone.hydra.umb.broadcast.UNT;
 import org.apache.rocketmq.client.exception.MQClientException;
-import org.apache.rocketmq.common.message.Message;
+import org.apache.rocketmq.client.producer.MQProducer;
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 
-public class RocketMQClient implements Pinenut {
+import java.util.HashSet;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
-    protected String pNameSrvAddr;
+public class RocketMQClient implements RocketClient {
+    protected Map<BroadcastProducer, Object> producerRegister;
 
-    protected Integer maxMessageSize ;
+    protected Map<BroadcastConsumer, Object> consumerRegister;
 
-    protected Integer sendMsgTimeout;
+    private static final Object PRESENT = new Object();
 
-    protected Integer retryTimesWhenSendFailed;
+    protected RocketConfig mRocketConfig;
 
-    protected String  groupName;
 
-    protected DefaultMQProducer mqProducer;
+    public RocketMQClient( String nameSrvAddr, String groupName ) {
+        this.mRocketConfig = new RocketMQConfig(
+                nameSrvAddr, groupName, 4096, 30000, 2
+        );
 
-    public RocketMQClient( String pNameSrvAddr, String groupName ){
-        this.pNameSrvAddr = pNameSrvAddr;
-        this.groupName = groupName;
-        this.maxMessageSize = 4096;
-        this.sendMsgTimeout = 30000;
-        this.retryTimesWhenSendFailed = 2;
-        this.mqProducer = this.getDefaultMQProducer();
+        this.producerRegister = new ConcurrentHashMap<>();
+        this.consumerRegister = new ConcurrentHashMap<>();
     }
 
-    public boolean sendMessage(String topic, String tags, String keys, byte[] body) throws MQClientException {
-        Message msg = new Message(topic, tags, keys, body);
-        try {
-            mqProducer.send(msg);
-            return true;
-        } catch (Exception e) {
-            System.out.println("Failed to send message: " + e.getMessage());
-            return false;
+    @Override
+    public RocketConfig getRocketConfig() {
+        return this.mRocketConfig;
+    }
+
+    @Override
+    public void close() {
+        for( Map.Entry<BroadcastConsumer, Object> kv : this.consumerRegister.entrySet() ) {
+            kv.getKey().close();
         }
+
+        for( Map.Entry<BroadcastProducer, Object> kv : this.producerRegister.entrySet() ) {
+            kv.getKey().close();
+        }
+
+        this.consumerRegister.clear();
+        this.producerRegister.clear();
     }
 
 
-    public void shutdown() {
-        if (mqProducer != null) {
-            mqProducer.shutdown();
-        }
+    @Override
+    public void register( BroadcastProducer producer ) {
+        this.producerRegister.put( producer, PRESENT );
     }
 
-    private DefaultMQProducer getDefaultMQProducer() {
-        DefaultMQProducer producer = new DefaultMQProducer(this.groupName);
-        producer.setNamesrvAddr(this.pNameSrvAddr);
-        producer.setMaxMessageSize(this.maxMessageSize);
-        producer.setSendMsgTimeout(this.sendMsgTimeout);
-        producer.setRetryTimesWhenSendFailed(this.retryTimesWhenSendFailed);
-        try {
-            producer.start();
-        } catch (MQClientException e) {
-            System.out.println(e.getErrorMessage());
-        }
+    @Override
+    public void register( BroadcastConsumer consumer ) {
+        this.consumerRegister.put( consumer, PRESENT );
+    }
+
+    @Override
+    public void deregister( BroadcastProducer producer ) {
+        this.producerRegister.remove( producer );
+    }
+
+    @Override
+    public void deregister( BroadcastConsumer consumer ) {
+        this.consumerRegister.remove( consumer );
+    }
+
+
+    public BroadcastProducer createProducer( Supplier<DefaultMQProducer> producerSupplier ) {
+        BroadcastProducer producer = new UlfBroadcastProducer( this, producerSupplier );
+        this.register( producer );
         return producer;
+    }
+
+    @Override
+    public BroadcastProducer createProducer() {
+        return this.createProducer( DefaultMQProducer::new );
+    }
+
+    @Override
+    public BroadcastConsumer createConsumer( String topic, String ns ) {
+        BroadcastConsumer consumer = new UlfPushConsumer( this, topic, ns );
+        this.register( consumer );
+        return consumer;
+    }
+
+    @Override
+    public BroadcastConsumer createConsumer( String topic ) {
+        return this.createConsumer( topic, "" );
+    }
+
+    @Override
+    public BroadcastConsumer createConsumer( UNT unt ) {
+        return this.createConsumer( unt.getTopic(), unt.getNamespace() );
     }
 
 }

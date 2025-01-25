@@ -2,7 +2,9 @@ package com.pinecone.hydra.umct;
 
 import com.pinecone.framework.system.prototype.Pinenut;
 
-public class ServiceException extends Exception implements Pinenut {
+import java.io.IOException;
+
+public class ServiceException extends IOException implements Pinenut {
     public ServiceException() {
         super();
     }
