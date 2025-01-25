@@ -7,6 +7,7 @@ import com.pinecone.hydra.system.component.ResourceDispenserCenter;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOIMasterManipulator;
 import com.pinecone.slime.jelly.source.ibatis.IbatisClient;
+import com.pinecone.ulf.util.guid.GUIDs;
 
 public class UserMappingDriver extends ArchMappingDriver implements KOIMappingDriver {
     protected KOIMasterManipulator mKOIMasterManipulator;

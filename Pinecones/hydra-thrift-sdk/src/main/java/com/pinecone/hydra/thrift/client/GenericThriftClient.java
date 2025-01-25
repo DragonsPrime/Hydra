@@ -1,41 +1,52 @@
 package com.pinecone.hydra.thrift.client;
 
+import org.apache.thrift.TException;
+import org.apache.thrift.TServiceClient;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.protocol.TProtocol;
+import org.apache.thrift.protocol.TProtocolFactory;
 import org.apache.thrift.transport.TSocket;
 import org.apache.thrift.transport.TTransport;
 
-public class GenericThriftClient<T> implements ThriftClient<T> {
-    private final String host;
-    private final int port;
-    private final Class<T> clientClass;
-    private TTransport transport;
-    private T client;
+public class GenericThriftClient<T extends TServiceClient> implements ThriftClient<T> {
+    private String          host;
 
-    public GenericThriftClient(String host, int port, Class<T> clientClass) {
+    private int             port;
+
+    private int             outTime;
+
+    private TTransport      transport;
+
+    private T               client;
+
+
+    public GenericThriftClient( String host, int port, int outTime, Class<T> clientClass ){
         this.host = host;
         this.port = port;
-        this.clientClass = clientClass;
+        this.outTime = outTime;
+        try {
+            // 创建传输层和协议
+            this.transport = new TSocket(this.host, this.port, this.outTime);
+            TProtocol protocol = new TBinaryProtocol(this.transport);
+
+            // 使用反射创建客户端实例
+            this.client = clientClass.getConstructor(TProtocol.class).newInstance(protocol);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize the client", e);
+        }
     }
 
     @Override
-    public T getClient() {
-        if (client == null) {
-            try {
-                transport = new TSocket(host, port);
-                transport.open();
-                TProtocol protocol = new TBinaryProtocol(transport);
-                client = clientClass.getConstructor(TProtocol.class).newInstance(protocol);
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to create Thrift client", e);
-            }
+    public T getClient() throws TException {
+        if (!transport.isOpen()) {
+            transport.open();
         }
         return client;
     }
 
     @Override
     public void close() {
-        if (transport != null) {
+        if (transport != null && transport.isOpen()) {
             transport.close();
         }
     }

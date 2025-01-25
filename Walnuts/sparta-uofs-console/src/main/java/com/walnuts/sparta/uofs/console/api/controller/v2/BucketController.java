@@ -49,7 +49,6 @@ public class BucketController {
     private UniformVolumeManager primaryVolume;
 
 
-
     /**
      * 创建bucket
      * @param bucketName 桶名
