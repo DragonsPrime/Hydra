@@ -18,6 +18,9 @@
         <module>sparta</module>
         <module>sparta-console</module>
         <module>sparta-uofs-service</module>
+        <module>sparta-uofs-console</module>
+        <module>sparta-uac-console</module>
+        <module>sparta-api-uac</module>
     </modules>
 
 

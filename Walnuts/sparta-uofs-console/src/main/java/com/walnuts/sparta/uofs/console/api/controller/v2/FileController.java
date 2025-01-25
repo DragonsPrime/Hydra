@@ -4,6 +4,8 @@ import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.ulf.util.guid.GUIDs;
 import com.walnuts.sparta.uofs.console.api.response.BasicResultResponse;
+import com.walnuts.sparta.uofs.console.rpc.thrift.AccountClient;
+import org.apache.thrift.TException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +21,9 @@ import javax.annotation.Resource;
 public class FileController {
     @Resource
     private KOMFileSystem primaryFileSystem;
+
+    @Resource
+    AccountClient accountClient;
 
     /**
      * 创建文件
@@ -53,4 +58,8 @@ public class FileController {
         return BasicResultResponse.success();
     }
 
+    @GetMapping("/queryByPath")
+    public String queryNodeByPath(@RequestParam("path") String path) throws TException {
+        return this.accountClient.queryNodeByPath(path);
+    }
 }
