@@ -1,5 +1,7 @@
 package com.pinecone.hydra.umc.msg;
 
+import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.Map;
 
 import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
@@ -54,5 +56,28 @@ public interface UMCHead extends EMCHead {
 
     default AbstractUMCHead inface() {
         return (AbstractUMCHead) this;
+    }
+
+
+
+
+    class EncodePair {
+        public final ByteBuffer byteBuffer;
+        public final int        bufLength;
+
+        public EncodePair( ByteBuffer byteBuffer, int bufLength ) {
+            this.byteBuffer = byteBuffer;
+            this.bufLength  = bufLength;
+        }
+
+        public byte[] getBytes() {
+            return Arrays.copyOfRange( this.byteBuffer.array(), 0, this.bufLength );
+        }
+    }
+
+    EncodePair bytesEncode( ExtraHeadCoder extraHeadCoder ) ;
+
+    default EncodePair bytesEncode() {
+        return this.bytesEncode( this.getExtraHeadCoder() );
     }
 }

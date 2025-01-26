@@ -39,7 +39,6 @@ public class TestUMCC {
 
             TestUMCC.testUMCC();
 
-
             return 0;
         }, (Object[]) args );
     }

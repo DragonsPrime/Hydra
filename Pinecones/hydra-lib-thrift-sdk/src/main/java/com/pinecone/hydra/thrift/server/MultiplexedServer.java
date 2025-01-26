@@ -104,7 +104,7 @@ public class MultiplexedServer implements ThriftServer {
             this.server = new TSimpleServer(tArgs);
             this.server.serve();
 
-
+            this.logger.info( "ThriftServer started at " + this.primaryBindAddress );
         }
         catch ( TTransportException e ) {
             e.printStackTrace();

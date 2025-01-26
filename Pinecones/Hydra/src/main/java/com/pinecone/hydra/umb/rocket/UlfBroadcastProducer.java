@@ -54,6 +54,10 @@ public class UlfBroadcastProducer implements BroadcastProducer {
     }
 
 
+    public RocketClient getRocketClient() {
+        return this.mRocketClient;
+    }
+
     @Override
     public void sendMessage( String topic, String ns, String name, byte[] body ) throws UMBClientException {
         Message msg = new Message( topic, ns, name, body );

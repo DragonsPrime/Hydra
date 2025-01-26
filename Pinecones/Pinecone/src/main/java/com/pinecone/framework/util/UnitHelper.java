@@ -98,4 +98,34 @@ public final class UnitHelper {
 
         return newArray;
     }
+
+
+
+    public static Object mergeArr( Object... arrays ) {
+        return UnitHelper.mergeArrays( arrays );
+    }
+
+    public static Object mergeArrays( Object[] arrays ) {
+        if ( arrays == null || arrays.length == 0 ) {
+            throw new IllegalArgumentException("Input arrays cannot be null or empty.");
+        }
+
+        Class<?> componentType = arrays[ 0 ].getClass().getComponentType();
+        int totalLength = 0;
+
+        for ( Object array : arrays ) {
+            totalLength += Array.getLength(array);
+        }
+
+        Object result = Array.newInstance( componentType, totalLength );
+
+        int currentIndex = 0;
+        for ( Object array : arrays ) {
+            int length = Array.getLength(array);
+            System.arraycopy( array, 0, result, currentIndex, length );
+            currentIndex += length;
+        }
+
+        return result;
+    }
 }

@@ -28,6 +28,8 @@ public class UMCCHeadV1 extends UMCHeadV1 implements UMCCHead {
 
     public static final int        BitmapAt          = 1;
 
+    public static final int        BitmapBytes       = Long.BYTES;
+
     protected long                 fieldIndexBitmap                           ; // :1 sizeof( int64 ) = 8, Field index-control bitmap.
 
 
@@ -114,7 +116,7 @@ public class UMCCHeadV1 extends UMCHeadV1 implements UMCCHead {
 
     @Override
     public int sizeof() {
-        int totalSize = 0;
+        int totalSize = BitmapBytes;
 
         for ( int i = 0; i < UMCHeadV1.HeadFieldsSize; ++i ) {
             if ( ( this.fieldIndexBitmap & (1L << i) ) != 0 ) {
@@ -217,23 +219,17 @@ public class UMCCHeadV1 extends UMCHeadV1 implements UMCCHead {
     @Override
     public void setExtraHead               ( JSONObject jo           ) {
         super.setExtraHead( jo );
-        this.transApplyExHead();
+        this.enableExtraHead();
     }
 
     @Override
     public void setExtraHead               ( Map<String,Object > jo  ) {
         super.setExtraHead( jo );
-        this.transApplyExHead();
+        this.enableExtraHead();
     }
 
     @Override
     public void setExtraHead               ( Object o                ) {
-        super.setExtraHead( o );
-        this.transApplyExHead();
-    }
-
-    @Override
-    public void onlySetExtraHead           ( Object o                 ) {
         super.setExtraHead( o );
         this.enableExtraHead();
     }
@@ -341,6 +337,11 @@ public class UMCCHeadV1 extends UMCHeadV1 implements UMCCHead {
         } );
     }
 
+    @Override
+    public EncodePair bytesEncode( ExtraHeadCoder extraHeadCoder ) {
+        return UMCCHeadV1.encode( this, extraHeadCoder );
+    }
+
     public static class HeadField {
         public final String name;
 
@@ -355,15 +356,6 @@ public class UMCCHeadV1 extends UMCHeadV1 implements UMCCHead {
         }
     }
 
-    public static class EncodePair {
-        public final ByteBuffer byteBuffer;
-        public final int        bufLength;
-
-        EncodePair( ByteBuffer byteBuffer, int bufLength ) {
-            this.byteBuffer = byteBuffer;
-            this.bufLength  = bufLength;
-        }
-    }
 
     public static EncodePair encode( UMCCHead umcHead, ExtraHeadCoder extraHeadCoder ) {
         UMCCHeadV1 head = (UMCCHeadV1) umcHead;
@@ -449,9 +441,7 @@ public class UMCCHeadV1 extends UMCHeadV1 implements UMCCHead {
     }
 
     public static UMCCHead decode( byte[] buf, String szSignature, ExtraHeadCoder extraHeadCoder ) throws IOException {
-        int nBufSize = szSignature.length() + UMCHeadV1.StructBlockSize;
-
-        if ( buf.length < nBufSize ) {
+        if ( buf.length < szSignature.length() ) { // Signature size is minimum.
             throw new StreamTerminateException( "StreamEndException:[UMC-CProtocol] Stream is ended." );
         }
 

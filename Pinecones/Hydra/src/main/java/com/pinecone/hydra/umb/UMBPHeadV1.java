@@ -1,17 +1,22 @@
 package com.pinecone.hydra.umb;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.Map;
 
 import com.pinecone.framework.system.prototype.ObjectiveBean;
-import com.pinecone.framework.unit.KeyValue;
+import com.pinecone.framework.unit.LinkedTreeMap;
+import com.pinecone.framework.util.Bytes;
 import com.pinecone.framework.util.ReflectionUtils;
-import com.pinecone.framework.util.json.JSON;
-import com.pinecone.framework.util.json.JSONEncoder;
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.umc.msg.AbstractUMCHead;
+import com.pinecone.hydra.umc.msg.ArchUMCProtocol;
 import com.pinecone.hydra.umc.msg.ExtraEncode;
 import com.pinecone.hydra.umc.msg.Status;
+import com.pinecone.hydra.umc.msg.StreamTerminateException;
+import com.pinecone.hydra.umc.msg.UMCCHeadV1;
 import com.pinecone.hydra.umc.msg.UMCHead;
 import com.pinecone.hydra.umc.msg.UMCHeadV1;
 import com.pinecone.hydra.umc.msg.UMCMethod;
@@ -45,6 +50,12 @@ public class UMBPHeadV1 extends AbstractUMCHead implements UMBHead {
     protected byte[]                 extraHead         = {}                     ;
     protected Object                 dyExtraHead                                ;
     protected ExtraHeadCoder         extraHeadCoder                             ;
+
+
+    public UMBPHeadV1(  ) {
+        this.szSignature = UMBPHeadV1.ProtocolSignature;
+        this.dyExtraHead = new LinkedTreeMap<>();
+    }
 
 
     @Override
@@ -277,7 +288,7 @@ public class UMBPHeadV1 extends AbstractUMCHead implements UMBHead {
 
     @Override
     protected UMCHead applyExHead( Map<String, Object > jo      ) {
-        if( !( this.dyExtraHead instanceof Map ) ) {
+        if( !( this.dyExtraHead instanceof Map ) && this.dyExtraHead != null ) {
             throw new IllegalArgumentException( "Current extra headed is not dynamic." );
         }
 
@@ -305,5 +316,68 @@ public class UMBPHeadV1 extends AbstractUMCHead implements UMBHead {
     public void release() {
         // Help GC
         this.dyExtraHead = null;
+    }
+
+    @Override
+    public EncodePair bytesEncode( ExtraHeadCoder extraHeadCoder ) {
+        return UMBPHeadV1.encode( this, extraHeadCoder );
+    }
+
+
+
+    public static EncodePair encode( UMCHead umcHead, ExtraHeadCoder extraHeadCoder ) {
+        UMBPHeadV1 head = (UMBPHeadV1) umcHead;
+        head.applyExtraHeadCoder( extraHeadCoder );
+        head.transApplyExHead();
+
+        ByteBuffer byteBuffer = ByteBuffer.allocate( UMCHeadV1.ReadBufferSize + head.getExtraHeadLength() );
+        byteBuffer.order( BinByteOrder );
+
+        byteBuffer.put( head.getSignature().getBytes() );
+
+        int nBufLength = head.getSignatureLength();
+        byteBuffer.putInt( head.nExtraHeadLength );
+        nBufLength += Integer.BYTES;
+
+        byteBuffer.put( head.extraEncode.getByteValue() );
+        nBufLength += Byte.BYTES;
+
+
+
+
+        if( head.extraHead == null ) {
+            byteBuffer.put( Bytes.Empty );
+        }
+        else {
+            byteBuffer.put( head.extraHead );
+        }
+        nBufLength += head.getExtraHeadLength();
+
+        return new EncodePair( byteBuffer, nBufLength );
+    }
+
+    public static UMCHead decode( byte[] buf, String szSignature, ExtraHeadCoder extraHeadCoder ) throws IOException {
+        int nBufSize = szSignature.length() + UMBPHeadV1.StructBlockSize;
+
+        if ( buf.length < nBufSize ) {
+            throw new StreamTerminateException( "StreamEndException:[UMBPProtocol] Stream is ended." );
+        }
+
+        int nReadAt = szSignature.length();
+        if ( !Arrays.equals( buf, 0, szSignature.length(), szSignature.getBytes(), 0, szSignature.length() )  ) {
+            throw new IOException( "[UMBPProtocol] Illegal protocol signature." );
+        }
+
+        UMBPHeadV1 head = new UMBPHeadV1();
+        head.applyExtraHeadCoder( extraHeadCoder );
+
+
+        head.nExtraHeadLength  = ByteBuffer.wrap( buf, nReadAt, Integer.BYTES ).order( BinByteOrder ).getInt();
+        nReadAt += Integer.BYTES;
+
+        head.extraEncode       = ExtraEncode.asValue( ByteBuffer.wrap( buf, nReadAt, Byte.BYTES ).order( BinByteOrder ).get() );
+        nReadAt += Byte.BYTES;
+
+        return head;
     }
 }

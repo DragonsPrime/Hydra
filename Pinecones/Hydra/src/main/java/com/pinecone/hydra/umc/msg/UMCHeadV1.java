@@ -1,16 +1,16 @@
 package com.pinecone.hydra.umc.msg;
 
 import com.pinecone.framework.system.prototype.ObjectiveBean;
-import com.pinecone.framework.system.prototype.Pinenut;
-import com.pinecone.framework.unit.KeyValue;
 import com.pinecone.framework.unit.LinkedTreeMap;
+import com.pinecone.framework.util.Bytes;
 import com.pinecone.framework.util.ReflectionUtils;
-import com.pinecone.framework.util.json.JSON;
-import com.pinecone.framework.util.json.JSONEncoder;
 import com.pinecone.framework.util.json.JSONObject;
 import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Arrays;
 import java.util.Map;
 
 public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
@@ -310,7 +310,7 @@ public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
     }
 
     protected UMCHead applyExHead( Map<String, Object > jo      ) {
-        if( !( this.dyExtraHead instanceof Map ) ) {
+        if( !( this.dyExtraHead instanceof Map ) && this.dyExtraHead != null ) {
             throw new IllegalArgumentException( "Current extra headed is not dynamic." );
         }
 
@@ -345,36 +345,115 @@ public class UMCHeadV1 extends AbstractUMCHead implements UMCHead {
         return this.toJSONString();
     }
 
-    protected String jsonifyExtraHead() {
-        Map<String, Object > joExtraHead = this.getMapExtraHead();
-        String szExtraHead;
-        if( joExtraHead == null ) {
-            szExtraHead = "[object Object]";
-        }
-        else {
-            szExtraHead = JSON.stringify( this.getMapExtraHead() );
-        }
-
-        return szExtraHead;
-    }
 
     @Override
-    public String toJSONString() {
-        String szExtraHead = this.jsonifyExtraHead();
-
-        return JSONEncoder.stringifyMapFormat( new KeyValue[]{
-                new KeyValue<>( "Signature"      , this.getSignature()                                             ),
-                new KeyValue<>( "ExtraHeadLength", this.getExtraHeadLength()                                       ),
-                new KeyValue<>( "ExtraEncode"    , this.getExtraEncode().getName()                                 ),
-                new KeyValue<>( "BodyLength"     , this.getBodyLength()                                            ),
-                new KeyValue<>( "KeepAlive"      , this.getKeepAlive()                                             ),
-                new KeyValue<>( "Method"         , this.getMethod()                                                ),
-                new KeyValue<>( "Status"         , this.getStatus().getName()                                      ),
-                new KeyValue<>( "ControlBits"    , "0x" + Long.toUnsignedString( this.getControlBits(),16 )  ),
-                new KeyValue<>( "IdentityId"     , this.getIdentityId()                                            ),
-                new KeyValue<>( "SessionId"      , this.getSessionId()                                             ),
-                new KeyValue<>( "ExtraHead"      , szExtraHead                                                     ),
-        } );
+    public EncodePair bytesEncode( ExtraHeadCoder extraHeadCoder ) {
+        return UMCHeadV1.encode( this, extraHeadCoder );
     }
 
+    public static EncodePair encode( UMCHead umcHead, ExtraHeadCoder extraHeadCoder ) {
+        UMCHeadV1 head = (UMCHeadV1) umcHead;
+        head.applyExtraHeadCoder( extraHeadCoder );
+        head.transApplyExHead();
+
+        ByteBuffer byteBuffer = ByteBuffer.allocate( UMCHeadV1.ReadBufferSize + head.getExtraHeadLength() );
+        byteBuffer.order( UMCHeadV1.BinByteOrder );
+
+        int nBufLength = head.getSignatureLength();
+        byteBuffer.put( head.getSignature().getBytes() );
+        //byteBuffer.put( (byte) ' ' );
+        //++nBufLength;
+
+        byteBuffer.putInt( head.nExtraHeadLength );
+        nBufLength += Integer.BYTES;
+
+        byteBuffer.put( head.extraEncode.getByteValue() );
+        nBufLength += Byte.BYTES;
+
+
+
+        byteBuffer.putLong( head.nBodyLength );
+        nBufLength += Long.BYTES;
+
+        byteBuffer.putLong( head.nKeepAlive );
+        nBufLength += Long.BYTES;
+
+        byteBuffer.put( head.method.getByteValue() );
+        nBufLength += Byte.BYTES;
+
+        byteBuffer.putShort( head.status.getShortValue() );
+        nBufLength += Short.BYTES;
+
+
+
+        byteBuffer.putLong( head.controlBits );
+        nBufLength += Long.BYTES;
+
+        byteBuffer.putLong( head.identityId );
+        nBufLength += Long.BYTES;
+
+        byteBuffer.putLong( head.sessionId );
+        nBufLength += Long.BYTES;
+
+
+
+        if( head.extraHead == null ) {
+            byteBuffer.put( Bytes.Empty );
+        }
+        else {
+            byteBuffer.put( head.extraHead );
+        }
+        nBufLength += head.getExtraHeadLength();
+
+        return new EncodePair( byteBuffer, nBufLength );
+    }
+
+    public static UMCHead decode( byte[] buf, String szSignature, ExtraHeadCoder extraHeadCoder ) throws IOException {
+        int nBufSize = ArchUMCProtocol.basicHeadLength( szSignature );
+
+        if ( buf.length < nBufSize ) {
+            throw new StreamTerminateException( "StreamEndException:[UMCProtocol] Stream is ended." );
+        }
+
+        int nReadAt = szSignature.length();
+        if ( !Arrays.equals( buf, 0, szSignature.length(), szSignature.getBytes(), 0, szSignature.length() )  ) {
+            throw new IOException( "[UMCProtocol] Illegal protocol signature." );
+        }
+
+        UMCHeadV1 head = new UMCHeadV1();
+        head.applyExtraHeadCoder( extraHeadCoder );
+        //nReadAt++; // For ' '
+
+
+        head.nExtraHeadLength  = ByteBuffer.wrap( buf, nReadAt, Integer.BYTES ).order( UMCHeadV1.BinByteOrder ).getInt();
+        nReadAt += Integer.BYTES;
+
+        head.extraEncode       = ExtraEncode.asValue( ByteBuffer.wrap( buf, nReadAt, Byte.BYTES ).order( UMCHeadV1.BinByteOrder ).get() );
+        nReadAt += Byte.BYTES;
+
+
+
+        head.nBodyLength       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
+        nReadAt += Long.BYTES;
+
+        head.nKeepAlive       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
+        nReadAt += Long.BYTES;
+
+        head.method            = UMCMethod.values()[ buf[nReadAt] ];
+        nReadAt += Byte.BYTES;
+
+        head.status            = Status.asValue( ByteBuffer.wrap( buf, nReadAt, Short.BYTES ).order( UMCHeadV1.BinByteOrder ).getShort() );
+        nReadAt += Short.BYTES;
+
+        head.controlBits      = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
+        nReadAt += Long.BYTES;
+
+        head.identityId       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
+        nReadAt += Long.BYTES;
+
+        head.sessionId        = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
+        nReadAt += Long.BYTES;
+
+        return head;
+    }
 }

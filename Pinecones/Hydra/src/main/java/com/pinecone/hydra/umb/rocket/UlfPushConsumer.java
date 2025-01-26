@@ -43,6 +43,7 @@ public class UlfPushConsumer extends ArchMQConsumer implements PushConsumer {
                             handler.onSuccessfulMsgReceived( msg.getBody(), new Object[] { msg, msgs, context } );
                         }
                         catch ( Exception e ) {
+                            handler.onError( msg.getBody(), e );
                             return ConsumeConcurrentlyStatus.RECONSUME_LATER;
                         }
                     }
@@ -80,6 +81,10 @@ public class UlfPushConsumer extends ArchMQConsumer implements PushConsumer {
             this.mRocketClient.deregister( this );
             this.wrappedConsumer = null;
         }
+    }
+
+    public RocketClient getRocketClient() {
+        return this.mRocketClient;
     }
 
 }

@@ -2,7 +2,7 @@ package com.pinecone.hydra.umc.msg;
 
 import java.util.Map;
 
-public abstract class ArchInformMessage extends ArchUMCMessage {
+public abstract class ArchInformMessage extends ArchUMCMessage implements InformMessage {
     public ArchInformMessage( UMCHead head ) {
         super( head );
     }

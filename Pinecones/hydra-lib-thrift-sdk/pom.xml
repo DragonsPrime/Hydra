@@ -33,5 +33,11 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.pinecone</groupId>
+            <artifactId>pinecone</artifactId>
+            <version>2.5.1</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 </project>

@@ -27,8 +27,6 @@ public interface UMCCHead extends UMCHead {
 
     void setExtraHead            ( Object o                ) ;
 
-    void onlySetExtraHead        ( Object o                ) ;
-
     void setExtraEncode          ( ExtraEncode encode      ) ;
 
     UMCCHead applyExHead         ( Map<String, Object > jo ) ;

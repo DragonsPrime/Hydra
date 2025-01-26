@@ -1,5 +1,7 @@
 package com.mc;
 
+import com.pinecone.hydra.umc.wolfmc.UlfBytesTransferMessage;
+import com.pinecone.hydra.umc.wolfmc.UlfStreamTransferMessage;
 import com.pinecone.hydra.umct.WolfMCExpress;
 import com.pinecone.hydra.umc.msg.ChannelControlBlock;
 import com.pinecone.hydra.umc.msg.Medium;
@@ -29,8 +31,9 @@ class Christ extends JesusChrist {
 
     @Override
     public void vitalize () throws Exception {
-        this.testServer();
+        //this.testServer();
         // this.testSystemServer();
+        this.testServerCos();
     }
 
     public void testServer() throws Exception {
@@ -64,15 +67,16 @@ class Christ extends JesusChrist {
 
         wolf.apply( new UlfAsyncMsgHandleAdapter() {
             public void onSuccessfulMsgReceived( Medium medium, ChannelControlBlock block, UMCMessage msg, ChannelHandlerContext ctx, Object rawMsg ) throws Exception {
-                UlfInformMessage mc = (UlfInformMessage) rawMsg;
-                Map<String,Object > jo = mc.getHead().getMapExtraHead();
-                String dos = jo.get( "do" ).toString();
-                if( dos.equals( "queryHeistConfTPL" ) ) {
-                    Debug.trace( "hahahaha" );
-                }
-                if( dos.equals( "xixi" ) ) {
-                    Debug.trace( "xixi" );
-                }
+                Debug.redf( rawMsg, new String( ( (UlfStreamTransferMessage) rawMsg).getBody().readAllBytes() ) );
+//                UlfStreamTransferMessage mc = (UlfStreamTransferMessage) rawMsg;
+//                Map<String,Object > jo = mc.getHead().getMapExtraHead();
+//                String dos = jo.get( "do" ).toString();
+//                if( dos.equals( "queryHeistConfTPL" ) ) {
+//                    Debug.trace( "hahahaha" );
+//                }
+//                if( dos.equals( "xixi" ) ) {
+//                    Debug.trace( "xixi" );
+//                }
             }
         });
 

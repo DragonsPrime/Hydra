@@ -113,60 +113,9 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
     }
 
     protected void sendMsgHead( UMCHead umcHead, boolean bFlush ) throws IOException {
-        UMCHeadV1 head = (UMCHeadV1) umcHead;
-        head.applyExtraHeadCoder( this.getExtraHeadCoder() );
-        head.transApplyExHead();
+        UMCHeadV1.EncodePair encodePair = UMCHeadV1.encode( umcHead, this.getExtraHeadCoder() );
 
-        ByteBuffer byteBuffer = ByteBuffer.allocate( UMCHeadV1.ReadBufferSize + head.getExtraHeadLength() );
-        byteBuffer.order( UMCHeadV1.BinByteOrder );
-
-        int nBufLength = head.getSignatureLength();
-        byteBuffer.put( head.getSignature().getBytes() );
-        //byteBuffer.put( (byte) ' ' );
-        //++nBufLength;
-
-        byteBuffer.putInt( head.nExtraHeadLength );
-        nBufLength += Integer.BYTES;
-
-        byteBuffer.put( head.extraEncode.getByteValue() );
-        nBufLength += Byte.BYTES;
-
-
-
-        byteBuffer.putLong( head.nBodyLength );
-        nBufLength += Long.BYTES;
-
-        byteBuffer.putLong( head.nKeepAlive );
-        nBufLength += Long.BYTES;
-
-        byteBuffer.put( head.method.getByteValue() );
-        nBufLength += Byte.BYTES;
-
-        byteBuffer.putShort( head.status.getShortValue() );
-        nBufLength += Short.BYTES;
-
-
-
-        byteBuffer.putLong( head.controlBits );
-        nBufLength += Long.BYTES;
-
-        byteBuffer.putLong( head.identityId );
-        nBufLength += Long.BYTES;
-
-        byteBuffer.putLong( head.sessionId );
-        nBufLength += Long.BYTES;
-
-
-
-        if( head.extraHead == null ) {
-            byteBuffer.put( Bytes.Empty );
-        }
-        else {
-            byteBuffer.put( head.extraHead );
-        }
-        nBufLength += head.getExtraHeadLength();
-
-        this.mOutputStream.write( byteBuffer.array(), 0, nBufLength );
+        this.mOutputStream.write( encodePair.byteBuffer.array(), 0, encodePair.bufLength );
         if( bFlush ) {
             this.mOutputStream.flush();
         }
@@ -203,51 +152,6 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
     }
 
     public static UMCHead onlyReadMsgBasicHead( byte[] buf, String szSignature, ExtraHeadCoder extraHeadCoder ) throws IOException {
-        int nBufSize = ArchUMCProtocol.basicHeadLength( szSignature );
-
-        if ( buf.length < nBufSize ) {
-            throw new StreamTerminateException( "StreamEndException:[UMCProtocol] Stream is ended." );
-        }
-
-        int nReadAt = szSignature.length();
-        if ( !Arrays.equals( buf, 0, szSignature.length(), szSignature.getBytes(), 0, szSignature.length() )  ) {
-            throw new IOException( "[UMCProtocol] Illegal protocol signature." );
-        }
-
-        UMCHeadV1 head = new UMCHeadV1();
-        head.applyExtraHeadCoder( extraHeadCoder );
-        //nReadAt++; // For ' '
-
-
-        head.nExtraHeadLength  = ByteBuffer.wrap( buf, nReadAt, Integer.BYTES ).order( UMCHeadV1.BinByteOrder ).getInt();
-        nReadAt += Integer.BYTES;
-
-        head.extraEncode       = ExtraEncode.asValue( ByteBuffer.wrap( buf, nReadAt, Byte.BYTES ).order( UMCHeadV1.BinByteOrder ).get() );
-        nReadAt += Byte.BYTES;
-
-
-
-        head.nBodyLength       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
-        nReadAt += Long.BYTES;
-
-        head.nKeepAlive       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
-        nReadAt += Long.BYTES;
-
-        head.method            = UMCMethod.values()[ buf[nReadAt] ];
-        nReadAt += Byte.BYTES;
-
-        head.status            = Status.asValue( ByteBuffer.wrap( buf, nReadAt, Short.BYTES ).order( UMCHeadV1.BinByteOrder ).getShort() );
-        nReadAt += Short.BYTES;
-
-        head.controlBits      = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
-        nReadAt += Long.BYTES;
-
-        head.identityId       = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
-        nReadAt += Long.BYTES;
-
-        head.sessionId        = ByteBuffer.wrap( buf, nReadAt, Long.BYTES ).order( UMCHeadV1.BinByteOrder ).getLong();
-        nReadAt += Long.BYTES;
-
-        return head;
+        return UMCHeadV1.decode( buf, szSignature, extraHeadCoder );
     }
 }

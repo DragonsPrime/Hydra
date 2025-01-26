@@ -2,10 +2,16 @@ package com.pinecone.hydra.umc.msg;
 
 import java.util.Map;
 
-public abstract class ArchInformCMessage extends ArchUMCMessage {
-    private static UMCCHead newUMCCHead( Object exHead ) {
+public abstract class ArchInformCMessage extends ArchUMCMessage implements InformMessage {
+    public static UMCCHead newUMCCHead( Object exHead ) {
         UMCCHeadV1 head = new UMCCHeadV1();
-        head.onlySetExtraHead( exHead );
+        head.setExtraHead( exHead );
+        return head;
+    }
+
+    public static UMCCHead newUMCCHead( Map<String,Object > joExHead ) {
+        UMCCHeadV1 head = new UMCCHeadV1();
+        head.applyExHead( joExHead );
         return head;
     }
 
@@ -14,11 +20,11 @@ public abstract class ArchInformCMessage extends ArchUMCMessage {
     }
 
     public ArchInformCMessage( Map<String,Object > joExHead ) {
-        super( ArchInformCMessage.newUMCCHead( joExHead ) );
+        this( ArchInformCMessage.newUMCCHead( joExHead ) );
     }
 
     public ArchInformCMessage( Object protoExHead ) {
-        super( ArchInformCMessage.newUMCCHead( protoExHead ) );
+        this( ArchInformCMessage.newUMCCHead( protoExHead ) );
     }
 
     @Override
