@@ -3,13 +3,7 @@ package com.pinecone.hydra.account;
 import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
-import com.pinecone.hydra.account.entity.Account;
-import com.pinecone.hydra.account.entity.Domain;
-import com.pinecone.hydra.account.entity.ElementNode;
-import com.pinecone.hydra.account.entity.GenericAccount;
-import com.pinecone.hydra.account.entity.GenericDomain;
-import com.pinecone.hydra.account.entity.GenericGroup;
-import com.pinecone.hydra.account.entity.Group;
+import com.pinecone.hydra.account.entity.*;
 import com.pinecone.hydra.account.source.AuthorizationManipulator;
 import com.pinecone.hydra.account.source.CredentialManipulator;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
@@ -151,6 +145,7 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
 
         return ret;
     }
+
     @Override
     public Account affirmAccount(String path) {
         return (Account) this.affirmTreeNodeByPath( path, GenericAccount.class, GenericDomain.class );
@@ -164,6 +159,12 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
     @Override
     public Domain affirmDomain(String path) {
         return (Domain) this.affirmTreeNodeByPath( path, null, GenericDomain.class );
+    }
+
+    @Override
+    public void insertCredential(Credential credential) {
+        this.credentialManipulator.insert( credential );
+
     }
 
     @Override
@@ -186,6 +187,20 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
         }
         return false;
     }
+
+    @Override
+    public List<GUID> queryAccountByName(String userName) {
+      return  this.userNodeManipulator.getGuidsByName( userName );
+
+    }
+
+    @Override
+    public boolean queryAccountByGuid(GUID userGuid, String kernelCredential) {
+              Account account = this.userNodeManipulator.queryUser( userGuid );
+        return account.getKernelCredential().equals(kernelCredential);
+
+    }
+
 
     protected boolean containsChild( GUIDNameManipulator manipulator, GUID parentGuid, String childName ) {
         List<GUID > guids = manipulator.getGuidsByName( childName );

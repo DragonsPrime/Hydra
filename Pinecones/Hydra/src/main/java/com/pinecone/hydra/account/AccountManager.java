@@ -1,11 +1,10 @@
 package com.pinecone.hydra.account;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.account.entity.Account;
-import com.pinecone.hydra.account.entity.Domain;
-import com.pinecone.hydra.account.entity.ElementNode;
-import com.pinecone.hydra.account.entity.Group;
+import com.pinecone.hydra.account.entity.*;
 import com.pinecone.hydra.system.ko.kom.KOMInstrument;
+
+import java.util.List;
 
 public interface AccountManager extends KOMInstrument {
     AccountConfig KernelAccountConfig = new KernelAccountConfig();
@@ -15,6 +14,7 @@ public interface AccountManager extends KOMInstrument {
     Group   affirmGroup( String path );
 
     Domain  affirmDomain( String path );
+    void insertCredential( Credential credential );
 
     ElementNode queryElement( String path );
 
@@ -22,4 +22,7 @@ public interface AccountManager extends KOMInstrument {
 
     boolean containsChild( GUID parentGuid, String childName );
 
+    List<GUID> queryAccountByName(String userName);
+
+    boolean queryAccountByGuid(GUID userGuid, String kernelCredential);
 }
