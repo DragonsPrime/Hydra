@@ -1,5 +1,7 @@
 package com.pinecone.hydra.storage.file;
 
+import com.pinecone.hydra.storage.file.builder.Feature;
+import com.pinecone.hydra.storage.file.builder.UOFSComponentor;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.slime.jelly.source.redis.GenericRedisMasterManipulator;
 import com.pinecone.slime.map.indexable.IndexableMapQuerier;
@@ -10,7 +12,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
-public class CacheFileSystemBuilder implements FileSystemBuilder{
+public class UOFSCacheComponentor implements UOFSComponentor {
     private FileSystemConfig        fileSystemConfig;
     private String                  redisHost;
     private int                     redisPort;
@@ -18,7 +20,7 @@ public class CacheFileSystemBuilder implements FileSystemBuilder{
     private String                  redisPassword;
     private int                     redisDatabase;
 
-    public CacheFileSystemBuilder(){
+    public UOFSCacheComponentor(){
         this.fileSystemConfig = new KernelFileSystemConfig();
         this.redisHost = this.fileSystemConfig.getRedisHost();
         this.redisPort = this.fileSystemConfig.getRedisPort();
@@ -27,7 +29,15 @@ public class CacheFileSystemBuilder implements FileSystemBuilder{
         this.redisDatabase = this.fileSystemConfig.getRedisDatabase();
     }
 
-    KOMFileSystem buildCacheFileSystem(KOIMappingDriver driver){
+    @Override
+    public Feature getFeature() {
+        return Feature.EnableGlobalCache;
+    }
+
+    @Override
+    public void apply( KOMFileSystem fs ) {
+        UniformObjectFileSystem uofs = (UniformObjectFileSystem) fs;
+
         JedisPoolConfig poolConfig = new JedisPoolConfig();
         JedisPool jedisPool = new JedisPool( poolConfig, this.redisHost, this.redisPort, this.redisTimeOut, this.redisPassword, this.redisDatabase );
         Jedis jedis = jedisPool.getResource();
@@ -35,7 +45,6 @@ public class CacheFileSystemBuilder implements FileSystemBuilder{
         IndexableIterableManipulator<String, String > manipulator = new GenericRedisMasterManipulator<>( jedis );
         IndexableTargetScopeMeta meta = new GenericIndexableTargetScopeMeta( "0", "", Object.class, manipulator );
         IndexableMapQuerier<String, String > querier = new IndexableMapQuerier<>( meta, true );
-
-        return new UniformObjectFileSystem(driver,querier);
+        uofs.apply( querier );
     }
 }

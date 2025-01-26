@@ -11,11 +11,12 @@ public class AccountClient implements Pinenut {
     AccountIface.Client accountClient;
 
     public AccountClient() throws TException {
-        GenericMultiplexedThriftClient thriftClient = new GenericMultiplexedThriftClient("localhost", 8081);
-        accountClient = thriftClient.getClient("Account", AccountIface.Client.class);
+//        GenericMultiplexedThriftClient thriftClient = new GenericMultiplexedThriftClient("localhost", 8081);
+//        accountClient = thriftClient.getClient("Account", AccountIface.Client.class);
     }
 
     public String queryNodeByPath( String path ) throws TException {
-        return this.accountClient.queryNodeByPath( path );
+        return null;
+        //return this.accountClient.queryNodeByPath( path );
     }
 }

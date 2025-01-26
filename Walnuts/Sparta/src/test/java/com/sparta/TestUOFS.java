@@ -2,10 +2,14 @@ package com.sparta;
 
 import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
+import com.pinecone.framework.util.Debug;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
 import com.pinecone.hydra.storage.TitanFileChannelChanface;
+import com.pinecone.hydra.storage.file.UOFSCacheComponentor;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
-import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
+import com.pinecone.hydra.storage.file.builder.ComponentUOFSBuilder;
+import com.pinecone.hydra.storage.file.builder.Feature;
+import com.pinecone.hydra.storage.file.builder.UOFSBuilder;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.transmit.exporter.TitanFileExportEntity64;
@@ -41,7 +45,11 @@ class Steve extends Radium {
         KOIMappingDriver koiVolumeMappingDriver = new VolumeMappingDriver(
                 this, (IbatisClient)this.getMiddlewareManager().getRDBManager().getRDBClientByName( "MySQLKingHydranium" ), this.getDispenserCenter()
         );
-        KOMFileSystem fileSystem = new UniformObjectFileSystem( koiMappingDriver );
+
+
+        UOFSBuilder builder = new ComponentUOFSBuilder( koiMappingDriver );
+//        KOMFileSystem fileSystem = new UniformObjectFileSystem( koiMappingDriver );
+        KOMFileSystem fileSystem = builder.registerComponentor( new UOFSCacheComponentor() ).buildByRegistered();
         UniformVolumeManager volumeManager = new UniformVolumeManager(koiVolumeMappingDriver);
         GuidAllocator guidAllocator = fileSystem.getGuidAllocator();
         //Debug.trace( fileSystem.get( GUIDs.GUID72( "020c8b0-000006-0002-54" ) ) );
@@ -49,8 +57,13 @@ class Steve extends Radium {
         //this.testUpload(fileSystem);
         //this.testDelete( fileSystem );
         //this.testChannelReceive( fileSystem, volumeManager );
-        this.testChannelExport( fileSystem, volumeManager );
+        //this.testChannelExport( fileSystem, volumeManager );
+        this.testQuery( fileSystem );
 
+    }
+
+    private void testQuery ( KOMFileSystem fileSystem ){
+        Debug.trace( fileSystem.queryGUIDByPath("我的文件/总2127.mp4") );
     }
 
     private void testInsert( KOMFileSystem fileSystem ){

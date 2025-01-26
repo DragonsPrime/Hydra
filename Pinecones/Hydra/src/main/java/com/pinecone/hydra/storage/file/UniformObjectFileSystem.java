@@ -4,6 +4,7 @@ import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.StringUtils;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
+import com.pinecone.hydra.storage.file.cache.DefaultCacheConstants;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.GenericFSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
@@ -159,6 +160,10 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
 
 
 
+    protected void apply( IndexableMapQuerier<String, String > globalPathGuidCacheQuerier ) {
+        this.globalPathGuidCacheQuerier = globalPathGuidCacheQuerier;
+    }
+
     @Override
     public FileTreeNode get(GUID guid, int depth ) {
         return (FileTreeNode) super.get( guid, depth );
@@ -302,15 +307,15 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     public GUID queryGUIDByPath( String path ) {
         FileSystemConfig config = this.getConfig();
         if ( this.globalPathGuidCacheQuerier != null ) {
-            String key = FileConstants.FILE_PATH_CACHE_KEY + path;
+            String key = DefaultCacheConstants.FilePathCacheNS + path;
             String szGUID = this.globalPathGuidCacheQuerier.get( key );
-            if ( StringUtils.isEmpty( szGUID ) ) {
+            if ( StringUtils.isNoneEmpty( szGUID ) ) {
                 return GUIDs.GUID72( szGUID );
             }
         }
         GUID guid =  super.queryGUIDByPath( path ); // Into OLTP-RDB
         if ( this.globalPathGuidCacheQuerier != null ) {
-            String key = FileConstants.FILE_PATH_CACHE_KEY + path;
+            String key = DefaultCacheConstants.FilePathCacheNS + path;
             this.globalPathGuidCacheQuerier.insert( key, guid.toString(), config.getExpiryTime() );
         }
         return guid;

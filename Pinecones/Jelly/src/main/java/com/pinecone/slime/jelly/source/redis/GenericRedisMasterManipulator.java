@@ -146,6 +146,9 @@ public class GenericRedisMasterManipulator<K extends String, V > implements Inde
                 }
                 return zset;
             }
+            else if ( "none".equals( type ) ) {
+                return null;
+            }
             else {
                 throw new IllegalArgumentException( "Unsupported data type[" + type + "] for selectByNS operation." );
             }

@@ -36,6 +36,10 @@ public final class StringUtils {
         return str == null || str.isEmpty();
     }
 
+    public static boolean isNoneEmpty( String str ) {
+        return !StringUtils.isEmpty( str );
+    }
+
     public static boolean hasLength(CharSequence str) {
         return str != null && str.length() > 0;
     }

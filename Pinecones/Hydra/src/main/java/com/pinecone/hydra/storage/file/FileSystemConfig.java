@@ -16,7 +16,7 @@ public interface FileSystemConfig extends KernelObjectConfig {
 
     String getDefaultVolume();
 
-    int getExpiryTime();
+    long getExpiryTime();
 
     String getRedisHost();
 

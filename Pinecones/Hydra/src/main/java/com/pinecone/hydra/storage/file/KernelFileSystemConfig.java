@@ -2,10 +2,9 @@ package com.pinecone.hydra.storage.file;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.storage.StorageConstants;
+import com.pinecone.hydra.storage.file.cache.DefaultCacheConstants;
 import com.pinecone.hydra.storage.volume.VolumeConstants;
 import com.pinecone.hydra.system.ko.ArchKernelObjectConfig;
-
-import java.util.concurrent.TimeUnit;
 
 public class KernelFileSystemConfig extends ArchKernelObjectConfig implements FileSystemConfig {
     protected String mszVersionSignature    = StorageConstants.StorageVersionSignature;
@@ -13,7 +12,7 @@ public class KernelFileSystemConfig extends ArchKernelObjectConfig implements Fi
     protected GUID   mLocalhostGUID         = StorageConstants.LocalhostGUID;
     protected Number TinyFileStripSizing    = VolumeConstants.TinyFileStripSizing;
     protected String DefaultVolumePath      = StorageConstants.DefaultVolumePath;
-    protected int    DefaultExpiryTime      = FileConstants.Expiry_Time;
+    protected long    DefaultExpiryTime      = DefaultCacheConstants.PathQueryExpiryTimeHotMil;
     protected String RedisHost              = FileConstants.REDIS_HOST;
     protected int    RedisPort              = FileConstants.REDIS_PORT;
     protected int    RedisTimeOut           = FileConstants.REDIS_TIME_OUT;
@@ -45,7 +44,7 @@ public class KernelFileSystemConfig extends ArchKernelObjectConfig implements Fi
     }
 
     @Override
-    public int getExpiryTime() {
+    public long getExpiryTime() {
         return this.DefaultExpiryTime;
     }
 
