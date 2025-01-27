@@ -1,6 +1,7 @@
 package com.walnuts.sparta.account.api.controller.v2;
 
 
+import com.alibaba.fastjson.JSON;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.account.AccountManager;
 import com.pinecone.hydra.account.entity.*;
@@ -77,17 +78,21 @@ public class AccountController {
     System.out.println("Account created at: " + formattedTime);
     GenericAccount account = new GenericAccount(this.primaryAccount);
     account.setName(userName);
-    if (this.primaryAccount.queryAccountByName(account.getName())==null) {
+    System.out.println(account.getName());
+    if (this.primaryAccount.queryAccountGuidByName(account.getName()).isEmpty()) {
         account.setNickName(nickName);
-        GenericCredential credential = new GenericCredential();
-        credential.setCredential(kernelCredential);
-        credential.setType("TextPassword");
-        credential.setName(userName);
-        credential.setCreateTime(now);
-        credential.setUpdateTime(now);
-        credential.setGuid(GUIDs.Dummy72());
+        GenericCredential credential = new GenericCredential(
+                this.primaryAccount.getGuidAllocator().nextGUID(),
+                userName,
+                kernelCredential,
+                now,
+                now,
+                "TextPassword"
+        );
         this.primaryAccount.insertCredential(credential);
+
         account.setCredentialGuid(credential.getGuid());
+        account.setRole("CLIENT");
         account.setKernelCredential(kernelCredential);
         account.setKernelGroupType(kernelGroupType);
         account.setCreateTime(now);
@@ -103,7 +108,7 @@ public class AccountController {
             @RequestParam("userName") String userName,
             @RequestParam("kernelCredential") String kernelCredential)
 {
-    List<GUID> userGuidList =this.primaryAccount.queryAccountByName(userName);
+    List<GUID> userGuidList =this.primaryAccount.queryAccountGuidByName(userName);
     if (userGuidList== null)
         return BasicResultResponse.error("Account not found");
 
@@ -118,9 +123,11 @@ public class AccountController {
     public BasicResultResponse<String> queryAccount(
             @RequestParam("userName") String userName)
 {
-    List<GUID> userGuidList =this.primaryAccount.queryAccountByName(userName);
-    if (userGuidList== null)
-        return BasicResultResponse.error("Account not found");
+    List<GUID> userGuidList =this.primaryAccount.queryAccountGuidByName(userName);
+    System.out.println(userGuidList);
+    if (userGuidList.isEmpty())
+    {
+        return BasicResultResponse.error("Account not found");}
     GUID userGuid = userGuidList.get(0); // 假设用户名是唯一的
     GenericAccount account = (GenericAccount) this.primaryAccount.get(userGuid);
     accountLoginVo accountLoginVo = new accountLoginVo();
@@ -131,11 +138,53 @@ public class AccountController {
     public BasicResultResponse<String> removeAccount(
             @RequestParam("userName") String userName)
 {
-    List<GUID> userGuidList =this.primaryAccount.queryAccountByName(userName);
-    if (userGuidList== null)
+    List<GUID> userGuidList =this.primaryAccount.queryAccountGuidByName(userName);
+    if (userGuidList.isEmpty())
         return BasicResultResponse.error("Account not found");
     GUID userGuid = userGuidList.get(0);
     this.primaryAccount.remove(userGuid);
     return BasicResultResponse.success("删除成功");
+}
+@PutMapping("/create/privilege")
+    public BasicResultResponse<String> createPrivilege(
+            @RequestParam("token") String token,
+            @RequestParam("name") String name,
+            @RequestParam("privilegeCode") String privilegeCode,
+            @RequestParam("type") String type,
+            @RequestParam(value = "parentPrivGuid", required = false) String parentPrivGuid)
+{
+  System.out.println(token);
+    GenericPrivilege privilege = new GenericPrivilege(
+            this.primaryAccount.getGuidAllocator().nextGUID(),
+            token,
+            name,
+            privilegeCode,
+            LocalDateTime.now(),
+            LocalDateTime.now(),
+            type
+    );
+    // 检查parentPrivGuid是否为空或空字符串
+    if (parentPrivGuid != null && !parentPrivGuid.isEmpty()) {
+        privilege.setParentPrivGuid(GUIDs.GUID72(parentPrivGuid));
+    } else {
+        privilege.setParentPrivGuid(null);
+    }
+    System.out.println(privilege.getParentPrivGuid());
+    this.primaryAccount.insertPrivilege(privilege);
+    return BasicResultResponse.success();
+}
+@DeleteMapping("/remove/privilege")
+    public BasicResultResponse<String> removePrivilege(
+            @RequestParam("privilegeGuid") String privilegeGuid)
+{
+    this.primaryAccount.removePrivilege(GUIDs.GUID72(privilegeGuid));
+    return BasicResultResponse.success();
+}
+@GetMapping("/List/privilege")
+    public BasicResultResponse<String> listPrivilege(
+           )
+{
+   List<GenericPrivilege> privileges = this.primaryAccount.queryAllPrivileges();
+   return BasicResultResponse.success(JSON.toJSONString(privileges));
 }
 }

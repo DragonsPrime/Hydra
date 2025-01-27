@@ -20,10 +20,34 @@ public class GenericAccount extends ArchElementNode implements Account {
     protected GUID credentialGuid;
 
     protected String kernelGroupType;
+    protected String role;
 
     protected LocalDateTime createTime;
 
     protected LocalDateTime updateTime;
+
+    public GenericAccount(
+            String name,
+            GUID guid,
+            String nickName,
+            String kernelCredential,
+            GUID credentialGuid,
+            String kernelGroupType,
+            String role,
+            LocalDateTime createTime,
+            LocalDateTime updateTime
+    ) {
+        this.name = name;
+        this.guid = guid;
+        this.nickName = nickName;
+        this.kernelCredential = kernelCredential;
+        this.credentialGuid = credentialGuid;
+        this.kernelGroupType = kernelGroupType;
+        this.role = role;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+    }
+
 
     public GenericAccount(){
         super();
@@ -33,6 +57,16 @@ public class GenericAccount extends ArchElementNode implements Account {
         super(accountManager);
     }
 
+
+    @Override
+    public String getRole() {
+       return this.role;
+    }
+
+    @Override
+    public void setRole(String role) {
+                this.role = role;
+    }
 
     @Override
     public String getNickName() {

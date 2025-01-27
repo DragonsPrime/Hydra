@@ -12,4 +12,5 @@ public interface UserMasterManipulator extends KOIMasterManipulator {
     CredentialManipulator       getCredentialManipulator();
 
     AuthorizationManipulator    getAuthorizationManipulator();
+    PrivilegeManipulator        getPrivilegeManipulator();
 }

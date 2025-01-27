@@ -18,7 +18,18 @@ public class GenericCredential implements Credential {
     private LocalDateTime updateTime;
 
     private String type;
+    public GenericCredential() {
+    }
+    // 全参构造方法
+    public GenericCredential( GUID guid, String name, String credential, LocalDateTime createTime, LocalDateTime updateTime, String type) {
 
+        this.guid = guid;
+        this.name = name;
+        this.credential = credential;
+        this.createTime = createTime;
+        this.updateTime = updateTime;
+        this.type = type;
+    }
     @Override
     public int getEnumId() {
         return this.enumId;

@@ -4,8 +4,7 @@ import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.account.entity.*;
-import com.pinecone.hydra.account.source.AuthorizationManipulator;
-import com.pinecone.hydra.account.source.CredentialManipulator;
+import com.pinecone.hydra.account.source.*;
 import com.pinecone.hydra.system.identifier.KOPathResolver;
 import com.pinecone.hydra.system.ko.dao.GUIDNameManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
@@ -16,10 +15,7 @@ import com.pinecone.hydra.unit.imperium.ImperialTreeNode;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 import com.pinecone.hydra.account.operator.GenericAccountOperatorFactory;
-import com.pinecone.hydra.account.source.DomainNodeManipulator;
-import com.pinecone.hydra.account.source.GroupNodeManipulator;
-import com.pinecone.hydra.account.source.UserMasterManipulator;
-import com.pinecone.hydra.account.source.UserNodeManipulator;
+import com.pinecone.ulf.util.guid.GUID72;
 import com.pinecone.ulf.util.guid.GUIDs;
 
 import java.util.ArrayList;
@@ -38,6 +34,7 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
     protected CredentialManipulator             credentialManipulator;
 
     protected AuthorizationManipulator          authorizationManipulator;
+    protected PrivilegeManipulator               privilegeManipulator;
 
     protected List<GUIDNameManipulator >        folderManipulators;
 
@@ -56,7 +53,7 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
         this.domainNodeManipulator      = this.userMasterManipulator.getDomainNodeManipulator();
         this.credentialManipulator      = this.userMasterManipulator.getCredentialManipulator();
         this.authorizationManipulator   = this.userMasterManipulator.getAuthorizationManipulator();
-
+this.privilegeManipulator               = this.userMasterManipulator.getPrivilegeManipulator();
         this.folderManipulators = new ArrayList<>(List.of(this.domainNodeManipulator, this.groupNodeManipulator));
         this.fileManipulators   = new ArrayList<>(List.of(this.userNodeManipulator));
 
@@ -188,8 +185,7 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
         return false;
     }
 
-    @Override
-    public List<GUID> queryAccountByName(String userName) {
+    public List<GUID> queryAccountGuidByName(String userName) {
       return  this.userNodeManipulator.getGuidsByName( userName );
 
     }
@@ -199,6 +195,30 @@ public class UniformAccountManager extends ArchKOMTree implements AccountManager
               Account account = this.userNodeManipulator.queryUser( userGuid );
         return account.getKernelCredential().equals(kernelCredential);
 
+    }
+
+    @Override
+    public void insertPrivilege(GenericPrivilege privilege) {
+        this.privilegeManipulator.insert(privilege);
+    }
+
+    @Override
+    public void removePrivilege(GUID privilegeGuid) {
+        this.privilegeManipulator.remove( privilegeGuid );
+    }
+
+    @Override
+    public Object queryPrivilege(GUID72 guid72) {
+        return null;
+    }
+
+    @Override
+    public List<GenericPrivilege> queryAllPrivileges() {
+        List<GenericPrivilege> privileges = new ArrayList<>();
+        for( GenericPrivilege privilege : this.privilegeManipulator.queryAllPrivileges() ) {
+            privileges.add( privilege );
+        }
+        return privileges;
     }
 
 

@@ -5,6 +5,8 @@ import com.pinecone.framework.util.id.GUID;
 import java.time.LocalDateTime;
 
 public interface Account extends FileElement {
+    String getRole();
+    void setRole( String role);
     String getNickName();
     void setNickName( String nickName );
 

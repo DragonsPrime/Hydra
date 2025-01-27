@@ -1,19 +1,10 @@
 package com.pinecone.hydra.account.ibatis.hydranium;
 
 import com.pinecone.framework.system.construction.Structure;
-import com.pinecone.hydra.account.ibatis.AuthorizationMapper;
-import com.pinecone.hydra.account.ibatis.CredentialMapper;
-import com.pinecone.hydra.account.source.AuthorizationManipulator;
-import com.pinecone.hydra.account.source.CredentialManipulator;
+import com.pinecone.hydra.account.ibatis.*;
+import com.pinecone.hydra.account.source.*;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.hydra.system.ko.driver.KOISkeletonMasterManipulator;
-import com.pinecone.hydra.account.ibatis.DomainNodeMapper;
-import com.pinecone.hydra.account.ibatis.GroupNodeMapper;
-import com.pinecone.hydra.account.ibatis.UserNodeMapper;
-import com.pinecone.hydra.account.source.DomainNodeManipulator;
-import com.pinecone.hydra.account.source.GroupNodeManipulator;
-import com.pinecone.hydra.account.source.UserMasterManipulator;
-import com.pinecone.hydra.account.source.UserNodeManipulator;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -43,6 +34,9 @@ public class UserMasterManipulatorImpl implements UserMasterManipulator {
     @Resource
     @Structure( type = CredentialMapper.class )
     protected CredentialManipulator credentialManipulator;
+    @Resource
+    @Structure( type = PrivilegeMapper.class )
+    protected PrivilegeManipulator privilegeManipulator;
 
 
 
@@ -83,5 +77,10 @@ public class UserMasterManipulatorImpl implements UserMasterManipulator {
     @Override
     public AuthorizationManipulator getAuthorizationManipulator() {
         return this.authorizationManipulator;
+    }
+
+    @Override
+    public PrivilegeManipulator getPrivilegeManipulator() {
+return this.privilegeManipulator;
     }
 }

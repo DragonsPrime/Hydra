@@ -3,6 +3,7 @@ package com.pinecone.hydra.account;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.hydra.account.entity.*;
 import com.pinecone.hydra.system.ko.kom.KOMInstrument;
+import com.pinecone.ulf.util.guid.GUID72;
 
 import java.util.List;
 
@@ -22,7 +23,14 @@ public interface AccountManager extends KOMInstrument {
 
     boolean containsChild( GUID parentGuid, String childName );
 
-    List<GUID> queryAccountByName(String userName);
+    List<GUID> queryAccountGuidByName(String userName);
 
     boolean queryAccountByGuid(GUID userGuid, String kernelCredential);
+
+    void insertPrivilege(GenericPrivilege privilege);
+    void removePrivilege(GUID privilegeGuid);
+
+    Object queryPrivilege(GUID72 guid72);
+
+    List<GenericPrivilege> queryAllPrivileges();
 }

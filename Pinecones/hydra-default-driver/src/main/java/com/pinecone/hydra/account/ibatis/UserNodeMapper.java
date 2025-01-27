@@ -14,7 +14,7 @@ import java.util.List;
 
 @IbatisDataAccessObject
 public interface UserNodeMapper extends UserNodeManipulator {
-    @Insert("INSERT INTO `hydra_account_user_node` (`guid`, `user_name`, `nick_name`, `kernel_credential`, `credential_guid`, `kernel_group_type`, `create_time`, `update_time`) VALUES (#{guid},#{name},#{nickName},#{kernelCredential},#{credentialGuid},#{kernelGroupType},#{createTime},#{updateTime})")
+    @Insert("INSERT INTO `hydra_account_user_node` (`guid`, `user_name`, `nick_name`, `kernel_credential`, `credential_guid`, `kernel_group_type`, `create_time`, `update_time`,`role`) VALUES (#{guid},#{name},#{nickName},#{kernelCredential},#{credentialGuid},#{kernelGroupType},#{createTime},#{updateTime},#{role})")
     void insert(Account account);
 
     @Delete("DELETE FROM `hydra_account_user_node` WHERE `guid` = #{userGuid}")
