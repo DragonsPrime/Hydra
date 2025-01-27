@@ -22,17 +22,8 @@ import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.umc.msg.UMCReceiver;
 import com.pinecone.hydra.umc.msg.UMCTransmit;
-import com.pinecone.hydra.umct.UMCTExpress;
 import com.pinecone.hydra.umct.UMCTExpressHandler;
 import com.pinecone.hydra.umct.WolfMCExpress;
-import com.pinecone.hydra.umct.husky.compiler.BytecodeIfacCompiler;
-import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
-import com.pinecone.hydra.umct.husky.machinery.HuskyContextMachinery;
-import com.pinecone.hydra.umct.husky.machinery.HuskyRouteDispatcher;
-import com.pinecone.hydra.umct.husky.machinery.PMCTContextMachinery;
-import com.pinecone.hydra.umct.husky.machinery.RouteDispatcher;
-import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
-import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 import com.sauron.radium.Radium;
 
 import javassist.ClassPool;
@@ -115,7 +106,7 @@ class Garrison extends Radium {
     }
 
     public void testWolfMCTB() throws Exception {
-        String nameSrvAddr = "localhost:9876";
+        String nameSrvAddr = "b-serverkingpin:9876";
         String groupName = "testGroup";
         String topic = "testTopic";
         String tags = "*";
@@ -162,7 +153,7 @@ class Garrison extends Radium {
 
 
         producer.start();
-        producer.issueInform( topic, "com.protobuf.Raccoon.scratch", "fuck you", 2025 );
+        producer.issueInform( topic, "com.protobuf.Raccoon.scratch", "fuck you !", 2025 );
 
 
 

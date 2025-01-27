@@ -26,7 +26,7 @@ public class RocketMQClient implements RocketClient {
 
     public RocketMQClient( long nodeId, String nameSrvAddr, String groupName ) {
         this.mRocketConfig = new RocketMQConfig(
-                nameSrvAddr, groupName, 4096, 30000, 2
+                nameSrvAddr, groupName, 4096, 8000, 2
         );
 
         this.producerRegister = new ConcurrentHashMap<>();

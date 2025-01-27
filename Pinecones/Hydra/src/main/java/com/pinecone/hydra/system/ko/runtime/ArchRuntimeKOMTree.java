@@ -3,6 +3,7 @@ package com.pinecone.hydra.system.ko.runtime;
 import java.util.List;
 
 import com.pinecone.framework.system.executum.Processum;
+import com.pinecone.framework.unit.trie.TrieMap;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.lang.DynamicFactory;
 import com.pinecone.framework.util.name.Namespace;
@@ -18,6 +19,9 @@ import com.pinecone.framework.util.id.GuidAllocator;
 public abstract class ArchRuntimeKOMTree implements RuntimeInstrument {
     protected Namespace             mThisNamespace;
     protected KOMInstrument         mParentInstrument;
+
+
+    protected TrieMap<String, String> m;
 
     protected Hydrarum              hydrarum;
     protected Processum             superiorProcess;
