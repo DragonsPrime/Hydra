@@ -1,8 +1,8 @@
 package com.pinecone.hydra.umb.broadcast;
 
-import com.pinecone.framework.system.prototype.Pinenut;
+import com.pinecone.hydra.umc.msg.MessageNodus;
 
-public interface BroadcastNode extends Pinenut {
+public interface BroadcastNode extends MessageNodus {
     String DefaultEntityName = "__DEFAULT__";
 
     void close();

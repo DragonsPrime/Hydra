@@ -2,6 +2,8 @@ package com.pinecone.hydra.umct;
 
 import java.util.List;
 
+import com.pinecone.framework.lang.field.FieldEntity;
+
 public class UlfMessageHandler implements MessageHandler {
     @Override
     public String getAddressMapping() {
@@ -26,5 +28,10 @@ public class UlfMessageHandler implements MessageHandler {
     @Override
     public Object getArgumentsDescriptor() {
         return null;
+    }
+
+    @Override
+    public FieldEntity[] getArgumentTemplate() {
+        return new FieldEntity[0];
     }
 }

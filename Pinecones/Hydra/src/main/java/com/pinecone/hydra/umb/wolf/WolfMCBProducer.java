@@ -44,6 +44,10 @@ public class WolfMCBProducer extends ArchBroadcastControlAgent implements Broadc
         this.mBroadcastProducer.sendMessage( topic, new UlfMBInformMessage( message.toByteArray() ) );
     }
 
+    @Override
+    public void issueInform( String topic, String szMethodAddress, Object... args ) throws IOException {
+        this.issueInform( topic, this.queryMethodPrototype( szMethodAddress ), args );
+    }
 
     @Override
     public void close() {

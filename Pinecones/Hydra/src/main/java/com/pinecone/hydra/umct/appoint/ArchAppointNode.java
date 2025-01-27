@@ -23,7 +23,6 @@ import com.pinecone.hydra.umct.husky.compiler.MethodPrototype;
 import com.pinecone.hydra.umct.husky.machinery.PMCTContextMachinery;
 import com.pinecone.ulf.util.protobuf.FieldProtobufDecoder;
 import com.pinecone.ulf.util.protobuf.FieldProtobufEncoder;
-import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
 
 public abstract class ArchAppointNode extends ArchServgramium implements AppointNode {
     protected PMCTContextMachinery mPMCTContextMachinery;
@@ -171,7 +170,7 @@ public abstract class ArchAppointNode extends ArchServgramium implements Appoint
                 throw new IlleagalResponseException( "Illegal undefined return type, what => " + digest.getReturnType() );
             }
             DynamicMessage rm = DynamicMessage.parseFrom( retDes, raw );
-            GenericFieldProtobufDecoder decoder = new GenericFieldProtobufDecoder();
+            FieldProtobufDecoder decoder = this.mPMCTContextMachinery.getFieldProtobufDecoder();
             return decoder.decode(
                     digest.getReturnType(), retDes, rm, this.getCompilerEncoder().getExceptedKeys(), this.getCompilerEncoder().getOptions()
             );

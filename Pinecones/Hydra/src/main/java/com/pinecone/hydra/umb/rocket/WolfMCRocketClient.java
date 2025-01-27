@@ -7,8 +7,11 @@ import org.apache.rocketmq.client.producer.DefaultMQProducer;
 import com.pinecone.hydra.umb.broadcast.UMCBroadcastConsumer;
 import com.pinecone.hydra.umb.broadcast.UMCBroadcastProducer;
 import com.pinecone.hydra.umb.broadcast.UNT;
+import com.pinecone.hydra.umc.msg.MessageNodus;
 import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 import com.pinecone.hydra.umc.msg.extra.GenericExtraHeadCoder;
+import com.pinecone.hydra.umc.msg.handler.ErrorMessageAudit;
+import com.pinecone.hydra.umc.msg.handler.GenericErrorMessageAudit;
 
 /**
  *  Pinecone Ursus For Java Wolf-UMC-RocketMQ [ Wolf, Uniform Message Control Protocol Client ]
@@ -23,15 +26,35 @@ public class WolfMCRocketClient extends RocketMQClient implements UlfRocketClien
 
     protected ExtraHeadCoder           mExtraHeadCoder;
 
-    public WolfMCRocketClient( String nameSrvAddr, String groupName, ExtraHeadCoder extraHeadCoder ) {
-        super( nameSrvAddr, groupName );
+    protected ErrorMessageAudit        mErrorMessageAudit;
+
+    public WolfMCRocketClient( long nodeId, String nameSrvAddr, String groupName, ExtraHeadCoder extraHeadCoder ) {
+        super( nodeId, nameSrvAddr, groupName );
 
         this.mExtraHeadCoder           = extraHeadCoder;
+        this.mErrorMessageAudit        = new GenericErrorMessageAudit( this );
+    }
+
+    public WolfMCRocketClient( String nameSrvAddr, String groupName, ExtraHeadCoder extraHeadCoder ) {
+        this( MessageNodus.nextLocalId(), nameSrvAddr, groupName, extraHeadCoder );
     }
 
     public WolfMCRocketClient( String nameSrvAddr, String groupName ) {
-        this( nameSrvAddr, groupName, new GenericExtraHeadCoder() );
+        this( MessageNodus.nextLocalId(), nameSrvAddr, groupName, new GenericExtraHeadCoder() );
     }
+
+
+
+    @Override
+    public ErrorMessageAudit getErrorMessageAudit() {
+        return this.mErrorMessageAudit;
+    }
+
+    @Override
+    public void setErrorMessageAudit( ErrorMessageAudit audit ){
+        this.mErrorMessageAudit = audit;
+    }
+
 
     @Override
     public ExtraHeadCoder getExtraHeadCoder() {

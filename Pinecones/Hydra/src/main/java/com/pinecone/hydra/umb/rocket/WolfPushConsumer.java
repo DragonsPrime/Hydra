@@ -9,9 +9,12 @@ import com.pinecone.hydra.umb.UlfMBInformMessage;
 import com.pinecone.hydra.umb.UlfPackageMessageHandler;
 import com.pinecone.hydra.umb.broadcast.UMCBroadcastConsumer;
 import com.pinecone.hydra.umc.msg.EMCBytesDecoder;
+import com.pinecone.hydra.umc.msg.Medium;
 import com.pinecone.hydra.umc.msg.UMCHead;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.umc.msg.UMCMethod;
+import com.pinecone.hydra.umc.msg.UMCReceiver;
+import com.pinecone.hydra.umc.msg.UMCTransmit;
 import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 import com.pinecone.hydra.umc.wolfmc.UlfBytesTransferMessage;
 import com.pinecone.hydra.umct.UMCTExpressHandler;
@@ -20,6 +23,11 @@ public class WolfPushConsumer extends UlfPushConsumer implements UMCBroadcastCon
     protected EMCBytesDecoder          mEMCBytesDecoder;
 
     protected ExtraHeadCoder           mExtraHeadCoder;
+
+    protected Medium                   mMedium;
+    protected UMCTransmit              mUMCTransmit;
+    protected UMCReceiver              mUMCReceiver;
+
 
     public WolfPushConsumer( UlfRocketClient client, String topic, String tag, @Nullable ExtraHeadCoder extraHeadCoder ) {
         super( client, topic, tag );
@@ -30,6 +38,11 @@ public class WolfPushConsumer extends UlfPushConsumer implements UMCBroadcastCon
         }
 
         this.mEMCBytesDecoder = new UMBBytesDecoder();
+
+        // Dummy [ MQ is base on unidirectional communication. ]
+        this.mMedium          = new RocketMedium( this.getRocketClient() );
+        this.mUMCReceiver     = new RocketReceiver( this.mMedium );
+        this.mUMCTransmit     = new RocketTransmit( this.mMedium );
     }
 
     public WolfPushConsumer( UlfRocketClient client, String topic, String tag ) {
@@ -61,13 +74,13 @@ public class WolfPushConsumer extends UlfPushConsumer implements UMCBroadcastCon
             @Override
             public void onSuccessfulMsgReceived( byte[] raw, Object[] args ) throws Exception {
                 UMCMessage message = WolfPushConsumer.this.decodeMessage( raw );
-                handler.onSuccessfulMsgReceived( null, null, null, message, args );
+                handler.onSuccessfulMsgReceived( WolfPushConsumer.this.mMedium, WolfPushConsumer.this.mUMCTransmit, WolfPushConsumer.this.mUMCReceiver, message, args );
             }
 
             @Override
             public void onErrorMsgReceived( byte[] raw, Object[] args ) throws Exception {
                 UMCMessage message = WolfPushConsumer.this.decodeMessage( raw );
-                handler.onErrorMsgReceived( null, null, null, message, args );
+                handler.onErrorMsgReceived( WolfPushConsumer.this.mMedium, WolfPushConsumer.this.mUMCTransmit, WolfPushConsumer.this.mUMCReceiver, message, args );
             }
 
             @Override

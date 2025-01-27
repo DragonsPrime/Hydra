@@ -8,24 +8,29 @@ import com.google.protobuf.DescriptorProtos;
 import com.google.protobuf.Descriptors;
 import com.google.protobuf.DynamicMessage;
 import com.google.protobuf.InvalidProtocolBufferException;
+import com.pinecone.framework.lang.field.FieldEntity;
 import com.pinecone.framework.system.ProxyProvokeHandleException;
 import com.pinecone.hydra.umc.msg.ExtraEncode;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 import com.pinecone.hydra.umc.wolfmc.UlfInformMessage;
 import com.pinecone.hydra.umct.husky.compiler.CompilerEncoder;
+import com.pinecone.ulf.util.protobuf.FieldProtobufDecoder;
 
 public class PrototypeDecipher implements HeaderDecipher {
     protected volatile static Descriptors.Descriptor PathDescriptor = null;
 
     protected static Descriptors.FieldDescriptor PathFieldDescriptor = null;
 
-    protected String           mszServicePathKey;
+    protected String               mszServicePathKey;
 
-    protected CompilerEncoder  mCompilerEncoder;
+    protected CompilerEncoder      mCompilerEncoder;
 
-    public PrototypeDecipher( String szServicePathKey, CompilerEncoder encoder ) {
-        this.mszServicePathKey = szServicePathKey;
-        this.mCompilerEncoder  = encoder;
+    protected FieldProtobufDecoder mFieldProtobufDecoder;
+
+    public PrototypeDecipher( String szServicePathKey, CompilerEncoder encoder, FieldProtobufDecoder decoder ) {
+        this.mszServicePathKey     = szServicePathKey;
+        this.mCompilerEncoder      = encoder;
+        this.mFieldProtobufDecoder = decoder;
     }
 
     @Override
@@ -61,7 +66,7 @@ public class PrototypeDecipher implements HeaderDecipher {
     }
 
     @Override
-    public Collection<Object > values( Object that, Object descriptor ) {
+    public Collection<Object > values( Object that, Object descriptor, Object argTpl ) {
         byte[] data = (byte[]) that;
         Descriptors.Descriptor messageDescriptor = (Descriptors.Descriptor) descriptor;
 
@@ -69,11 +74,14 @@ public class PrototypeDecipher implements HeaderDecipher {
             DynamicMessage message = DynamicMessage.parseFrom( messageDescriptor, data );
             Collection<Object > fieldValues = new ArrayList<>();
 
+            Object[] decodes = this.mFieldProtobufDecoder.decodeValues(
+                    (FieldEntity[]) argTpl, messageDescriptor, message, this.mCompilerEncoder.getExceptedKeys(), this.mCompilerEncoder.getOptions()
+            );
+
             int i = 0;
-            for ( Descriptors.FieldDescriptor fieldDescriptor : messageDescriptor.getFields() ) {
+            for ( Object val : decodes ) {
                 if ( i != 0 ) {
-                    Object value = message.getField( fieldDescriptor );
-                    fieldValues.add( value );
+                    fieldValues.add( val );
                 }
                 ++i;
             }
@@ -85,13 +93,17 @@ public class PrototypeDecipher implements HeaderDecipher {
     }
 
     @Override
-    public Object[] evals( Object that, Object descriptor, List<String> keys ) {
+    public Object[] evals( Object that, Object descriptor, List<String> keys, Object argTpl ) {
         byte[] data = (byte[]) that;
         Descriptors.Descriptor messageDescriptor = (Descriptors.Descriptor) descriptor;
 
         try {
             DynamicMessage message = DynamicMessage.parseFrom( messageDescriptor, data );
             Object[] results = new Object[ keys.size() ];
+
+            Object[] decodes = this.mFieldProtobufDecoder.decodeValues(
+                    (FieldEntity[]) argTpl, messageDescriptor, message, this.mCompilerEncoder.getExceptedKeys(), this.mCompilerEncoder.getOptions()
+            );
 
             for ( int i = 1; i < keys.size(); ++i ) {
                 String key = keys.get(i);
@@ -101,7 +113,7 @@ public class PrototypeDecipher implements HeaderDecipher {
                     results[i] = null; // Field not found
                 }
                 else {
-                    results[i] = message.getField(fieldDescriptor);
+                    results[i] = decodes[i];
                 }
             }
 

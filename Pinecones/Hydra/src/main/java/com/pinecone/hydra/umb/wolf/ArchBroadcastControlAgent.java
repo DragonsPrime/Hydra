@@ -7,6 +7,7 @@ import com.pinecone.hydra.umb.broadcast.BroadcastControlAgent;
 import com.pinecone.hydra.umb.broadcast.BroadcastControlNode;
 import com.pinecone.hydra.umct.husky.compiler.ClassDigest;
 import com.pinecone.hydra.umct.husky.compiler.CompilerEncoder;
+import com.pinecone.hydra.umct.husky.compiler.DynamicMethodPrototype;
 import com.pinecone.hydra.umct.husky.compiler.InterfacialCompiler;
 import com.pinecone.hydra.umct.husky.compiler.MethodDigest;
 import com.pinecone.hydra.umct.husky.compiler.MethodPrototype;
@@ -87,12 +88,21 @@ public abstract class ArchBroadcastControlAgent implements BroadcastControlAgent
 
         FieldEntity[] types = prototype.getArgumentTemplate().getSegments();
         for ( int i = 0; i < args.length; ++i ) {
-            int ti = i + i; // Fuck duplicated codes.
-            types[ ti ].setValue( args [ i ] );
+            Object v = args [ i ]; // Fuck duplicated codes.
+            types[ i + 1 ].setValue( v );
         }
 
         return encoder.encode(
                 descriptor, types, this.getCompilerEncoder().getExceptedKeys(), this.getCompilerEncoder().getOptions()
         );
+    }
+
+    protected DynamicMethodPrototype queryMethodPrototype( String szMethodAddress ) {
+        DynamicMethodPrototype method = (DynamicMethodPrototype) this.queryMethodDigest( szMethodAddress );
+        if ( method == null ) {
+            throw new IllegalArgumentException( "Method address: `" + szMethodAddress + "` is invalid." );
+        }
+
+        return method;
     }
 }

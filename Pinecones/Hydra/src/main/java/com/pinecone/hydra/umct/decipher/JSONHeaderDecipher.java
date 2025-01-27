@@ -29,12 +29,12 @@ public class JSONHeaderDecipher implements HeaderDecipher {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Collection<Object > values( Object that, Object descriptor ) {
+    public Collection<Object > values( Object that, Object descriptor, Object argTpl ) {
         return ( (Map) that ).values();
     }
 
     @Override
-    public Object[] evals( Object that, Object descriptor, List<String> keys ) {
+    public Object[] evals( Object that, Object descriptor, List<String> keys, Object argTpl ) {
         Map map = (Map) that;
         Object[] ret = new Object[ keys.size() ];
         int i = 0;

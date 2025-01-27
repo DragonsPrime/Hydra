@@ -113,7 +113,10 @@ public class GenericFieldProtobufDecoder extends GenericBeanProtobufDecoder impl
                         Descriptors.Descriptor nestedDescriptor = fieldDescriptor.getMessageType();
                         Object nestedBean;
                         Class<?> nestedType = entity.getType();
-                        if( Map.class.equals( nestedType ) ) {
+                        if( Map.class.isAssignableFrom( nestedType ) ) {
+                            if( nestedType.isInterface() && Map.class.isAssignableFrom( nestedType ) ) {
+                                nestedType = options.getDefaultMapType();
+                            }
                             nestedBean = this.decodeMap( nestedType, nestedDescriptor, (DynamicMessage) value, exceptedKeys, options );
                         }
                         else {

@@ -1,5 +1,7 @@
 package com.protobuf;
 
+import java.util.Map;
+
 import com.pinecone.hydra.umct.bind.ArgParam;
 import com.pinecone.hydra.umct.stereotype.Iface;
 
@@ -7,6 +9,11 @@ import com.pinecone.hydra.umct.stereotype.Iface;
 public interface Raccoon {
     @Iface
     String scratch( String target, int time );
+
+    @Iface
+    default String scratchA( String target, int time, Rabbit rabbit ) {
+        return null;
+    }
 
     @Iface
     default void scratchV( String target, int time ) {

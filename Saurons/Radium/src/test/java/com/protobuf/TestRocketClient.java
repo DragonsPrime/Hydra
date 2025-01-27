@@ -7,6 +7,7 @@ import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.hydra.umb.UlfMBInformMessage;
 import com.pinecone.hydra.umb.UlfPackageMessageHandler;
 import com.pinecone.hydra.umb.broadcast.BroadcastConsumer;
+import com.pinecone.hydra.umb.broadcast.BroadcastControlConsumer;
 import com.pinecone.hydra.umb.broadcast.BroadcastControlNode;
 import com.pinecone.hydra.umb.broadcast.BroadcastControlProducer;
 import com.pinecone.hydra.umb.broadcast.BroadcastProducer;
@@ -121,54 +122,47 @@ class Garrison extends Radium {
         String keys = "testKeys";
 
 
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        RouteDispatcher dispatcher = new HuskyRouteDispatcher( classLoader, true );
-        PMCTContextMachinery machinery = new HuskyContextMachinery( new BytecodeIfacCompiler(
-                ClassPool.getDefault(), classLoader
-        ), new BytecodeControllerInspector(
-                ClassPool.getDefault(), classLoader
-        ), new GenericFieldProtobufDecoder() );
-
-        BroadcastControlNode client = new WolfMCBClient( new WolfMCRocketClient( nameSrvAddr, groupName ), dispatcher, machinery, "", this );
-        UMCTExpress express = new WolfMCExpress( "", client );
-        dispatcher.setUMCTExpress( express );
+        BroadcastControlNode client = new WolfMCBClient( new WolfMCRocketClient( nameSrvAddr, groupName ), "", this, WolfMCExpress.class );
 
 
 
+//        UMCBroadcastConsumer consumer = client.createUlfConsumer( topic );
+//        consumer.start(new UMCTExpressHandler() {
+//            @Override
+//            public void onSuccessfulMsgReceived( Medium medium, UMCTransmit transmit, UMCReceiver receiver, UMCMessage msg, Object[] args ) throws Exception {
+//                if ( msg.evinceTransferMessage() != null ) {
+//                    Debug.greenfs( msg.getHead(), new String( (byte[]) msg.evinceTransferMessage().getBody() ) );
+//                }
+//                else {
+//                    byte[] bytes = (byte[]) msg.evinceInformMessage().getExHead();
+//                    for ( int i = 0; i < bytes.length; ++i ) {
+//                        try{
+//                            Debug.greenfs( (char)bytes[ i ] );
+//                        }
+//                        catch ( Exception e ) {
+//                            e.printStackTrace();
+//                        }
+//                    }
+//
+//                    Debug.redf( msg.getHead() );
+//                }
+//            }
+//        });
 
-        UMCBroadcastConsumer consumer = client.createUlfConsumer( topic );
-        consumer.start(new UMCTExpressHandler() {
-            @Override
-            public void onSuccessfulMsgReceived( Medium medium, UMCTransmit transmit, UMCReceiver receiver, UMCMessage msg, Object[] args ) throws Exception {
-                if ( msg.evinceTransferMessage() != null ) {
-                    Debug.greenfs( msg.getHead(), new String( (byte[]) msg.evinceTransferMessage().getBody() ) );
-                }
-                else {
-                    byte[] bytes = (byte[]) msg.evinceInformMessage().getExHead();
-                    for ( int i = 0; i < bytes.length; ++i ) {
-                        try{
-                            Debug.greenfs( (char)bytes[ i ] );
-                        }
-                        catch ( Exception e ) {
-                            e.printStackTrace();
-                        }
-                    }
 
-                    Debug.redf( msg.getHead() );
-                }
-            }
-        });
-
+        BroadcastControlConsumer consumer = client.createBroadcastControlConsumer( topic );
+        RaccoonController controller  = new RaccoonController();
+        consumer.registerController( controller );
+        consumer.start();
 
 
 
         client.compile( Raccoon.class, false );
-        DynamicMethodPrototype digest = (DynamicMethodPrototype)client.queryMethodDigest( "com.protobuf.Raccoon.scratch" );
-
-
         BroadcastControlProducer producer = client.createBroadcastControlProducer();
+
+
         producer.start();
-        producer.issueInform( topic, digest, new Object[]{ "fuck you", 2025 } );
+        producer.issueInform( topic, "com.protobuf.Raccoon.scratch", "fuck you", 2025 );
 
 
 

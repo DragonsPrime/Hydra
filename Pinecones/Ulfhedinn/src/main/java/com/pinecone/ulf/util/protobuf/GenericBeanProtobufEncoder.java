@@ -469,7 +469,7 @@ public class GenericBeanProtobufEncoder implements BeanProtobufEncoder {
         }
     }
 
-    protected Object reinterpretFieldValue(Object value, Descriptors.FieldDescriptor.Type fieldType ) {
+    protected Object reinterpretFieldValue( Object value, Descriptors.FieldDescriptor.Type fieldType ) {
         switch ( fieldType ) {
             case SINT32:
             case SFIXED32:

@@ -3,6 +3,9 @@ package com.pinecone.hydra.umb.rocket;
 import com.pinecone.hydra.umb.broadcast.BroadcastConsumer;
 import com.pinecone.hydra.umb.broadcast.BroadcastProducer;
 import com.pinecone.hydra.umb.broadcast.UNT;
+import com.pinecone.hydra.umc.msg.MessageNodus;
+import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
+
 import org.apache.rocketmq.client.producer.DefaultMQProducer;
 
 import java.util.Map;
@@ -16,16 +19,34 @@ public class RocketMQClient implements RocketClient {
 
     private static final Object PRESENT = new Object();
 
-    protected RocketConfig mRocketConfig;
+    protected RocketConfig     mRocketConfig;
+
+    protected long             mnNodeId;
 
 
-    public RocketMQClient( String nameSrvAddr, String groupName ) {
+    public RocketMQClient( long nodeId, String nameSrvAddr, String groupName ) {
         this.mRocketConfig = new RocketMQConfig(
                 nameSrvAddr, groupName, 4096, 30000, 2
         );
 
         this.producerRegister = new ConcurrentHashMap<>();
         this.consumerRegister = new ConcurrentHashMap<>();
+        this.mnNodeId         = nodeId;
+    }
+
+    public RocketMQClient( String nameSrvAddr, String groupName ) {
+        this( MessageNodus.nextLocalId(), nameSrvAddr, groupName );
+    }
+
+
+    @Override
+    public ExtraHeadCoder getExtraHeadCoder() {
+        return null;
+    }
+
+    @Override
+    public long getMessageNodeId() {
+        return this.mnNodeId;
     }
 
     @Override

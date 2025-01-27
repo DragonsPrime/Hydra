@@ -1,15 +1,11 @@
 package com.pinecone.hydra.umc.msg;
 
-import com.pinecone.framework.util.Bytes;
-import com.pinecone.framework.util.json.JSONException;
-import com.pinecone.framework.util.json.JSONMaptron;
-import com.pinecone.framework.util.json.JSONObject;
-import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
+import java.io.OutputStream;
+import java.io.InputStream;
+import java.io.IOException;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
-import java.util.Map;
+import com.pinecone.framework.util.json.JSONException;
+import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
 
 /**
  *  Pinecone Ursus For Java UlfMCProtocol [ Wolf Uniform Message Control Protocol ]
@@ -37,7 +33,7 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
 
     protected String        mszSignature   = UMCHeadV1.ProtocolSignature;
 
-    protected UMCHead       mHead          ;
+    protected UMCHead       mTemplateHead  ;
 
     protected OutputStream  mOutputStream  ;
 
@@ -57,7 +53,7 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
         this.mMessageSource = medium;
         UMCHeadV1 head      = new UMCHeadV1( this.mszSignature );
         head.applyExtraHeadCoder( this.getExtraHeadCoder() );
-        this.mHead          = head;
+        this.mTemplateHead          = head;
         return this;
     }
 
@@ -78,24 +74,24 @@ public abstract class ArchUMCProtocol implements UMCProtocol {
 
     @Override
     public UMCHead getHead() {
-        return this.mHead;
+        return this.mTemplateHead;
     }
 
     @Override
     public void setHead( UMCHead head ) {
-        this.mHead = head;
+        this.mTemplateHead = head;
         this.mszSignature = head.getSignature();
     }
 
     @Override
     public void release() {
         this.mMessageSource.release();
-        this.mHead.release();
+        this.mTemplateHead.release();
 
         this.mMessageSource   = null;
         this.mszVersion       = null;
         this.mszSignature     = null;
-        this.mHead            = null;
+        this.mTemplateHead            = null;
         this.mOutputStream    = null;
         this.mInputStream     = null;
     }

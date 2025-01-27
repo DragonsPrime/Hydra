@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.pinecone.framework.lang.field.FieldEntity;
 import com.pinecone.hydra.express.Deliver;
 import com.pinecone.hydra.servgram.Servgramium;
 import com.pinecone.hydra.system.component.Slf4jTraceable;
@@ -49,7 +50,7 @@ public class HuskyRouteDispatcher implements RouteDispatcher {
     protected void applyExpress( InterfacialCompiler compiler, UMCTExpress express ) {
         this.mUMCTExpress = express;
 
-        this.mDefaultDeliver      = new ProtoletMsgDeliver( AppointServer.DefaultEntityName, this.mUMCTExpress, compiler.getCompilerEncoder() );
+        this.mDefaultDeliver      = new ProtoletMsgDeliver( AppointServer.DefaultEntityName, this.mUMCTExpress, this.mPMCTContextMachinery, compiler.getCompilerEncoder() );
         this.mUMCTExpress.register( this.mDefaultDeliver  );
     }
 
@@ -166,6 +167,11 @@ public class HuskyRouteDispatcher implements RouteDispatcher {
                     return digest.getArgumentsDescriptor();
                 }
 
+                @Override
+                public FieldEntity[] getArgumentTemplate() {
+                    return digest.getArgumentTemplate().getSegments();
+                }
+
             };
 
             deliver.registerHandler( fullPath, handler );
@@ -265,6 +271,10 @@ public class HuskyRouteDispatcher implements RouteDispatcher {
                             return imd.getArgumentsDescriptor();
                         }
 
+                        @Override
+                        public FieldEntity[] getArgumentTemplate() {
+                            return imd.getArgumentTemplate().getSegments();
+                        }
                     };
 
                     deliver.registerHandler( address, handler );

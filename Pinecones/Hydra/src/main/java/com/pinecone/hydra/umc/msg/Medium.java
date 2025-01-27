@@ -29,5 +29,5 @@ public interface Medium extends Pinenut {
 
     void release();
 
-    MessageNode getMessageNode();
+    MessageNodus getMessageNode();
 }

@@ -2,6 +2,7 @@ package com.protobuf;
 
 
 import java.util.List;
+import java.util.Map;
 
 import com.mc.JesusChrist;
 import com.pinecone.Pinecone;
@@ -242,7 +243,6 @@ class Jeff extends JesusChrist {
 //        }
 
 
-
         Debug.greenf( wolf.invokeInform( 2048, "com.protobuf.Raccoon.scratch", "fuck you", 2025 ) );
 
         Raccoon raccoon = wolf.getIface( 2048, Raccoon.class );
@@ -272,7 +272,12 @@ class Jeff extends JesusChrist {
 
         wolf.embraces(2);
 
+//        Rabbit rabbit = new Rabbit();
+//        rabbit.name = "rabbit";
+//        Debug.bluef( wolf.invokeInform( "com.protobuf.Raccoon.scratchA", "DP you!", 5202, rabbit ) );
+
         Debug.bluef( wolf.invokeInform( "com.protobuf.Raccoon.scratch", "DP you!", 5202 ) );
+
 
         //Debug.greenf( wolf.invokeInform(digest, "fuck you", 2024 ) );
 

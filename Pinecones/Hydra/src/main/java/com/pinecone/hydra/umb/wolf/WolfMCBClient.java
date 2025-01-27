@@ -1,23 +1,44 @@
 package com.pinecone.hydra.umb.wolf;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
+import org.slf4j.Logger;
+
+import com.pinecone.framework.system.Nullable;
 import com.pinecone.framework.system.executum.Processum;
 import com.pinecone.hydra.servgram.ArchServgramium;
 import com.pinecone.hydra.umb.broadcast.BroadcastConsumer;
+import com.pinecone.hydra.umb.broadcast.BroadcastControlConsumer;
 import com.pinecone.hydra.umb.broadcast.BroadcastControlNode;
 import com.pinecone.hydra.umb.broadcast.BroadcastControlProducer;
+import com.pinecone.hydra.umb.broadcast.BroadcastNode;
 import com.pinecone.hydra.umb.broadcast.BroadcastProducer;
 import com.pinecone.hydra.umb.broadcast.UMCBroadcastConsumer;
 import com.pinecone.hydra.umb.broadcast.UMCBroadcastNode;
 import com.pinecone.hydra.umb.broadcast.UMCBroadcastProducer;
 import com.pinecone.hydra.umb.broadcast.UNT;
 import com.pinecone.hydra.umc.msg.extra.ExtraHeadCoder;
+import com.pinecone.hydra.umc.msg.handler.ErrorMessageAudit;
+import com.pinecone.hydra.umct.MessageJunction;
+import com.pinecone.hydra.umct.UMCTExpress;
+import com.pinecone.hydra.umct.WolfMCExpress;
+import com.pinecone.hydra.umct.husky.compiler.BytecodeIfacCompiler;
 import com.pinecone.hydra.umct.husky.compiler.ClassDigest;
 import com.pinecone.hydra.umct.husky.compiler.InterfacialCompiler;
 import com.pinecone.hydra.umct.husky.compiler.MethodDigest;
+import com.pinecone.hydra.umct.husky.machinery.HuskyContextMachinery;
+import com.pinecone.hydra.umct.husky.machinery.HuskyRouteDispatcher;
+import com.pinecone.hydra.umct.husky.machinery.HuskyRouteDispatcherFabricator;
 import com.pinecone.hydra.umct.husky.machinery.PMCTContextMachinery;
 import com.pinecone.hydra.umct.husky.machinery.RouteDispatcher;
+import com.pinecone.hydra.umct.mapping.BytecodeControllerInspector;
+import com.pinecone.hydra.umct.mapping.ControllerInspector;
 import com.pinecone.ulf.util.protobuf.FieldProtobufDecoder;
 import com.pinecone.ulf.util.protobuf.FieldProtobufEncoder;
+import com.pinecone.ulf.util.protobuf.GenericFieldProtobufDecoder;
+
+import javassist.ClassPool;
 
 /**
  *  Pinecone Ursus For Java Wolf-UMCT-B [ Uniform Message Broadcast Control Transmit ]
@@ -28,7 +49,7 @@ import com.pinecone.ulf.util.protobuf.FieldProtobufEncoder;
  *  统一消息广播传输控制传输协议
  *  **********************************************************
  */
-public class WolfMCBClient extends ArchServgramium implements BroadcastControlNode {
+public class WolfMCBClient extends ArchServgramium implements UlfBroadcastControlNode {
 
     protected PMCTContextMachinery          mPMCTContextMachinery;
 
@@ -37,7 +58,7 @@ public class WolfMCBClient extends ArchServgramium implements BroadcastControlNo
     protected UMCBroadcastNode              mUMCBroadcastNode;
 
 
-    public WolfMCBClient( UMCBroadcastNode broadcastNode, RouteDispatcher routeDispatcher, PMCTContextMachinery machinery, String szGramName, Processum parent ) {
+    public WolfMCBClient( UMCBroadcastNode broadcastNode, @Nullable RouteDispatcher routeDispatcher, PMCTContextMachinery machinery, String szGramName, Processum parent ) {
         super( szGramName, parent );
 
         this.mPMCTContextMachinery = machinery;
@@ -45,9 +66,96 @@ public class WolfMCBClient extends ArchServgramium implements BroadcastControlNo
         this.mUMCBroadcastNode     = broadcastNode;
     }
 
+    public WolfMCBClient( UMCBroadcastNode broadcastNode, PMCTContextMachinery machinery, String szGramName, Processum parent ) {
+        this( broadcastNode, null, machinery, szGramName, parent );
+
+        this.mRouteDispatcher = this.createHuskyRoute();
+    }
+
+    public WolfMCBClient( UMCBroadcastNode broadcastNode, PMCTContextMachinery machinery, String szGramName, Processum parent, Class<?> expressType ) {
+        this( broadcastNode, null, machinery, szGramName, parent );
+
+        UMCTExpress express   = this.createUMCTExpress( BroadcastNode.DefaultEntityName, expressType );
+        this.mRouteDispatcher = this.createHuskyRoute( express );
+        HuskyRouteDispatcherFabricator.afterConstructed( (HuskyRouteDispatcher)this.mRouteDispatcher, express );
+    }
+
+    public WolfMCBClient( UMCBroadcastNode broadcastNode, String szGramName, Processum parent, Class<?> expressType ) {
+        this(
+                broadcastNode,
+                null,
+
+                new HuskyContextMachinery( new BytecodeIfacCompiler(
+                        ClassPool.getDefault(), parent.getTaskManager().getClassLoader()
+                ), new BytecodeControllerInspector(
+                        ClassPool.getDefault(),  parent.getTaskManager().getClassLoader()
+                ), new GenericFieldProtobufDecoder() ),
+
+                szGramName,
+                parent
+        );
+
+        UMCTExpress express   = this.createUMCTExpress( BroadcastNode.DefaultEntityName, expressType );
+        this.mRouteDispatcher = this.createHuskyRoute( express );
+        HuskyRouteDispatcherFabricator.afterConstructed( (HuskyRouteDispatcher)this.mRouteDispatcher, express );
+    }
+
+
+    @Override
+    public long getMessageNodeId() {
+        return this.mUMCBroadcastNode.getMessageNodeId();
+    }
+
+    @Override
+    public ErrorMessageAudit getErrorMessageAudit() {
+        return this.mUMCBroadcastNode.getErrorMessageAudit();
+    }
+
+    @Override
+    public void setErrorMessageAudit( ErrorMessageAudit audit ) {
+        this.mUMCBroadcastNode.setErrorMessageAudit( audit );
+    }
 
 
 
+
+    @Override
+    public void applyPMCTContextMachinery( PMCTContextMachinery mPMCTContextMachinery ) {
+        this.mPMCTContextMachinery = mPMCTContextMachinery;
+    }
+
+    @Override
+    public void applyRouteDispatcher( RouteDispatcher mRouteDispatcher ) {
+        this.mRouteDispatcher = mRouteDispatcher;
+    }
+
+    @Override
+    public UMCTExpress createUMCTExpress( String name, Class<?> expressType ) {
+        try{
+            Constructor<?> constructor = expressType.getConstructor( String.class, MessageJunction.class, Logger.class );
+            return  (UMCTExpress) constructor.newInstance( name, this, this.getLogger() );
+        }
+        catch ( NoSuchMethodException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e ) {
+            throw new IllegalArgumentException( "`" + expressType.getSimpleName() + "` is not UMCTExpress calibre qualified." );
+        }
+    }
+
+    @Override
+    public UMCTExpress createUlfExpress( String name ) {
+        return this.createUMCTExpress( name, WolfMCExpress.class );
+    }
+
+    @Override
+    public RouteDispatcher createHuskyRoute() {
+        return new HuskyRouteDispatcher( this.getTaskManager().getClassLoader(), true );
+    }
+
+    @Override
+    public RouteDispatcher createHuskyRoute( UMCTExpress express ) {
+        RouteDispatcher dispatcher = this.createHuskyRoute();
+        dispatcher.setUMCTExpress( express );
+        return dispatcher;
+    }
 
 
 
@@ -62,6 +170,11 @@ public class WolfMCBClient extends ArchServgramium implements BroadcastControlNo
     }
 
     @Override
+    public RouteDispatcher getRouteDispatcher() {
+        return this.mRouteDispatcher;
+    }
+
+    @Override
     public FieldProtobufEncoder getFieldProtobufEncoder() {
         return this.mPMCTContextMachinery.getFieldProtobufEncoder();
     }
@@ -70,6 +183,7 @@ public class WolfMCBClient extends ArchServgramium implements BroadcastControlNo
     public FieldProtobufDecoder getFieldProtobufDecoder() {
         return this.mPMCTContextMachinery.getFieldProtobufDecoder();
     }
+
 
 
 
@@ -100,6 +214,57 @@ public class WolfMCBClient extends ArchServgramium implements BroadcastControlNo
 
 
 
+
+
+    @Override
+    public void registerInstance( String deliverName, Object instance, Class<?> iface ) {
+        this.mRouteDispatcher.registerInstance( deliverName, instance, iface );
+    }
+
+    @Override
+    public void registerInstance( Object instance, Class<?> iface ) {
+        this.mRouteDispatcher.registerInstance( instance, iface );
+    }
+
+    @Override
+    public void registerController( String deliverName, Object instance, Class<?> controllerType ) {
+        this.mRouteDispatcher.registerController( deliverName, instance, controllerType );
+    }
+
+    @Override
+    public void registerController( Object instance, Class<?> controllerType ) {
+        this.mRouteDispatcher.registerController( instance, controllerType );
+    }
+
+
+
+
+
+
+    @Override
+    public BroadcastControlConsumer createBroadcastControlConsumer( UMCBroadcastConsumer workAgent, RouteDispatcher routeDispatcher ) {
+        return new WolfMCBConsumer( this, routeDispatcher, workAgent );
+    }
+
+    @Override
+    public BroadcastControlConsumer createBroadcastControlConsumer( UMCBroadcastConsumer workAgent ) {
+        return this.createBroadcastControlConsumer( workAgent, this.getRouteDispatcher() );
+    }
+
+    @Override
+    public BroadcastControlConsumer createBroadcastControlConsumer( UNT unt ) {
+        return this.createBroadcastControlConsumer( this.createUlfConsumer( unt ), this.getRouteDispatcher() );
+    }
+
+    @Override
+    public BroadcastControlConsumer createBroadcastControlConsumer( String topic, String ns ) {
+        return this.createBroadcastControlConsumer( this.createUlfConsumer( topic, ns ), this.getRouteDispatcher() );
+    }
+
+    @Override
+    public BroadcastControlConsumer createBroadcastControlConsumer( String topic ) {
+        return this.createBroadcastControlConsumer( this.createUlfConsumer( topic ), this.getRouteDispatcher() );
+    }
 
 
 
@@ -204,4 +369,5 @@ public class WolfMCBClient extends ArchServgramium implements BroadcastControlNo
     public void terminate() {
         this.close();
     }
+
 }

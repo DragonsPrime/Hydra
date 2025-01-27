@@ -13,6 +13,8 @@ public interface BroadcastControlProducer extends BroadcastControlAgent {
 
     void issueInform( String topic, MethodPrototype method, Object[] args ) throws IOException ;
 
+    void issueInform( String topic, String szMethodAddress, Object... args ) throws IOException ;
+
     void close();
 
     void start() throws UMBServiceException;

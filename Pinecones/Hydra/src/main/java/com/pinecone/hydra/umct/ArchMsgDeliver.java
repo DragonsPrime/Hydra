@@ -127,11 +127,11 @@ public abstract class ArchMsgDeliver implements MessageDeliver {
 
                 Object[] args;
                 if( controller.isArgsIndexed() ) {
-                    args = this.mHeaderDecipher.values( exHead, controller.getArgumentsDescriptor() ).toArray();
+                    args = this.mHeaderDecipher.values( exHead, controller.getArgumentsDescriptor(), controller.getArgumentTemplate() ).toArray();
                 }
                 else {
                     List<String > keys = controller.getArgumentsKey();
-                    args = this.mHeaderDecipher.evals( exHead, controller.getArgumentsDescriptor(), keys );
+                    args = this.mHeaderDecipher.evals( exHead, controller.getArgumentsDescriptor(), keys, controller.getArgumentTemplate() );
                 }
 
                 try{

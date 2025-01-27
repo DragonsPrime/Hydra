@@ -1,12 +1,12 @@
 package com.pinecone.hydra.umc.msg.handler;
 
-import com.pinecone.hydra.umc.msg.MessageNode;
+import com.pinecone.hydra.umc.msg.MessageNodus;
 import com.pinecone.hydra.umc.msg.UMCMessage;
 
 public class GenericErrorMessageAudit implements ErrorMessageAudit {
-    protected MessageNode mMessageNode;
+    protected MessageNodus mMessageNode;
 
-    public GenericErrorMessageAudit( MessageNode node ) {
+    public GenericErrorMessageAudit( MessageNodus node ) {
         this.mMessageNode = node;
     }
 

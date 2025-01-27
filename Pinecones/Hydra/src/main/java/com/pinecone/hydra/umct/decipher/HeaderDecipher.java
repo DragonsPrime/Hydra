@@ -26,9 +26,9 @@ public interface HeaderDecipher extends Pinenut {
         return null;
     }
 
-    Collection<Object > values( Object that, @Nullable Object descriptor );
+    Collection<Object > values( Object that, @Nullable Object descriptor, @Nullable Object argTpl );
 
-    Object[] evals( Object that, @Nullable Object descriptor, List<String > keys );
+    Object[] evals( Object that, @Nullable Object descriptor, List<String > keys, @Nullable Object argTpl );
 
     String getServicePath( Object that );
 
