@@ -11,7 +11,7 @@ public class GenericSymbolic implements Symbolic{
     private LocalDateTime           createTime;
     private LocalDateTime           updateTime;
     private String                  name;
-    private int                     reparsedPoint;
+    private String                  reparsedPoint;
     private SymbolicMeta            symbolicMeta;
     private SymbolicManipulator     symbolicManipulator;
 
@@ -24,7 +24,7 @@ public class GenericSymbolic implements Symbolic{
         this.updateTime = LocalDateTime.now();
     }
 
-    public GenericSymbolic(long enumId, GUID guid, LocalDateTime createTime, LocalDateTime updateTime, String name, int reparsedPoint, SymbolicMeta symbolicMeta) {
+    public GenericSymbolic(long enumId, GUID guid, LocalDateTime createTime, LocalDateTime updateTime, String name, String reparsedPoint, SymbolicMeta symbolicMeta) {
         this.enumId = enumId;
         this.guid = guid;
         this.createTime = createTime;
@@ -85,12 +85,12 @@ public class GenericSymbolic implements Symbolic{
     }
 
 
-    public int getReparsedPoint() {
+    public String getReparsedPoint() {
         return reparsedPoint;
     }
 
 
-    public void setReparsedPoint(int reparsedPoint) {
+    public void setReparsedPoint( String reparsedPoint ) {
         this.reparsedPoint = reparsedPoint;
     }
 

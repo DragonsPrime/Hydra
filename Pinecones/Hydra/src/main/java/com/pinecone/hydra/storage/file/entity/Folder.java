@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public interface Folder extends ElementNode{
+public interface Folder extends ElementNode {
     void setNodeAttribute(FileSystemAttributes attributes);
 
     FolderMeta getFolderMeta();
@@ -22,7 +22,7 @@ public interface Folder extends ElementNode{
     List<FileTreeNode > listItem();
 
 
-    void put (String key, FileTreeNode val);
+    void put ( String key, FileTreeNode val );
 
     void remove ( String key );
 
