@@ -1,4 +1,4 @@
-package com.pinecone.hydra.storage;
+package com.pinecone.hydra.storage.io;
 
 import java.nio.ByteBuffer;
 

@@ -260,6 +260,7 @@ public class GenericFileNode extends ArchElementNode implements FileNode{
         }
         return false;
     }
+
     @Override
     public Number size() {
         return this.physicalSize;

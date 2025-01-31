@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-public interface FileSystemAttributes extends Pinenut ,Map<String, String >{
+public interface FileSystemAttributes extends Pinenut ,Map<String, String > {
     GUID getGuid();
 
     void setGuid( GUID guid );

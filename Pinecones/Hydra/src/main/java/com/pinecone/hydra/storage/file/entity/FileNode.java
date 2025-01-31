@@ -1,12 +1,12 @@
 package com.pinecone.hydra.storage.file.entity;
 
 import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.UniformFile;
+import com.pinecone.hydra.storage.CheckedFile;
 
 import java.time.LocalDateTime;
 import java.util.TreeMap;
 
-public interface FileNode extends ElementNode, UniformFile {
+public interface FileNode extends ElementNode, CheckedFile {
     LocalDateTime getDeletedTime();
     void setDeletedTime(LocalDateTime deletedTime);
 
@@ -45,12 +45,15 @@ public interface FileNode extends ElementNode, UniformFile {
     void setDefinitionSize(long definitionSize);
 
     String getCrc32Xor();
+
     void setCrc32Xor(String crc32Xor);
 
     boolean getIntegrityCheckEnable();
     void setIntegrityCheckEnable(boolean integrityCheckEnable);
 
     boolean getDisableCluster();
+
     void setDisableCluster(boolean disableCluster);
+
     boolean isUploadSuccess();
 }

@@ -8,4 +8,9 @@ public interface Symbolic extends ReparseSemanticNode {
     void create();
 
     void remove();
+
+    @Override
+    default Symbolic evinceSymbolic() {
+        return this;
+    }
 }

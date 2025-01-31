@@ -1,6 +1,7 @@
 package com.pinecone.hydra.file.ibatis.hydranium;
 
 import com.pinecone.framework.system.construction.Structure;
+import com.pinecone.hydra.file.ibatis.ExternalSymbolicMapper;
 import com.pinecone.hydra.file.ibatis.FileMapper;
 import com.pinecone.hydra.file.ibatis.FileMetaMapper;
 import com.pinecone.hydra.file.ibatis.FileSystemAttributeMapper;
@@ -9,10 +10,10 @@ import com.pinecone.hydra.file.ibatis.FolderMetaMapper;
 import com.pinecone.hydra.file.ibatis.FolderVolumeMappingMapper;
 import com.pinecone.hydra.file.ibatis.LocalFrameMapper;
 import com.pinecone.hydra.file.ibatis.RemoteFrameMapper;
-import com.pinecone.hydra.file.ibatis.StripMapper;
 import com.pinecone.hydra.file.ibatis.SymbolicMapper;
 import com.pinecone.hydra.file.ibatis.SymbolicMetaMapper;
 
+import com.pinecone.hydra.storage.file.source.ExternalSymbolicManipulator;
 import com.pinecone.hydra.storage.file.source.FileManipulator;
 import com.pinecone.hydra.storage.file.source.FileMasterManipulator;
 import com.pinecone.hydra.storage.file.source.FileMetaManipulator;
@@ -22,7 +23,6 @@ import com.pinecone.hydra.storage.file.source.FolderMetaManipulator;
 import com.pinecone.hydra.storage.file.source.FolderVolumeMappingManipulator;
 import com.pinecone.hydra.storage.file.source.LocalFrameManipulator;
 import com.pinecone.hydra.storage.file.source.RemoteFrameManipulator;
-import com.pinecone.hydra.storage.file.source.StripManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicManipulator;
 import com.pinecone.hydra.storage.file.source.SymbolicMetaManipulator;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
@@ -70,11 +70,12 @@ public class FileMasterManipulatorImpl implements FileMasterManipulator {
     @Structure( type = SymbolicMetaMapper.class )
     SymbolicMetaManipulator symbolicMetaManipulator;
 
+    @Resource
+    @Structure( type = ExternalSymbolicMapper.class )
+    ExternalSymbolicManipulator externalSymbolicManipulator;
+
     @Resource( type = FileMasterTreeManipulatorImpl.class )
     KOISkeletonMasterManipulator skeletonMasterManipulator;
-
-    @Structure( type = StripMapper.class )
-    StripManipulator            stripManipulator;
 
     @Structure( type = FolderVolumeMappingMapper.class)
     FolderVolumeMappingMapper folderVolumeRelationMapper;
@@ -134,8 +135,8 @@ public class FileMasterManipulatorImpl implements FileMasterManipulator {
     }
 
     @Override
-    public StripManipulator getStripManipulator() {
-        return this.stripManipulator;
+    public ExternalSymbolicManipulator getExternalSymbolicManipulator() {
+        return this.externalSymbolicManipulator;
     }
 
     @Override

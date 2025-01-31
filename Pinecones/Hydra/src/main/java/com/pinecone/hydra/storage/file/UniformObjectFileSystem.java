@@ -5,6 +5,8 @@ import com.pinecone.framework.util.StringUtils;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.uoi.UOI;
 import com.pinecone.hydra.storage.file.cache.DefaultCacheConstants;
+import com.pinecone.hydra.storage.file.direct.DirectFileSystemAccess;
+import com.pinecone.hydra.storage.file.direct.KenDirectFileSystemAccess;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.GenericFSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
@@ -82,6 +84,8 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
 
     protected IndexableMapQuerier<String, String >    globalPathGuidCacheQuerier;
 
+    protected DirectFileSystemAccess                  directFileSystemAccess;
+
 
     public UniformObjectFileSystem( Processum superiorProcess, KOIMasterManipulator masterManipulator, KOMFileSystem parent, String name, IndexableMapQuerier<String, String > globalPathGuidCacheQuerier ){
         // Phase [1] Construct system.
@@ -117,6 +121,8 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
 //        this.textValueTypeConverter        =  new DefaultTextValueConverter();
         this.fsNodeAllotment                 =  new GenericFSNodeAllotment(this.fileMasterManipulator,this);
         this.globalPathGuidCacheQuerier      =  globalPathGuidCacheQuerier;
+
+        this.directFileSystemAccess          = new KenDirectFileSystemAccess(this);
     }
 
 //    public GenericKOMFileSystem( Hydrarum hydrarum ) {
@@ -171,6 +177,11 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     }
 
     @Override
+    public FileMasterManipulator getFileMasterManipulator() {
+        return this.fileMasterManipulator;
+    }
+
+    @Override
     public FileTreeNode get( GUID guid ) {
         return (FileTreeNode) super.get( guid );
     }
@@ -214,13 +225,10 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
     }
 
     @Override
-    public void removeFileNode(GUID guid) {
-
-    }
-
-    @Override
-    public void removeFolder(GUID guid) {
-
+    public void remove(String path) {
+        String key = DefaultCacheConstants.FilePathCacheNS + path;
+        this.globalPathGuidCacheQuerier.erase(key);
+        super.remove(path);
     }
 
     @Override

@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume;
 
-import com.pinecone.hydra.storage.UniformFile;
+import com.pinecone.hydra.storage.CheckedFile;
 
 public class TitanVolumeFile implements VolumeFile{
     private String name;
@@ -44,7 +44,7 @@ public class TitanVolumeFile implements VolumeFile{
     }
 
     @Override
-    public VolumeFile fromUniformFile(UniformFile file) {
+    public VolumeFile fromUniformFile(CheckedFile file) {
         this.name = file.getName();
         this.size = file.size();
         this.parityCheck = file.getParityCheck();

@@ -21,11 +21,13 @@ public class GenericFolder extends ArchElementNode implements Folder{
 
     public GenericFolder() {
     }
-    public GenericFolder(KOMFileSystem fileSystem ) {
+    public GenericFolder( KOMFileSystem fileSystem ) {
         this.fileSystem = fileSystem;
         GuidAllocator guidAllocator = this.fileSystem.getGuidAllocator();
         this.setGuid( guidAllocator.nextGUID() );
         this.setCreateTime( LocalDateTime.now() );
+
+        this.folderManipulator = fileSystem.getFileMasterManipulator().getFolderManipulator();
     }
 
     public GenericFolder( KOMFileSystem fileSystem, FolderManipulator folderManipulator ) {
@@ -70,7 +72,7 @@ public class GenericFolder extends ArchElementNode implements Folder{
     }
 
     @Override
-    public void setChildrenGuids(List<GUID> contentGuids, int depth) {
+    public void setChildrenGuids( List<GUID> contentGuids, int depth ) {
 
     }
 
@@ -86,13 +88,38 @@ public class GenericFolder extends ArchElementNode implements Folder{
     }
 
     @Override
-    public void put(String key, FileTreeNode val) {
+    public void put( String key, FileTreeNode val ) {
 
     }
 
     @Override
-    public void remove(String key) {
+    public void remove( String key ) {
 
+    }
+
+
+    @Override
+    public void put( ElementNode child ) {
+        this.fileSystem.put( child );
+        this.fileSystem.affirmOwnedNode( this.guid, child.getGuid() );
+    }
+
+    @Override
+    public Folder createFolder( String name ) {
+        Folder neo = new GenericFolder( this.fileSystem );
+        neo.setName( name );
+
+        this.put( neo );
+        return neo;
+    }
+
+    @Override
+    public ExternalSymbolic createExternalSymbolic( String name ) {
+        ExternalSymbolic neo = new GenericExternalSymbolic( this.fileSystem );
+        neo.setName( name );
+
+        this.put( neo );
+        return neo;
     }
 
     @Override
@@ -122,16 +149,16 @@ public class GenericFolder extends ArchElementNode implements Folder{
         return false;
     }
 
-    @Override
-    public Number size() {
-        long size = 0;
-        List<TreeNode> children = this.fileSystem.getChildren(this.guid);
-        for( TreeNode node : children ){
-            ElementNode elementNode = (ElementNode) node;
-            size += elementNode.size().longValue();
-        }
-        return size;
-    }
+//    @Override
+//    public Number size() {
+//        long size = 0;
+//        List<TreeNode> children = this.fileSystem.getChildren(this.guid);
+//        for( TreeNode node : children ){
+//            ElementNode elementNode = (ElementNode) node;
+//            size += elementNode.size().longValue();
+//        }
+//        return size;
+//    }
 
     @Override
     public boolean isEmpty() {

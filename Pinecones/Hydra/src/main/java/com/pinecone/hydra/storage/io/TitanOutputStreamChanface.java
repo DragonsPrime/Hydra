@@ -1,4 +1,4 @@
-package com.pinecone.hydra.storage;
+package com.pinecone.hydra.storage.io;
 
 import com.pinecone.framework.system.NotImplementedException;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
@@ -31,7 +31,7 @@ public class TitanOutputStreamChanface implements Chanface {
     }
 
     @Override
-    public int read( ChanfaceReader reader, int size, long offset ) throws IOException {
+    public int read(ChanfaceReader reader, int size, long offset ) throws IOException {
         throw new NotImplementedException();
     }
 
@@ -88,4 +88,9 @@ public class TitanOutputStreamChanface implements Chanface {
         return bytesWritten;
     }
 
+
+    @Override
+    public Object getNativeFace() {
+        return this.stream;
+    }
 }

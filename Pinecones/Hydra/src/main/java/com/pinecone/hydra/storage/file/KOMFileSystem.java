@@ -7,6 +7,7 @@ import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.file.entity.Folder;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
 import com.pinecone.hydra.storage.file.entity.Frame;
+import com.pinecone.hydra.storage.file.source.FileMasterManipulator;
 import com.pinecone.hydra.storage.file.transmit.exporter.FileExportEntity;
 import com.pinecone.hydra.storage.file.transmit.receiver.FileReceiveEntity;
 import com.pinecone.hydra.system.ko.kom.ReparseKOMTree;
@@ -57,8 +58,6 @@ public interface KOMFileSystem extends ReparseKOMTree {
     FileSystemConfig getConfig();
 
 
-
-
     //todo update方法
 
     @Override
@@ -66,12 +65,6 @@ public interface KOMFileSystem extends ReparseKOMTree {
 
     @Override
     void removeReparseLink( GUID guid );
-
-    void removeFileNode(GUID guid);
-
-    void removeFolder(GUID guid);
-
-
 
 
     @Override
@@ -179,4 +172,6 @@ public interface KOMFileSystem extends ReparseKOMTree {
 
     void export( FileExportEntity entity ) throws SQLException, IOException, InvocationTargetException, InstantiationException, IllegalAccessException;
     void export( FileExportEntity entity, Number offset, Number endSize );
+
+    FileMasterManipulator  getFileMasterManipulator();
 }

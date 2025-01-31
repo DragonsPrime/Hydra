@@ -1,6 +1,6 @@
 package com.walnuts.sparta.uofs.console.api.controller.v2;
 
-import com.pinecone.hydra.storage.TitanFileChannelChanface;
+import com.pinecone.hydra.storage.io.TitanFileChannelChanface;
 import com.pinecone.hydra.storage.bucket.BucketInstrument;
 import com.pinecone.hydra.storage.bucket.entity.Bucket;
 import com.pinecone.hydra.storage.bucket.entity.GenericBucket;

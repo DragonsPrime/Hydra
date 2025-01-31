@@ -1,21 +1,21 @@
 package com.pinecone.hydra.storage.volume.entity.local.physical.receive;
 
 import com.pinecone.framework.util.Bytes;
-import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.io.Chanface;
 import com.pinecone.hydra.storage.RandomAccessChanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageNaming;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
 import com.pinecone.hydra.storage.TitanStorageIOResponse;
 import com.pinecone.hydra.storage.TitanStorageNaming;
-import com.pinecone.hydra.storage.file.Verification;
 import com.pinecone.hydra.storage.volume.VolumeManager;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.file.Files;
@@ -122,7 +122,6 @@ public class TitanDirectReceive64 implements DirectReceive64{
         }, size, offset );
         ByteBuffer buffer = lpBuf[ 0 ];
 
-
         buffer.flip();
         CRC32 crc = new CRC32();
 
@@ -132,8 +131,19 @@ public class TitanDirectReceive64 implements DirectReceive64{
             checksum += b & 0xFF;
             crc.update(b);
         }
-        String sourceName = this.storageNaming.naming(storageReceiveIORequest.getName(), storageReceiveIORequest.getStorageObjectGuid().toString());
-        Path path = Paths.get(destDirPath, sourceName);
+        URI uri = null;
+        try {
+            uri = new URI( this.destDirPath );
+        }
+        catch ( URISyntaxException e ) {
+            throw new IOException(e);
+        }
+
+        Path path = Paths.get(uri);
+        String sourceName = this.storageNaming.naming(
+                this.storageReceiveIORequest.getName(), this.storageReceiveIORequest.getStorageObjectGuid().toString()
+        );
+        path = path.resolve(sourceName);
 
         try (FileChannel chunkChannel = FileChannel.open(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.APPEND)) {
             buffer.rewind();

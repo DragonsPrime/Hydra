@@ -1,6 +1,6 @@
 package com.pinecone.hydra.storage.volume.entity.local.simple.recevice.channel;
 
-import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.io.Chanface;
 import com.pinecone.hydra.storage.volume.entity.SimpleVolume;
 import com.pinecone.hydra.storage.volume.entity.local.simple.recevice.SimpleReceiverEntity;
 

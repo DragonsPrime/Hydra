@@ -1,4 +1,4 @@
-package com.pinecone.hydra.storage;
+package com.pinecone.hydra.storage.io;
 
 import com.pinecone.framework.system.NotImplementedException;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
@@ -11,11 +11,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class TitanInputStreamChanface implements Chanface {
     protected InputStream          stream;
-    protected final ReentrantLock  reentrantLock;
 
     public TitanInputStreamChanface(InputStream stream ){
         this.stream        = stream;
-        this.reentrantLock = new ReentrantLock();
     }
 
     @Override
@@ -32,7 +30,7 @@ public class TitanInputStreamChanface implements Chanface {
     }
 
     @Override
-    public int read( ChanfaceReader reader, int size, long offset ) throws IOException {
+    public int read(ChanfaceReader reader, int size, long offset ) throws IOException {
         int bytesRead = 0;
         byte[] tempBuffer = new byte[ size ];
         bytesRead = stream.read( tempBuffer );
@@ -72,4 +70,8 @@ public class TitanInputStreamChanface implements Chanface {
         this.stream.close();
     }
 
+    @Override
+    public Object getNativeFace() {
+        return this.stream;
+    }
 }

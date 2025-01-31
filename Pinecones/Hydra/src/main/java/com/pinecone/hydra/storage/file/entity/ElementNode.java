@@ -5,7 +5,7 @@ import com.pinecone.hydra.storage.file.KOMFileSystem;
 
 import java.time.LocalDateTime;
 
-public interface ElementNode extends FileTreeNode{
+public interface ElementNode extends FileTreeNode {
     long getEnumId();
 
     GUID getGuid();
@@ -19,9 +19,8 @@ public interface ElementNode extends FileTreeNode{
     void setName(String name);
 
     FileSystemAttributes getAttributes();
-    void setAttributes(FileSystemAttributes attributes);
+    void setAttributes( FileSystemAttributes attributes );
 
     KOMFileSystem parentFileSystem();
-    Number size();
 
 }

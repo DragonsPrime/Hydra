@@ -1,6 +1,7 @@
-package com.pinecone.hydra.storage;
+package com.pinecone.hydra.storage.io;
 
 import com.pinecone.framework.system.NotImplementedException;
+import com.pinecone.hydra.storage.RandomAccessChanface;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 
 import java.io.FilterInputStream;
@@ -9,7 +10,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-public class TitanRandomInputStreamAccessChanface implements RandomAccessChanface{
+public class TitanRandomInputStreamAccessChanface implements RandomAccessChanface {
     protected FilterInputStream stream;
 
     protected final ReentrantLock reentrantLock;
@@ -33,7 +34,7 @@ public class TitanRandomInputStreamAccessChanface implements RandomAccessChanfac
     }
 
     @Override
-    public int read( ChanfaceReader reader, int size, long offset ) throws IOException {
+    public int read(ChanfaceReader reader, int size, long offset ) throws IOException {
         int bytesRead = 0;
         byte[] tempBuffer = new byte[ size ];
         bytesRead = stream.read( tempBuffer );
@@ -81,5 +82,10 @@ public class TitanRandomInputStreamAccessChanface implements RandomAccessChanfac
     @Override
     public void reset() throws IOException {
         this.stream.reset();
+    }
+
+    @Override
+    public Object getNativeFace() {
+        return this.stream;
     }
 }

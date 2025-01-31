@@ -1,18 +1,15 @@
-package com.pinecone.hydra.storage;
+package com.pinecone.hydra.storage.io;
 
 import com.pinecone.framework.system.NotImplementedException;
-import com.pinecone.framework.util.Bytes;
-import com.pinecone.hydra.storage.file.Verification;
+import com.pinecone.hydra.storage.RandomAccessChanface;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlock;
 import com.pinecone.hydra.storage.volume.entity.local.striped.CacheBlockStatus;
-import org.aspectj.weaver.patterns.ThisOrTargetAnnotationPointcut;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.zip.CRC32;
 
 public class TitanFileChannelChanface implements RandomAccessChanface {
     private final FileChannel       channel;
@@ -34,7 +31,7 @@ public class TitanFileChannelChanface implements RandomAccessChanface {
     }
 
     @Override
-    public int read( ChanfaceReader reader, int size, long offset ) throws IOException {
+    public int read(ChanfaceReader reader, int size, long offset ) throws IOException {
         this.reentrantLock.lock();
         int read = 0;
         try {
@@ -122,5 +119,10 @@ public class TitanFileChannelChanface implements RandomAccessChanface {
         // 准备将 mergedBuffer 用于读取
         mergedBuffer.flip();
         return mergedBuffer;
+    }
+
+    @Override
+    public Object getNativeFace() {
+        return this.channel;
     }
 }

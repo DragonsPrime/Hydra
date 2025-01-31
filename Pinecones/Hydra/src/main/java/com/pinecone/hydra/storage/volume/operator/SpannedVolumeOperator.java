@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public class SpannedVolumeOperator extends ArchVolumeOperator  implements VolumeOperator{
-    protected Map<GUID, LogicVolume> cacheMap  =  new HashMap<>();
     protected SpannedVolumeManipulator     SpannedVolumeManipulator;
 
     public SpannedVolumeOperator( VolumeOperatorFactory  factory ){

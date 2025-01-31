@@ -45,6 +45,11 @@ public class GenericFileSystemOperatorFactory implements FileSystemOperatorFacto
                 new GenericFolderOperator(this)
         );
 
+        this.registerer.put(
+                DefaultExternalSymbolic,
+                new GenericExternalSymbolicOperator(this)
+        );
+
         this.registerDefaultMetaTypes();
     }
 

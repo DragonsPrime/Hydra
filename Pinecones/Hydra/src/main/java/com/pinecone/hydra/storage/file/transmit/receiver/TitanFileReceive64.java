@@ -1,12 +1,10 @@
 package com.pinecone.hydra.storage.file.transmit.receiver;
 
 import com.pinecone.framework.util.Bytes;
-import com.pinecone.framework.util.StringUtils;
-import com.pinecone.framework.util.id.GUID;
-import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.io.Chanface;
 import com.pinecone.hydra.storage.StorageIOResponse;
 import com.pinecone.hydra.storage.StorageReceiveIORequest;
-import com.pinecone.hydra.storage.TitanFileChannelChanface;
+import com.pinecone.hydra.storage.io.TitanFileChannelChanface;
 import com.pinecone.hydra.storage.TitanStorageReceiveIORequest;
 import com.pinecone.hydra.storage.file.FrameSegmentNaming;
 import com.pinecone.hydra.storage.file.KOFSFrameSegmentNaming;
@@ -14,11 +12,9 @@ import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.Verification;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
-import com.pinecone.hydra.storage.file.entity.FileTreeNode;
 import com.pinecone.hydra.storage.file.entity.LocalFrame;
 import com.pinecone.hydra.storage.file.entity.RemoteFrame;
 import com.pinecone.hydra.storage.file.transmit.UniformSourceLocator;
-import com.pinecone.hydra.storage.file.transmit.exporter.TitanFileExport64;
 import com.pinecone.hydra.storage.file.transmit.exporter.TitanFileExportEntity64;
 import com.pinecone.hydra.storage.volume.UnifiedTransmitConstructor;
 import com.pinecone.hydra.storage.volume.VolumeManager;

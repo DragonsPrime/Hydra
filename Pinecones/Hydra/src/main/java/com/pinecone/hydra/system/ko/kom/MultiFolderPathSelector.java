@@ -127,6 +127,11 @@ public class MultiFolderPathSelector implements PathSelector {
             }
 
             for ( GUID guid : guids ) {
+                Object blocker = this.tryTerminationBlock( currentPart, guid );
+                if ( blocker != null ) {
+                    return blocker;
+                }
+
                 if ( this.isGuidMatchingPartName( guid, currentPart, depth, parts.size() ) ) {
                     if ( depth == parts.size() - 1 ) {
                         return this.beforeDFSTermination( currentPart, guid );
@@ -169,6 +174,11 @@ public class MultiFolderPathSelector implements PathSelector {
         // Indexing method traverses all possible GUIs and continues to recursively descend.
         for ( GUID guid : guids ) {
             // Using index to find.
+            Object blocker = this.tryTerminationBlock( currentPart, guid );
+            if ( blocker != null ) {
+                return blocker;
+            }
+
             if ( this.isGuidMatchingPartName( guid, currentPart, depth, parts.size() ) ) {
                 if ( depth == parts.size() - 1 ) {
                     return this.beforeDFSTermination( currentPart, guid );
@@ -186,6 +196,10 @@ public class MultiFolderPathSelector implements PathSelector {
 
     protected Object beforeDFSTermination( String currentPart, GUID guid ) {
         return guid;
+    }
+
+    protected Object tryTerminationBlock( String currentPart, GUID guid ) {
+        return null;
     }
 
     protected boolean checkPartInAllManipulators( GUID guid, String partName ) {

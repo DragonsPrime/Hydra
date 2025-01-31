@@ -137,12 +137,4 @@ public class GenericFSNodeAllotment implements FSNodeAllotment {
         return new GenericSymbolicMeta(this.fileMasterManipulator.getSymbolicMetaManipulator());
     }
 
-
-    @Override
-    public Strip newStrip() {
-
-        GenericStrip strip = new GenericStrip(this.fileMasterManipulator.getStripManipulator());
-        strip.setStripGuid( this.guidAllocator.nextGUID() );
-        return strip;
-    }
 }

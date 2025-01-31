@@ -1,14 +1,12 @@
 package com.pinecone.hydra.storage.volume.entity.local.striped;
 
 import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.storage.Chanface;
-import com.pinecone.hydra.storage.StorageReceiveIORequest;
+import com.pinecone.hydra.storage.io.Chanface;
 import com.pinecone.hydra.storage.volume.entity.LogicVolume;
 import com.pinecone.hydra.storage.volume.runtime.MasterVolumeGram;
 import com.pinecone.hydra.storage.volume.runtime.VolumeJobCompromiseException;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 

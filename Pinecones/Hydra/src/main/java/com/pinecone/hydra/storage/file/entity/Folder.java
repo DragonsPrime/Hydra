@@ -26,6 +26,12 @@ public interface Folder extends ElementNode {
 
     void remove ( String key );
 
+    void put ( ElementNode child );
+
+    Folder createFolder( String name );
+
+    ExternalSymbolic createExternalSymbolic( String name );
+
     KOMFileSystem getFileTree();
 
     boolean containsKey  ( String key );

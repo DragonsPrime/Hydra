@@ -10,4 +10,8 @@ public interface FileTreeNode extends TreeNode {
     default Folder evinceFolder(){
         return null;
     }
+
+    default Symbolic evinceSymbolic() {
+        return null;
+    }
 }

@@ -4,7 +4,7 @@ import com.pinecone.framework.util.id.GUID;
 
 import java.time.LocalDateTime;
 
-public abstract class ArchElementNode implements ElementNode{
+public abstract class ArchElementNode implements ElementNode {
     protected long                    enumId;
     protected GUID                    guid;
     protected LocalDateTime           createTime;
@@ -13,7 +13,7 @@ public abstract class ArchElementNode implements ElementNode{
 
     protected FileSystemAttributes fileSystemAttributes;
 
-
+    @Override
     public long getEnumId() {
         return enumId;
     }
@@ -24,16 +24,19 @@ public abstract class ArchElementNode implements ElementNode{
     }
 
 
+    @Override
     public GUID getGuid() {
         return guid;
     }
 
 
+    @Override
     public void setGuid(GUID guid) {
         this.guid = guid;
     }
 
 
+    @Override
     public LocalDateTime getCreateTime() {
         return createTime;
     }
@@ -44,6 +47,7 @@ public abstract class ArchElementNode implements ElementNode{
     }
 
 
+    @Override
     public LocalDateTime getUpdateTime() {
         return updateTime;
     }
@@ -54,22 +58,26 @@ public abstract class ArchElementNode implements ElementNode{
     }
 
 
+    @Override
     public String getName() {
         return name;
     }
 
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
 
+    @Override
     public FileSystemAttributes getAttributes() {
         return fileSystemAttributes;
     }
 
 
-    public void setAttributes(FileSystemAttributes fileSystemAttributes) {
+    @Override
+    public void setAttributes( FileSystemAttributes fileSystemAttributes ) {
         this.fileSystemAttributes = fileSystemAttributes;
     }
 

@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import com.pinecone.framework.system.prototype.Pinenut;
 import com.pinecone.framework.util.id.GUID;
 
-public interface ReparseSemanticNode extends Pinenut {
+public interface ReparseSemanticNode extends ElementNode {
     long getEnumId();
     void setEnumId(long enumId);
 

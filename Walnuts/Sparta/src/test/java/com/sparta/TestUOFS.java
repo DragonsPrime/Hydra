@@ -3,13 +3,20 @@ package com.sparta;
 import com.pinecone.Pinecone;
 import com.pinecone.framework.system.CascadeSystem;
 import com.pinecone.framework.util.Debug;
+import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
-import com.pinecone.hydra.storage.TitanFileChannelChanface;
+import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
+import com.pinecone.hydra.storage.file.direct.KenDirectFileSystemAccess;
+import com.pinecone.hydra.storage.file.entity.ElementNode;
+import com.pinecone.hydra.storage.file.entity.ExternalSymbolic;
+import com.pinecone.hydra.storage.file.entity.GenericExternalSymbolic;
+import com.pinecone.hydra.storage.io.TitanFileChannelChanface;
 import com.pinecone.hydra.storage.file.UOFSCacheComponentor;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.builder.ComponentUOFSBuilder;
-import com.pinecone.hydra.storage.file.builder.Feature;
 import com.pinecone.hydra.storage.file.builder.UOFSBuilder;
+import com.pinecone.hydra.storage.file.cache.FileSystemCacheConfig;
+import com.pinecone.hydra.storage.file.cache.MappedFileSystemCacheConfig;
 import com.pinecone.hydra.storage.file.entity.FSNodeAllotment;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.transmit.exporter.TitanFileExportEntity64;
@@ -48,8 +55,9 @@ class Steve extends Radium {
 
 
         UOFSBuilder builder = new ComponentUOFSBuilder( koiMappingDriver );
-//        KOMFileSystem fileSystem = new UniformObjectFileSystem( koiMappingDriver );
-        KOMFileSystem fileSystem = builder.registerComponentor( new UOFSCacheComponentor() ).buildByRegistered();
+        KOMFileSystem fileSystem = new UniformObjectFileSystem( koiMappingDriver );
+//        FileSystemCacheConfig cacheConfig = new MappedFileSystemCacheConfig(new JSONMaptron("{redisHost: \"47.115.216.203\",redisPort: 6379, redisTimeOut: 2000, redisPassword: 1234abcd, redisDatabase: 0}"));
+//        KOMFileSystem fileSystem = builder.registerComponentor( new UOFSCacheComponentor(cacheConfig) ).buildByRegistered();
         UniformVolumeManager volumeManager = new UniformVolumeManager(koiVolumeMappingDriver);
         GuidAllocator guidAllocator = fileSystem.getGuidAllocator();
         //Debug.trace( fileSystem.get( GUIDs.GUID72( "020c8b0-000006-0002-54" ) ) );
@@ -58,7 +66,8 @@ class Steve extends Radium {
         //this.testDelete( fileSystem );
         //this.testChannelReceive( fileSystem, volumeManager );
         //this.testChannelExport( fileSystem, volumeManager );
-        this.testQuery( fileSystem );
+        //this.testQuery( fileSystem );
+        this.testExternal( fileSystem );
 
     }
 
@@ -72,6 +81,21 @@ class Steve extends Radium {
         fileSystem.affirmFileNode("game/我的世界/暮色森林/暮色惡魂");
         fileSystem.affirmFileNode("game/泰拉瑞亚/腐化之地/世界吞噬者");
         fileSystem.affirmFileNode("movie/生还危机/浣熊市");
+    }
+
+    private void testExternal(KOMFileSystem fileSystem){
+        KenDirectFileSystemAccess directFileSystemAccess = new KenDirectFileSystemAccess(fileSystem);
+//        GenericExternalSymbolic externalSymbolic = new GenericExternalSymbolic();
+//        externalSymbolic.setName("xxx");
+//        externalSymbolic.setGuid( fileSystem.getGuidAllocator().nextGUID() );
+//        directFileSystemAccess.insertExternalSymbolic( externalSymbolic );
+
+//        ElementNode e = fileSystem.queryElement( "我的文件" );
+//        e.evinceFolder().createExternalSymbolic( "external" );
+
+
+
+        directFileSystemAccess.queryElement("我的文件/external");
     }
 
 

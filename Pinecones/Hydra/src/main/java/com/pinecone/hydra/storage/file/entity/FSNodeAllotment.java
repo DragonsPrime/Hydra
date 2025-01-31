@@ -22,6 +22,4 @@ public interface FSNodeAllotment extends Pinenut {
      RemoteFrame         newRemoteFrame( GUID fileGuid, int segId );
      Symbolic            newSymbolic();
      SymbolicMeta        newSymbolicMeta();
-
-     Strip  newStrip();
 }

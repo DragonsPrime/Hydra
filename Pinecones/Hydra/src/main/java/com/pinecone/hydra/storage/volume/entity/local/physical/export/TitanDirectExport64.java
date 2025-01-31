@@ -2,7 +2,7 @@ package com.pinecone.hydra.storage.volume.entity.local.physical.export;
 
 import com.pinecone.framework.util.Bytes;
 import com.pinecone.framework.util.Debug;
-import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.io.Chanface;
 import com.pinecone.hydra.storage.RandomAccessChanface;
 import com.pinecone.hydra.storage.StorageExportIORequest;
 import com.pinecone.hydra.storage.StorageIOResponse;

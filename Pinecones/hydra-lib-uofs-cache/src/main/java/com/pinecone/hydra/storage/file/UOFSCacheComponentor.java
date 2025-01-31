@@ -2,6 +2,7 @@ package com.pinecone.hydra.storage.file;
 
 import com.pinecone.hydra.storage.file.builder.Feature;
 import com.pinecone.hydra.storage.file.builder.UOFSComponentor;
+import com.pinecone.hydra.storage.file.cache.FileSystemCacheConfig;
 import com.pinecone.hydra.system.ko.driver.KOIMappingDriver;
 import com.pinecone.slime.jelly.source.redis.GenericRedisMasterManipulator;
 import com.pinecone.slime.map.indexable.IndexableMapQuerier;
@@ -13,20 +14,20 @@ import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
 
 public class UOFSCacheComponentor implements UOFSComponentor {
-    private FileSystemConfig        fileSystemConfig;
+    private FileSystemCacheConfig   cacheConfig;
     private String                  redisHost;
     private int                     redisPort;
     private int                     redisTimeOut;
     private String                  redisPassword;
     private int                     redisDatabase;
 
-    public UOFSCacheComponentor(){
-        this.fileSystemConfig = new KernelFileSystemConfig();
-        this.redisHost = this.fileSystemConfig.getRedisHost();
-        this.redisPort = this.fileSystemConfig.getRedisPort();
-        this.redisTimeOut = this.fileSystemConfig.getRedisTimeOut();
-        this.redisPassword = this.fileSystemConfig.getRedisPassword();
-        this.redisDatabase = this.fileSystemConfig.getRedisDatabase();
+    public UOFSCacheComponentor(FileSystemCacheConfig cacheConfig){
+        this.cacheConfig = cacheConfig;
+        this.redisHost = this.cacheConfig.getRedisHost();
+        this.redisPort = this.cacheConfig.getRedisPort();
+        this.redisTimeOut = this.cacheConfig.getRedisTimeOut();
+        this.redisPassword = this.cacheConfig.getRedisPassword();
+        this.redisDatabase = this.cacheConfig.getRedisDatabase();
     }
 
     @Override

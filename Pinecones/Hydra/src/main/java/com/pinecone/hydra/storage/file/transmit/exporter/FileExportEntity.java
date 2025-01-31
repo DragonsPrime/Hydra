@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.file.transmit.exporter;
 
 import com.pinecone.framework.system.prototype.Pinenut;
-import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.io.Chanface;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.volume.VolumeManager;

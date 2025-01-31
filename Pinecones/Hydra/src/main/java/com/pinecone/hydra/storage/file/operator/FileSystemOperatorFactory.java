@@ -1,6 +1,7 @@
 package com.pinecone.hydra.storage.file.operator;
 
 import com.pinecone.hydra.storage.file.KOMFileSystem;
+import com.pinecone.hydra.storage.file.entity.ExternalSymbolic;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.Folder;
 import com.pinecone.hydra.storage.file.source.FileMasterManipulator;
@@ -8,8 +9,9 @@ import com.pinecone.hydra.unit.imperium.operator.OperatorFactory;
 import com.pinecone.hydra.unit.imperium.operator.TreeNodeOperator;
 
 public interface FileSystemOperatorFactory extends OperatorFactory {
-    String DefaultFile          =   FileNode.class.getSimpleName();
-    String DefaultFolder        =   Folder.class.getSimpleName();
+    String DefaultFile               =   FileNode.class.getSimpleName();
+    String DefaultFolder             =   Folder.class.getSimpleName();
+    String DefaultExternalSymbolic   = ExternalSymbolic.class.getSimpleName();
 
     void register( String typeName, TreeNodeOperator functionalNodeOperation );
 

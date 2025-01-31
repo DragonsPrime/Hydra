@@ -72,7 +72,7 @@ public class FolderController {
      * @return 返回操作结果
      */
     @DeleteMapping("/remove/file")
-    public BasicResultResponse<String> removeFile( String fileGuid ){
+    public BasicResultResponse<String> removeFile( @RequestParam("fileGuid") String fileGuid ){
         this.primaryFileSystem.remove( GUIDs.GUID72( fileGuid ) );
         return BasicResultResponse.success();
     }

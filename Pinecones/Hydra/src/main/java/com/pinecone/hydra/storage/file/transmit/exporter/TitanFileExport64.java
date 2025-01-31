@@ -1,7 +1,7 @@
 package com.pinecone.hydra.storage.file.transmit.exporter;
 
 import com.pinecone.framework.util.json.JSON;
-import com.pinecone.hydra.storage.Chanface;
+import com.pinecone.hydra.storage.io.Chanface;
 import com.pinecone.hydra.storage.TitanStorageExportIORequest;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.Frame;

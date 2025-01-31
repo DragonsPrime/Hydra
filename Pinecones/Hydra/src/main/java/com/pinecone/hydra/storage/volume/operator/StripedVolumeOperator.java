@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public class StripedVolumeOperator extends ArchVolumeOperator  implements VolumeOperator{
-    protected Map<GUID, LogicVolume> cacheMap  =  new HashMap<>();
     protected StripedVolumeManipulator          stripedVolumeManipulator;
 
     public StripedVolumeOperator( VolumeOperatorFactory  factory ){

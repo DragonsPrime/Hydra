@@ -21,8 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-public class GenericFileOperator extends ArchFileSystemOperator{
-    protected Map<GUID, FileTreeNode> cacheMap = new HashMap<>();
+public class GenericFileOperator extends ArchFileSystemOperator {
     protected FileManipulator               fileManipulator;
     protected FileMetaManipulator           fileMetaManipulator;
 
@@ -84,29 +83,25 @@ public class GenericFileOperator extends ArchFileSystemOperator{
 
     @Override
     public FileTreeNode get(GUID guid) {
-        FileNode fileTreeNode = (FileNode) this.cacheMap.get( guid );
-        if ( fileTreeNode == null ) {
-            fileTreeNode = this.getFileTreeNodeWideData( guid ).evinceFileNode();
-            FileNode thisNode = fileTreeNode;
-            while ( true ) {
-                GUID affinityGuid = thisNode.getDataAffinityGuid();
-                if ( affinityGuid != null ){
-                    FileNode parent = this.getFileTreeNodeWideData( affinityGuid ).evinceFileNode();
-                    this.inherit( thisNode, parent );
-                    thisNode = parent;
-                }
-                else {
-                    break;
-                }
+        FileNode fileTreeNode = this.getFileTreeNodeWideData( guid ).evinceFileNode();
+        FileNode thisNode = fileTreeNode;
+        while ( true ) {
+            GUID affinityGuid = thisNode.getDataAffinityGuid();
+            if ( affinityGuid != null ){
+                FileNode parent = this.getFileTreeNodeWideData( affinityGuid ).evinceFileNode();
+                this.inherit( thisNode, parent );
+                thisNode = parent;
             }
-            this.cacheMap.put( guid, fileTreeNode );
+            else {
+                break;
+            }
         }
         return fileTreeNode;
     }
 
     @Override
     public FileTreeNode get(GUID guid, int depth) {
-        return null;
+        return this.get( guid );
     }
 
     @Override
@@ -143,7 +138,7 @@ public class GenericFileOperator extends ArchFileSystemOperator{
         return cn;
     }
 
-    protected void inherit(FileTreeNode self, FileTreeNode prototype ){
+    protected void inherit( FileTreeNode self, FileTreeNode prototype ){
         Class<? extends FileTreeNode> clazz = self.getClass();
         Field[] fields = clazz.getDeclaredFields();
 

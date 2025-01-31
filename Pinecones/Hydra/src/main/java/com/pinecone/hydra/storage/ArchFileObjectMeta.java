@@ -1,4 +1,4 @@
 package com.pinecone.hydra.storage;
 
-public abstract class ArchFileObjectMeta implements UniformFile {
+public abstract class ArchFileObjectMeta implements CheckedFile {
 }
