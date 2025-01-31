@@ -9,6 +9,7 @@ import com.pinecone.hydra.storage.file.entity.FileMeta;
 import com.pinecone.hydra.storage.file.entity.FileNode;
 import com.pinecone.hydra.storage.file.entity.FileSystemAttributes;
 import com.pinecone.hydra.storage.file.entity.FileTreeNode;
+import com.pinecone.hydra.storage.file.entity.GenericExternalSymbolic;
 import com.pinecone.hydra.storage.file.entity.GenericFileNode;
 import com.pinecone.hydra.storage.file.source.ExternalSymbolicManipulator;
 import com.pinecone.hydra.storage.file.source.FileMasterManipulator;
@@ -69,20 +70,7 @@ public class GenericExternalSymbolicOperator extends ArchFileSystemOperator{
 
     @Override
     public FileTreeNode get( GUID guid ) {
-        FileNode fileTreeNode = this.getFileTreeNodeWideData( guid ).evinceFileNode();
-        FileNode thisNode = fileTreeNode;
-        while ( true ) {
-            GUID affinityGuid = thisNode.getDataAffinityGuid();
-            if ( affinityGuid != null ){
-                FileNode parent = this.getFileTreeNodeWideData( affinityGuid ).evinceFileNode();
-                this.inherit( thisNode, parent );
-                thisNode = parent;
-            }
-            else {
-                break;
-            }
-        }
-        return fileTreeNode;
+        return (ExternalSymbolic) this.getFileTreeNodeWideData( guid );
     }
 
     @Override
@@ -108,8 +96,8 @@ public class GenericExternalSymbolicOperator extends ArchFileSystemOperator{
     protected FileTreeNode getFileTreeNodeWideData(GUID guid ){
         GUIDImperialTrieNode node = this.imperialTree.getNode( guid );
         ExternalSymbolic cn = this.externalSymbolicManipulator.getSymbolicByGuid( guid );
-        if( cn instanceof GenericFileNode) {
-            ((GenericFileNode) cn).apply( this.fileSystem );
+        if( cn instanceof GenericExternalSymbolic) {
+            ((GenericExternalSymbolic) cn).apply( this.externalSymbolicManipulator );
         }
 
         //Notice: Registry attributes is difference from other tree, -- that is, same as DOM;
