@@ -2,6 +2,7 @@ package com.pinecone.hydra.storage.file.entity;
 
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.id.GuidAllocator;
+import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
 import com.pinecone.hydra.storage.file.source.ExternalSymbolicManipulator;
 
@@ -45,5 +46,14 @@ public class GenericExternalSymbolic extends ArcReparseSemanticNode implements E
     @Override
     public void apply(ExternalSymbolicManipulator externalSymbolicManipulator) {
         this.externalSymbolicManipulator = externalSymbolicManipulator;
+    }
+    @Override
+    public String toJSONString() {
+        return BeanJSONEncoder.BasicEncoder.encode( this );
+    }
+
+    @Override
+    public String toString() {
+        return this.toJSONString();
     }
 }

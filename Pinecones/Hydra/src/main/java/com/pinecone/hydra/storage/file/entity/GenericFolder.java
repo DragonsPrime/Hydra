@@ -3,10 +3,14 @@ package com.pinecone.hydra.storage.file.entity;
 import com.pinecone.framework.util.id.GUID;
 import com.pinecone.framework.util.json.homotype.BeanJSONEncoder;
 import com.pinecone.hydra.storage.file.KOMFileSystem;
+import com.pinecone.hydra.storage.file.direct.GenericExternalFile;
+import com.pinecone.hydra.storage.file.direct.GenericExternalFolder;
 import com.pinecone.hydra.storage.file.source.FolderManipulator;
 import com.pinecone.hydra.unit.imperium.entity.TreeNode;
 import com.pinecone.framework.util.id.GuidAllocator;
+import lombok.val;
 
+import java.io.File;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,6 +85,21 @@ public class GenericFolder extends ArchElementNode implements Folder{
         ArrayList<FileTreeNode> fileTreeNodes = new ArrayList<>();
         List<TreeNode> children = this.fileSystem.getChildren(this.guid);
         for( TreeNode node : children ){
+//            if( node instanceof ExternalSymbolic ){
+//                ExternalSymbolic externalSymbolic = (ExternalSymbolic) node;
+//                String reparsedPoint = externalSymbolic.getReparsedPoint();
+//                File file = new File(reparsedPoint);
+//                if( file.isDirectory() ){
+//                    GenericExternalFolder externalFolder = new GenericExternalFolder(file);
+//                    fileTreeNodes.add(externalFolder);
+//                }else {
+//                    GenericExternalFile externalFile = new GenericExternalFile(file);
+//                    fileTreeNodes.add(externalFile);
+//                }
+//            }else {
+//                FileTreeNode fileTreeNode = this.fileSystem.get(node.getGuid());
+//                fileTreeNodes.add( fileTreeNode );
+//            }
             FileTreeNode fileTreeNode = this.fileSystem.get(node.getGuid());
             fileTreeNodes.add( fileTreeNode );
         }

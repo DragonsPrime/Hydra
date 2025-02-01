@@ -60,7 +60,7 @@ public abstract class ArchElementNode implements ElementNode {
 
     @Override
     public String getName() {
-        return name;
+        return this.name;
     }
 
 
@@ -79,9 +79,5 @@ public abstract class ArchElementNode implements ElementNode {
     @Override
     public void setAttributes( FileSystemAttributes fileSystemAttributes ) {
         this.fileSystemAttributes = fileSystemAttributes;
-    }
-
-    public String toString() {
-        return "ArchElementNode{enumId = " + enumId + ", guid = " + guid + ", createTime = " + createTime + ", updateTime = " + updateTime + ", name = " + name + ", attributes = " + fileSystemAttributes + "}";
     }
 }

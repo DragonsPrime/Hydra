@@ -6,6 +6,9 @@ import com.pinecone.framework.util.Debug;
 import com.pinecone.framework.util.json.JSONMaptron;
 import com.pinecone.hydra.file.ibatis.hydranium.FileMappingDriver;
 import com.pinecone.hydra.storage.file.UniformObjectFileSystem;
+import com.pinecone.hydra.storage.file.direct.ExternalFile;
+import com.pinecone.hydra.storage.file.direct.GenericExternalFile;
+import com.pinecone.hydra.storage.file.direct.GenericExternalFolder;
 import com.pinecone.hydra.storage.file.direct.KenDirectFileSystemAccess;
 import com.pinecone.hydra.storage.file.entity.ElementNode;
 import com.pinecone.hydra.storage.file.entity.ExternalSymbolic;
@@ -94,8 +97,11 @@ class Steve extends Radium {
 //        e.evinceFolder().createExternalSymbolic( "external" );
 
 
-
-        directFileSystemAccess.queryElement("我的文件/external");
+//        ExternalFile externalFile = (GenericExternalFile)directFileSystemAccess.queryElement("我的文件/external/《智育》概要设计.docx");
+//        Debug.trace(externalFile.getPath());
+        GenericExternalFolder externalFolder = new GenericExternalFolder(new File("D:/文件"));
+        Debug.trace(externalFolder.getName());
+        Debug.trace(externalFolder.toJSONString());
     }
 
 

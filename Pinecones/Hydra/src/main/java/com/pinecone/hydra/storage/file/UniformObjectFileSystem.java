@@ -336,7 +336,7 @@ public class UniformObjectFileSystem extends ArchReparseKOMTree implements KOMFi
         if( guid != null ) {
             return (ElementNode) this.get( guid );
         }
-        return null;
+        return this.directFileSystemAccess.queryElement(path);
     }
 
     @Override

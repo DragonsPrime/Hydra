@@ -62,10 +62,6 @@ public class KenDirectFileSystemAccess implements DirectFileSystemAccess {
                 this.externalSymbolicManipulator
         );
     }
-    @Override
-    public void remove(String path) {
-
-    }
 
     @Override
     public ElementNode queryElement(String path) {
@@ -73,9 +69,18 @@ public class KenDirectFileSystemAccess implements DirectFileSystemAccess {
         if(guid == null){
             return null;
         }
+
         ExternalSymbolic externalSymbolic = this.externalSymbolicManipulator.getSymbolicByGuid(guid);
-        Debug.trace(externalSymbolic);
-        return null;
+        String externalPath = this.fileSystem.getPath(externalSymbolic.getGuid());
+        String remainingPath = path.substring(externalPath.length()).replaceFirst("^/", "");
+
+        String realFilePath = externalSymbolic.getReparsedPoint()+ "/" + remainingPath;
+        File file = new File(realFilePath);
+        if( file.isDirectory() ){
+            return new GenericExternalFolder(file);
+        }else {
+            return new GenericExternalFile(file);
+        }
     }
 
     @Override
@@ -103,9 +108,6 @@ public class KenDirectFileSystemAccess implements DirectFileSystemAccess {
 
 
         guid = this.pathSelector.searchGUID( resolvedParts );
-        if( guid != null ){
-            this.imperialTree.insertCachePath( guid, path );
-        }
         return guid;
     }
 }

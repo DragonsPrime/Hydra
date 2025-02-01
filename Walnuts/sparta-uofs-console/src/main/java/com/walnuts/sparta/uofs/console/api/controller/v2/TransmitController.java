@@ -2,6 +2,10 @@ package com.walnuts.sparta.uofs.console.api.controller.v2;
 
 
 import com.pinecone.framework.util.id.GUID;
+import com.pinecone.hydra.storage.file.direct.ExternalFile;
+import com.pinecone.hydra.storage.file.direct.GenericExternalFile;
+import com.pinecone.hydra.storage.file.entity.ElementNode;
+import com.pinecone.hydra.storage.file.entity.GenericFileNode;
 import com.pinecone.hydra.storage.io.Chanface;
 import com.pinecone.hydra.storage.io.TitanFileChannelChanface;
 import com.pinecone.hydra.storage.io.TitanOutputStreamChanface;
@@ -36,6 +40,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -128,6 +133,48 @@ public class TransmitController {
     }
 
     /**
+     * 使用文件路径下载文件
+     */
+    @GetMapping("/download/path")
+    public void getFileByPath(HttpServletRequest request, HttpServletResponse response) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        Map<String, String[]> parameterMap = request.getParameterMap();
+        String[] paths = parameterMap.get("path");
+        String path = null;
+
+        if(paths != null){
+            path = paths[0];
+        }
+
+        ServletOutputStream outputStream = response.getOutputStream();
+        TitanOutputStreamChanface kChannel = new TitanOutputStreamChanface(outputStream);
+
+        ElementNode elementNode = this.primaryFileSystem.queryElement(path);
+        if(elementNode instanceof GenericExternalFile){
+            ExternalFile externalFile = (ExternalFile) elementNode;
+            File nativeFile = externalFile.getNativeFile();
+            try (FileInputStream fileInputStream = new FileInputStream(nativeFile)) {
+                byte[] buffer = new byte[1024];
+                int bytesRead;
+                while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                // 刷新输出流
+                outputStream.flush();
+                return;
+            } catch (IOException e) {
+                // 处理异常，比如记录日志等
+                e.printStackTrace();
+            }
+        }
+
+        if( elementNode instanceof GenericFileNode){
+            FileNode fileNode = (FileNode) elementNode;
+            TitanFileExportEntity64 entity = new TitanFileExportEntity64(this.primaryFileSystem, this.primaryVolume, fileNode, kChannel);
+            this.primaryFileSystem.export( entity );
+        }
+    }
+
+    /**
      * 上传文件
      * @param filePath 目标路径
      * @param version 版本号
@@ -181,19 +228,20 @@ public class TransmitController {
      */
     @PostMapping("/upload")
     public BasicResultResponse<String> upload(@RequestParam("filePath") String filePath, @RequestParam("file") MultipartFile file ) throws IOException, SQLException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        File tempFile = File.createTempFile("upload",".temp");
-        file.transferTo(tempFile);
+        ElementNode elementNode = this.primaryFileSystem.queryElement(filePath);
+            File tempFile = File.createTempFile("upload",".temp");
+            file.transferTo(tempFile);
 
-        FSNodeAllotment fsNodeAllotment = this.primaryFileSystem.getFSNodeAllotment();
-        FileChannel channel = FileChannel.open(tempFile.toPath(), StandardOpenOption.READ);
-        TitanFileChannelChanface titanFileChannelKChannel = new TitanFileChannelChanface( channel );
-        FileNode fileNode = fsNodeAllotment.newFileNode();
-        fileNode.setDefinitionSize( tempFile.length() );
-        fileNode.setName( tempFile.getName() );
-        TitanFileReceiveEntity64 receiveEntity = new TitanFileReceiveEntity64( this.primaryFileSystem,filePath, fileNode,titanFileChannelKChannel,this.primaryVolume );
+            FSNodeAllotment fsNodeAllotment = this.primaryFileSystem.getFSNodeAllotment();
+            FileChannel channel = FileChannel.open(tempFile.toPath(), StandardOpenOption.READ);
+            TitanFileChannelChanface titanFileChannelKChannel = new TitanFileChannelChanface( channel );
+            FileNode fileNode = fsNodeAllotment.newFileNode();
+            fileNode.setDefinitionSize( tempFile.length() );
+            fileNode.setName( tempFile.getName() );
+            TitanFileReceiveEntity64 receiveEntity = new TitanFileReceiveEntity64( this.primaryFileSystem,filePath, fileNode,titanFileChannelKChannel,this.primaryVolume );
 
-        this.primaryFileSystem.receive( receiveEntity );
-        return BasicResultResponse.success();
+            this.primaryFileSystem.receive( receiveEntity );
+            return BasicResultResponse.success();
     }
 
     @PostMapping("/stream")
